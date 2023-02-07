@@ -1,0 +1,27 @@
+.center {
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.logine-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.login-full-width {
+  width: 100%;
+}
+
+button {
+  margin: 0 auto;
+}
+
+.login-form {
+  width: 500px;
+}
+
+.second {
+  display: inline-block;
+}

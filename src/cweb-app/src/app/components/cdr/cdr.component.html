@@ -1,0 +1,170 @@
+<app-inner-header name="CDR" [loadCounter]="loadCounter"></app-inner-header>
+ <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedIndexChange)="tabChanged($event)">
+  <mat-tab label="Search">
+    <div>
+      <div class="filter-container">
+        <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                (click)="getRecords()">
+          Get Records
+        </button>
+      </div>
+      <div class="filter-container">
+        <mat-form-field hideRequiredMarker>
+          <mat-label>Filter Field</mat-label>
+          <mat-select [(ngModel)]="filter.field" [disabled]="!columns" disableOptionCentering>
+            <mat-option [value]="null">
+              ---
+            </mat-option>
+            <mat-option *ngFor="let val of columns" [value]="val">
+              {{val}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field hideRequiredMarker>
+          <mat-label>Operand</mat-label>
+          <mat-select [(ngModel)]="filter.operand" [disabled]="!filter.field">
+            <mat-option *ngFor="let val of operands" [value]="val" disableOptionCentering>
+              {{val}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field hideRequiredMarker>
+        <mat-label>Value</mat-label>
+        <input matInput name="Value" [(ngModel)]="filter.field_value" [disabled]="!filter.operand" required>
+        </mat-form-field>
+        <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                *ngIf="!filters[toEditFilter]"
+                [disabled]="!filter.field_value || !filter.operand || !filter.field"
+                (click)="addFilter()">
+          Add filter
+        </button>
+        <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+                *ngIf="filters[toEditFilter]"
+                [disabled]="!filter.field_value || !filter.operand || !filter.field"
+                (click)="saveFilter()">
+          Edit filter
+        </button>
+        <mat-form-field hideRequiredMarker>
+          <mat-label>Order Field</mat-label>
+          <mat-select [(ngModel)]="sortColumns" [disabled]="!columns" disableOptionCentering>
+            <mat-option [value]="null">
+              ---
+            </mat-option>
+            <mat-option *ngFor="let val of columns" [value]="val">
+              {{val}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-checkbox [(ngModel)]="sortObject.desc" class="checkbox-spacer-left"
+                      [disabled]="sortObject.fields.length == 0 && !sortColumns">DESC
+        </mat-checkbox>
+        <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                [disabled]="!sortColumns"
+                (click)="addSorter()">
+          Add sorting
+        </button>
+      </div>
+      <div class="chips-pad">
+        <mat-chip-listbox aria-label="Filter selection">
+          <mat-chip color="accent"
+                    *ngFor="let filterItem of filters; let i = index"
+                    (click)="editFilter(i)"
+                    [selectable]="true"
+                    [removable]="true"
+                    (removed)="removeFilter(filterItem)"
+                    >
+            {{filterItem.field}} {{filterItem.operand}} {{filterItem.field_value}}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+          <mat-chip color="primary"
+                    *ngIf="sortObject.fields.length > 0"
+                    [selectable]="true"
+                    [removable]="true"
+                    (removed)="clearSorting()"
+                    selected>
+            <span>ORDER BY </span>
+            <span *ngFor="let sort of sortObject.fields; let i = index;">{{sort}}<i
+              *ngIf="i < sortObject.fields.length - 1">,</i> </span>
+            <span *ngIf="sortObject.desc">DESC</span>
+            <span *ngIf="!sortObject.desc">ASC</span>
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </mat-chip-listbox>
+      </div>
+      <div class="table-container" *ngIf="list.cdrData">
+        <table mat-table class="full-width-table" [dataSource]="list.cdrData">
+          <ng-container *ngFor="let disCol of columns; let colIndex = index" matColumnDef="{{disCol}}">
+            <th mat-header-cell *matHeaderCellDef  (click)="filter.field = disCol">{{disCol}}</th>
+            <td mat-cell *matCellDef="let element">
+              <audio controls *ngIf="settings[fieldFileServeColumn] == disCol">
+                <source [src]="element[disCol]" [type]="'audio/'+fileTypeByName(element[disCol])">
+                Your browser does not support the audio element.
+              </audio>
+              <span *ngIf="settings[fieldFileServeColumn] != disCol">{{element[disCol]}}</span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+      </div>
+      <mat-paginator *ngIf="pageTotal > 0"
+                     [length]="pageTotal"
+                     [pageIndex]="pageEvent.pageIndex"
+                     [pageSize]="pageEvent.pageSize"
+                     [pageSizeOptions]="paginationScale"
+                     (page)="pageEvent = $event"
+      >
+      </mat-paginator>
+    </div>
+  </mat-tab>
+  <mat-tab label="Settings">
+    <mat-card>
+      <mat-card-content>
+        <div>
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Module</mat-label>
+            <mat-select [(ngModel)]="settings[fieldModule]">
+              <mat-option *ngFor="let val of moduleOptions" [value]="val">
+                {{val}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field hideRequiredMarker>
+        <mat-label>Table</mat-label>
+        <input matInput name="table" [(ngModel)]="settings[fieldTable]" [disabled]="settings[fieldModule] != 'odbc_cdr'">
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field hideRequiredMarker>
+        <mat-label>Media file column</mat-label>
+        <input matInput name="Media file column" [(ngModel)]="settings[fieldFileServeColumn]"
+                   appResizeInput
+                   [resizeOnString]="settings[fieldFileServeColumn]"
+            >
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field hideRequiredMarker>
+        <mat-label>File path</mat-label>
+        <input matInput name="File path" [(ngModel)]="settings[fieldFileServerPath]"
+                   appResizeInput
+                   [resizeOnString]="settings[fieldFileServerPath]"
+            >
+            <mat-hint><mat-error>WARNING! Filesystem access!</mat-error></mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="save-but">
+          <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                  (click)="saveSettings()">
+            Save
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+</mat-tab-group>

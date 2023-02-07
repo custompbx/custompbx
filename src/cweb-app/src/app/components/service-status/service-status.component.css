@@ -1,0 +1,11 @@
+.indicator {
+  position: fixed;
+  right: 66px;
+  top: 70px;
+  z-index: 6;
+}
+
+.icon {
+  font-size: 50px;
+  display: inline;
+}

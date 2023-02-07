@@ -1,0 +1,63 @@
+.instances-cards {
+  max-width: 400px;
+  overflow: hidden;
+}
+
+.instances-pad {
+  display: grid;
+  grid-gap: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 2fr));
+  overflow: hidden;
+  margin: 15px;
+  padding: 2px;
+}
+
+.subtitle {
+  margin-bottom: 5px;
+}
+
+.action-pad {
+  display: grid;
+}
+
+.connect-button {
+  grid-column: 10;
+}
+
+.current-instance-check {
+  color: #56d756;
+  display: inline-block;
+  height: 33px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.card-header-spacer {
+  flex: 1 1 auto;
+}
+
+.instances-content {
+  margin-top: 15px;
+  margin-left: 55px;
+}
+
+.header-image {
+  font-size: 45px;
+}
+
+.instance-switch-button {
+  margin-top: -15px;
+  margin-right: -15px;
+}
+
+.spacerb {
+  margin-top: 15px;
+}
+
+.but-spacer-left {
+  margin-left: 5px;
+}
+
+mat-form-field {
+  padding: 0 5px;
+}

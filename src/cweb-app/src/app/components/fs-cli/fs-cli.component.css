@@ -1,0 +1,35 @@
+.mat-progress-bar {
+  display: block;
+  height: 2px;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  transition: opacity 250ms linear;
+  width: 100%;
+  z-index: 1000;
+}
+
+.filter-container {
+  margin: 20px 0 10px 20px;
+  display: inline-table;
+}
+
+.term-field {
+  background-color: black;
+  color: #efefef;
+  font: 1.3rem Inconsolata, monospace;
+  min-height: 30px;
+  padding: 20px;
+  line-height: 30px;
+  width: fit-content;
+  min-width: 97%;
+}
+
+.term-body {
+  margin: 0;
+}
+
+.but-spacer-left {
+  margin-left: 5px;
+}

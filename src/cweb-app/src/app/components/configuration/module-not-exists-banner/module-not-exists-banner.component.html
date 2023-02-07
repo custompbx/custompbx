@@ -1,0 +1,9 @@
+<mat-card *ngIf="list && list.exists === false">
+  <mat-card-content>
+    This config is not serving now. Go to Modules page to manage the configs.
+    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+            routerLink="/configuration/modules">
+      Modules
+    </button>
+  </mat-card-content>
+</mat-card>

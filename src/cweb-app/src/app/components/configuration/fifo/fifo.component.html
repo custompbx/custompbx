@@ -1,0 +1,115 @@
+<app-inner-header name="Fifo" [loadCounter]="loadCounter"></app-inner-header>
+<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
+ <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list && list.exists !== false">
+  <mat-tab label="List">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-subtitle>Settings</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Settings
+            </mat-panel-title>
+            <mat-panel-description>
+              Click to get details
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <h3>Params:</h3>
+          <app-key-value-pad-2 [exist]="list.settings"
+                               [items]="list.settings"
+                               [newItems]="list.settings?.new"
+                               [id]="null"
+                               [toCopy]="null"
+                               [dispatchersCallbacks]="globalSettingsDispatchers"
+          >
+          </app-key-value-pad-2>
+        </mat-expansion-panel>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-subtitle>Fifos</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngFor="let item of onlyValues(list.fifos); trackBy: trackByFn" class="panel-wrapper">
+          <mat-expansion-panel (opened)="getFifoFifosParams(item.id)"
+                               [expanded]="panelCloser['fifo' + item.id]">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{item.name}}
+              </mat-panel-title>
+              <mat-panel-description>
+                Click to get details
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <h3>Importance:</h3>
+            <div *ngIf="item.id" class="spacer">
+              <form #details="ngForm">
+                <mat-form-field hideRequiredMarker>
+        <mat-label>Importance</mat-label>
+        <input matInput name="importance" [ngModel]="item.importance" required
+                         [name]="'importance' + item.id">
+                </mat-form-field>
+                <button mat-button color="accent"
+                        [disabled]="!isvalueReadyToSend(details.controls['importance' + item.id])"
+                        (click)="updateImportance(item.id, details.controls['importance' + item.id])">
+                  Update
+                </button>
+              </form>
+            </div>
+            <button mat-raised-button color="basic" (click)="copyFifo(item.id)"
+                    *ngIf="list.fifos[item.id] && (list.fifos[item.id].members)">Copy
+            </button>
+            <h3>Members:</h3>
+            <div>
+              <app-key-value-pad-2 [exist]="item.members"
+                                   [items]="item.members"
+                                   [newItems]="item.members?.new"
+                                   [id]="item.id"
+                                   [toCopy]="toCopyFifo"
+                                   [dispatchersCallbacks]="fifoSettingsDispatchers"
+                                   [fieldsMask]="memberMask"
+              >
+              </app-key-value-pad-2>
+            </div>
+          </mat-expansion-panel>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Add">
+    <form class="spacer spacerb" (ngSubmit)="onFifoSubmit()">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="New fifo name" required name="name" [(ngModel)]="newFifoName">
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Submit</button>
+    </form>
+  </mat-tab>
+
+  <mat-tab label="Delete/Rename">
+    <form class="spacer spacerb" #deleteForm="ngForm">
+      <h3>Fifo:</h3>
+      <div *ngFor="let fifo of onlyValues(list.fifos); trackBy: trackByFn">
+        <mat-form-field hideRequiredMarker>
+        <mat-label>Fifo name</mat-label>
+        <input matInput name="Fifo name" required [ngModel]="fifo.name"
+                 [name]="'fifo::' + fifo.id">
+        </mat-form-field>
+        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['fifo::' + fifo.id])"
+                (click)="openBottomSheetFifo(fifo.id, deleteForm.controls['fifo::' + fifo.id].value, fifo.name, 'rename')">
+          Update
+        </button>
+        <button mat-raised-button color="warn"
+                (click)="openBottomSheetFifo(fifo.id, deleteForm.controls['fifo::' + fifo.id].value, fifo.name, 'delete')">
+          Delete
+        </button>
+      </div>
+    </form>
+  </mat-tab>
+</mat-tab-group>
+

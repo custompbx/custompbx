@@ -1,0 +1,5 @@
+<div class="indicator">
+  <mat-icon color="accent" class="icon" *ngIf="noDB" matTooltip="Database">sync_disabled</mat-icon>
+  <mat-icon color="accent" class="icon" *ngIf="noESL" matTooltip="ESL">sync_problem</mat-icon>
+  <mat-icon color="accent" class="icon" *ngIf="noConnect" matTooltip="Websocket">wifi_off</mat-icon>
+</div>

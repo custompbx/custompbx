@@ -1,0 +1,19 @@
+.but-spacer-left {
+  margin-left: 5px;
+}
+
+mat-form-field {
+  padding: 0 5px;
+}
+
+.spacerb {
+  margin-top: 15px;
+}
+
+.mat-expansion-panel {
+  border-radius: 0;
+}
+
+.mat-expansion-panel-header {
+  border-radius: 0;
+}

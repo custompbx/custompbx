@@ -1,0 +1,12 @@
+<app-service-status></app-service-status>
+<app-header *ngIf="userService.isAuthenticated && !login" [currentComponent]="currentComponent"></app-header>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav mode="side" [opened]="userService.isAuthenticated && !login">
+    <mat-nav-list>
+      <app-sidenav></app-sidenav>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet (activate)="onRouterOutletActivate($event)"></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

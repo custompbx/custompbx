@@ -1,0 +1,267 @@
+<app-inner-header name="Users" [loadCounter]="loadCounter"></app-inner-header>
+<mat-card *ngIf="loadCounter === 0 && !onlyValues(list)?.length">
+  <mat-card-content>
+    Here no any domains yet. You can create it or try to import from existing config at domains page.
+    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+            routerLink="/directory/domains">
+      Go to domains
+    </button>
+  </mat-card-content>
+</mat-card>
+ <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="onlyValues(list)?.length">
+  <mat-tab label="List">
+    <div class="filter-container" *ngIf="list && objectLenght(list) > 1">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Domain</mat-label>
+        <mat-select required [(ngModel)]="domainIds" multiple disableOptionCentering>
+          <mat-option *ngFor="let domain of onlyValues(list)" [value]="domain.id">{{domain.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div *ngFor="let domain of onlyValues(domainFilter()); trackBy: trackByFnId;">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Domain: <b>{{domain.name}}</b></mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-expansion-panel (opened)="getDetails(user.id)" (closed)="clearDetails(user.id)"
+                               *ngFor="let user of onlyValuesByParent(userList, domain.id); trackBy: trackByFnId;">
+            <mat-expansion-panel-header>
+              <mat-panel-title class="vert-centered">
+                <mat-icon class="icon-spacer">face</mat-icon>
+                <span>{{user.name}}</span>
+              </mat-panel-title>
+              <mat-panel-description>
+                Click to get details
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <form #details="ngForm">
+              <div>
+                <button mat-raised-button color="basic" (click)="copy(user.id)"
+                        *ngIf="user.parameters || user.variables">
+                  Copy
+                </button>
+              </div>
+              <div class="user-attribute">
+                <h3>Cache:</h3>
+                <div class="spacer">
+                  <mat-form-field hideRequiredMarker>
+                    <mat-label>Cache</mat-label>
+                    <input matInput placeholder="cache" [ngModel]="user.cache" required
+                           [name]="'cache' + user.id">
+                  </mat-form-field>
+                  <button mat-button color="accent"
+                          [disabled]="!isvalueReadyToSend(details.controls['cache' + user.id])"
+                          (click)="updateCache(user.id, details.controls['cache' + user.id])">
+                    Update
+                  </button>
+                </div>
+              </div>
+              <div class="user-attributes">
+                <h3>Number Alias:</h3>
+                <div class="spacer">
+                  <mat-form-field hideRequiredMarker>
+                    <mat-label>Number-Alias</mat-label>
+                    <input matInput placeholder="number-alias" [ngModel]="user.number_alias"
+                           [name]="'number_alias' + user.id">
+                  </mat-form-field>
+                  <button mat-button color="accent"
+                          [disabled]="!isvalueReadyToSend(details.controls['number_alias' + user.id])"
+                          (click)="updateNumberAlias(user.id, details.controls['number_alias' + user.id])">
+                    Update
+                  </button>
+                </div>
+              </div>
+              <div class="user-attributes">
+                <h3>Cidr:</h3>
+                <div class="spacer">
+                  <mat-form-field hideRequiredMarker>
+                    <mat-label>Cidr</mat-label>
+                    <input matInput placeholder="cidr" [ngModel]="user.cidr"
+                           [name]="'cidr' + user.id">
+                  </mat-form-field>
+                  <button mat-button color="accent"
+                          [disabled]="!isvalueReadyToSend(details.controls['cidr' + user.id])"
+                          (click)="updateCidr(user.id, details.controls['cidr' + user.id])">
+                    Update
+                  </button>
+                </div>
+              </div>
+
+            </form>
+            <h3>Parameters:</h3>
+            <div *ngIf="user">
+              <app-key-value-pad [exist]="user"
+                                 [items]="user.parameters"
+                                 [newItems]="user.parameters?.new"
+                                 [id]="user.id"
+                                 [toCopy]="toCopy"
+                                 [store]="store"
+                                 [dispatchers]="userParamDispatchers"
+              >
+              </app-key-value-pad>
+            </div>
+            <h3>Variables:</h3>
+            <div *ngIf="user">
+              <app-key-value-pad [exist]="user"
+                                 [items]="user.variables"
+                                 [newItems]="user.variables?.new"
+                                 [id]="user.id"
+                                 [toCopy]="toCopy"
+                                 [store]="store"
+                                 [dispatchers]="userVarDispatchers"
+              >
+              </app-key-value-pad>
+            </div>
+          </mat-expansion-panel>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-tab>
+
+  <mat-tab label="Add">
+    <form class="spacer filter-container" (ngSubmit)="onUserSubmit()">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Domain</mat-label>
+        <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
+          <mat-option>--</mat-option>
+          <mat-option *ngFor="let domain of onlyValues(list)" [value]="domain.id">{{domain.name}}</mat-option>
+          <!--mat-hint>{{selectdomain?.sound}}</mat-hint-->
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="New user name" required name="name" [(ngModel)]="newUserName">
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Bulk</mat-label>
+        <input matInput type="number" max="100" placeholder="Bulk" required name="bulk" [(ngModel)]="bulkUsers">
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Submit</button>
+    </form>
+    <mat-card>
+      <mat-card-content>
+        <button mat-raised-button color="basic" class="but-spacer-left switch-button spacer-bottom"
+                [disabled]="!XMLBody || !domainId"
+                (click)="ImportXMLUser()"
+        >
+          Import
+        </button>
+        <mat-expansion-panel (opened)="initEditor()">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              XML editor
+            </mat-panel-title>
+            <mat-panel-description>
+              Click to get details
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <app-code-editor [(content)]="XMLBody" *ngIf="editorInited"></app-code-editor>
+        </mat-expansion-panel>
+        <mat-expansion-panel (opened)="GetWebDirectoryUsersTemplatesList()">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              User Templates
+            </mat-panel-title>
+            <mat-panel-description>
+              Click to get details
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <mat-card>
+            <mat-expansion-panel *ngFor="let template of onlyValues(usersTemplates); trackBy: trackById;"
+                                 class="tabbed-panel"
+                                 (opened)="GetWebDirectoryUsersTemplateForm(template.id)">
+              <mat-expansion-panel-header>
+                <mat-panel-title>{{template.name}}</mat-panel-title>
+                <mat-panel-description>
+                  Click to get details
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <form class="spacer">
+                <div *ngIf="templatesItems[template.id]">
+                  <mat-form-field hideRequiredMarker>
+                    <mat-label>UserName</mat-label>
+                    <input matInput
+                           placeholder="Number/User Name"
+                           [(ngModel)]="templatesItems[template.id].name"
+                           name="userName"
+                    >
+                  </mat-form-field>
+                  <div *ngFor="let parameter of templatesItems[template.id].parameters; trackBy: trackById;">
+                    <mat-form-field hideRequiredMarker>
+                      <input matInput
+                             [placeholder]="parameter.name"
+                             [(ngModel)]="parameter.value"
+                             [name]="parameter.name"
+                             [disabled]="parameter.disabled || !parameter.editable"
+                      >
+                    </mat-form-field>
+                    <mat-card class="description">{{parameter.description}}</mat-card>
+                  </div>
+                  <div *ngFor="let variable of templatesItems[template.id].variables; trackBy: trackById;">
+                    <mat-form-field hideRequiredMarker>
+                      <input matInput
+                             [placeholder]="variable.name"
+                             [(ngModel)]="variable.value"
+                             [name]="variable.name"
+                             [disabled]="variable.disabled || !variable.editable"
+                      >
+                    </mat-form-field>
+                    <mat-card class="description" *ngIf="variable.description">{{variable.description}}</mat-card>
+                  </div>
+                </div>
+
+                <button mat-raised-button color="primary" type="submit"
+                        (click)="onTemplateUserSubmit(templatesItems[template.id])">Submit
+                </button>
+              </form>
+
+            </mat-expansion-panel>
+          </mat-card>
+        </mat-expansion-panel>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Delete/Rename">
+    <form class="spacer filter-container" #deleteForm="ngForm">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Domain</mat-label>
+        <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
+          <mat-option>--</mat-option>
+          <mat-option *ngFor="let domain of onlyValues(list); trackBy: trackByFnId;" [value]="domain.id">
+            {{domain.name}}
+          </mat-option>
+          <!--mat-hint>{{selectdomain?.sound}}</mat-hint-->
+        </mat-select>
+      </mat-form-field>
+      <div *ngFor="let user of onlyValuesByParent(userList, domainId); trackBy: trackByFnId;">
+        <mat-form-field hideRequiredMarker>
+        <mat-label>User name</mat-label>
+        <input matInput name="user name" required [ngModel]="user.name" [name]="'user::' + user.id">
+        </mat-form-field>
+        <button mat-button color="accent" class="but-spacer-left"
+                [disabled]="checkDirty(deleteForm.controls['user::' + user.id])"
+                (click)="openBottomSheet(user.id, deleteForm.controls['user::' + user.id].value, user.name, 'rename')">
+          Update
+        </button>
+        <button *ngIf="user.enabled" mat-raised-button color="accent"
+                class="but-spacer-left switch-button"
+                (click)="switchUser(user)">
+          Disable
+        </button>
+        <button *ngIf="!user.enabled" mat-raised-button color="primary"
+                class="but-spacer-left switch-button"
+                (click)="switchUser(user)">
+          Enable
+        </button>
+        <button mat-raised-button color="warn" class="but-spacer-left"
+                (click)="openBottomSheet(user.id, deleteForm.controls['user::' + user.id].value, user.name, 'delete')">
+          Delete
+        </button>
+      </div>
+    </form>
+  </mat-tab>
+</mat-tab-group>

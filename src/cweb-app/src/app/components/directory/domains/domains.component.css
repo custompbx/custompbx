@@ -1,0 +1,46 @@
+mat-form-field {
+  padding: 0 5px;
+}
+
+.spacerb {
+  margin-top: 15px;
+}
+
+.plusbut {
+  font-size: 40px;
+  display: inline;
+}
+
+.oversize {
+  height: 50px;
+  width: 50px;
+}
+
+.mat-expansion-panel {
+  border-radius: 0;
+}
+
+.mat-expansion-panel-header {
+  border-radius: 0;
+}
+
+.but-spacer-left {
+  margin-left: 5px;
+}
+
+.xml-area{
+  width: 100%;
+  overflow: hidden;
+}
+
+.mat-progress-bar {
+  display: block;
+  height: 2px;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  transition: opacity 250ms linear;
+  width: 100%;
+  z-index: 1000;
+}

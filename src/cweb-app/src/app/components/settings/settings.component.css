@@ -1,0 +1,119 @@
+.full-form {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(2, 330px);
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.full-form + * {
+  display: grid;
+}
+
+.setting-title {
+  text-align: center;
+}
+
+.setting-title > div {
+  color: #9b9b9b;
+  position: relative;
+  top: -20px;
+  font-size: 14px;
+}
+
+.settings-full-width {
+  min-width: 250px;
+  width: 100%;
+}
+
+mat-toolbar-row {
+  justify-content: space-between;
+}
+
+.content-center {
+  text-align: -webkit-center;
+  place-content: center;
+  grid-column: 1 / -1;
+}
+
+button {
+  margin: 5px;
+}
+
+.mat-expansion-panel {
+  border-radius: 0;
+}
+
+.mat-expansion-panel-header {
+  border-radius: 0;
+}
+
+.switch-button {
+  min-width: 78px;
+}
+
+.but-spacer-left {
+  margin-left: 5px;
+}
+
+.tabbed-panel {
+  margin: 0 3px;
+}
+
+.tabbed-panel:last-child {
+  margin-bottom: 3px;
+}
+
+mat-form-field {
+  padding: 0 5px;
+}
+
+.spacerb {
+  margin-top: 15px;
+}
+
+.switch-button {
+  min-width: 78px;
+}
+
+.avatar-ico {
+  display: inline-block;
+  min-width: 45px;
+}
+
+.avatar-ico > mat-icon {
+  font-size: 45px;
+}
+
+.avatar-img {
+  display: inline-block;
+  height: 45px;
+  width: 45px;
+  border-radius: 45px;
+  overflow: hidden;
+}
+
+.upload-image {
+  position: relative;
+  top: -15px;
+}
+
+.mat-tab-body-active {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  z-index: 1;
+  flex-grow: 1;
+}
+
+.list-wrap {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.extra-space {
+  margin-bottom: 10px;
+}
+.token-table {
+  width: 100%;
+}

@@ -1,0 +1,118 @@
+.type-icon {
+  color: #757575;
+  margin-right: 5px;
+}
+
+mat-form-field {
+  padding: 0 5px;
+}
+
+.spacerb {
+  margin-top: 15px;
+}
+
+.plusbut {
+  font-size: 40px;
+  display: inline;
+}
+
+.oversize {
+  height: 50px;
+  width: 50px;
+}
+
+.float-card {
+  border-top: 1px solid #efefef;
+  margin: 0 2px;
+  padding: 5px 0 5px 0;
+}
+
+.add-button {
+  display: block;
+}
+.sidenav-container {
+  /*width: 100%;*/
+  min-height: 100%;
+  position: absolute;
+  background: #ffffff;
+}
+
+.users-to-del {
+  display: grid;
+  grid-gap: 15px 10px;
+  grid-template-columns: repeat(auto-fill, minmax(175px,2fr));
+  margin-top: 5px;
+}
+
+.users-to-add {
+  display: grid;
+  grid-gap: 15px 10px;
+  grid-template-columns: repeat(auto-fill, minmax(175px,2fr));
+}
+
+.action {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  height: 22px;
+  border-radius: 25px;
+  padding: 0px;
+}
+
+.action-chip {
+  min-height: 25px;
+}
+
+.example-container {
+  width: 400px;
+  max-width: 100%;
+  margin: 0 25px 25px 0;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.example-list {
+  overflow: hidden;
+}
+
+.example-box {
+  margin-bottom: 5px;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  background: white;
+  font-size: 14px;
+}
+
+.mat-expansion-panel {
+  border-radius: 0;
+}
+
+.mat-expansion-panel-header {
+  border-radius: 0;
+}
+
+
+
+.but-spacer-left {
+  margin-left: 5px;
+}
+
+.mat-progress-bar {
+  display: block;
+  height: 2px;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  transition: opacity 250ms linear;
+  width: 100%;
+  z-index: 1000;
+}
+
+.icon-spacer {
+  margin-right: 3px;
+}

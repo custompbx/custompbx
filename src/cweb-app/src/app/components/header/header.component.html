@@ -1,0 +1,42 @@
+<mat-toolbar color="primary" role="heading" class="header">
+  <span class="example-spacer"></span>
+  <button mat-icon-button (click)="showHidePhone()">
+    <mat-icon>phone</mat-icon>
+  </button>
+  <button mat-icon-button (click)="cloneComponent()">
+    <mat-icon>filter_2</mat-icon>
+  </button>
+  <button *ngIf="user?.group_id === 1" mat-icon-button [routerLink]="['/settings']">
+    <mat-icon>settings</mat-icon>
+  </button>
+  <label class="flex-v-center">
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon *ngIf="!user.avatar_format">face</mat-icon>
+      <img *ngIf="user.avatar_format" class="avatar-img"
+           [src]="'./assets/img/avatar/' + user.id + '.' + user.avatar_format">
+    </button>
+    <span class="user-name">{{user.login}}</span>
+  </label>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item>
+      <mat-icon>account_circle</mat-icon>
+      <span>Profile</span>
+    </button>
+    <button *ngIf="user?.group_id === 1" mat-menu-item [routerLink]="['/settings']">
+      <mat-icon>settings</mat-icon>
+      <span>Settings</span>
+    </button>
+    <button mat-menu-item (click)="logOut()">
+      <mat-icon>keyboard_tab</mat-icon>
+      <span>Log out</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
+<app-lazy-wrapper *ngIf="showPhone" [hidden]="hidePhone" type="phone"></app-lazy-wrapper>
+
+<ng-container>
+  <!--div class="over-component" cdkDrag-->
+  <div class="over-component">
+    <template #componentContainer></template>
+  </div>
+</ng-container>

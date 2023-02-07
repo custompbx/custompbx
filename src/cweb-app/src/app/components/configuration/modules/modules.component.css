@@ -1,0 +1,37 @@
+.but-spacer-left {
+  margin-left: 5px;
+}
+
+.name-button{
+  min-width: 120px;
+  width: 95%;
+/*  text-align: start;*/
+}
+
+article {
+  display: inline-grid;
+  grid-template-columns: auto ;
+  white-space: nowrap;
+  grid-gap: 4px;
+}
+
+.section {
+  display: inline-grid;
+  grid-template-columns: 1fr auto auto auto auto auto ;
+}
+
+.sections {
+  display: inline-grid;
+  grid-template-columns: auto;
+}
+
+.total {
+  margin-top: 10px;
+  display: inline-grid;
+  grid-template-columns: auto;
+}
+
+.xml-area{
+  width: 100%;
+  overflow: hidden;
+}

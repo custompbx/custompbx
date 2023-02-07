@@ -1,0 +1,31 @@
+{
+  "freeswitch": {
+    "esl": {
+      "host":"127.0.0.1",
+      "port":"8021",
+      "pass":"ClueCon",
+      "timeout":10
+    }
+  },
+  "webserver": {
+    "host":"127.0.0.1",
+    "port":"8080"
+  },
+  "database":{
+    "name":"customconf",
+    "host":"127.0.0.1",
+    "port":"5432",
+    "user":"custompbx",
+    "pass":"custompbx"
+  },
+  "logging": {
+    "level": 5,
+    "syslog": false,
+    "file": "custompbx.log",
+    "dir": "/var/log"
+  },
+  "master_user": {
+    "login": "admin",
+    "password": "admin"
+  },
+}

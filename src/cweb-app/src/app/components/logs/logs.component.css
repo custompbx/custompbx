@@ -1,0 +1,101 @@
+.full-width-table {
+  width: 100%;
+  box-shadow: none;
+}
+
+.table-container {
+  height: 70vh;
+}
+
+td {
+  min-width: 50px;
+
+}
+
+th.mat-header-cell {
+  padding-right: 20px;
+}
+
+.log-container {
+  overflow: auto;
+  background-color: black;
+  color: #efefef;
+  font: 16px Inconsolata, monospace;
+  min-height: 30px;
+  padding: 20px;
+  line-height: 22px;
+  width: fit-content;
+  min-width: 95%;
+  max-height: calc(100vh - 330px);
+}
+
+.get-button {
+  margin: 20px 0 10px 20px;
+  display: inline-table;
+}
+
+.filter-container {
+  margin: 20px 0 10px 20px;
+  display: inline-table;
+}
+
+mat-form-field {
+  margin-left: 20px;
+}
+
+.but-spacer-left {
+  margin-left: 5px;
+}
+
+.checkbox-spacer-left {
+  margin-left: 20px;
+}
+
+.chips-pad {
+  margin: 4px;
+}
+
+.warn-sign {
+  margin: 5px 0;
+  max-width: 300px;
+}
+
+.save-but {
+  margin: 10px;
+}
+
+.log-console {
+  color: #ffffff;
+}
+
+.log-debug {
+  color: #c9cd16;
+}
+
+.log-info {
+  color: #09cd28;
+}
+
+.log-notice {
+  color: #24a4cd;
+}
+
+.log-warning {
+  color: #c52bcd;
+}
+
+.log-err {
+  color: #cd1919;
+}
+
+.log-crit {
+  color: #cd1919;
+}
+
+.log-alert {
+  color: #cd1919;
+}
+
+.pre-margin {
+  margin: 0;
+}
