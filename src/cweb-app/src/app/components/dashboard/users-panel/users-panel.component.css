@@ -1,0 +1,93 @@
+.user-card {
+  max-width: 400px;
+  overflow: hidden;
+  padding: 0 10px 3px 10px;
+}
+.card-header {
+  padding: 10px 0 0 0;
+}
+.status-bar {
+  height: 55px;
+  width: calc(100% + 24px);
+  position: relative;
+  left: -12px;
+}
+
+.header-image {
+  /*background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
+  background-size: cover;*/
+  font-size: 40px;
+  height: 40px;
+  width: 40px
+}
+
+.domain-users {
+  display: grid;
+  grid-gap: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 2fr));
+  overflow: hidden;
+  padding: 16px;
+}
+
+.subtitle {
+  margin-bottom: 5px;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.domain-div {
+  margin: 0 10px;
+}
+
+.action-pad {
+  display: grid;
+  margin: -11px -20px!important;
+}
+
+.connect-button {
+  grid-column: 10;
+}
+
+.mat-card-image {
+ margin-bottom: 0;
+}
+
+.filter-container > mat-form-field {
+  margin-left: 10px;
+}
+
+.avatar-img{
+  display: inline-block;
+  height: 45px;
+  width: 45px;
+  border-radius: 45px;
+  overflow: hidden;
+}
+
+.checkbox-spacer-left {
+  margin-left: 20px;
+}
+
+.cc-bar {
+  height: 14px;
+  font-size: 10px;
+  position: absolute;
+  top: 117px;
+  width: 100%;
+}
+
+.up-side-down {
+  -moz-transform: scale(1, -1);
+  -webkit-transform: scale(1, -1);
+  -o-transform: scale(1, -1);
+  -ms-transform: scale(1, -1);
+  transform: scale(1, -1);
+}
+/*
+
+.cdk-overlay-container {
+  position: unset;
+}
+*/

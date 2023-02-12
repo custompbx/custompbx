@@ -1,0 +1,20 @@
+<app-inner-header name="Curl" [loadCounter]="loadCounter"></app-inner-header>
+<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
+  <mat-card *ngIf="list && list.exists !== false">
+  <mat-card-header>
+    <mat-card-subtitle>Settings</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+      <h3>Params:</h3>
+      <app-key-value-pad-2 [exist]="list.settings"
+                           [items]="list.settings"
+                           [newItems]="list.settings?.new"
+                           [id]="null"
+                           [toCopy]="null"
+                           [dispatchersCallbacks]="globalSettingsDispatchers"
+      >
+      </app-key-value-pad-2>
+  </mat-card-content>
+  </mat-card>
+
+

@@ -1,0 +1,568 @@
+<app-inner-header name="Callcenter" [loadCounter]="loadCounter"></app-inner-header>
+<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
+ <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"
+               *ngIf="list && list.exists !== false">
+  <mat-tab label="List">
+     <mat-card>
+      <mat-card-content>
+         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedIndexChange)="tabChanged($event)" *ngIf="list && list.queues">
+          <mat-tab label="Queues">
+            <div *ngFor="let item of onlyValues(list.queues); trackBy: trackByFnId" class="panel-wrapper">
+              <mat-expansion-panel (opened)="GetCallcenterQueuesParams(item.id)"
+                                   [expanded]="panelCloser['queue' + item.id]">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{item.name}}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    Click to get details
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <button mat-raised-button color="basic" (click)="copyQueue(item.id)"
+                        *ngIf="list.queues[item.id] && (list.queues[item.id].parameters)">Copy
+                </button>
+                <h3>Params:</h3>
+                <app-key-value-pad-2 [exist]="item.parameters"
+                                     [items]="item.parameters"
+                                     [newItems]="item.parameters?.new"
+                                     [id]="item.id"
+                                     [toCopy]="toCopyqueue"
+                                     [dispatchersCallbacks]="queueParamDispatchers"
+                >
+                </app-key-value-pad-2>
+              </mat-expansion-panel>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Agents">
+            <mat-card *ngIf="!list?.agents?.total && filters.length == 0">
+              <mat-card-actions>
+                There no any agents. You can start creating them and tiers or import while module is loaded.
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        (click)="ImportCallcenterAgentsAndTiers()">
+                  Import
+                </button>
+              </mat-card-actions>
+            </mat-card>
+            <div>
+              <div class="filter-container">
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        (click)="GetCallcenterAgents()">
+                  Get List
+                </button>
+              </div>
+              <div class="filter-container">
+                <mat-form-field hideRequiredMarker>
+                  <mat-label>Field</mat-label>
+                  <mat-select [(ngModel)]="filter.field" [disabled]="!columns" disableOptionCentering>
+                    <mat-option [value]="null">
+                      ---
+                    </mat-option>
+                    <mat-option *ngFor="let val of columns" [value]="val">
+                      {{val}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field hideRequiredMarker>
+                  <mat-label>Operand</mat-label>
+                  <mat-select [(ngModel)]="filter.operand" [disabled]="!filter.field" disableOptionCentering>
+                    <mat-option *ngFor="let val of operands" [value]="val">
+                      {{val}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field hideRequiredMarker>
+        <mat-label>Value</mat-label>
+        <input matInput name="value" [(ngModel)]="filter.field_value" [disabled]="!filter.operand"
+                         required>
+                </mat-form-field>
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        *ngIf="!filters[toEditAgentFilter]"
+                        [disabled]="!this.filter.operand || !this.filter.field"
+                        (click)="addFilter()">
+                  Add filter
+                </button>
+                <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+                        *ngIf="filters[toEditAgentFilter]"
+                        [disabled]="!this.filter.operand || !this.filter.field"
+                        (click)="saveFilter()">
+                  Edit filter
+                </button>
+                <mat-form-field hideRequiredMarker class="checkbox-spacer-left">
+                  <mat-label>Field</mat-label>
+                  <mat-select [(ngModel)]="sortColumns" [disabled]="!columns" disableOptionCentering>
+                    <mat-option [value]="null">
+                      ---
+                    </mat-option>
+                    <mat-option *ngFor="let val of columns" [value]="val">
+                      {{val}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-checkbox [(ngModel)]="sortObject.desc" class="checkbox-spacer-left"
+                              [disabled]="sortObject.fields.length == 0 && !sortColumns">DESC
+                </mat-checkbox>
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        [disabled]="!sortColumns"
+                        (click)="addSorter()">
+                  Add sorting
+                </button>
+              </div>
+              <div class="chips-pad">
+                <mat-chip-listbox aria-label="Filter selection">
+                  <mat-chip color="accent"
+                            *ngFor="let filterItem of filters; let i = index"
+                            (click)="editFilter(i)"
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="removeFilter(filterItem)"
+                            selected>
+                    {{filterItem.field}} {{filterItem.operand}} {{filterItem.field_value}}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                  <mat-chip color="primary"
+                            *ngIf="sortObject.fields.length > 0"
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="clearSorting()"
+                            selected>
+                    <span>ORDER BY </span>
+                    <span *ngFor="let sort of sortObject.fields; let i = index;">{{sort}}<i
+                      *ngIf="i < sortObject.fields.length - 1">,</i> </span>
+                    <span *ngIf="sortObject.desc">DESC</span>
+                    <span *ngIf="!sortObject.desc">ASC</span>
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+              <div class="table-container" *ngIf="list.agents && isArray(list.agents.table)">
+                <table mat-table class="full-width-table" [dataSource]="list.agents.table">
+                  <ng-container *ngFor="let disCol of columns; let colIndex = index" matColumnDef="{{disCol}}">
+                    <th mat-header-cell *matHeaderCellDef  (click)="filter.field = disCol" class="spacer table-cell">{{disCol}}</th>
+                    <td mat-cell
+                        [class]="'cells-main spacer table-cell'"
+                        [ngClass]="{'warn-cell': disCol === 'contact' && element['contact'] === '', 'input-cell-changed': list.changed.agents[element['id']] && list.changed.agents[element['id']][disCol], 'input-cell': toEdit[element['id']] === disCol }"
+                        *matCellDef="let element"
+                        (click)="toInput(element['id'], disCol)"
+                        (mouseover)="showDel[element['id']] = true"
+                        (mouseleave)="leaveDelIco(element['id'])"
+                    >
+                      <mat-icon #delIco *ngIf="disCol === 'id' && showDel[element['id']]" color="warn" class="del-ico"
+                                (click)="DelCallcenterAgent(element['id'], element['name'])">delete_outline
+                      </mat-icon>
+                      <span [class]="'plain-cell-text'" [ngClass]="{'to-hide': toEdit[element['id']] === disCol}">{{element[disCol]}}</span>
+                      <input matInput
+                             class="table-input"
+                             *ngIf="toEdit[element['id']] === disCol"
+                             [placeholder]="disCol"
+                             [(ngModel)]="element[disCol]"
+                             [title]="disCol"
+                             (keydown.enter)="UpdateCallcenterAgent(element['id'], disCol, element[disCol]);"
+                             (change)="markChanged(element['id'], disCol)"
+                             appAutoFocus
+                      >
+                      <!--<mat-icon #editIco class="edit-ico" color="primary" *ngIf="toEdit[element['id']] === disCol" aria-hidden="false" aria-label="Edit">edit</mat-icon>-->
+                    </td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+                  <tr mat-row *matRowDef="let row; columns: columns"></tr>
+                </table>
+              </div>
+              <mat-paginator *ngIf="list.agents?.total > 0"
+                             [length]="list.agents?.total"
+                             [pageIndex]="pageEvent.pageIndex"
+                             [pageSize]="pageEvent.pageSize"
+                             [pageSizeOptions]="paginationScale"
+                             (page)="pageEvent = $event; GetCallcenterAgents()"
+
+              >
+              </mat-paginator>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Tiers">
+            <mat-card *ngIf="!list?.tiers?.total && tiersFilters.length == 0">
+              <mat-card-content>
+                There no any tiers. You can start creating them and agents or import while module is loaded.
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        (click)="ImportCallcenterAgentsAndTiers()">
+                  Import
+                </button>
+              </mat-card-content>
+            </mat-card>
+            <div>
+              <div class="filter-container">
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        (click)="GetCallcenterTiers()">
+                  Get List
+                </button>
+              </div>
+              <div class="filter-container">
+                <mat-form-field hideRequiredMarker>
+                  <mat-label>Field</mat-label>
+                  <mat-select [(ngModel)]="tiersFilter.field" [disabled]="!tiersColumns" disableOptionCentering>
+                    <mat-option [value]="null">
+                      ---
+                    </mat-option>
+                    <mat-option *ngFor="let val of tiersColumns" [value]="val">
+                      {{val}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field hideRequiredMarker>
+                  <mat-label>Operand</mat-label>
+                  <mat-select [(ngModel)]="tiersFilter.operand" [disabled]="!tiersFilter.field" disableOptionCentering>
+                    <mat-option *ngFor="let val of operands" [value]="val">
+                      {{val}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field hideRequiredMarker>
+        <mat-label>Value</mat-label>
+        <input matInput name="value" [(ngModel)]="tiersFilter.field_value" [disabled]="!tiersFilter.operand"
+                         required>
+                </mat-form-field>
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        *ngIf="!filters[toEditTierFilter]"
+                        [disabled]="!this.tiersFilter.operand || !this.tiersFilter.field"
+                        (click)="tiersAddFilter()">
+                  Add filter
+                </button>
+                <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+                        *ngIf="filters[toEditTierFilter]"
+                        [disabled]="!this.tiersFilter.operand || !this.tiersFilter.field"
+                        (click)="saveTierFilter()">
+                  Edit filter
+                </button>
+                <mat-form-field hideRequiredMarker class="checkbox-spacer-left">
+                  <mat-label>Field</mat-label>
+                  <mat-select [(ngModel)]="tiersSortColumns" [disabled]="!tiersColumns" disableOptionCentering>
+                    <mat-option [value]="null">
+                      ---
+                    </mat-option>
+                    <mat-option *ngFor="let val of tiersColumns" [value]="val">
+                      {{val}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-checkbox [(ngModel)]="tiersSortObject.desc" class="checkbox-spacer-left"
+                              [disabled]="tiersSortObject.fields.length == 0 && !tiersSortColumns">DESC
+                </mat-checkbox>
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        [disabled]="!tiersSortColumns"
+                        (click)="tiersAddSorter()">
+                  Add sorting
+                </button>
+              </div>
+              <div class="chips-pad">
+                <mat-chip-listbox aria-label="Filter selection">
+                  <mat-chip color="accent"
+                            *ngFor="let filterItem of tiersFilters; let i = index"
+                            (click)="editTierFilter(i)"
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="tiersRemoveFilter(filterItem)"
+                            selected>
+                    {{filterItem.field}} {{filterItem.operand}} {{filterItem.field_value}}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                  <mat-chip color="primary"
+                            *ngIf="tiersSortObject.fields.length > 0"
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="tiersClearSorting()"
+                            selected>
+                    <span>ORDER BY </span>
+                    <span *ngFor="let sort of tiersSortObject.fields; let i = index;">{{sort}}<i
+                      *ngIf="i < tiersSortObject.fields.length - 1">,</i> </span>
+                    <span *ngIf="tiersSortObject.desc">DESC</span>
+                    <span *ngIf="!tiersSortObject.desc">ASC</span>
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+              <div class="table-container" *ngIf="list.tiers && isArray(list.tiers.table)">
+                <table mat-table class="full-width-table" [dataSource]="list.tiers.table">
+                  <ng-container *ngFor="let disCol of tiersColumns; let colIndex = index" matColumnDef="{{disCol}}">
+                    <th mat-header-cell *matHeaderCellDef  (click)="tiersFilter.field = disCol" class="spacer table-cell">{{disCol}}</th>
+                    <td mat-cell
+                        [class]="'cells-main spacer table-cell'"
+                        [ngClass]="{'input-cell-changed': list.changed.tiers[element['id']] && list.changed.tiers[element['id']][disCol], 'input-cell': toEditTier[element['id']] === disCol }"
+                        *matCellDef="let element"
+                        (click)="toInputTier(element['id'], disCol)"
+                        (mouseover)="showDel[element['id']] = true"
+                        (mouseleave)="leaveDelIco(element['id'])"
+                    >
+                      <mat-icon #delIco *ngIf="disCol === 'id' && showDel[element['id']]" color="warn" class="del-ico"
+                                (click)="DelCallcenterTier(element['id'], element['id'])">delete_outline
+                      </mat-icon>
+                      <span [class]="'plain-cell-text'" [ngClass]="{'to-hide': toEditTier[element['id']] === disCol}">{{element[disCol]}}</span>
+                      <input matInput
+                             class="table-input"
+                             *ngIf="toEditTier[element['id']] === disCol"
+                             [placeholder]="disCol"
+                             [(ngModel)]="element[disCol]"
+                             [title]="disCol"
+                             (keydown.enter)="UpdateCallcenterTier(element['id'], disCol, element[disCol]);"
+                             (change)="markChangedTier(element['id'], disCol)"
+                             appAutoFocus
+                      >
+                      <!--<mat-icon #editIco class="edit-ico" color="primary" *ngIf="toEdit[element['id']] === disCol" aria-hidden="false" aria-label="Edit">edit</mat-icon>-->
+                    </td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="tiersColumns; sticky: true"></tr>
+                  <tr mat-row *matRowDef="let row; columns: tiersColumns"></tr>
+                </table>
+              </div>
+              <mat-paginator *ngIf="list.tiers?.total > 0"
+                             [length]="list.tiers?.total"
+                             [pageIndex]="tiersPageEvent.pageIndex"
+                             [pageSize]="tiersPageEvent.pageSize"
+                             [pageSizeOptions]="paginationScale"
+                             (page)="tiersPageEvent = $event; GetCallcenterTiers()"
+              >
+              </mat-paginator>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Members">
+              <div class="filter-container">
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        (click)="GetCallcenterMembers()">
+                  Get List
+                </button>
+              </div>
+              <div class="filter-container">
+                <mat-form-field hideRequiredMarker>
+                  <mat-label>Field</mat-label>
+                  <mat-select [(ngModel)]="membersFilter.field" [disabled]="!membersColumns" disableOptionCentering>
+                    <mat-option [value]="null">
+                      ---
+                    </mat-option>
+                    <mat-option *ngFor="let val of membersColumns" [value]="val">
+                      {{val}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field hideRequiredMarker>
+                  <mat-label>Operand</mat-label>
+                  <mat-select [(ngModel)]="membersFilter.operand" [disabled]="!membersFilter.field" disableOptionCentering>
+                    <mat-option *ngFor="let val of operands" [value]="val">
+                      {{val}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field hideRequiredMarker>
+        <mat-label>Value</mat-label>
+        <input matInput name="value" [(ngModel)]="membersFilter.field_value" [disabled]="!membersFilter.operand"
+                         required>
+                </mat-form-field>
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        *ngIf="!filters[toEditMemberFilter]"
+                        [disabled]="!this.membersFilter.operand || !this.membersFilter.field"
+                        (click)="membersAddFilter()">
+                  Add filter
+                </button>
+                <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+                        *ngIf="filters[toEditMemberFilter]"
+                        [disabled]="!this.membersFilter.operand || !this.membersFilter.field"
+                        (click)="saveMemberFilter()">
+                  Edit filter
+                </button>
+                <mat-form-field hideRequiredMarker class="checkbox-spacer-left">
+                  <mat-label>Field</mat-label>
+                  <mat-select [(ngModel)]="membersSortColumns" [disabled]="!membersColumns" disableOptionCentering>
+                    <mat-option [value]="null">
+                      ---
+                    </mat-option>
+                    <mat-option *ngFor="let val of membersColumns" [value]="val">
+                      {{val}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-checkbox [(ngModel)]="membersSortObject.desc" class="checkbox-spacer-left"
+                              [disabled]="membersSortObject.fields.length == 0 && !membersSortColumns">DESC
+                </mat-checkbox>
+                <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        [disabled]="!membersSortColumns"
+                        (click)="membersAddSorter()">
+                  Add sorting
+                </button>
+              </div>
+              <div class="chips-pad">
+                <mat-chip-listbox aria-label="Filter selection">
+                  <mat-chip color="accent"
+                            *ngFor="let filterItem of membersFilters; let i = index"
+                            (click)="editMemberFilter(i)"
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="membersRemoveFilter(filterItem)"
+                            selected>
+                    {{filterItem.field}} {{filterItem.operand}} {{filterItem.field_value}}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                  <mat-chip color="primary"
+                            *ngIf="membersSortObject.fields.length > 0"
+                            [selectable]="true"
+                            [removable]="true"
+                            (removed)="membersClearSorting()"
+                            selected>
+                    <span>ORDER BY </span>
+                    <span *ngFor="let sort of membersSortObject.fields; let i = index;">{{sort}}<i
+                      *ngIf="i < membersSortObject.fields.length - 1">,</i> </span>
+                    <span *ngIf="membersSortObject.desc">DESC</span>
+                    <span *ngIf="!membersSortObject.desc">ASC</span>
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+              <div class="table-container" *ngIf="list.members && isArray(list.members.table)">
+                <table mat-table class="full-width-table" [dataSource]="list.members.table">
+                  <ng-container *ngFor="let disCol of membersColumns; let colIndex = index" matColumnDef="{{disCol}}">
+                    <th mat-header-cell *matHeaderCellDef  (click)="membersFilter.field = disCol" class="spacer table-cell">{{disCol}}</th>
+                    <td mat-cell
+                        [class]="'cells-main spacer table-cell'"
+                        *matCellDef="let element"
+                        (mouseover)="showDel[element['uuid']] = true"
+                        (mouseleave)="leaveDelIco(element['uuid'])"
+                    >
+                      <mat-icon #delIco *ngIf="disCol === 'uuid' && showDel[element['uuid']]" color="warn" class="del-ico"
+                                (click)="DelCallcenterMember(element['uuid'])">delete_outline
+                      </mat-icon>
+                      <span [class]="'plain-cell-text'">{{element[disCol]}}</span>
+                    </td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="membersColumns; sticky: true"></tr>
+                  <tr mat-row *matRowDef="let row; columns: membersColumns"></tr>
+                </table>
+              </div>
+              <mat-paginator *ngIf="list?.members?.total > 0"
+                             [length]="list?.members?.total"
+                             [pageIndex]="membersPageEvent.pageIndex"
+                             [pageSize]="membersPageEvent.pageSize"
+                             [pageSizeOptions]="paginationScale"
+                             (page)="membersPageEvent = $event; GetCallcenterMembers()"
+              >
+              </mat-paginator>
+          </mat-tab>
+
+          <mat-tab label="Queues commands">
+            <div class="panel-wrapper panel-wrapper-top">
+              <h3>Queues:</h3>
+              <article>
+                <div class="section" *ngFor="let queue of onlyValues(list.queues); trackBy: trackByFnId">
+                  <section class="mat-subheading-1">
+                    <span class=" grid-inner-title">{{queue.name}}</span>
+                  </section>
+                  <section>
+                    <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                            (click)="queueCommand(queue.id, 0, 'load')">
+                      Load
+                    </button>
+                  </section>
+                  <section>
+                    <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                            (click)="queueCommand(queue.id, 0, 'load')">
+                      Reload
+                    </button>
+                  </section>
+                  <section>
+                    <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                            (click)="queueCommand(queue.id, 0, 'load')">
+                      Unload
+                    </button>
+                  </section>
+                </div>
+              </article>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Global Settings">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-subtitle> Global Settings</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <h3>Params:</h3>
+                <app-key-value-pad-2 [exist]="list.settings"
+                                     [items]="list.settings"
+                                     [newItems]="list.settings?.new"
+                                     [id]="null"
+                                     [toCopy]="null"
+                                     [dispatchersCallbacks]="globalSettingsDispatchers"
+                >
+                </app-key-value-pad-2>
+              </mat-card-content>
+            </mat-card>
+          </mat-tab>
+        </mat-tab-group>
+
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Add">
+    <form class="spacer spacerb" (ngSubmit)="AddCallcenterQueue()">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Queue Name</mat-label>
+        <input matInput placeholder="New queue name" required name="name" [(ngModel)]="newQueueName">
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!newQueueName">Submit</button>
+    </form>
+
+    <form class="spacer spacerb" (ngSubmit)="AddCallcenterAgent()">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>New Agent Name</mat-label>
+        <input matInput placeholder="New agent name" name="name" [(ngModel)]="newAgentName" required>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!newAgentName">Submit</button>
+    </form>
+
+    <form class="spacer spacerb" (ngSubmit)="AddCallcenterTier()">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Queue</mat-label>
+        <mat-select required name="queue" [(ngModel)]="queueId" disableOptionCentering>
+          <mat-option *ngFor="let val of onlyValues(list.queues); trackBy: trackByFnId" [value]="val.id">
+            {{val.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Tier Agent Name</mat-label>
+        <input matInput placeholder="agent name" name="name" [(ngModel)]="agentName" required>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!queueId || !agentName">Submit</button>
+    </form>
+
+  </mat-tab>
+
+  <mat-tab label="Delete/Rename">
+    <form class="spacer spacerb" #deleteForm="ngForm">
+      <h3>Queues:</h3>
+      <div *ngIf="list.queues">
+        <div *ngFor="let queue of onlyValues(list.queues); trackBy: trackByFnId">
+          <mat-form-field hideRequiredMarker>
+        <mat-label>Queue name</mat-label>
+        <input matInput name="Queue name" required [ngModel]="queue.name"
+                   [name]="'queue::' + queue.id">
+          </mat-form-field>
+          <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['queue::' + queue.id])"
+                  (click)="openBottomSheetQueue(queue.id, deleteForm.controls['queue::' + queue.id].value, list.queues[queue.id].name, 'rename')">
+            Update
+          </button>
+          <button mat-raised-button color="warn"
+                  (click)="openBottomSheetQueue(queue.id, deleteForm.controls['queue::' + queue.id].value, list.queues[queue.id].name, 'delete')">
+            Delete
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </mat-tab>
+</mat-tab-group>

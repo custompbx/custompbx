@@ -1,0 +1,20 @@
+.sidenav-container {
+  width: 100%;
+  min-height: 100%;
+  position: absolute;
+  background: #ffffff;
+}
+
+.mat-drawer-content {
+  position: unset;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  overflow: auto;
+}
+
+/*
+.cdk-overlay-container {
+  position: unset;
+}
+*/

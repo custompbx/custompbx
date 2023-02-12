@@ -1,0 +1,540 @@
+<app-inner-header name="Autodialer" [loadCounter]="loadCounter"></app-inner-header>
+ <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+  <mat-tab label="List">
+    <mat-card *ngIf="list">
+      <mat-card-content>
+        <h3>Companies:</h3>
+        <div *ngIf="onlyValues(list.AutoDialerCompanies).length === 0; else elseCompanies">No companies yet.</div>
+        <ng-container #elseCompanies *ngFor="let company of onlyValues(list.AutoDialerCompanies); trackBy: trackByFn">
+          <mat-expansion-panel
+            (opened)="getAutoDialerReducers(company.domain.id); GetAutoDialerReducerMembers(company.reducer?.id || 0)"
+            *ngIf="company.id">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{company?.name || ''}}@{{domainsList[company.domain.id]?.name}}
+              </mat-panel-title>
+              <mat-panel-description>
+                Click to get details
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <mat-horizontal-stepper (selectionChange)="onStepChange($event, company)">
+              <mat-step label="Fill out your scenario">
+                <div>
+                  <mat-form-field>
+                    <mat-label>New scenario name</mat-label>
+                    <input matInput [(ngModel)]="newReducerName">
+                  </mat-form-field>
+                  <button mat-button (click)="addAutoDialerCompanyReducer(company.domain.id)">Add</button>
+                </div>
+                <div>
+                  <mat-form-field hideRequiredMarker>
+                    <mat-label>Scenario</mat-label>
+                    <mat-select required name="scenarioName" [ngModel]="company?.reducer?.id || 0"
+                                disableOptionCentering (selectionChange)="changeReducer(company.id, $event.value)">
+                      <mat-option value="0">--</mat-option>
+                      <mat-option *ngFor="let reducer of onlyValues(list.AutoDialerReducers)"
+                                  [value]="reducer.id">{{reducer.name}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <div class="margin-bottom-15">
+                    <button mat-raised-button [color]="company?.predictive ? 'accent' : 'primary'"
+                            class="switch-button"
+                            (click)="SwitchAutoDialerCompanyPredictive(company)">
+                      {{company?.predictive ? 'Predictive' : 'Non predictive'}}
+                    </button>
+                  </div>
+                </div>
+
+                <h3>Scenario actions:</h3>
+                <div *ngIf="company?.reducer?.id || false" cdkDropList
+                     (cdkDropListDropped)="dropAction($event, onlySortedValues(list.AutoDialerReducerMembers[company?.reducer?.id]))">
+                  <form #details="ngForm" class="d-inline-grid">
+                    <div
+                      *ngIf="onlySortedValues(list.AutoDialerReducerMembers[company?.reducer?.id]).length === 0; else elseReducerMembers">
+                      No members yet.
+                    </div>
+
+                    <div class="spacer bg-white d-inline-block padding-right-10px"
+                         *ngFor="let action of onlySortedValues(list.AutoDialerReducerMembers[company?.reducer?.id]); trackBy: trackByIdFn"
+                         cdkDrag #elseReducerMembers>
+                      <div *ngIf="action.id && !isArray(action)">
+
+                        <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                        <mat-form-field hideRequiredMarker>
+        <mat-label>Application</mat-label>
+        <input matInput name="application" [(ngModel)]="action.application" required
+                                 [disabled]="!action.enabled"
+                                 [name]="'application' + action.id"
+                                 appResizeInput
+                                 [resizeOnString]="action.application"
+                          >
+                        </mat-form-field>
+                        <mat-form-field hideRequiredMarker>
+        <mat-label>Data</mat-label>
+        <input matInput name="data" [(ngModel)]="action.data" required
+                                 [disabled]="!action.enabled"
+                                 [name]="'actionData' + action.id"
+                                 appResizeInput
+                                 [resizeOnString]="action.data"
+                          >
+                        </mat-form-field>
+                        <button mat-button color="accent" class="but-spacer-left"
+                                [disabled]="!isReadyToSend(details.controls['application' + action.id], details.controls['actionData' + action.id])"
+                                (click)="UpdateAutoDialerReducerMember(action)">
+                          Update
+                        </button>
+                        <button mat-raised-button [color]="action.enabled ? 'accent' : 'primary'"
+                                class="but-spacer-left switch-button"
+                                (click)="SwitchAutoDialerReducerMember(action)">
+                          {{action.enabled ? 'Disable' : 'Enable'}}
+                        </button>
+                        <button mat-raised-button color="warn" class="but-spacer-left"
+                                (click)="deleteAutoDialerCompanyReducerMember(action)">
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="spacer"
+                           *ngFor="let newAction of list.NewAutoDialerReducerMembers[company?.reducer?.id]; let i = index">
+                        <div *ngIf="newAction" class="spacer">
+                          <mat-form-field hideRequiredMarker>
+        <mat-label>Application</mat-label>
+        <input matInput name="application" [(ngModel)]="newAction.application" required
+                                   [name]="'newApplication' + i"
+                                   appResizeInput
+                                   [resizeOnString]="newAction.application"
+                            >
+                          </mat-form-field>
+                          <mat-form-field hideRequiredMarker>
+        <mat-label>Data</mat-label>
+        <input matInput name="data" [(ngModel)]="newAction.data" required
+                                   [name]="'newData' + i"
+                                   appResizeInput
+                                   [resizeOnString]="newAction.data"
+                            >
+                          </mat-form-field>
+                          <button mat-button color="accent" class="but-spacer-left"
+                                  [disabled]="!isReadyToSend(details.controls['newData' + i], details.controls['newApplication' + i])"
+                                  (click)="addAutoDialerReducerMember(company?.reducer?.id, i, details.controls['newData' + i].value, details.controls['newApplication' + i].value)">
+                            Update
+                          </button>
+                          <button mat-button color="warn"
+                                  (click)="dropNewAutoDialerReducerMembers(company?.reducer?.id, i)"
+                                  class="but-spacer-left">
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                  <div>
+                    <button mat-raised-button color="accent"
+                            (click)="addNewAutoDialerReducerMembers(company?.reducer?.id)">
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </mat-step>
+
+              <mat-step label="Fill out your teams">
+                <div>
+                  <mat-form-field>
+                    <mat-label>New team name</mat-label>
+                    <input matInput [(ngModel)]="newTeamName">
+                  </mat-form-field>
+                  <button mat-button (click)="addAutoDialerCompanyTeam(company.domain.id)">Add</button>
+                </div>
+                <div>
+                  <mat-form-field hideRequiredMarker>
+                    <mat-label>Team</mat-label>
+                    <mat-select required name="teamName" [ngModel]="company?.team?.id || 0"
+                                disableOptionCentering (selectionChange)="changeTeam(company.id, $event.value)">
+                      <mat-option value="0">--</mat-option>
+                      <mat-option *ngFor="let team of onlyValues(list.AutoDialerTeams)"
+                                  [value]="team.id">{{team.name}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <div class="margin-bottom-15">
+                    <button mat-raised-button [color]="company?.predictive ? 'accent' : 'primary'"
+                            class="switch-button"
+                            (click)="SwitchAutoDialerCompanyPredictive(company)">
+                      {{company?.predictive ? 'Predictive' : 'Non predictive'}}
+                    </button>
+                  </div>
+                </div>
+
+                <ng-container *ngIf="company?.team?.id || false">
+                  <form #userDetails="ngForm" *ngIf="teamUserArr && teamUserArr[company?.team?.id]">
+                    <mat-form-field>
+                      <mat-label>Directory Users</mat-label>
+                      <mat-select #mySelectUser name="sipUser" multiple [(ngModel)]="teamUserArr[company?.team?.id]">
+                        <mat-select-trigger>
+                          List of users
+                          <!--                        <span *ngIf="toppings.value?.length > 1" class="example-additional-selection">
+                                                    (+{{toppings.value.length - 1}} {{toppings.value?.length === 2 ? 'other' : 'others'}})
+                                                  </span>-->
+                        </mat-select-trigger>
+                        <mat-option [value]="0" *ngIf="onlyValuesByParent(userList, company?.domain?.id).length > 0"
+                                    (click)="toggleAllSelection(mySelectUser)">
+                          All/None
+                        </mat-option>
+                        <mat-option *ngFor="let directoryUser of onlyValuesByParent(userList, company?.domain?.id)"
+                                    [value]="directoryUser.id">
+                          {{directoryUser.name}}@{{domainsList[directoryUser.parent?.id].name}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+
+                    <button mat-button color="accent" class="but-spacer-left"
+                            [disabled]="!isvalueReadyToSend(userDetails.controls['sipUser'])"
+                            (click)="UpdateAutoDialerTeamMembers(company?.team?.id, userDetails.controls['sipUser'].value); userDetails.form.markAsPristine();">
+                      Update
+                    </button>
+                  </form>
+                  <!--<div cdkDropList
+                       (cdkDropListDropped)="dropAction($event, onlySortedValues(list.AutoDialerTeamMembers[company?.team?.id]))">
+                    <form #details="ngForm" class="d-inline-grid">
+                      <div
+                        *ngIf="onlySortedValues(list.AutoDialerTeamMembers[company?.team?.id]).length === 0; else elseTeamMembers">
+                        No members yet.
+                      </div>
+
+                      <div class="spacer bg-white d-inline-block padding-right-10px"
+                           *ngFor="let action of onlySortedValues(list.AutoDialerTeamMembers[company?.team?.id]); trackBy: trackByIdFn"
+                           cdkDrag #elseTeamMembers>
+                        <div *ngIf="action.id && !isArray(action)">
+
+                          <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                          <mat-form-field hideRequiredMarker>
+        <mat-label>Application</mat-label>
+        <input matInput name="application" [(ngModel)]="action.application" required
+                                   [disabled]="!action.enabled"
+                                   [name]="'newApplication' + action.id"
+                                   appResizeInput
+                                   [resizeOnString]="action.application"
+                            >
+                          </mat-form-field>
+                          <mat-form-field hideRequiredMarker>
+        <mat-label>Data</mat-label>
+        <input matInput name="data" [(ngModel)]="action.data" required
+                                   [disabled]="!action.enabled"
+                                   [name]="'actionData' + action.id"
+                                   appResizeInput
+                                   [resizeOnString]="action.data"
+                            >
+                          </mat-form-field>
+                          <button mat-button color="accent" class="but-spacer-left"
+                                  [disabled]="!isReadyToSend(details.controls['newApplication' + action.id], details.controls['actionData' + action.id])"
+                                  (click)="UpdateAutoDialerTeamMember(action)">
+                            Update
+                          </button>
+                          <button mat-raised-button [color]="action.enabled ? 'primary' : 'accent'"
+                                  class="but-spacer-left switch-button"
+                                  (click)="SwitchAutoDialerTeamMember(action)">
+                            {{action.enabled ? 'Disable' : 'Enable'}}
+                          </button>
+                          <button mat-raised-button color="warn" class="but-spacer-left"
+                                  (click)="deleteAutoDialerCompanyTeamMember(action)">
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="spacer"
+                             *ngFor="let action of list.NewAutoDialerTeamMembers[company?.team?.id]; let i = index">
+                          <div *ngIf="action" class="spacer">
+                            <mat-form-field hideRequiredMarker>
+        <mat-label>Application</mat-label>
+        <input matInput name="application" [(ngModel)]="action.application" required
+                                     [name]="'newApplication' + i"
+                                     appResizeInput
+                                     [resizeOnString]="action.application"
+                              >
+                            </mat-form-field>
+                            <button mat-button color="accent" class="but-spacer-left"
+                                    [disabled]="!isvalueReadyToSend(details.controls['newData' + i])"
+                                    (click)="addAutoDialerTeamMember(company?.team?.id, i, details.controls['newData' + i].value)">
+                              Update
+                            </button>
+                            <button mat-button color="warn"
+                                    (click)="dropNewAutoDialerTeamMembers(company?.team?.id, i)"
+                                    class="but-spacer-left">
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                    <div>
+                      <button mat-raised-button color="accent"
+                              (click)="addNewAutoDialerTeamMembers(company?.team?.id)">
+                        Add
+                      </button>
+                    </div>
+                  </div>-->
+                </ng-container>
+              </mat-step>
+
+              <mat-step label="Fill out your number lists">
+                <div>
+                  <mat-form-field>
+                    <mat-label>New list name</mat-label>
+                    <input matInput [(ngModel)]="newListName">
+                  </mat-form-field>
+                  <button mat-button (click)="addAutoDialerCompanyList(company?.domain?.id)">Add</button>
+                </div>
+                <div>
+                  <mat-form-field hideRequiredMarker>
+                    <mat-label>List</mat-label>
+                    <mat-select required name="ListName" [ngModel]="company?.list?.id || 0"
+                                disableOptionCentering
+                                (selectionChange)="changeList(company?.id, $event.value)">
+                      <mat-option value="0">--</mat-option>
+                      <mat-option *ngFor="let num_list of onlyValues(list.AutoDialerLists)"
+                                  [value]="num_list.id">{{num_list.name}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      Add list from CSV
+                    </mat-panel-title>
+                    <mat-panel-description>
+                      Click to get details
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <mat-form-field class="but-spacer-left" style="min-width: 100%;" *ngIf="list.AutoDialerListMembers[company?.list?.id]">
+                    <mat-label>CSV Data</mat-label>
+                    <textarea matInput
+                              [disabled]="!list.AutoDialerListMembers[company?.list?.id]"
+                              [(ngModel)]="list.AutoDialerListMembers[company?.list?.id].tableMeta.csvData"
+                              placeholder="to_number, from_number, retries, name, custom_vars separator(&)"
+                              style="min-width: 100%;"
+                              cdkTextareaAutosize
+                              #autosize="cdkTextareaAutosize"
+                              cdkAutosizeMinRows="1"
+                              cdkAutosizeMaxRows="35"
+                    ></textarea>
+                  </mat-form-field>
+                  <div>
+                    <button mat-button color="accent" class="but-spacer-left"
+                            [disabled]="!list.AutoDialerListMembers[company?.list?.id]"
+                            (click)="UpdateAutoDialerList(company?.list?.id, list.AutoDialerListMembers[company?.list?.id].tableMeta.csvData)">
+                      Update
+                    </button>
+                  </div>
+                </mat-expansion-panel>
+
+
+
+                  <div *ngIf="list.AutoDialerListMembers[company?.list?.id]">
+                    <div class="filter-container">
+                      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                              (click)="GetAutoDialerListMembers(company?.list?.id, list.AutoDialerListMembers[company?.list?.id].tableMeta)">
+                        Get List
+                      </button>
+                    </div>
+                    <div class="filter-container">
+                      <mat-form-field hideRequiredMarker>
+                        <mat-label>Field</mat-label>
+                        <mat-select [(ngModel)]="filter.field" [disabled]="!list.AutoDialerListMembers[company?.list?.id].tableMeta.columns" disableOptionCentering>
+                          <mat-option [value]="null">
+                            ---
+                          </mat-option>
+                          <mat-option *ngFor="let val of list.AutoDialerListMembers[company?.list?.id].tableMeta.columns" [value]="val">
+                            {{val}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field hideRequiredMarker>
+                        <mat-label>Operand</mat-label>
+                        <mat-select [(ngModel)]="filter.operand" [disabled]="!filter.field" disableOptionCentering>
+                          <mat-option *ngFor="let val of operands" [value]="val">
+                            {{val}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <mat-form-field hideRequiredMarker>
+        <mat-label>Value</mat-label>
+        <input matInput name="value" [(ngModel)]="filter.field_value" [disabled]="!filter.operand"
+                               required>
+                      </mat-form-field>
+                      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                              *ngIf="!list.AutoDialerListMembers[company?.list?.id].tableMeta.filters[toEditFilter]"
+                              [disabled]="!this.filter.operand || !this.filter.field"
+                              (click)="addFilter(list.AutoDialerListMembers[company?.list?.id].tableMeta.filters)">
+                        Add filter
+                      </button>
+                      <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+                              *ngIf="list.AutoDialerListMembers[company?.list?.id].tableMeta.filters[toEditFilter]"
+                              [disabled]="!this.filter.operand || !this.filter.field"
+                              (click)="saveFilter(list.AutoDialerListMembers[company?.list?.id].tableMeta.filters)">
+                        Edit filter
+                      </button>
+                      <mat-form-field hideRequiredMarker class="checkbox-spacer-left">
+                        <mat-label>Field</mat-label>
+                        <mat-select [(ngModel)]="list.AutoDialerListMembers[company?.list?.id].tableMeta.sortColumns" [disabled]="!list.AutoDialerListMembers[company?.list?.id].tableMeta.columns" disableOptionCentering>
+                          <mat-option [value]="null">
+                            ---
+                          </mat-option>
+                          <mat-option *ngFor="let val of list.AutoDialerListMembers[company?.list?.id].tableMeta.columns" [value]="val">
+                            {{val}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      <mat-checkbox [(ngModel)]="list.AutoDialerListMembers[company?.list?.id].tableMeta.sortObject.desc" class="checkbox-spacer-left"
+                                    [disabled]="list.AutoDialerListMembers[company?.list?.id].tableMeta.sortObject.fields.length == 0 && !list.AutoDialerListMembers[company?.list?.id].tableMeta.sortColumns">DESC
+                      </mat-checkbox>
+                      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                              [disabled]="!list.AutoDialerListMembers[company?.list?.id].tableMeta.sortColumns"
+                              (click)="addSorter(list.AutoDialerListMembers[company?.list?.id].tableMeta)">
+                        Add sorting
+                      </button>
+                    </div>
+                    <div class="chips-pad">
+                      <mat-chip-listbox aria-label="Filter selection">
+                        <mat-chip color="accent"
+                                  *ngFor="let filterItem of list.AutoDialerListMembers[company?.list?.id].tableMeta.filters; let i = index"
+                                  (click)="editFilter(i, list.AutoDialerListMembers[company?.list?.id].tableMeta.filters)"
+                                  [selectable]="true"
+                                  [removable]="true"
+                                  (removed)="removeFilter(filterItem, list.AutoDialerListMembers[company?.list?.id].tableMeta.filters)"
+                                  selected>
+                          {{filterItem.field}} {{filterItem.operand}} {{filterItem.field_value}}
+                          <mat-icon matChipRemove>cancel</mat-icon>
+                        </mat-chip>
+                        <mat-chip color="primary"
+                                  *ngIf="list.AutoDialerListMembers[company?.list?.id].tableMeta.sortObject.fields.length > 0"
+                                  [selectable]="true"
+                                  [removable]="true"
+                                  (removed)="clearSorting(list.AutoDialerListMembers[company?.list?.id].tableMeta)"
+                                  selected>
+                          <span>ORDER BY </span>
+                          <span *ngFor="let sort of list.AutoDialerListMembers[company?.list?.id].tableMeta.sortObject.fields; let i = index;">{{sort}}<i
+                            *ngIf="i < list.AutoDialerListMembers[company?.list?.id].tableMeta.sortObject.fields.length - 1">,</i> </span>
+                          <span *ngIf="list.AutoDialerListMembers[company?.list?.id].tableMeta.sortObject.desc">DESC</span>
+                          <span *ngIf="!list.AutoDialerListMembers[company?.list?.id].tableMeta.sortObject.desc">ASC</span>
+                          <mat-icon matChipRemove>cancel</mat-icon>
+                        </mat-chip>
+                      </mat-chip-listbox>
+                    </div>
+                    <div
+                      [ngClass]="{'table-container': list.AutoDialerListMembers[company?.list?.id]?.table.length > 0 }"
+                      *ngIf="list.AutoDialerListMembers[company?.list?.id] && isArray(list.AutoDialerListMembers[company?.list?.id]?.table)"
+                    >
+                      <table mat-table class="full-width-table" [dataSource]="list.AutoDialerListMembers[company?.list?.id]?.table">
+                        <ng-container *ngFor="let disCol of list.AutoDialerListMembers[company?.list?.id].tableMeta.columns; let colIndex = index" matColumnDef="{{disCol}}">
+                          <th mat-header-cell *matHeaderCellDef  (click)="filter.field = disCol" class="spacer table-cell">{{disCol}}</th>
+                          <td mat-cell
+                              [class]="'cells-main spacer table-cell'"
+                              [ngClass]="{'input-cell-changed': list.AutoDialerListMembers.changed[element['id']] && list.AutoDialerListMembers.changed[element['id']][disCol], 'input-cell': toEdit[element['id']] === disCol }"
+                              *matCellDef="let element"
+                              (click)="toInput(element['id'], disCol)"
+                              (mouseover)="showDel[element['id']] = true"
+                              (mouseleave)="leaveDelIco(element['id'])"
+                          >
+                            <mat-icon #delIco *ngIf="disCol === 'id' && showDel[element['id']]" color="warn" class="del-ico"
+                                      (click)="DelAutoDialerListMember(element['id'], element['name'])">
+                              delete_outline
+                            </mat-icon>
+                            <span [class]="'plain-cell-text'" [ngClass]="{'to-hide': toEdit[element['id']] === disCol}">{{element[disCol]}}</span>
+                            <input matInput
+                                   class="table-input"
+                                   *ngIf="toEdit[element['id']] === disCol"
+                                   [placeholder]="disCol"
+                                   [(ngModel)]="element[disCol]"
+                                   [title]="disCol"
+                                   (keydown.enter)="UpdateAutoDialerListMember(element['id'], disCol, element[disCol]);"
+                                   (change)="markChanged(element['id'], disCol)"
+                                   appAutoFocus
+                            >
+                            <!--<mat-icon #editIco class="edit-ico" color="primary" *ngIf="toEdit[element['id']] === disCol" aria-hidden="false" aria-label="Edit">edit</mat-icon>-->
+                          </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="list.AutoDialerListMembers[company?.list?.id].tableMeta.columns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: list.AutoDialerListMembers[company?.list?.id].tableMeta.columns"></tr>
+                      </table>
+                    </div>
+                    <mat-paginator *ngIf="list.AutoDialerListMembers[company?.list?.id]?.total > 0"
+                                   [length]="list.AutoDialerListMembers[company?.list?.id]?.total"
+                                   [pageIndex]="pageEvent.pageIndex"
+                                   [pageSize]="pageEvent.pageSize"
+                                   [pageSizeOptions]="paginationScale"
+                                   (page)="pageEvent = $event; GetAutoDialerListMembers(company?.list?.id, list.AutoDialerListMembers[company?.list?.id].tableMeta)"
+
+                    >
+                    </mat-paginator>
+                  </div>
+
+
+
+              </mat-step>
+
+              <mat-step label="Proceed">
+                Everything seems correct.
+                <div>
+                  <button mat-button>Done</button>
+                </div>
+              </mat-step>
+            </mat-horizontal-stepper>
+          </mat-expansion-panel>
+        </ng-container>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+  <mat-tab label="Add">
+    <mat-card>
+      <mat-card-content>
+        <form class="spacer spacerb" *ngIf="list">
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Domain</mat-label>
+            <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
+              <mat-option>--</mat-option>
+              <mat-option *ngFor="let domain of onlyValues(domainsList)"
+                          [value]="domain.id">{{domain.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="New Company name" [(ngModel)]="newCompanyName" required name="name">
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="addAutoDialerCompany()"
+                  [disabled]="!domainId && !newCompanyName">Submit
+          </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+  <mat-tab label="Delete/Rename">
+    <mat-card>
+      <mat-card-content>
+        <form class="spacer spacerb" #delForm="ngForm">
+          <h3>Companies:</h3>
+          <div *ngIf="list.AutoDialerCompanies">
+            <div *ngFor="let company of onlyValues(list.AutoDialerCompanies); trackBy: trackByFn">
+              <mat-form-field hideRequiredMarker>
+        <mat-label>Queue name</mat-label>
+        <input matInput name="Queue name" required [ngModel]="company.name"
+                       [name]="'company::' + company.id">
+              </mat-form-field>
+              <button mat-button color="accent" [disabled]="checkDirty(delForm.controls['company::' + company.id])"
+                      (click)="openBottomSheetCompany(company.id, delForm.controls['company::' + company.id].value, list.AutoDialerCompanies[company.id].name, 'rename')">
+                Update
+              </button>
+              <button mat-raised-button color="warn"
+                      (click)="openBottomSheetCompany(company.id, delForm.controls['company::' + company.id].value, list.AutoDialerCompanies[company.id].name, 'delete')">
+                Delete
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+</mat-tab-group>

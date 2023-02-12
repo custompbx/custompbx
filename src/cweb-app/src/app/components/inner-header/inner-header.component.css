@@ -1,0 +1,11 @@
+.mat-progress-bar {
+  display: block;
+  height: 2px;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  transition: opacity 250ms linear;
+  width: 100%;
+  z-index: 1000;
+}

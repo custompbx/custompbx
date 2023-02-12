@@ -1,0 +1,115 @@
+<app-inner-header name="Dashboard" [loadCounter]="loadCounter"></app-inner-header>
+<div class="grid-container">
+  <h1 class="mat-h1">System</h1>
+  <div class="main-panel">
+    <ng-container *ngFor="let card of cards | async; trackBy: trackByFn; let i = index;">
+      <div [class]="card?.class" *ngIf="showCard(card?.moduleName)">
+        <mat-card class="dashboard-card">
+          <mat-card-header>
+            <mat-card-title>
+              {{card.title}}
+              <!--            <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
+                            <mat-icon>more_vert</mat-icon>
+                      </button>
+                          <mat-menu #menu="matMenu" xPosition="before">
+                            <button mat-menu-item>Expand</button>
+                            <button mat-menu-item>Remove</button>
+                          </mat-menu>-->
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="dashboard-card-content">
+            <ng-container
+              *ngIf="list && list.dynamic_metrics && (list.dynamic_metrics[card.field] || list[card.field] || list[card.field] == 0 || card.type == 'table')">
+              <ng-container [ngSwitch]="card.type">
+                <ng-container *ngSwitchCase="'pie'">
+                  <div class="chart">
+                    <canvas baseChart
+                            height="300%"
+                            [datasets]="pieData[card.field]"
+                            [labels]="card.chartLabels"
+                            [type]="card.type"
+                            [legend]="pieChartLegend"
+                            [options]="card.chartOption">
+                    <!--[colors]="pieChartColors"
+                            -->
+                    </canvas>
+                  </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'bar'">
+                  <div style="display: block">
+                    <canvas baseChart
+                            height="300%"
+                            [datasets]="barData[card.field]"
+                            [options]="card.chartOption"
+                            [plugins]="barChartPlugins"
+                            [legend]="barChartLegend"
+                            [labels]="card.chartLabels"
+                            [colors]="barChartColors"
+                            [chartType]="card.type">
+                    </canvas>
+                  </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'number'">
+                  <div class="calls-block">
+                    <h1 class="numberAnswered">Answered: {{list[card.field].answered}}</h1>
+                    <h1 class="numberCircle">Total: {{list[card.field].total}}</h1>
+                  </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'items'">
+                  <div class="calls-block mat-headline">
+                    <div>Host: {{list.hostname}}</div>
+                    <div>OS: {{list.os}}</div>
+                    <div>Platform: {{list.platform}}</div>
+                    <div>CPU: {{list.cpu_model}}</div>
+                    <div>CPU Frequency: {{list.cpu_frequency}}</div>
+                  </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="'table'">
+                  <div style="display: block">
+                    <table mat-table [dataSource]="list[card.field]" class="mat-elevation-z8">
+                      <!-- Id Column -->
+                      <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef> ID</th>
+                        <td mat-cell *matCellDef="let element"> {{element.id}}</td>
+                      </ng-container>
+                      <!-- Name Column -->
+                      <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef> Name</th>
+                        <td mat-cell *matCellDef="let element"> {{element.name}}</td>
+                      </ng-container>
+                      <!-- Enabled Column -->
+                      <ng-container matColumnDef="enabled">
+                        <th mat-header-cell *matHeaderCellDef> Enabled</th>
+                        <td mat-cell *matCellDef="let element">
+                          <span *ngIf="!element.enabled" color="warn" selected>{{element.enabled}}</span>
+                          <span *ngIf="element.enabled" color="primary" selected>{{element.enabled}}</span>
+                        </td>
+                      </ng-container>
+                      <!-- Uri Column -->
+                      <ng-container matColumnDef="uri">
+                        <th mat-header-cell *matHeaderCellDef> URI</th>
+                        <td mat-cell *matCellDef="let element"> {{element.uri}}</td>
+                      </ng-container>
+                      <!-- State Column -->
+                      <ng-container matColumnDef="state">
+                        <th mat-header-cell *matHeaderCellDef> State</th>
+                        <td mat-cell *matCellDef="let element"> {{element.state}}</td>
+                      </ng-container>
+                      <!-- Started Column -->
+                      <ng-container matColumnDef="started">
+                        <th mat-header-cell *matHeaderCellDef> Started</th>
+                        <td mat-cell *matCellDef="let element"> {{element.started}}</td>
+                      </ng-container>
+                      <tr mat-header-row *matHeaderRowDef="card.tableFields"></tr>
+                      <tr mat-row *matRowDef="let row; columns: card.tableFields;"></tr>
+                    </table>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -1,0 +1,74 @@
+.main-content-wrapper {
+  width: 250px;
+  position: fixed;
+  top: 127px;
+  z-index: 35000;
+  right: 100px;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  -webkit-box-shadow: 0px 5px 26px -8px rgba(158,158,158,1);
+  -moz-box-shadow: 0px 5px 26px -8px rgba(158,158,158,1);
+  box-shadow: 0px 5px 26px -8px rgba(158,158,158,1);
+}
+
+.buttons-pad {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  width: 225px;
+  margin: 0 auto 10px;
+}
+
+.actions-buttons-pad {
+  display: grid;
+  margin: auto;
+}
+
+.phone-digit-button {
+  border: 1px solid #dedede;
+  font-size: 25px;
+  color: #333333;
+  margin: 1px;
+  box-shadow: none;
+  background-color: white;
+  border-radius: 0px;
+  min-height: 40px;
+  outline: none;
+}
+
+.phone-digit-button:hover {
+  background-color: #e7e7e7;
+}
+
+.no-shadow {
+  box-shadow: none;
+}
+
+.phone-action-button {
+  border-radius: 0;
+}
+
+.timer {
+  margin: -10px auto 5px;
+  text-align: center;
+}
+
+.number-field {
+  width: 90%;
+  margin: 5px auto 0;
+  display: block;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.dialpad-button-remove {
+  position: absolute;
+  right: 30px;
+}

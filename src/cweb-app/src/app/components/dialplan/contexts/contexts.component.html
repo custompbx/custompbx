@@ -1,0 +1,582 @@
+<app-inner-header name="Dialplan" [loadCounter]="loadCounter"></app-inner-header>
+ <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list" (selectedIndexChange)="mainTabChanged($event)">
+  <mat-tab label="List">
+    <mat-card *ngIf="loadCounter === 0 && !onlyValues(list)?.length">
+      <mat-card-content>
+        Here no any contexts yet. You can start creating them or try to import from existing config.
+        <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                (click)="importDialplan()">
+          Import
+        </button>
+      </mat-card-content>
+    </mat-card>
+    <mat-card *ngIf="onlyValues(list)?.length">
+      <mat-card-header>
+        <mat-card-subtitle>Contexts</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngFor="let context of onlyValues(list); trackBy: trackByFn" class="panel-wrapper">
+          <mat-expansion-panel (opened)="getExtensions(context.id)" *ngIf="context">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{context.name}}
+              </mat-panel-title>
+              <mat-panel-description>
+                Click to get details
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div cdkDropList class="example-list"
+                 (cdkDropListDropped)="dropExtension($event, context.extensions)">
+              <div class="panel-wrapper"
+                   *ngFor="let extension of context.extensions; trackBy: trackByFn" cdkDrag>
+                <mat-expansion-panel (opened)="getConditions(extension.id)" *ngIf="extension">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                      {{extension.name}}
+                      <span *ngIf="extension.continue === 'true'" class="continue-label">Continue</span>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                      Click to get details
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <mat-checkbox class="continue-box" [checked]="extension.continue === 'true'" (change)="switchContinue(extension)">Continue</mat-checkbox>
+                  <button mat-raised-button color="accent"
+                          (click)="addCondition(extension.id)">
+                    Add Condition
+                  </button>
+                  <div cdkDropList class="example-list"
+                       (cdkDropListDropped)="dropCondition($event, extension.conditions)">
+                    <div class="panel-wrapper"
+                         *ngFor="let condition of extension.conditions; trackBy: trackById;" cdkDrag>
+                      <mat-expansion-panel (opened)="getActions(condition.id)" *ngIf="condition">
+                        <mat-expansion-panel-header>
+                          <mat-panel-title>
+                            <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                            {{condition | objectDataToName}}
+                          </mat-panel-title>
+                          <mat-panel-description>
+                            Click to get details
+                          </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <form #details="ngForm">
+                          <h3>Condition fields:</h3>
+                          <div class="spacer">
+                            <div  *ngIf="!condition.regex">
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Field</mat-label>
+        <input matInput name="field" [(ngModel)]="condition.field" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionField' + condition.id">
+                              </mat-form-field>
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Expression</mat-label>
+        <input matInput name="expression" [(ngModel)]="condition.expression"
+                                       required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionExpression' + condition.id">
+                              </mat-form-field>
+                            </div>
+                            <div *ngIf="!condition.field && !condition.regex">
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Dst</mat-label>
+        <input matInput name="dst" [(ngModel)]="condition.dst" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionDst' + condition.id">
+                              </mat-form-field>
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Hour</mat-label>
+        <input matInput name="hour" [(ngModel)]="condition.hour" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionHour' + condition.id">
+                              </mat-form-field>
+                            </div>
+                            <div *ngIf="!condition.field && !condition.regex">
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Mday</mat-label>
+        <input matInput name="mday" [(ngModel)]="condition.mday" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionMday' + condition.id">
+                              </mat-form-field>
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Minday</mat-label>
+        <input matInput name="minday" [(ngModel)]="condition.minday" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionMinday' + condition.id">
+                              </mat-form-field>
+                            </div>
+                            <div *ngIf="!condition.field && !condition.regex">
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Minute</mat-label>
+        <input matInput name="minute" [(ngModel)]="condition.minute" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionMinute' + condition.id">
+                              </mat-form-field>
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Mon</mat-label>
+        <input matInput name="mon" [(ngModel)]="condition.mon" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionMon' + condition.id">
+                              </mat-form-field>
+                            </div>
+                            <div *ngIf="!condition.field && !condition.regex">
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Mweek</mat-label>
+        <input matInput name="mweek" [(ngModel)]="condition.mweek" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionMweek' + condition.id">
+                              </mat-form-field>
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Date-time</mat-label>
+        <input matInput name="date-time" [(ngModel)]="condition.date_time" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionDate_time' + condition.id">
+                              </mat-form-field>
+                            </div>
+                            <div *ngIf="!condition.field && !condition.regex">
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Time_of_day</mat-label>
+        <input matInput name="time_of_day" [(ngModel)]="condition.time_of_day"
+                                       required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionTime_of_day' + condition.id">
+                              </mat-form-field>
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Tz_offset</mat-label>
+        <input matInput name="tz_offset" [(ngModel)]="condition.tz_offset" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionTz_offset' + condition.id">
+                              </mat-form-field>
+                            </div>
+                            <div *ngIf="!condition.field && !condition.regex">
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Wday</mat-label>
+        <input matInput name="wday" [(ngModel)]="condition.wday" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionWday' + condition.id">
+                              </mat-form-field>
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Week</mat-label>
+        <input matInput name="week" [(ngModel)]="condition.week" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionWeek' + condition.id">
+                              </mat-form-field>
+                            </div>
+                            <div *ngIf="!condition.field && !condition.regex">
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Yday</mat-label>
+        <input matInput name="yday" [(ngModel)]="condition.yday" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionYday' + condition.id">
+                              </mat-form-field>
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Year</mat-label>
+        <input matInput name="year" [(ngModel)]="condition.year" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionYear' + condition.id">
+                              </mat-form-field>
+                            </div>
+                            <div>
+                              <mat-form-field hideRequiredMarker *ngIf="!condition.field">
+        <mat-label>Regex</mat-label>
+        <input matInput name="regex" [(ngModel)]="condition.regex" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionRegex' + condition.id">
+                              </mat-form-field>
+                              <mat-form-field hideRequiredMarker>
+        <mat-label>Break</mat-label>
+        <input matInput name="break" [(ngModel)]="condition.break" required
+                                       [disabled]="!condition.enabled"
+                                       [name]="'conditionBreak' + condition.id">
+                              </mat-form-field>
+                              <button mat-button color="accent" class="but-spacer-left"
+
+                                      (click)="updateCondition(condition)">
+                                Update
+                              </button>
+                              <button *ngIf="condition.enabled" mat-raised-button color="accent"
+                                      class="but-spacer-left switch-button"
+                                      (click)="switchCondition(condition)">
+                                Disable
+                              </button>
+                              <button *ngIf="!condition.enabled" mat-raised-button color="primary"
+                                      class="but-spacer-left switch-button"
+                                      (click)="switchCondition(condition)">
+                                Enable
+                              </button>
+                              <button mat-raised-button color="warn" class="but-spacer-left"
+                                      (click)="openBottomSheetCondition(condition)">
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                          <h3 *ngIf="condition.regex">Regexes:</h3>
+                          <div cdkDropList class="example-list" *ngIf="condition.regex">
+                            <div *ngFor="let regex of condition.regexes; trackBy: trackById">
+                              <div *ngIf="regex">
+                                <mat-form-field hideRequiredMarker>
+        <mat-label>Field</mat-label>
+        <input matInput name="field" [(ngModel)]="regex.field" required
+                                         [disabled]="!regex.enabled"
+                                         [name]="'regexField' + regex.id">
+                                </mat-form-field>
+                                <mat-form-field hideRequiredMarker>
+        <mat-label>Expression</mat-label>
+        <input matInput name="expression" [(ngModel)]="regex.expression" required
+                                         [disabled]="!regex.enabled"
+                                         [name]="'regexExpression' + regex.id">
+                                </mat-form-field>
+                                <button mat-button color="accent" class="but-spacer-left"
+                                        [disabled]="!isReadyToSend(details.controls['regexField' + regex.id], details.controls['regexExpression' + regex.id])"
+                                        (click)="updateRegex(regex)">
+                                  Update
+                                </button>
+                                <button *ngIf="regex.enabled" mat-raised-button color="accent"
+                                        class="but-spacer-left switch-button"
+                                        (click)="switchRegex(regex)">
+                                  Disable
+                                </button>
+                                <button *ngIf="!regex.enabled" mat-raised-button color="primary"
+                                        class="but-spacer-left switch-button"
+                                        (click)="switchRegex(regex)">
+                                  Enable
+                                </button>
+                                <button mat-raised-button color="warn" class="but-spacer-left"
+                                        (click)="deleteRegex(regex)">
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                            <div cdkDropList class="example-list">
+                              <div *ngFor="let newRegex of condition.newRegexes; trackBy: trackByFn; let i = index;">
+                                <div *ngIf="newRegex" class="spacer">
+                                  <mat-form-field hideRequiredMarker>
+        <mat-label>Field</mat-label>
+        <input matInput name="field" [(ngModel)]="newRegex.field" required
+                                           [disabled]="!newRegex.enabled"
+                                           [name]="'newRegexField' + i">
+                                  </mat-form-field>
+                                  <mat-form-field hideRequiredMarker>
+        <mat-label>Expression</mat-label>
+        <input matInput name="expression" [(ngModel)]="newRegex.expression" required
+                                           [disabled]="!newRegex.enabled"
+                                           [name]="'newRegexExpression' + i">
+                                  </mat-form-field>
+                                  <button mat-button color="accent" class="but-spacer-left"
+                                          [disabled]="!isReadyToSend(details.controls['newRegexField' + i], details.controls['newRegexExpression' + i])"
+                                          (click)="addRegex(context.id, extension.id, condition.id, i, newRegex)">
+                                    Update
+                                  </button>
+                                  <button mat-button color="warn" class="but-spacer-left"
+                                          (click)="delNewRegex(i, context.id, extension.id, condition.id)">
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                              <button mat-raised-button color="accent"
+                                      (click)="addNewRegex(context.id, extension.id, condition.id)">
+                                Add
+                              </button>
+                            </div>
+                          </div>
+
+                          <h3>Actions:</h3>
+                          <div cdkDropList class="example-list"
+                               (cdkDropListDropped)="dropAction($event, condition.actions)">
+                            <div *ngFor="let action of condition.actions; trackBy: trackById" cdkDrag>
+                              <div *ngIf="action">
+                                <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                                <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput name="name" [(ngModel)]="action.application" required
+                                         [disabled]="!action.enabled"
+                                         [name]="'actionApplication' + action.id"
+                                         appResizeInput
+                                         [resizeOnString]="action.application"
+                                  >
+                                </mat-form-field>
+                                <mat-form-field hideRequiredMarker [ngClass]="{'expanded': !inlineActions[action.application]}">
+        <mat-label>Data</mat-label>
+        <input matInput name="data" [(ngModel)]="action.data" required
+                                         [disabled]="!action.enabled"
+                                         [name]="'actionData' + action.id"
+                                         appResizeInput
+                                         [resizeOnString]="action.data"
+                                  >
+                                </mat-form-field>
+                                <mat-form-field hideRequiredMarker *ngIf="inlineActions[action.application]" class="inline-action">
+        <mat-label>Inline</mat-label>
+        <input matInput name="inline" [(ngModel)]="action.inline" required
+                                         [disabled]="!action.enabled"
+                                         [name]="'actionInline' + action.id">
+                                </mat-form-field>
+                                <button mat-button color="accent" class="but-spacer-left"
+                                        [disabled]="!isReadyToSendAction(details.controls['actionApplication' + action.id], details.controls['actionData' + action.id], details.controls['actionInline' + action.id])"
+                                        (click)="updateAction(action)">
+                                  Update
+                                </button>
+                                <button *ngIf="action.enabled" mat-raised-button color="accent"
+                                        class="but-spacer-left switch-button"
+                                        (click)="switchAction(action)">
+                                  Disable
+                                </button>
+                                <button *ngIf="!action.enabled" mat-raised-button color="primary"
+                                        class="but-spacer-left switch-button"
+                                        (click)="switchAction(action)">
+                                  Enable
+                                </button>
+                                <button mat-raised-button color="warn" class="but-spacer-left"
+                                        (click)="deleteAction(action)">
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                            <div *ngFor="let newAction of condition.newActions; trackBy: trackByFn; let i = index;">
+                              <div *ngIf="newAction" class="spacer">
+                                <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput name="name" [(ngModel)]="newAction.application" required
+                                         [name]="'newActionApplication' + i"
+                                         appResizeInput
+                                         [resizeOnString]="newAction.application"
+                                  >
+                                </mat-form-field>
+                                <mat-form-field hideRequiredMarker>
+        <mat-label>Data</mat-label>
+        <input matInput name="data" [(ngModel)]="newAction.data" required
+                                         [name]="'newActionData' + i"
+                                         appResizeInput
+                                         [resizeOnString]="newAction.data"
+                                  >
+                                </mat-form-field>
+                                <mat-form-field hideRequiredMarker *ngIf="inlineActions[newAction.application]" class="inline-action">
+        <mat-label>Inline</mat-label>
+        <input matInput name="inline" [(ngModel)]="newAction.inline" required
+                                         [name]="'newActionData' + i">
+                                </mat-form-field>
+                                <button mat-button color="accent" class="but-spacer-left"
+                                        [disabled]="!isReadyToSend(details.controls['newActionApplication' + i], details.controls['newActionData' + i])"
+                                        (click)="addAction(context.id, extension.id, condition.id, i, newAction)">
+                                  Update
+                                </button>
+                                <button mat-button color="warn" class="but-spacer-left"
+                                        (click)="delNewAction(i, context.id, extension.id, condition.id)">
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                            <button mat-raised-button color="accent"
+                                    (click)="addNewAction(context.id, extension.id, condition.id)">
+                              Add
+                            </button>
+                          </div>
+
+                          <h3>Antiactions:</h3>
+                          <div cdkDropList class="example-list"
+                               (cdkDropListDropped)="dropAntiaction($event, condition.antiactions)">
+                            <div *ngFor="let antiaction of condition.antiactions; trackBy: trackById"
+                                 cdkDrag>
+                              <div *ngIf="antiaction">
+                                <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                                <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput name="name" [(ngModel)]="antiaction.application" required
+                                         [disabled]="!antiaction.enabled"
+                                         [name]="'antiactionApplication' + antiaction.id"
+                                         appResizeInput
+                                         [resizeOnString]="antiaction.application"
+                                  >
+                                </mat-form-field>
+                                <mat-form-field hideRequiredMarker>
+        <mat-label>Data</mat-label>
+        <input matInput name="data" [(ngModel)]="antiaction.data" required
+                                         [disabled]="!antiaction.enabled"
+                                         [name]="'antiactionData' + antiaction.id"
+                                         appResizeInput
+                                         [resizeOnString]="antiaction.data"
+                                  >
+                                </mat-form-field>
+                                <button mat-button color="accent" class="but-spacer-left"
+                                        [disabled]="!isReadyToSend(details.controls['antiactionApplication' + antiaction.id], details.controls['antiactionData' + antiaction.id])"
+                                        (click)="updateAntiaction(antiaction)">
+                                  Update
+                                </button>
+                                <button *ngIf="antiaction.enabled" mat-raised-button color="accent"
+                                        class="but-spacer-left switch-button"
+                                        (click)="switchAntiaction(antiaction)">
+                                  Disable
+                                </button>
+                                <button *ngIf="!antiaction.enabled" mat-raised-button color="primary"
+                                        class="but-spacer-left switch-button"
+                                        (click)="switchAntiaction(antiaction)">
+                                  Enable
+                                </button>
+                                <button mat-raised-button color="warn" class="but-spacer-left"
+                                        (click)="deleteAntiaction(antiaction)">
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                            <div
+                              *ngFor="let newAntiaction of condition.newAntiactions; trackBy: trackByFn; let i = index;">
+                              <div *ngIf="newAntiaction" class="spacer">
+                                <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput name="name" [(ngModel)]="newAntiaction.application" required
+                                         [name]="'newAntiactionApplication' + i"
+                                         appResizeInput
+                                         [resizeOnString]="newAntiaction.application"
+                                  >
+                                </mat-form-field>
+                                <mat-form-field hideRequiredMarker>
+        <mat-label>Data</mat-label>
+        <input matInput name="data" [(ngModel)]="newAntiaction.data" required
+                                         [name]="'newAntiactionData' + i"
+                                         appResizeInput
+                                         [resizeOnString]="newAntiaction.data"
+                                  >
+                                </mat-form-field>
+                                <button mat-button color="accent" class="but-spacer-left"
+                                        [disabled]="!isReadyToSend(details.controls['newAntiactionApplication' + i], details.controls['newAntiactionData' + i])"
+                                        (click)="addAntiaction(context.id, extension.id, condition.id, i, newAntiaction)">
+                                  Update
+                                </button>
+                                <button mat-button color="warn" class="but-spacer-left"
+                                        (click)="delNewAntiaction(i, context.id, extension.id, condition.id)">
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                            <button mat-raised-button color="accent"
+                                    (click)="addNewAntiaction(context.id, extension.id, condition.id)">
+                              Add
+                            </button>
+                          </div>
+                        </form>
+
+                      </mat-expansion-panel>
+                    </div>
+                  </div>
+
+                </mat-expansion-panel>
+              </div>
+            </div>
+
+          </mat-expansion-panel>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Add">
+    <form class="spacer spacerb" (ngSubmit)="onContextSubmit()">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="New context name" required name="name" [(ngModel)]="newContextName">
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Submit</button>
+    </form>
+    <form class="spacer spacerb" (ngSubmit)="onExtensionSubmit()">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Context</mat-label>
+        <mat-select required name="context" [(ngModel)]="newContextId" disableOptionCentering>
+          <mat-option *ngFor="let context of onlyValues(list); trackBy: trackByFn" [value]="context.id">
+          <span *ngIf="context">
+            {{context.name}}
+          </span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="New extension name" required name="name" [(ngModel)]="newExtensionName">
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Submit</button>
+    </form>
+  </mat-tab>
+
+  <mat-tab label="Rename/Delete">
+    <form class="spacer spacerb" #deleteForm="ngForm">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Context</mat-label>
+        <mat-select required name="context" [(ngModel)]="contextId" (selectionChange)="selectContext($event)" disableOptionCentering>
+          <mat-option *ngFor="let context of onlyValues(list); trackBy: trackByFn" [value]="context.id">
+          <span *ngIf="context">
+            {{context.name}}
+          </span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div *ngIf="list && list[contextId]">
+        <h3>Context:</h3>
+        <mat-form-field hideRequiredMarker>
+        <mat-label>Context name</mat-label>
+        <input matInput name="Context name" required [ngModel]="list[contextId].name"
+                 [name]="'context::' + contextId">
+        </mat-form-field>
+        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['context::' + contextId])"
+                (click)="openBottomSheetContext(contextId, deleteForm.controls['context::' + contextId].value, list[contextId].name, 'rename')">
+          Update
+        </button>
+        <button mat-raised-button color="warn"
+                (click)="openBottomSheetContext(contextId, deleteForm.controls['context::' + contextId].value, list[contextId].name, 'delete')">
+          Delete
+        </button>
+        <h3>Extensions:</h3>
+        <div *ngFor="let extension of list[contextId].extensions;" class="panel-wrapper">
+          <mat-form-field hideRequiredMarker>
+        <mat-label>Extension name</mat-label>
+        <input matInput name="Extension name" required [ngModel]="extension.name"
+                   [name]="'extension::' + extension.id">
+          </mat-form-field>
+          <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['extension::' + extension.id])"
+                  (click)="openBottomSheetExtension(extension.id, deleteForm.controls['extension::' + extension.id].value, extension.name, 'rename')">
+            Update
+          </button>
+          <button mat-raised-button color="warn"
+                  (click)="openBottomSheetExtension(extension.id, deleteForm.controls['extension::' + extension.id].value, extension.name, 'delete')">
+            Delete
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-tab>
+
+  <mat-tab label="Dialplan Settings">
+    <div class="spacer spacerv">
+      <h3>Settings</h3>
+      <button mat-raised-button color="basic" *ngIf="!staticDialplan"
+              (click)="switchNoProceed()">
+        Enable static dialplan
+      </button>
+      <button mat-raised-button color="primary" *ngIf="staticDialplan"
+              (click)="switchNoProceed()">
+        Disable static dialplan
+      </button>
+    </div>
+    <mat-divider class="spacer spacerv"></mat-divider>
+    <div class="spacer spacerv">
+      <h3>Dialplan Debug</h3>
+      <button mat-raised-button color="basic" *ngIf="!debug.enabled"
+              (click)="switchDebug()">
+        Enable collecting
+      </button>
+      <button mat-raised-button color="primary" *ngIf="debug.enabled"
+              (click)="switchDebug()">
+        Disable collecting
+      </button>
+      <button mat-raised-button color="basic" class="but-spacer-left"
+              (click)="clearDebug()">
+        Clear
+      </button>
+      <div *ngFor="let log of debug.log; trackBy: trackByFn; let i = index;">
+        <h3>Conditions log:</h3>
+        <p *ngFor="let conditions of log.log; trackBy: trackByFn; let i = index;">{{conditions}}</p>
+        <h3>Got Actions:</h3>
+        <p *ngFor="let actions of log.actions; trackBy: trackByFn; let i = index;">application={{actions.application}} data={{actions.data}}</p>
+        <mat-divider></mat-divider>
+      </div>
+    </div>
+  </mat-tab>
+</mat-tab-group>

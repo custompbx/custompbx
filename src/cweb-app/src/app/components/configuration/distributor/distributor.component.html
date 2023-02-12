@@ -1,0 +1,128 @@
+<app-inner-header name="Distributor" [loadCounter]="loadCounter"></app-inner-header>
+<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
+ <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list && list.exists !== false">
+  <mat-tab label="List">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-subtitle>Lists</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngFor="let item of onlyValues(list.lists); trackBy: trackByFn">
+          <mat-expansion-panel (opened)="getDetails(item.id)" (closed)="clearDetails(item.id)">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{item.name}}
+              </mat-panel-title>
+              <mat-panel-description>
+                Click to get details
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <form #details="ngForm">
+              <h3>Nodes:</h3>
+              <div *ngIf="item && item.nodes">
+                <div class="spacer" *ngFor="let node of onlyValues(item.nodes)">
+                  <div *ngIf="node.id && !isArray(node)">
+                    <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput name="name" [(ngModel)]="node.name" required
+                             [disabled]="!node.enabled"
+                             [name]="'nodeName' + node.id"
+                             appResizeInput
+                             [resizeOnString]="node.name"
+                      >
+                    </mat-form-field>
+                    <mat-form-field hideRequiredMarker>
+        <mat-label>Weight</mat-label>
+        <input matInput name="weight" [(ngModel)]="node.weight" required
+                             [disabled]="!node.enabled"
+                             [name]="'nodeMain' + node.id"
+                             appResizeInput
+                             [resizeOnString]="node.weight"
+                      >
+                    </mat-form-field>
+                    <button mat-button color="accent" class="but-spacer-left"
+                            [disabled]="!isReadyToSend(details.controls['nodeName' + node.id], details.controls['nodeMain' + node.id])"
+                            (click)="updateNode(node)">
+                      Update
+                    </button>
+                    <button *ngIf="node.enabled" mat-raised-button color="accent"
+                            class="but-spacer-left switch-button" (click)="switchNode(node)">
+                      Disable
+                    </button>
+                    <button *ngIf="!node.enabled" mat-raised-button color="primary"
+                            class="but-spacer-left switch-button" (click)="switchNode(node)">
+                      Enable
+                    </button>
+                    <button mat-raised-button color="warn" class="but-spacer-left" (click)="deleteNode(node)">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="item && item.nodes">
+                  <div class="spacer" *ngFor="let node of item.nodes.new; let i = index">
+                    <div *ngIf="node">
+                      <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput name="name" [(ngModel)]="node.name" required [name]="'newNodeName' + i"
+                               appResizeInput
+                               [resizeOnString]="node.name"
+                        >
+                      </mat-form-field>
+                      <mat-form-field hideRequiredMarker>
+        <mat-label>Weight</mat-label>
+        <input matInput name="weight" [(ngModel)]="node.weight" required [name]="'newNodeWeight' + i"
+                               appResizeInput
+                               [resizeOnString]="node.weight"
+                        >
+                      </mat-form-field>
+                      <button mat-button color="accent" class="but-spacer-left"
+                              [disabled]="!isReadyToSend(details.controls['newNodeName' + i], details.controls['newNodeWeight' + i])"
+                              (click)="newNode(item.id, i, details.controls['newNodeName' + i].value, details.controls['newNodeWeight' + i])">
+                        Update
+                      </button>
+                      <button mat-button color="warn" (click)="dropNewNode(item.id, i)" class="but-spacer-left">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button mat-raised-button color="accent" class="spacer" (click)="addDistributorNodeField(item.id)">
+                Add
+              </button>
+            </form>
+          </mat-expansion-panel>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Add">
+    <form class="spacer spacerb" (ngSubmit)="onDistributorListSubmit()" *ngIf="list">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="New list name" required name="name" [(ngModel)]="newItemName">
+      </mat-form-field>
+      <button mat-raised-button color="primary" name="submit">Submit</button>
+    </form>
+  </mat-tab>
+
+  <mat-tab label="Delete/Rename">
+    <form class="spacer spacerb" #deleteForm="ngForm"  *ngIf="list">
+      <div *ngFor="let item of onlyValues(list.lists); trackBy: trackByFn">
+        <mat-form-field hideRequiredMarker>
+        <mat-label>Distributor list name</mat-label>
+        <input matInput name="Distributor list name" required [ngModel]="item.name" [name]="'list::' + item.id">
+        </mat-form-field>
+        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['list::' + item.id])"
+                (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'rename')">
+          Update
+        </button>
+        <button mat-raised-button color="warn"
+                (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'delete')">
+          Delete
+        </button>
+      </div>
+    </form>
+  </mat-tab>
+</mat-tab-group>

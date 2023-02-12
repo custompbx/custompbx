@@ -1,0 +1,14 @@
+bin/*
+/src/custompbx/.idea/
+/src/custompbx/.run/
+/src/cweb-app/node_modules/
+/src/cweb-app/.angular/
+/src/cweb-app/.idea
+/src/cweb-app/.run
+/src/cweb-app/dist/
+.vscode
+src/custompbx/Gopkg.lock
+src/custompbx/Gopkg.toml
+/.idea
+/src/custompbx/Gopkg.lock
+/src/custompbx/Gopkg.toml

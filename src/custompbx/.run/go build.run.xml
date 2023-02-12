@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <working_directory value="$PROJECT_DIR$/src/custompbx" />
+    <go_parameters value="-ldflags=&quot;-s -w&quot;" />
+    <envs>
+      <env name="GOOS" value="linux" />
+      <env name="GOARCH" value="amd64" />
+    </envs>
+    <kind value="DIRECTORY" />
+    <filePath value="$PROJECT_DIR$" />
+    <package value="custompbx" />
+    <directory value="$PROJECT_DIR$/src/custompbx" />
+    <output_directory value="$PROJECT_DIR$/bin" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>

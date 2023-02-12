@@ -1,0 +1,131 @@
+<form *ngIf="exist" #form="ngForm" cdkDropList
+      (cdkDropListDropped)="dropAction($event, onlySortedValues(items))">
+  <div class="spacer" *ngFor="let item of onlySortedValues(items); trackBy: trackByFnId;" cdkDrag>
+    <div *ngIf="item.id && !isArray(item)">
+      <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+      <mat-form-field hideRequiredMarker  [ngStyle]="fieldsMask.name?.style">
+        <mat-label>{{fieldsMask.name.name}}</mat-label>
+        <input matInput [placeholder]="fieldsMask.name.name"
+               [(ngModel)]="item[fieldsMask.name.name]" required
+               [disabled]="!item.enabled || disIf(item[fieldsMask.name.depend], fieldsMask.name.value)"
+               [name]="'itemName' + item.id"
+               appResizeInput
+               [resizeOnString]="item[fieldsMask.name.name]"
+        >
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.value?.style">
+        <mat-label>{{fieldsMask.value.name}}</mat-label>
+        <input matInput [placeholder]="fieldsMask.value.name"
+               [(ngModel)]="item[fieldsMask.value.name]"
+               [disabled]="!item.enabled || disIf(item[fieldsMask.value.depend], fieldsMask.value.value)"
+               [name]="'itemValue' + item.id"
+               appResizeInput
+               [resizeOnString]="item[fieldsMask.value.name]"
+        ><!--(inputType)="item.textarea = $event"-->
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField1" [ngStyle]="fieldsMask.extraField1?.style">
+        <mat-label>{{fieldsMask.extraField1.name}}</mat-label>
+        <input matInput [placeholder]="fieldsMask.extraField1.name"
+               [(ngModel)]="item[fieldsMask.extraField1.name]"
+               [disabled]="!item.enabled || disIf(item[fieldsMask.extraField1.depend], fieldsMask.extraField1.value)"
+               [name]="'itemExtraField1' + item.id"
+               appResizeInput
+               [resizeOnString]="item[fieldsMask.extraField1.name]"
+        >
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField2" [ngStyle]="fieldsMask.extraField2?.style">
+        <mat-label>{{fieldsMask.extraField2.name}}</mat-label>
+        <input matInput [placeholder]="fieldsMask.extraField2.name"
+               [(ngModel)]="item[fieldsMask.extraField2.name]"
+               [disabled]="!item.enabled || disIf(item[fieldsMask.extraField2.depend], fieldsMask.extraField2.value)"
+               [name]="'itemExtraField2' + item.id"
+               appResizeInput
+               [resizeOnString]="item[fieldsMask.extraField2.name]"
+        >
+      </mat-form-field>
+      <button mat-button color="accent" class="but-spacer-left"
+              [disabled]="!isReadyToSend(form.controls['itemName' + item.id], form.controls['itemValue' + item.id], form.controls['itemExtraField1' + item.id], form.controls['itemExtraField2' + item.id])"
+              (click)="updateItem(item); form.controls['itemName' + item.id].markAsPristine(); form.controls['itemValue' + item.id].markAsPristine();">
+        Update
+      </button>
+      <button *ngIf="item.enabled" mat-raised-button color="accent"
+              class="but-spacer-left switch-button"
+              (click)="switchItem(item)">
+        Disable
+      </button>
+      <button *ngIf="!item.enabled" mat-raised-button color="primary"
+              class="but-spacer-left switch-button"
+              (click)="switchItem(item)">
+        Enable
+      </button>
+      <button mat-raised-button color="warn" class="but-spacer-left"
+              (click)="deleteItem(item)">
+        Delete
+      </button>
+    </div>
+  </div>
+  <div *ngIf="newItems">
+    <div class="spacer" *ngFor="let item of newItems; let i = index">
+      <div *ngIf="item">
+        <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.name?.style">
+          <mat-label>{{fieldsMask.name.name}}</mat-label>
+          <input matInput
+                 [placeholder]="fieldsMask.name.name"
+                 [(ngModel)]="item.name" required
+                 [name]="'newItemName' + i"
+                 appResizeInput
+                 [resizeOnString]="item.name"
+          >
+        </mat-form-field>
+        <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.value?.style">
+          <mat-label>{{fieldsMask.value.name}}</mat-label>
+          <input matInput
+                 [placeholder]="fieldsMask.value.name"
+                 [(ngModel)]="item.value"
+                 [name]="'newItemValue' + i"
+                 appResizeInput
+                 [resizeOnString]="item.value"
+          >
+        </mat-form-field>
+        <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField1" [ngStyle]="fieldsMask.extraField1?.style">
+          <mat-label>{{fieldsMask.extraField1.name}}</mat-label>
+          <input matInput
+                 [placeholder]="fieldsMask.extraField1.name"
+                 [(ngModel)]="item[fieldsMask.extraField1.name]"
+                 [name]="'newItemExtraField1' + i"
+                 [disabled]="disIf(item[fieldsMask.extraField1.depend], fieldsMask.extraField1.value)"
+                 appResizeInput
+                 [resizeOnString]="item[fieldsMask.extraField1.name]"
+          >
+        </mat-form-field>
+        <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField2" [ngStyle]="fieldsMask.extraField2?.style">
+          <mat-label>{{fieldsMask.extraField2.name}}</mat-label>
+          <input matInput
+                 [placeholder]="fieldsMask.extraField2.name"
+                 [(ngModel)]="item[fieldsMask.extraField2.name]"
+                 [name]="'newItemExtraField2' + i"
+                 [disabled]="disIf(item[fieldsMask.extraField2.depend], fieldsMask.extraField2.value)"
+                 appResizeInput
+                 [resizeOnString]="item[fieldsMask.extraField2.name]"
+          >
+        </mat-form-field>
+        <button mat-button color="accent" class="but-spacer-left"
+                [disabled]="!isNewReadyToSend(form.controls['newItemName' + i], form.controls['newItemValue' + i], form.controls['newItemExtraField1' + i], form.controls['newItemExtraField2' + i])"
+                (click)="addItem(i, form.controls['newItemName' + i].value, form.controls['newItemValue' + i].value, form.controls['newItemExtraField1' + i]?.value, form.controls['newItemExtraField2' + i]?.value)">
+          Update
+        </button>
+        <button mat-button color="warn" class="but-spacer-left"
+                (click)="dropNewItem(i)">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+<button mat-raised-button color="accent" class="spacer" (click)="addNewItemField()">
+  Add
+</button>
+<button mat-raised-button color="primary" class="but-spacer-left" (click)="pasteItems()"
+        *ngIf="toCopy && toCopy !== id">
+  Paste
+</button>
