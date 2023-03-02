@@ -2,7 +2,7 @@
 
 **CustomPBX** (under development) is API server and Web GUI for [FreeSwitch](https://github.com/signalwire/freeswitch).
 Providing pure FreeSWITCH experience and can be installed on existing systems with import existing configuration.
-Built in the single binary file.
+Built in the single [binary file](https://github.com/custompbx/custompbx/releases).
 
 The project is under development, not tested well and can have security issues.  
 
@@ -24,8 +24,16 @@ To run frontend local build+test set backend websoket url ``export WS_BACKGROUND
 ``make front-serve``  
 Look into Makefile for more options.
 
-Built binary file can be found in ``bin/`` directory and can be used according [Documentation](https://github.com/CustomPBX/doc)
+Built binary file can be found in ``bin/`` directory and can be used according [Documentation](https://github.com/custompbx/custompbx/wiki).
+
+Or just use precompiled binary from **[Releases Page](https://github.com/custompbx/custompbx/releases)**
 
 ---
-### GUI 
+### Documentation
+For **Installation** and **Configuration** manuals follow project's **[Wiki Page](https://github.com/custompbx/custompbx/wiki)**
+
+![scheme](https://github.com/custompbx/doc/raw/master/img/Diagram1.png)
+
+---
+### GUI
 ![demo](https://github.com/custompbx/doc/blob/master/img/demo_anim.gif?raw=true)
