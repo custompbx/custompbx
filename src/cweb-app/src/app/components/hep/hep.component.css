@@ -116,7 +116,7 @@ th:hover {
 /*styles for accordion END*/
 
 .chosen {
-  background-color: #6ce4d9;
+  background-color: #6ce4d9 !important;
 }
 
 article {

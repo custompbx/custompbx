@@ -9,7 +9,7 @@ import (
 const (
 	WebRTCLibVerto   = "verto"
 	WebRTCLibSipJs   = "sipjs"
-	Version          = "0.0.1"
+	Version          = "0.0.101"
 	NoProceedName    = "NoProceed"
 	CustomPBXVersion = "custompbx_version"
 )

@@ -12,9 +12,9 @@ Frontend with Angular v.15 located in ``src/cweb-app``.
 
 
 Service requirements:  
-OS Linux (amd64)  
-FreeSWITCH  
-Postgres
+* OS Linux (amd64)  
+* FreeSWITCH  
+* Postgres
 
 To build run:  
 ``make install``  
@@ -27,6 +27,8 @@ Look into Makefile for more options.
 Built binary file can be found in ``bin/`` directory and can be used according [Documentation](https://github.com/custompbx/custompbx/wiki).
 
 Or just use precompiled binary from **[Releases Page](https://github.com/custompbx/custompbx/releases)**
+
+Feel free to contact via [telegram](https://t.me/custompbx) or open an **[issue](https://github.com/custompbx/custompbx/issues)**!
 
 ---
 ### Documentation

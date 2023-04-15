@@ -1228,7 +1228,7 @@ func XMLSofia(name string, arg string) *mainStruct.Configuration {
 		Description: "Sofia Config",
 		AnyXML: []interface{}{
 			struct {
-				XMLName xml.Name    `xml:"settings,omitempty"`
+				XMLName xml.Name    `xml:"global_settings,omitempty"`
 				Inner   interface{} `xml:"param"`
 			}{Inner: &params},
 			struct {

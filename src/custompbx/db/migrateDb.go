@@ -94,6 +94,8 @@ func Migrate(switchName string) (bool, error) {
 	case "":
 		//return updated, nil
 		//fallthrough
+	case "0.0.1":
+		return updated, nil
 	case mainStruct.Version:
 		return updated, nil
 	}
