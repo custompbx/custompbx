@@ -59,13 +59,6 @@ section {
   border-radius: 0;
 }
 
-.expanded {
-  width: 245px;
-}
-
-.secure{
-  max-width: 55px;
-}
 
 .bg-white {
   background-color: white;

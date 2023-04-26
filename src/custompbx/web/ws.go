@@ -1381,7 +1381,7 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 		resp = getUserForConfig(msg, updateConfig, struct {
 			S interface{}
 			A []string
-		}{&altStruct.ConfigSofiaProfileParameter{Id: msg.Param.Id, Name: msg.Param.Name, Value: msg.Param.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
+		}{&altStruct.ConfigVertoProfileParameter{Id: msg.Param.Id, Name: msg.Param.Name, Value: msg.Param.Value, Secure: msg.Param.Secure}, []string{"Name", "Value", "secure"}}, onlyAdminGroup())
 	//Request:{"event":"[Config][Verto][Profile][Add]","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","name":"new_profile"}}
 	//Response:{"MessageType":"[Config][Verto][Profile][Add]","data":{"id":4,"position":3,"enabled":true,"name":"new_profile","description":"","parent":{"id":46,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:

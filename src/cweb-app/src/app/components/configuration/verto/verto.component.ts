@@ -90,7 +90,7 @@ export class VertoComponent implements OnInit, OnDestroy {
     this.profileParamsMask = {
       name: {name: 'name'},
       value: {name: 'value'},
-      extraField1: {name: 'secure', style: {'max-width': '55px'}, depend: 'name', value: 'bind-local'}};
+      extraField1: {name: 'secure', style: {'max-width': '71px'}, depend: 'name', value: 'bind-local'}};
   }
 
   ngOnDestroy() {
