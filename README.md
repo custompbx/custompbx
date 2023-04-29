@@ -37,5 +37,5 @@ For **Installation** and **Configuration** manuals follow project's **[Wiki Page
 ![scheme](https://github.com/custompbx/doc/raw/master/img/Diagram1.png)
 
 ---
-### GUI
+### GUI Demo
 ![demo](https://github.com/custompbx/doc/blob/master/img/demo_anim.gif?raw=true)

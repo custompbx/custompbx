@@ -560,7 +560,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
     if (this.data.number === '') {
       return;
     }
-    this.data.number.slice(0, -1);
+    this.data.number = this.data.number.slice(0, -1);
   }
 
   panelCall(user: string) {
