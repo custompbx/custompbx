@@ -1,7 +1,6 @@
 package web
 
 import (
-	"crypto/md5"
 	"custompbx/altData"
 	"custompbx/altStruct"
 	"custompbx/cache"
@@ -14,6 +13,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"math/rand"
 	"regexp"
@@ -41,9 +41,7 @@ func checkLogin(data *webStruct.MessageData) webStruct.UserResponse {
 		return webStruct.UserResponse{Error: "Unknown user", MessageType: data.Event}
 	}
 
-	passHash := fmt.Sprintf("%x", md5.Sum([]byte(data.Password)))
-
-	if user.Login == "" || passHash != user.Key {
+	if user.Login == "" || !CheckPassword(data.Password, []byte(user.Key)) {
 		return webStruct.UserResponse{Error: "Wrong Login", MessageType: data.Event}
 	}
 	token := tokenGenerator()
@@ -197,8 +195,11 @@ func addWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruc
 	}
 	group := mainStruct.GetWebUserGroup(data.GroupId)
 
-	passHash := fmt.Sprintf("%x", md5.Sum([]byte(data.Password)))
-	webUser = webcache.AddWebUser(data.Login, passHash, group.Id)
+	hashedPassword := HashPassword(data.Password)
+	if hashedPassword == "" {
+		return webStruct.UserResponse{Error: "unsuitable password", MessageType: data.Event}
+	}
+	webUser = webcache.AddWebUser(data.Login, hashedPassword, group.Id, cache.GetCurrentInstanceId())
 	if webUser == nil {
 		return webStruct.UserResponse{Error: "can't add", MessageType: data.Event}
 	}
@@ -300,8 +301,11 @@ func updateWebUsersPassword(data *webStruct.MessageData, user *mainStruct.WebUse
 	if webUser == nil {
 		return webStruct.UserResponse{Error: "user not found", MessageType: data.Event}
 	}
-	passHash := fmt.Sprintf("%x", md5.Sum([]byte(data.Password)))
-	ok := webcache.UpdateWebUserPassword(webUser, passHash)
+	hashedPassword := HashPassword(data.Password)
+	if hashedPassword == "" {
+		return webStruct.UserResponse{Error: "unsuitable password", MessageType: data.Event}
+	}
+	ok := webcache.UpdateWebUserPassword(webUser, hashedPassword)
 	if !ok {
 		return webStruct.UserResponse{Error: "can't change", MessageType: data.Event}
 	}
@@ -1076,4 +1080,17 @@ func RandStringBytes(n int) string {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 	return string(b)
+}
+
+func HashPassword(password string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return ""
+	}
+	return string(hash)
+}
+
+func CheckPassword(password string, hash []byte) bool {
+	err := bcrypt.CompareHashAndPassword(hash, []byte(password))
+	return err == nil
 }

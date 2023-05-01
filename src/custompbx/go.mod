@@ -17,7 +17,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/shirou/gopsutil v2.19.10+incompatible
 	github.com/zusrut/fsock v0.0.0-20200207174906-02bc1fd2a8d6
-	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
+	golang.org/x/net v0.9.0
 )
 
 require (
@@ -42,7 +42,7 @@ require (
 	github.com/pion/stun v0.3.5 // indirect
 	github.com/pion/transport v0.10.1 // indirect
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
-	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
-	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
-	golang.org/x/text v0.3.3 // indirect
+	golang.org/x/crypto v0.8.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/text v0.9.0 // indirect
 )

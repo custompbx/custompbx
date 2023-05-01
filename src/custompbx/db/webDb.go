@@ -7,8 +7,8 @@ import (
 	"log"
 )
 
-func InitWebDB() {
-	createWebUsersTable(db)
+func InitWebDB(instanceId int64) {
+	createWebUsersTable(db, instanceId)
 	createWebUsersTokensTable(db)
 
 	//corm := customOrm.Init(db)
@@ -16,7 +16,7 @@ func InitWebDB() {
 	//CreateTableByStruct(&mainStruct.WebDirectoryUsersTemplate{})
 }
 
-func createWebUsersTable(db *sql.DB) {
+func createWebUsersTable(db *sql.DB, instanceId int64) {
 	_, err := db.Exec(`
 	CREATE TABLE IF NOT EXISTS web_users(
 		id serial NOT NULL PRIMARY KEY,
@@ -31,17 +31,19 @@ func createWebUsersTable(db *sql.DB) {
 		lang INTEGER DEFAULT 0,
 		avatar TEXT DEFAULT '',
 		avatar_format VARCHAR DEFAULT '',
-		enabled BOOLEAN NOT NULL DEFAULT TRUE 
+		enabled BOOLEAN NOT NULL DEFAULT TRUE,
+		instance_id bigint NOT NULL REFERENCES fs_instances (id) ON DELETE CASCADE
 	)
 	WITH (OIDS=FALSE);`,
 	)
 	panicErr(err)
 
 	sqlReq := fmt.Sprintf(
-		"INSERT INTO web_users(login, key, group_id) SELECT '%s', '%s', %d WHERE NOT EXISTS (SELECT login FROM web_users WHERE login = '%s');",
+		"INSERT INTO web_users(login, key, group_id, instance_id) SELECT '%s', '%s', %d, %d WHERE NOT EXISTS (SELECT login FROM web_users WHERE login = '%s');",
 		"admin",
-		"21232f297a57a5a743894a0e4a801fc3",
+		"$2a$10$kq/GYf1EVEm7GKks6VbD6.ghCwDNDlucW/rPs8pDeolY23kX2XieW",
 		1,
+		instanceId,
 		"admin",
 	)
 	db.QueryRow(sqlReq)
@@ -62,7 +64,7 @@ func createWebUsersTokensTable(db *sql.DB) {
 	panicErr(err)
 }
 
-func GetWebUser(login string) (*mainStruct.WebUser, error) {
+func GetWebUser(login string, instanceId int64) (*mainStruct.WebUser, error) {
 	user, err := db.Query(
 		`SELECT
 					wu.id as id,
@@ -76,8 +78,9 @@ func GetWebUser(login string) (*mainStruct.WebUser, error) {
 					wu.enabled as enabled
 				FROM web_users wu
 				WHERE
-					wu.login = $1`,
+					wu.login = $1 AND instance_id = $2`,
 		login,
+		instanceId,
 	)
 	defer user.Close()
 	if err != nil {
@@ -95,7 +98,7 @@ func GetWebUser(login string) (*mainStruct.WebUser, error) {
 	return &wUser, nil
 }
 
-func GetWebUsers(users *mainStruct.WebUsers) {
+func GetWebUsers(users *mainStruct.WebUsers, instanceId int64) {
 	user, err := db.Query(
 		`SELECT
 					wu.id as id,
@@ -111,7 +114,9 @@ func GetWebUsers(users *mainStruct.WebUsers) {
 					wu.avatar as avatar,
 					wu.avatar_format as avatar_format,
 					wu.enabled as enabled
-				FROM web_users wu`,
+				FROM web_users wu
+				WHERE instance_id = $1`,
+		instanceId,
 	)
 	if err != nil {
 		log.Printf("%+v", err)
@@ -222,10 +227,10 @@ func RenameWebUser(id int64, login string) bool {
 	return true
 }
 
-func AddWebUser(login, key string, groupId int) int64 {
+func AddWebUser(login, key string, groupId int, instanceId int64) int64 {
 	var id int64
 	err := db.QueryRow(
-		`INSERT INTO web_users(login, key, group_id) VALUES($1, $2, $3) RETURNING id;`, login, key, groupId).Scan(&id)
+		`INSERT INTO web_users(login, key, group_id, instance_id) VALUES($1, $2, $3, $4) RETURNING id;`, login, key, groupId, instanceId).Scan(&id)
 	if err != nil {
 		log.Printf("%+v", err)
 		return id

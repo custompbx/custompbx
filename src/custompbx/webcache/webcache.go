@@ -27,8 +27,8 @@ func InitCacheObjects() {
 	webSettings = mainStruct.NewWebSettings()
 }
 
-func InitUsersCache() {
-	db.GetWebUsers(users)
+func InitUsersCache(instanceId int64) {
+	db.GetWebUsers(users, instanceId)
 }
 
 func InitWebSettings(instanceId int64) {
@@ -215,11 +215,11 @@ func UpdateWebUserAvatar(user *mainStruct.WebUser, avatar, avatarFormat string) 
 	return true
 }
 
-func AddWebUser(login, key string, groupId int) *mainStruct.WebUser {
+func AddWebUser(login, key string, groupId int, instanceId int64) *mainStruct.WebUser {
 	if login == "" {
 		return nil
 	}
-	id := db.AddWebUser(login, key, groupId)
+	id := db.AddWebUser(login, key, groupId, instanceId)
 	if id == 0 {
 		return nil
 	}

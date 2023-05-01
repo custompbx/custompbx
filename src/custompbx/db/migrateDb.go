@@ -4,7 +4,8 @@ import (
 	"context"
 	"custompbx/mainStruct"
 	"database/sql"
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 	"log"
 )
 
@@ -95,7 +96,15 @@ func Migrate(switchName string) (bool, error) {
 		//return updated, nil
 		//fallthrough
 	case "0.0.1":
-		return updated, nil
+		fallthrough
+	case "0.0.101":
+		log.Println("Updating schema from 0.0.101")
+		err = migrateForV0v0v102(instanceId)
+		if err != nil {
+			return false, err
+		}
+		updated = true
+		fallthrough
 	case mainStruct.Version:
 		return updated, nil
 	}
@@ -140,4 +149,55 @@ func getInstanceId(switchName string) int64 {
 	}
 
 	return instanceId
+}
+
+func migrateForV0v0v102(instanceId int64) error {
+	if instanceId == 0 {
+		return errors.New("no id")
+	}
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	_, err = tx.ExecContext(ctx, "ALTER TABLE IF EXISTS web_users ADD COLUMN IF NOT EXISTS instance_id BIGINT NOT NULL DEFAULT 0")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, fmt.Sprintf(`
+DO $$                  
+    BEGIN 
+        IF EXISTS
+            ( SELECT 1
+              FROM   information_schema.tables 
+              WHERE  table_schema = 'public'
+              AND    table_name = 'web_users'
+            )
+        THEN
+            UPDATE web_users 
+            SET instance_id = %d;
+        END IF ;
+    END
+   $$ ;`, instanceId))
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.ExecContext(ctx, "ALTER TABLE IF EXISTS web_users DROP CONSTRAINT IF EXISTS web_users_ipk")
+	_, err = tx.ExecContext(ctx, "ALTER TABLE IF EXISTS web_users ADD CONSTRAINT web_users_ipk FOREIGN KEY (instance_id) REFERENCES fs_instances (id) ON DELETE CASCADE ")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	err = UpdateVersionRequest(instanceId, tx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+
+	return nil
 }

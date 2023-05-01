@@ -88,11 +88,11 @@ func main() {
 		nocache.InitDB()
 		apps.InitApps()
 		db.InitLogDB()
-		web.InitDB()
+		web.InitDB(cache.GetCurrentInstanceId())
 		db.InitGlobalVariablesDB()
 
 		pbxcache.InitPBXCache()
-		webcache.InitUsersCache()
+		webcache.InitUsersCache(cache.GetCurrentInstanceId())
 		webcache.InitWebSettings(cache.GetCurrentInstanceId())
 		webcache.InitWebData()
 
