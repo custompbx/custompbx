@@ -7,7 +7,7 @@
         <mat-card class="instances-cards">
           <mat-card-header>
             <div mat-card-avatar>
-              <mat-icon class="header-image">multiple_stop</mat-icon>
+              <mat-icon>multiple_stop</mat-icon>
             </div>
             <mat-card-title>
               {{instance.value.name}}
@@ -16,7 +16,7 @@
                         </mat-icon>-->
             </mat-card-title>
             <span class="card-header-spacer"></span>
-            <button *ngIf="instance.value.id !== currentInstanceId" (click)="switchInstance(instance.value.id)" mat-button class="instance-switch-button">Switch</button>
+            <button *ngIf="instance.value.id !== currentInstanceId" (click)="switchInstance(instance.value.id)" mat-button class="instance-switch-button">Open</button>
             <div *ngIf="instance.value.id == currentInstanceId" class="current-instance-check" title="Current Instance"><span>Active</span></div>
             <mat-card-subtitle class="subtitle">{{instance.value.description || 'Description'}}</mat-card-subtitle>
           </mat-card-header>
