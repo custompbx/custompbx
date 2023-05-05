@@ -28,7 +28,7 @@ Built binary file can be found in ``bin/`` directory and can be used according [
 
 Or just use precompiled binary from **[Releases Page](https://github.com/custompbx/custompbx/releases)**
 
-Feel free to contact via [telegram](https://t.me/custompbx) or open an **[issue](https://github.com/custompbx/custompbx/issues)**!
+Feel free to contact via **[discussions](https://github.com/custompbx/custompbx/discussions)** or open an **[issue](https://github.com/custompbx/custompbx/issues)**!
 
 ---
 ### Documentation
