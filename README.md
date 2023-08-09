@@ -6,23 +6,35 @@ Built in the single [binary file](https://github.com/custompbx/custompbx/release
 
 The project is under development, not tested well and can have security issues.  
 
-Backend created with Golang v.1.19 located in ``src/custompbx``.
+**Backend** created with Golang v.1.19 located in ``src/custompbx``.
 
-Frontend with Angular v.15 located in ``src/cweb-app``.
+**Frontend** with Angular v.15 located in ``src/cweb-app``.
 
-
+---
 Service requirements:  
 * OS Linux (amd64)  
 * FreeSWITCH  
-* Postgres
-
+* Postgres Database
+---
+### Build
 To build run:  
-``make install``  
+```
+make install
+```
 To rebuild after resolved dependencies:  
-``make build``  
-To run frontend local build+test set backend websoket url ``export WS_BACKGROUND_OVERRIDE=wss://HOST:PORT/ws`` and run:  
-``make front-serve``  
-Look into Makefile for more options.
+```
+make build
+``` 
+To run frontend locally build+test set backend websocket url ``export WS_BACKGROUND_OVERRIDE=wss://HOST:PORT/ws`` and run:  
+```
+make front-serve
+```  
+Check Makefile for more options.
+
+Also Docker version available currently for test only. You can start DB + Freeswitch + Custompbx by replacing token ``- SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``  in ``docker-compose.yml`` and command:
+```
+docker compose up -d
+```
 
 Built binary file can be found in ``bin/`` directory and can be used according [Documentation](https://github.com/custompbx/custompbx/wiki).
 

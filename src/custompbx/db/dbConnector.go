@@ -13,24 +13,33 @@ import (
 
 var db *sql.DB
 
-func StartDB() {
+func DBConnect() {
+	var err error
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s fallback_application_name=%s sslmode=disable",
 		cfg.CustomPbx.Db.User, cfg.CustomPbx.Db.Pass, cfg.CustomPbx.Db.Name, cfg.CustomPbx.Db.Host, strconv.Itoa(cfg.CustomPbx.Db.Port), cfg.AppName)
-	conn, err := sql.Open("postgres", dbinfo)
-
-	if err != nil || conn == nil || conn.Ping() != nil {
+	db, err = sql.Open("postgres", dbinfo)
+	if err != nil || db == nil || db.Ping() != nil {
 		daemonCache.State.DatabaseConnection = false
 		daemonCache.State.DataBaseError = err
-
 		return
 	}
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(5 * time.Minute)
 
-	conn.SetMaxOpenConns(50)
-	conn.SetMaxIdleConns(10)
-	conn.SetConnMaxLifetime(time.Hour)
-
-	db = conn
 	daemonCache.State.DatabaseConnection = true
+}
+
+func StartDB() {
+	DBConnect()
+	for {
+		if daemonCache.State.DatabaseConnection {
+			return
+		}
+		log.Println("Failed to connect to the database. Retrying in 5 seconds...")
+		time.Sleep(5 * time.Second)
+		DBConnect()
+	}
 }
 
 func panicErr(err error) {

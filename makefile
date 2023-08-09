@@ -30,7 +30,7 @@ dep-front:
 		@ cd $(web_path) && npm install
 
 dep-back:
-		@ cd $(go_path) && $(go_app) mod tidy
+		@ cd $(go_path) && $(go_app) mod download
 
 build: front back
 		@ echo build started at: $(shell date)

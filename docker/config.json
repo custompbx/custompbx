@@ -1,0 +1,39 @@
+{
+  "freeswitch": {
+    "switchname": "docker-fs",
+    "esl": {
+      "host": "freeswitch-host",
+      "port": 8021,
+      "pass": "ClueCon",
+      "timeout": 10,
+      "collect_logs": 7
+    },
+    "hep_collector": {
+      "host": "0.0.0.0",
+      "port": 9060
+    }
+  },
+  "webserver": {
+    "route": "/ws",
+    "host": "0.0.0.0",
+    "port": 8080,
+    "stun_port": 3478,
+    "cert_path": "",
+    "key_path": ""
+  },
+  "xml_curl_server": {
+    "route": "/conf/config",
+    "host": "0.0.0.0",
+    "port": 8081,
+    "stun_port": 0,
+    "cert_path": "",
+    "key_path": ""
+  },
+  "database": {
+    "name": "custompbx",
+    "host": "postgres-host",
+    "port": 5432,
+    "user": "custompbx",
+    "pass": "custompbx"
+  }
+}

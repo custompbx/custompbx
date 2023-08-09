@@ -2,6 +2,10 @@ package main
 
 import (
 	"bytes"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"custompbx/apps"
 	"custompbx/cache"
 	"custompbx/cfg"
@@ -18,6 +22,8 @@ import (
 	"custompbx/webcache"
 	"custompbx/xmlcurl"
 	"encoding/base64"
+	"encoding/pem"
+	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
@@ -27,27 +33,31 @@ import (
 	"image/jpeg"
 	"image/png"
 	"log"
+	"math/big"
 	"mime"
 	"net"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"time"
 )
 
 func main() {
+	eventChannel := make(chan interface{}, 42)
+	logsChannel := make(chan mainStruct.LogType, 420)
+
 	log.Println("CustomPBX development version: " + mainStruct.Version)
 	log.Println("Starting...")
 	daemonCache.InitDaemonState()
 	log.Println("DB")
 	db.StartDB()
+	log.Println("Database connected.")
+
 	pbxcache.InitCacheObjects()
 	webcache.InitCacheObjects()
 
 	log.Println("Events Handler")
-	eventChannel := make(chan interface{}, 42)
-	logsChannel := make(chan mainStruct.LogType, 420)
-
 	web.SetBroadcastChannel(eventChannel)
 	go web.TimeEvents()
 
@@ -102,7 +112,6 @@ func main() {
 		log.Println("FS logs collecting")
 		go freeswitchLogHandler(logsChannel)
 
-		log.Println("HEP collecting")
 		db.InitHEPDb()
 		go func() { hepHandler.StartHepListener(db.SaveHEPPackets, cache.GetCurrentInstanceId()) }()
 	} else {
@@ -157,10 +166,17 @@ func main() {
 
 	go turnServer()
 
+	var curlCert, curlKey, webCert, webKey = checkAndCreateCerts()
+
 	go func() {
-		if cfg.CustomPbx.XMLCurl.CertPath != "" {
+		if curlCert != "" {
 			log.Println("Secure XMLCurl Server")
-			err := http.ListenAndServeTLS(cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port), cfg.CustomPbx.XMLCurl.CertPath, cfg.CustomPbx.XMLCurl.KeyPath, rCurl)
+			err := http.ListenAndServeTLS(
+				cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port),
+				curlCert,
+				curlKey,
+				rCurl,
+			)
 			if err != nil {
 				log.Println(err)
 				log.Println("Insecure XMLCurl Server")
@@ -172,9 +188,14 @@ func main() {
 		}
 	}()
 
-	if cfg.CustomPbx.Web.CertPath != "" {
+	if webCert != "" {
 		log.Println("Secure Web Server")
-		err := http.ListenAndServeTLS(cfg.CustomPbx.Web.Host+":"+strconv.Itoa(cfg.CustomPbx.Web.Port), cfg.CustomPbx.Web.CertPath, cfg.CustomPbx.Web.KeyPath, r)
+		err := http.ListenAndServeTLS(
+			cfg.CustomPbx.Web.Host+":"+strconv.Itoa(cfg.CustomPbx.Web.Port),
+			webCert,
+			webKey,
+			r,
+		)
 		if err != nil {
 			log.Println(err)
 		}
@@ -475,4 +496,167 @@ func ReloadCallcenter(rw http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pbxcache.ReloadCallcenter()
 	_, _ = rw.Write([]byte("Done"))
+}
+
+func checkAndCreateCerts() (string, string, string, string) {
+	var curlCert = cfg.CustomPbx.XMLCurl.CertPath
+	var curlKey = cfg.CustomPbx.XMLCurl.KeyPath
+	var webCert = cfg.CustomPbx.Web.CertPath
+	var webKey = cfg.CustomPbx.Web.KeyPath
+
+	var err error
+	log.Println("Checking XMLCurl cert")
+	curlCert, curlKey, err = loadCertificateAndKey(curlCert, curlKey)
+	if err != nil {
+		curlCert = "./cert.pem"
+		curlKey = curlCert
+		_, err := os.ReadFile(curlCert)
+		if err != nil {
+			createCert(curlCert)
+		}
+	}
+
+	if cfg.CustomPbx.XMLCurl.CertPath == cfg.CustomPbx.Web.CertPath {
+		return curlCert, curlKey, curlCert, curlKey
+	}
+
+	log.Println("Checking Web cert", webCert, webKey)
+	webCert, webKey, err = loadCertificateAndKey(webCert, webKey)
+	if err != nil {
+		webCert = "./cert.pem"
+		webKey = webCert
+		_, err := os.ReadFile(webCert)
+		if err != nil {
+			createCert(webCert)
+		}
+	}
+
+	return curlCert, curlKey, webCert, webKey
+}
+
+func createCert(filePath string) {
+	// Generate a new private key
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		fmt.Println("Failed to generate private key:", err)
+		return
+	}
+
+	// Create a template for the certificate
+	template := x509.Certificate{
+		SerialNumber:          big.NewInt(1),
+		Subject:               pkix.Name{CommonName: "Self-Signed Certificate"},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(1, 0, 0), // Valid for 1 year
+		IsCA:                  true,
+		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+		BasicConstraintsValid: true,
+	}
+
+	// Generate the certificate using the template and the private key
+	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
+	if err != nil {
+		fmt.Println("Failed to create certificate:", err)
+		return
+	}
+
+	// Create a buffer to hold the PEM data
+	pemBuffer := []byte{}
+
+	// Append the private key PEM block to the buffer
+	privateKeyPEM := &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
+	}
+	pemBuffer = append(pemBuffer, pem.EncodeToMemory(privateKeyPEM)...)
+
+	// Append the certificate PEM block to the buffer
+	certPEM := &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: derBytes,
+	}
+	pemBuffer = append(pemBuffer, pem.EncodeToMemory(certPEM)...)
+
+	// Save the combined PEM data to a file
+	combinedFile, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println("Failed to create", filePath, "PEM file:", err)
+		return
+	}
+	defer combinedFile.Close()
+
+	if _, err := combinedFile.Write(pemBuffer); err != nil {
+		fmt.Println("Failed to create", filePath, "PEM file:", err)
+		return
+	}
+
+	fmt.Println("Self-signed certificate and private key have been generated and saved in", filePath)
+}
+
+func loadCertificateAndKey(certFilePath, keyFilePath string) (string, string, error) {
+	certBytes, err := os.ReadFile(certFilePath)
+	if err != nil {
+		return "", "", err
+	}
+
+	// Decode the PEM data and get the certificate and private key
+	var cert *x509.Certificate
+	//var privateKey interface{}
+	var certContainsKey bool
+
+	for {
+		block, rest := pem.Decode(certBytes)
+		if block == nil {
+			break
+		}
+
+		certBytes = rest
+
+		switch block.Type {
+		case "CERTIFICATE":
+			cert, err = x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				return "", "", err
+			}
+		case "RSA PRIVATE KEY", "PRIVATE KEY":
+			_, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+			if err != nil {
+				// If PKCS#1 parsing fails, try PKCS#8 parsing
+				_, err = x509.ParsePKCS8PrivateKey(block.Bytes)
+				if err != nil {
+					return "", "", err
+				}
+			}
+			certContainsKey = true
+		default:
+			// Handle other PEM blocks if needed
+		}
+	}
+
+	keyFile := certFilePath
+	// If the certificate doesn't contain the key, load the key from the key file
+	if !certContainsKey {
+		keyFile = keyFilePath
+		privateKeyBytes, err := os.ReadFile(keyFilePath)
+		if err != nil {
+			return "", "", err
+		}
+
+		_, err = x509.ParsePKCS8PrivateKey(privateKeyBytes)
+		if err != nil {
+			return "", "", err
+		}
+	}
+
+	fmt.Println(
+		"The cert", certFilePath, "is valid.",
+		"Subject:", cert.Subject.CommonName,
+		"Issuer:", cert.Issuer.CommonName,
+		"Not Before:", cert.NotBefore,
+		"Not After:", cert.NotAfter,
+		"The key ", keyFile, "is valid.",
+	)
+
+	return certFilePath, keyFile, nil
 }

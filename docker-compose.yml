@@ -1,0 +1,83 @@
+version: "3.9"
+
+volumes:
+  fsdata:
+    driver_opts:
+      type: none
+      o: bind
+      device: docker/fsdata
+  cdata:
+    driver_opts:
+      type: none
+      o: bind
+      device: docker/cdata
+
+services:
+  postgres:
+    container_name: postgres-host
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: custompbx
+      POSTGRES_PASSWORD: custompbx
+      POSTGRES_DB: custompbx
+    ports:
+      - 5432:5432
+    volumes:
+      - /var/lib/postgresql/data
+    networks:
+      - local_network
+
+  freeswitch:
+    container_name: freeswitch-host
+    hostname: docker-fs
+    build:
+      context: .
+      dockerfile: docker/fs.Dockerfile
+      args:
+        - SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>
+        - XML_CURL_SERVER_HOST=custompbx-host
+        - XML_CURL_SERVER_PORT=8081
+        - XML_CURL_SERVER_ROUTE=conf/config
+    depends_on:
+      custompbx:
+        #condition: service_healthy
+        condition: service_started
+    restart: always
+    ports:
+      - 5060:5060/tcp
+      - 5060:5060/udp
+      - 5080:5080/tcp
+      - 7443:7443/tcp
+      - 8021:8021/tcp
+      - 16384-16399:16384-16399/udp
+    volumes:
+      - /var/log/freeswitch/log
+      - /usr/local/freeswitch/db
+    networks:
+      - local_network
+
+  custompbx:
+    container_name: custompbx-host
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        - WS_BACKGROUND_OVERRIDE=wss://127.0.0.1:8080/ws
+    depends_on:
+      postgres:
+        condition: service_started
+    restart: always
+    ports:
+      - 8080:8080
+      - 8081:8081
+      - 3478:3478
+    volumes:
+      - /app
+      - ./docker/config.json:/app/config.json
+    networks:
+      - local_network
+
+networks:
+  local_network:
+    name: local_network

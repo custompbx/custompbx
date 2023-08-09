@@ -1,6 +1,8 @@
 package hepHandler
 
 import (
+	"custompbx/cfg"
+	"fmt"
 	"github.com/custompbx/hepparser"
 	"log"
 	"net"
@@ -8,10 +10,15 @@ import (
 )
 
 const maxPktLen = 8192
-const addr = "127.0.0.1:9060"
 
 func StartHepListener(DBSaveHandler func(hep []*hepparser.HEP, instanceId int64) error, instanceId int64) {
-	ua, err := net.ResolveUDPAddr("udp", addr)
+	if cfg.CustomPbx.Fs.HEPCollector.Host == "" || cfg.CustomPbx.Fs.HEPCollector.Port < 1024 || cfg.CustomPbx.Fs.HEPCollector.Port > 65535 {
+		log.Println("HEP collecting disabled")
+		return
+	}
+
+	log.Println("HEP collecting")
+	ua, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", cfg.CustomPbx.Fs.HEPCollector.Host, cfg.CustomPbx.Fs.HEPCollector.Port))
 	if err != nil {
 		log.Printf("%v", err)
 		return

@@ -521,10 +521,10 @@ func Connect(eventChannel chan interface{}, logsChannel chan mainStruct.LogType)
 		daemonCache.State.ESLConnection = false
 	} else {
 		daemonCache.State.ESLConnection = true
+		log.Println("Esl connected.")
 	}
 
 	eventChannel <- daemonCache.State
-
 }
 
 func OneTimeConnectCommand(command string) string {

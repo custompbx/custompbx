@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import * as SIP from 'sip.js';
-import {Verto} from 'vertojs/Dist';
+import {Verto} from 'vertojs/dist';
 
 import {select, Store} from '@ngrx/store';
 import {AppState, selectPhoneState} from '../../store/app.states';

@@ -3,7 +3,6 @@ package cfg
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 )
@@ -16,8 +15,9 @@ const (
 var CustomPbx GeneralCfg
 
 type FreeSWITCH struct {
-	Switchname string `json:"switchname"`
-	Esl        Esl    `json:"esl"`
+	Switchname   string       `json:"switchname"`
+	Esl          Esl          `json:"esl"`
+	HEPCollector HEPCollector `json:"hep_collector"`
 }
 
 type Esl struct {
@@ -26,6 +26,11 @@ type Esl struct {
 	Pass        string `json:"pass"`
 	Timeout     int    `json:"timeout"`
 	CollectLogs int    `json:"collect_logs"`
+}
+
+type HEPCollector struct {
+	Host string `json:"host"`
+	Port int    `json:"port"`
 }
 
 type WebServer struct {
@@ -59,7 +64,7 @@ func RD() (config GeneralCfg, err error) {
 		os.Exit(1)
 	}
 
-	file, err := ioutil.ReadFile(workDir + "/" + configFile)
+	file, err := os.ReadFile(workDir + "/" + configFile)
 	if err != nil {
 		fmt.Printf("Config file not found. Creating...\n")
 		config = createConfig()
@@ -78,7 +83,7 @@ func WD(conf GeneralCfg) (config GeneralCfg, err error) {
 	}
 
 	file, _ := json.MarshalIndent(conf, "", "    ")
-	err = ioutil.WriteFile(workDir+"/"+configFile, file, 0644)
+	err = os.WriteFile(workDir+"/"+configFile, file, 0644)
 	if err != nil {
 		err = fmt.Errorf("Couldn't write to file: " + err.Error())
 		return config, err
@@ -110,6 +115,8 @@ func createConfig() GeneralCfg {
 	item.Db.User = "custompbx"
 	item.Db.Pass = "custompbx"
 	item.Db.Port = 5432
+	item.Fs.HEPCollector.Host = "127.0.0.1"
+	item.Fs.HEPCollector.Port = 9060
 	item.Fs.Esl.Port = 8021
 	item.Fs.Esl.Pass = "ClueCon"
 	item.Fs.Esl.Host = "127.0.0.1"
@@ -119,13 +126,13 @@ func createConfig() GeneralCfg {
 	item.Web.Host = "127.0.0.1"
 	item.Web.Port = 8080
 	item.Web.StunPort = 3478
-	item.Web.CertPath = "/etc/freeswitch/tls/wss.pem"
-	item.Web.KeyPath = "/etc/freeswitch/tls/wss.pem"
+	item.Web.CertPath = ""
+	item.Web.KeyPath = ""
 	item.XMLCurl.Route = "/conf/config"
 	item.XMLCurl.Host = "127.0.0.1"
 	item.XMLCurl.Port = 8081
-	item.XMLCurl.CertPath = "/etc/freeswitch/tls/wss.pem"
-	item.XMLCurl.KeyPath = "/etc/freeswitch/tls/wss.pem"
+	item.XMLCurl.CertPath = ""
+	item.XMLCurl.KeyPath = ""
 
 	return item
 }
