@@ -7,7 +7,6 @@ import (
 	"custompbx/daemonCache"
 	"custompbx/intermediateDB"
 	"custompbx/mainStruct"
-	"custompbx/pbxcache"
 	"custompbx/webStruct"
 	"custompbx/webcache"
 	"encoding/base64"
@@ -544,7 +543,7 @@ func UpdateWebUserGroup(data *webStruct.MessageData, user *mainStruct.WebUser) w
 
 // /////////////////////////////////////////////////////////////////////////////////////////
 func GetWebDirectoryUsersTemplates(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	res, err := intermediateDB.GetAllFromDBAsMap(&mainStruct.WebDirectoryUsersTemplate{})
+	res, err := intermediateDB.GetAllFromDBAsMap(&altStruct.WebDirectoryUsersTemplate{})
 	if err != nil {
 		return webStruct.UserResponse{Error: "can't get", MessageType: data.Event}
 	}
@@ -553,7 +552,7 @@ func GetWebDirectoryUsersTemplates(data *webStruct.MessageData, user *mainStruct
 }
 
 func AddWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	item := mainStruct.WebDirectoryUsersTemplate{}
+	item := altStruct.WebDirectoryUsersTemplate{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
@@ -579,7 +578,7 @@ func DelWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
 
-	err := intermediateDB.DeleteById(&mainStruct.WebDirectoryUsersTemplate{Id: data.Id})
+	err := intermediateDB.DeleteById(&altStruct.WebDirectoryUsersTemplate{Id: data.Id})
 	if err != nil {
 		return webStruct.UserResponse{Error: "can't get", MessageType: data.Event}
 	}
@@ -588,7 +587,7 @@ func DelWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.
 }
 
 func SwitchWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	item := mainStruct.WebDirectoryUsersTemplate{}
+	item := altStruct.WebDirectoryUsersTemplate{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
@@ -598,7 +597,7 @@ func SwitchWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStru
 	}
 
 	err = intermediateDB.UpdateByIdByValuesMap(
-		&mainStruct.WebDirectoryUsersTemplate{Id: item.Id, Enabled: !item.Enabled},
+		&altStruct.WebDirectoryUsersTemplate{Id: item.Id, Enabled: !item.Enabled},
 		map[string]bool{"Enabled": true},
 	)
 	if err != nil {
@@ -612,7 +611,7 @@ func SwitchWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStru
 }
 
 func UpdateWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	item := mainStruct.WebDirectoryUsersTemplate{}
+	item := altStruct.WebDirectoryUsersTemplate{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
 		log.Println(err)
@@ -638,7 +637,7 @@ func GetWebDirectoryUsersTemplateParameters(data *webStruct.MessageData, user *m
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
 	res, err := intermediateDB.GetByValueAsMap(
-		&mainStruct.WebDirectoryUsersTemplateParameter{Parent: &mainStruct.WebDirectoryUsersTemplate{Id: data.Id}},
+		&altStruct.WebDirectoryUsersTemplateParameter{Parent: &altStruct.WebDirectoryUsersTemplate{Id: data.Id}},
 		map[string]bool{"Parent": true},
 	)
 	if err != nil {
@@ -650,7 +649,7 @@ func GetWebDirectoryUsersTemplateParameters(data *webStruct.MessageData, user *m
 }
 
 func AddWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	item := mainStruct.WebDirectoryUsersTemplateParameter{}
+	item := altStruct.WebDirectoryUsersTemplateParameter{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
@@ -675,7 +674,7 @@ func DelWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *ma
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
-	item := mainStruct.WebDirectoryUsersTemplateParameter{Id: data.Id}
+	item := altStruct.WebDirectoryUsersTemplateParameter{Id: data.Id}
 	err := intermediateDB.DeleteById(&item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "can't del", MessageType: data.Event}
@@ -685,7 +684,7 @@ func DelWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *ma
 }
 
 func SwitchWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	item := mainStruct.WebDirectoryUsersTemplateParameter{}
+	item := altStruct.WebDirectoryUsersTemplateParameter{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
@@ -695,7 +694,7 @@ func SwitchWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user 
 	}
 
 	err = intermediateDB.UpdateByIdByValuesMap(
-		&mainStruct.WebDirectoryUsersTemplateParameter{Id: item.Id, Enabled: !item.Enabled},
+		&altStruct.WebDirectoryUsersTemplateParameter{Id: item.Id, Enabled: !item.Enabled},
 		map[string]bool{"Enabled": true},
 	)
 	if err != nil {
@@ -709,7 +708,7 @@ func SwitchWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user 
 }
 
 func UpdateWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	item := mainStruct.WebDirectoryUsersTemplateParameter{}
+	item := altStruct.WebDirectoryUsersTemplateParameter{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
@@ -734,7 +733,7 @@ func GetWebDirectoryUsersTemplateVariables(data *webStruct.MessageData, user *ma
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
 	res, err := intermediateDB.GetByValueAsMap(
-		&mainStruct.WebDirectoryUsersTemplateVariable{Parent: &mainStruct.WebDirectoryUsersTemplate{Id: data.Id}},
+		&altStruct.WebDirectoryUsersTemplateVariable{Parent: &altStruct.WebDirectoryUsersTemplate{Id: data.Id}},
 		map[string]bool{"Parent": true},
 	)
 	if err != nil {
@@ -746,7 +745,7 @@ func GetWebDirectoryUsersTemplateVariables(data *webStruct.MessageData, user *ma
 }
 
 func AddWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	item := mainStruct.WebDirectoryUsersTemplateVariable{}
+	item := altStruct.WebDirectoryUsersTemplateVariable{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
@@ -770,7 +769,7 @@ func DelWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mai
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
-	item := mainStruct.WebDirectoryUsersTemplateVariable{Id: data.Id}
+	item := altStruct.WebDirectoryUsersTemplateVariable{Id: data.Id}
 	err := intermediateDB.DeleteById(&item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "can't del", MessageType: data.Event}
@@ -780,7 +779,7 @@ func DelWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mai
 }
 
 func SwitchWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	item := mainStruct.WebDirectoryUsersTemplateVariable{}
+	item := altStruct.WebDirectoryUsersTemplateVariable{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
@@ -790,7 +789,7 @@ func SwitchWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *
 	}
 
 	err = intermediateDB.UpdateByIdByValuesMap(
-		&mainStruct.WebDirectoryUsersTemplateVariable{Id: item.Id, Enabled: !item.Enabled},
+		&altStruct.WebDirectoryUsersTemplateVariable{Id: item.Id, Enabled: !item.Enabled},
 		map[string]bool{"Enabled": true},
 	)
 	if err != nil {
@@ -804,7 +803,7 @@ func SwitchWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *
 }
 
 func UpdateWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	item := mainStruct.WebDirectoryUsersTemplateVariable{}
+	item := altStruct.WebDirectoryUsersTemplateVariable{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
@@ -827,14 +826,19 @@ func GetWebDirectoryUsersTemplatesList(data *webStruct.MessageData, user *mainSt
 	var err error
 	var res interface{}
 	if user.GroupId == mainStruct.GetAdminId() {
-		res, err = intermediateDB.GetAllFromDBAsMap(&mainStruct.WebDirectoryUsersTemplate{})
+		res, err = intermediateDB.GetAllFromDBAsMap(&altStruct.WebDirectoryUsersTemplate{})
 	} else {
-		sipUser := pbxcache.GetUser(user.SipId.Int64)
-		if sipUser == nil {
+		var userI interface{}
+		userI, err = intermediateDB.GetByIdArg(
+			&altStruct.DirectoryDomainUser{},
+			user.SipId.Int64,
+		)
+		sipUser, ok := userI.(altStruct.DirectoryDomainUser)
+		if !ok || sipUser.Id == 0 {
 			return webStruct.UserResponse{Error: "no directory sip user", MessageType: data.Event}
 		}
 		res, err = intermediateDB.GetByValueAsMap(
-			&mainStruct.WebDirectoryUsersTemplate{Domain: &mainStruct.Domain{Id: sipUser.Domain.Id}},
+			&altStruct.WebDirectoryUsersTemplate{Domain: &altStruct.DirectoryDomain{Id: sipUser.Parent.Id}},
 			map[string]bool{"Domain": true},
 		)
 	}
@@ -857,26 +861,31 @@ func GetWebDirectoryUsersTemplateForm(data *webStruct.MessageData, user *mainStr
 	var resStruct = templateObj{Id: data.Id}
 
 	if user.GroupId != mainStruct.GetAdminId() {
-		sipUser := pbxcache.GetUser(user.SipId.Int64)
-		if sipUser == nil {
+		var userI interface{}
+		userI, err = intermediateDB.GetByIdArg(
+			&altStruct.DirectoryDomainUser{},
+			user.SipId.Int64,
+		)
+		sipUser, ok := userI.(altStruct.DirectoryDomainUser)
+		if !ok || sipUser.Id == 0 {
 			return webStruct.UserResponse{Error: "no directory sip user", MessageType: data.Event}
 		}
 		res, err = intermediateDB.GetByValueAsMap(
-			&mainStruct.WebDirectoryUsersTemplate{Domain: &mainStruct.Domain{Id: sipUser.Domain.Id}},
+			&altStruct.WebDirectoryUsersTemplate{Domain: &altStruct.DirectoryDomain{Id: sipUser.Parent.Id}},
 			map[string]bool{"Domain": true},
 		)
 		if err != nil || res == nil {
 			log.Println(err)
 			return webStruct.UserResponse{Error: "can't get", MessageType: data.Event}
 		}
-		_, ok := res[data.Id]
+		_, ok = res[data.Id]
 		if !ok {
 			return webStruct.UserResponse{Error: "no access", MessageType: data.Event}
 		}
 	}
 
 	res, err = intermediateDB.GetByValueAsMap(
-		&mainStruct.WebDirectoryUsersTemplateParameter{Show: true, Parent: &mainStruct.WebDirectoryUsersTemplate{Id: data.Id}},
+		&altStruct.WebDirectoryUsersTemplateParameter{Show: true, Parent: &altStruct.WebDirectoryUsersTemplate{Id: data.Id}},
 		map[string]bool{"Parent": true, "Show": true},
 	)
 	if err != nil {
@@ -884,7 +893,7 @@ func GetWebDirectoryUsersTemplateForm(data *webStruct.MessageData, user *mainStr
 		return webStruct.UserResponse{Error: "can't get", MessageType: data.Event}
 	}
 	for _, it := range res {
-		item, ok := it.(mainStruct.WebDirectoryUsersTemplateParameter)
+		item, ok := it.(altStruct.WebDirectoryUsersTemplateParameter)
 		if !ok {
 			continue
 		}
@@ -902,7 +911,7 @@ func GetWebDirectoryUsersTemplateForm(data *webStruct.MessageData, user *mainStr
 	}
 
 	res, err = intermediateDB.GetByValueAsMap(
-		&mainStruct.WebDirectoryUsersTemplateVariable{Show: true, Parent: &mainStruct.WebDirectoryUsersTemplate{Id: data.Id}},
+		&altStruct.WebDirectoryUsersTemplateVariable{Show: true, Parent: &altStruct.WebDirectoryUsersTemplate{Id: data.Id}},
 		map[string]bool{"Parent": true, "Show": true},
 	)
 	if err != nil {
@@ -910,7 +919,7 @@ func GetWebDirectoryUsersTemplateForm(data *webStruct.MessageData, user *mainStr
 		return webStruct.UserResponse{Error: "can't get", MessageType: data.Event}
 	}
 	for _, it := range res {
-		item, ok := it.(mainStruct.WebDirectoryUsersTemplateVariable)
+		item, ok := it.(altStruct.WebDirectoryUsersTemplateVariable)
 		if !ok {
 			continue
 		}
@@ -945,8 +954,8 @@ func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData, user *mainSt
 	}
 
 	var res map[int64]interface{}
-	var template mainStruct.WebDirectoryUsersTemplate
-	var searchStruct = &mainStruct.WebDirectoryUsersTemplate{Id: item.Id}
+	var template altStruct.WebDirectoryUsersTemplate
+	var searchStruct = &altStruct.WebDirectoryUsersTemplate{Id: item.Id}
 	var searchFields = map[string]bool{"Id": true}
 	if user.GroupId != mainStruct.GetAdminId() {
 		sipUserI, err := intermediateDB.GetByIdFromDB(&altStruct.DirectoryDomainUser{Id: user.SipId.Int64})
@@ -957,7 +966,7 @@ func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData, user *mainSt
 		if !ok {
 			return webStruct.UserResponse{Error: "no directory sip user", MessageType: data.Event}
 		}
-		searchStruct.Domain = &mainStruct.Domain{Id: sipUser.Parent.Id}
+		searchStruct.Domain = &altStruct.DirectoryDomain{Id: sipUser.Parent.Id}
 		searchFields["Domain"] = true
 	}
 
@@ -975,7 +984,7 @@ func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData, user *mainSt
 		return webStruct.UserResponse{Error: "no access", MessageType: data.Event}
 	}
 
-	template, ok = templateIntf.(mainStruct.WebDirectoryUsersTemplate)
+	template, ok = templateIntf.(altStruct.WebDirectoryUsersTemplate)
 	if !ok || template.Id == 0 {
 		return webStruct.UserResponse{Error: "no access", MessageType: data.Event}
 	}
@@ -992,7 +1001,7 @@ func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData, user *mainSt
 	}
 	// PARAMS
 	tParams, err := intermediateDB.GetByValueAsMap(
-		&mainStruct.WebDirectoryUsersTemplateParameter{Parent: &mainStruct.WebDirectoryUsersTemplate{Id: template.Id}},
+		&altStruct.WebDirectoryUsersTemplateParameter{Parent: &altStruct.WebDirectoryUsersTemplate{Id: template.Id}},
 		map[string]bool{"Parent": true},
 	)
 	if err != nil {
@@ -1002,7 +1011,7 @@ func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData, user *mainSt
 	}
 
 	for _, v := range tParams {
-		param, ok := v.(mainStruct.WebDirectoryUsersTemplateParameter)
+		param, ok := v.(altStruct.WebDirectoryUsersTemplateParameter)
 		if !ok {
 			intermediateDB.DeleteById(&altStruct.DirectoryDomainUser{Id: newUserId})
 			return webStruct.UserResponse{Error: "can't add", MessageType: data.Event}
@@ -1035,7 +1044,7 @@ func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData, user *mainSt
 
 	// VARIABLES
 	tVars, err := intermediateDB.GetByValueAsMap(
-		&mainStruct.WebDirectoryUsersTemplateVariable{Parent: &mainStruct.WebDirectoryUsersTemplate{Id: template.Id}},
+		&altStruct.WebDirectoryUsersTemplateVariable{Parent: &altStruct.WebDirectoryUsersTemplate{Id: template.Id}},
 		map[string]bool{"Parent": true},
 	)
 	if err != nil {
@@ -1044,7 +1053,7 @@ func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData, user *mainSt
 		return webStruct.UserResponse{Error: "error while adding", MessageType: data.Event}
 	}
 	for _, v := range tVars {
-		variable, ok := v.(mainStruct.WebDirectoryUsersTemplateVariable)
+		variable, ok := v.(altStruct.WebDirectoryUsersTemplateVariable)
 		if !ok {
 			intermediateDB.DeleteById(&altStruct.DirectoryDomainUser{Id: newUserId})
 			return webStruct.UserResponse{Error: "can't add", MessageType: data.Event}

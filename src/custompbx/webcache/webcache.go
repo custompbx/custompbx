@@ -1,6 +1,7 @@
 package webcache
 
 import (
+	"custompbx/altStruct"
 	"custompbx/db"
 	"custompbx/mainStruct"
 	"database/sql"
@@ -38,9 +39,9 @@ func InitWebSettings(instanceId int64) {
 func InitWebData() {
 	corm := customorm.Init(db.GetDB())
 
-	corm.CreateTable(&mainStruct.WebDirectoryUsersTemplate{})
-	corm.CreateTable(&mainStruct.WebDirectoryUsersTemplateParameter{})
-	corm.CreateTable(&mainStruct.WebDirectoryUsersTemplateVariable{})
+	corm.CreateTable(&altStruct.WebDirectoryUsersTemplate{})
+	corm.CreateTable(&altStruct.WebDirectoryUsersTemplateParameter{})
+	corm.CreateTable(&altStruct.WebDirectoryUsersTemplateVariable{})
 }
 
 func GetWebSetting(key string) string {

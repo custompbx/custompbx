@@ -98,7 +98,7 @@ func main() {
 		nocache.InitDB()
 		apps.InitApps()
 		db.InitLogDB()
-		web.InitDB(cache.GetCurrentInstanceId())
+		db.InitWebDB(cache.GetCurrentInstanceId())
 		db.InitGlobalVariablesDB()
 
 		pbxcache.InitPBXCache()
@@ -490,12 +490,6 @@ func turnServer() {
 	<-sigs
 
 	daemonCache.State.StunServerStatus = false
-}
-
-func ReloadCallcenter(rw http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	pbxcache.ReloadCallcenter()
-	_, _ = rw.Write([]byte("Done"))
 }
 
 func checkAndCreateCerts() (string, string, string, string) {

@@ -37,45 +37,45 @@ type Message struct {
 }
 
 type MessageData struct {
-	Login            string                     `json:"login"`
-	Payload          cfg.GeneralCfg             `json:"payload,omitempty"`
-	Password         string                     `json:"password"`
-	Token            string                     `json:"token,omitempty"`
-	Id               int64                      `json:"id,omitempty"`
-	IdInt            int64                      `json:"id_int,omitempty"`
-	Name             string                     `json:"name,omitempty"`
-	Value            string                     `json:"value,omitempty"`
-	Direction        string                     `json:"direction,omitempty"`
-	Default          string                     `json:"default,omitempty"`
-	Node             mainStruct.Node            `json:"node,omitempty"`
-	Param            Param                      `json:"param,omitempty"`
-	SofiaDomain      mainStruct.SofiaDomain     `json:"sofia_domain,omitempty"`
-	SofiaAlias       mainStruct.Alias           `json:"sofia_alias,omitempty"`
-	Variable         MessageDataVariable        `json:"variable,omitempty"`
-	Regex            mainStruct.Regex           `json:"regex,omitempty"`
-	Action           mainStruct.Action          `json:"action,omitempty"`
-	AntiAction       mainStruct.AntiAction      `json:"antiaction,omitempty"`
-	Condition        mainStruct.Condition       `json:"condition,omitempty"`
-	Enabled          *bool                      `json:"enabled,omitempty"`
-	KeepSubscription *bool                      `json:"keep_subscription,omitempty"`
-	PreviousIndex    int64                      `json:"previous_index,omitempty"`
-	CurrentIndex     int64                      `json:"current_index,omitempty"`
-	ParamId          int64                      `json:"param_id,omitempty"`
-	Bulk             int                        `json:"bulk,omitempty"`
-	GroupId          int                        `json:"group_id,omitempty"`
-	Field            mainStruct.Field           `json:"field,omitempty"`
-	DBRequest        mainStruct.DBRequest       `json:"db_request,omitempty"`
-	File             string                     `json:"file,omitempty"`
-	Uuid             string                     `json:"uuid,omitempty"`
-	ArrVal           []string                   `json:"values,omitempty"`
-	Table            mainStruct.Table           `json:"table,omitempty"`
-	OdbcCdrField     mainStruct.ODBCField       `json:"odbc_cdr_field,omitempty"`
-	WebSettings      map[string]string          `json:"web_settings,omitempty"`
-	DistributorNode  mainStruct.DistributorNode `json:"distributor_node,omitempty"`
-	Importance       string                     `json:"importance,omitempty"`
-	FifoFifoMember   mainStruct.FifoFifoMember  `json:"fifo_fifo_member,omitempty"`
-	Fields           []string                   `json:"fields,omitempty"`
-	Ids              []int64                    `json:"ids,omitempty"`
+	Login            string                              `json:"login"`
+	Payload          cfg.GeneralCfg                      `json:"payload,omitempty"`
+	Password         string                              `json:"password"`
+	Token            string                              `json:"token,omitempty"`
+	Id               int64                               `json:"id,omitempty"`
+	IdInt            int64                               `json:"id_int,omitempty"`
+	Name             string                              `json:"name,omitempty"`
+	Value            string                              `json:"value,omitempty"`
+	Direction        string                              `json:"direction,omitempty"`
+	Default          string                              `json:"default,omitempty"`
+	Node             altStruct.ConfigAclNode             `json:"node,omitempty"`
+	Param            Param                               `json:"param,omitempty"`
+	SofiaDomain      altStruct.ConfigSofiaProfileDomain  `json:"sofia_domain,omitempty"`
+	SofiaAlias       altStruct.ConfigSofiaProfileAlias   `json:"sofia_alias,omitempty"`
+	Variable         MessageDataVariable                 `json:"variable,omitempty"`
+	Regex            mainStruct.Regex                    `json:"regex,omitempty"`
+	Action           mainStruct.Action                   `json:"action,omitempty"`
+	AntiAction       mainStruct.AntiAction               `json:"antiaction,omitempty"`
+	Condition        mainStruct.Condition                `json:"condition,omitempty"`
+	Enabled          *bool                               `json:"enabled,omitempty"`
+	KeepSubscription *bool                               `json:"keep_subscription,omitempty"`
+	PreviousIndex    int64                               `json:"previous_index,omitempty"`
+	CurrentIndex     int64                               `json:"current_index,omitempty"`
+	ParamId          int64                               `json:"param_id,omitempty"`
+	Bulk             int                                 `json:"bulk,omitempty"`
+	GroupId          int                                 `json:"group_id,omitempty"`
+	Field            altStruct.ConfigCdrPgCsvSchema      `json:"field,omitempty"`
+	DBRequest        mainStruct.DBRequest                `json:"db_request,omitempty"`
+	File             string                              `json:"file,omitempty"`
+	Uuid             string                              `json:"uuid,omitempty"`
+	ArrVal           []string                            `json:"values,omitempty"`
+	Table            altStruct.ConfigOdbcCdrTable        `json:"table,omitempty"`
+	OdbcCdrField     altStruct.ConfigOdbcCdrTableField   `json:"odbc_cdr_field,omitempty"`
+	WebSettings      map[string]string                   `json:"web_settings,omitempty"`
+	DistributorNode  altStruct.ConfigDistributorListNode `json:"distributor_node,omitempty"`
+	Importance       string                              `json:"importance,omitempty"`
+	FifoFifoMember   altStruct.ConfigFifoFifoMember      `json:"fifo_fifo_member,omitempty"`
+	Fields           []string                            `json:"fields,omitempty"`
+	Ids              []int64                             `json:"ids,omitempty"`
 
 	Data     json.RawMessage `json:"data,omitempty"`
 	IntSlice []int64         `json:"-"`
@@ -140,96 +140,43 @@ type Param struct {
 }
 
 type UserResponse struct {
-	MessageType             string                                                 `json:"MessageType"`
-	Token                   string                                                 `json:"token,omitempty"`
-	TokensList              *[]mainStruct.WebUserToken                             `json:"tokens_list,omitempty"`
-	Uuid                    *string                                                `json:"uuid,omitempty"`
-	Response                *string                                                `json:"response,omitempty"`
-	FSInstances             *map[int64]*mainStruct.FsInstance                      `json:"fs_instances,omitempty"`
-	Domains                 *map[int64]*mainStruct.Domain                          `json:"domains,omitempty"`
-	DirectoryUsers          interface{}                                            `json:"directory_users,omitempty"`
-	User                    *mainStruct.WebUser                                    `json:"user,omitempty"`
-	Settings                *cfg.GeneralCfg                                        `json:"settings,omitempty"`
-	Daemon                  *mainStruct.DaemonState                                `json:"daemon,omitempty"`
-	Items                   *map[int64]string                                      `json:"items,omitempty"`
-	List                    *map[int64]map[int64]string                            `json:"list,omitempty"`
-	Item                    *Item                                                  `json:"item,omitempty"`
-	DomainDetails           *map[int64]DomainDetails                               `json:"domain_details,omitempty"`
-	UserDetails             *map[int64]UserDetails                                 `json:"user_details,omitempty"`
-	GroupUsers              *map[int64]map[int64]*mainStruct.GroupUser             `json:"group_users,omitempty"`
-	UserGateways            *map[int64]map[int64]map[int64]*mainStruct.UserGateway `json:"user_gateways,omitempty"`
-	GatewayDetails          *map[int64]*GatewayDetails                             `json:"gateway_details,omitempty"`
-	Error                   string                                                 `json:"error,omitempty"`
-	Id                      *int64                                                 `json:"id,omitempty"`
-	AffectedId              *int64                                                 `json:"affected_id,omitempty"`
-	AclLists                *map[int64]*mainStruct.List                            `json:"acl_lists,omitempty"`
-	AclListNodes            *map[int64]*mainStruct.Node                            `json:"acl_list_nodes,omitempty"`
-	SofiaProfiles           *map[int64]*mainStruct.SofiaProfile                    `json:"sofia_profiles,omitempty"`
-	Parameters              *map[int64]*mainStruct.Param                           `json:"parameters,omitempty"`
-	SofiaProfileParams      *map[int64]*mainStruct.SofiaProfileParam               `json:"sofia_profile_params,omitempty"`
-	SofiaGateways           *map[int64]map[int64]*mainStruct.SofiaGateway          `json:"sofia_gateways,omitempty"`
-	SofiaGatewayDetails     *map[int64]*SofiaGatewayDetails                        `json:"sofia_gateway_details,omitempty"`
-	SofiaDomains            *map[int64]*mainStruct.SofiaDomain                     `json:"sofia_profile_domains,omitempty"`
-	SofiaAliases            *map[int64]*mainStruct.Alias                           `json:"sofia_profile_aliases,omitempty"`
-	Modules                 *altStruct.Configurations                              `json:"modules,omitempty"`
-	Module                  *altStruct.Configurations                              `json:"module,omitempty"`
-	Exists                  *bool                                                  `json:"exists,omitempty"`
-	DialplanContexts        *map[int64]*mainStruct.Context                         `json:"dialplan_contexts,omitempty"`
-	DialplanSettings        *mainStruct.Dialplans                                  `json:"dialplan_settings,omitempty"`
-	DialplanExtensions      *[]*mainStruct.Extension                               `json:"dialplan_extensions,omitempty"`
-	DialplanConditions      *map[int64]*[]*mainStruct.Condition                    `json:"dialplan_conditions,omitempty"`
-	DialplanDetails         *map[int64]*DialplanDetails                            `json:"dialplan_details,omitempty"`
-	Dashboard               *mainStruct.Dashboard                                  `json:"dashboard_data,omitempty"`
-	WebUsers                *map[int64]*mainStruct.WebUser                         `json:"web_users,omitempty"`
-	WebUsersGroups          *map[int]mainStruct.WebUserGroup                       `json:"web_users_groups,omitempty"`
-	Options                 *[]string                                              `json:"options,omitempty"`
-	AltOptions              *[]string                                              `json:"alt_options,omitempty"`
-	CdrPgCsvSchema          *map[int64]*mainStruct.Field                           `json:"cdr_pg_csv_schema,omitempty"`
-	VertoProfiles           *map[int64]*mainStruct.VertoProfile                    `json:"verto_profiles,omitempty"`
-	VertoProfileParams      *map[int64]*mainStruct.VertoProfileParam               `json:"verto_profile_params,omitempty"`
-	LcrProfiles             *map[int64]*mainStruct.LcrProfile                      `json:"lcr_profiles,omitempty"`
-	LcrProfileParams        *map[int64]*mainStruct.LcrProfileParam                 `json:"lcr_profile_params,omitempty"`
-	PhoneCreds              *PhoneCreds                                            `json:"phone_creds,omitempty"`
-	NoToken                 *bool                                                  `json:"no_token,omitempty"`
-	DialplanDebug           *mainStruct.DialplanDebug                              `json:"dialplan_debug,omitempty"`
-	Enabled                 *bool                                                  `json:"enabled,omitempty"`
-	CallcenterQueues        *map[int64]*mainStruct.Queue                           `json:"callcenter_queues,omitempty"`
-	CallcenterQueuesParams  *map[int64]*mainStruct.QueueParam                      `json:"callcenter_queues_params,omitempty"`
-	CallcenterAgentsList    *map[int64]*mainStruct.Agent                           `json:"callcenter_agents_list,omitempty"`
-	CallcenterAgents        *[]*mainStruct.Agent                                   `json:"callcenter_agents,omitempty"`
-	CallcenterAgent         *mainStruct.CCAgentLight                               `json:"callcenter_agent,omitempty"`
-	CallcenterTiersList     *map[int64]*mainStruct.Tier                            `json:"callcenter_tiers_list,omitempty"`
-	CallcenterTiers         *[]*mainStruct.Tier                                    `json:"callcenter_tiers,omitempty"`
-	CallcenterTier          *mainStruct.CCTierLight                                `json:"callcenter_tier,omitempty"`
-	CallcenterMembers       *[]*mainStruct.Member                                  `json:"callcenter_members,omitempty"`
-	Total                   *int                                                   `json:"total,omitempty"`
-	AltTotal                *int                                                   `json:"alt_total,omitempty"`
-	OdbcCdrTable            *map[int64]*mainStruct.Table                           `json:"odbc_cdr_tables,omitempty"`
-	OdbcCdrTableField       *map[int64]map[int64]*mainStruct.ODBCField             `json:"odbc_cdr_table_fields,omitempty"`
-	WebSettings             *map[string]string                                     `json:"web_settings,omitempty"`
-	PostSwitchParameters    *map[int64]*mainStruct.Param                           `json:"post_load_switch_parameters,omitempty"`
-	PostSwitchCliKeybinding *map[int64]*mainStruct.Param                           `json:"post_load_switch_cli_keybinding,omitempty"`
-	PostSwitchDefaultPtime  *map[int64]*mainStruct.DefaultPtime                    `json:"post_load_switch_default_ptime,omitempty"`
-	DistributorLists        *map[int64]*mainStruct.DistributorList                 `json:"distributor_lists,omitempty"`
-	DistributorListNodes    *map[int64]*mainStruct.DistributorNode                 `json:"distributor_list_nodes,omitempty"`
-
-	DirectoryProfiles                 *map[int64]*mainStruct.DirectoryProfile                       `json:"directory_profiles,omitempty"`
-	DirectoryProfileParams            *map[int64]*mainStruct.DirectoryProfileParam                  `json:"directory_profile_params,omitempty"`
-	FifoFifo                          *map[int64]*mainStruct.FifoFifo                               `json:"fifo_fifos,omitempty"`
-	FifoFifosMembers                  *map[int64]*mainStruct.FifoFifoMember                         `json:"fifo_fifo_members,omitempty"`
-	OpalListeners                     *map[int64]*mainStruct.OpalListener                           `json:"opal_listeners,omitempty"`
-	OpalListenerParams                *map[int64]*mainStruct.OpalListenerParam                      `json:"opal_listener_params,omitempty"`
-	OspProfiles                       *map[int64]*mainStruct.OspProfile                             `json:"osp_profiles,omitempty"`
-	OspProfileParams                  *map[int64]*mainStruct.OspProfileParam                        `json:"osp_profile_params,omitempty"`
-	UnicallSpans                      *map[int64]*mainStruct.UnicallSpan                            `json:"unicall_spans,omitempty"`
-	UnicallSpanParams                 *map[int64]*mainStruct.UnicallSpanParam                       `json:"unicall_span_params,omitempty"`
-	ConferenceRooms                   *map[int64]*mainStruct.ConfigConferenceAdvertiseRooms         `json:"conference_rooms,omitempty"`
-	ConferenceCallerControlGroups     *map[int64]*mainStruct.ConfigConferenceCallerControlsGroups   `json:"conference_caller_control_groups,omitempty"`
-	ConferenceCallerControl           *map[int64]*mainStruct.ConfigConferenceCallerControlsControls `json:"conference_caller_controls,omitempty"`
-	ConferenceProfiles                *map[int64]*mainStruct.ConfigConferenceProfiles               `json:"conference_profiles,omitempty"`
-	ConferenceProfileParams           *map[int64]*mainStruct.ConfigConferenceProfilesParams         `json:"conference_profile_params,omitempty"`
-	ConferenceChatPermissionsUsers    *map[int64]*mainStruct.ConfigConferenceChatPermissionUsers    `json:"conference_chat_permissions_users,omitempty"`
-	ConferenceChatPermissionsProfiles *map[int64]*mainStruct.ConfigConferenceChatPermissions        `json:"conference_chat_permissions_profiles,omitempty"`
+	MessageType          string                              `json:"MessageType"`
+	Token                string                              `json:"token,omitempty"`
+	TokensList           *[]mainStruct.WebUserToken          `json:"tokens_list,omitempty"`
+	Uuid                 *string                             `json:"uuid,omitempty"`
+	Response             *string                             `json:"response,omitempty"`
+	FSInstances          *map[int64]*mainStruct.FsInstance   `json:"fs_instances,omitempty"`
+	DirectoryUsers       interface{}                         `json:"directory_users,omitempty"`
+	User                 *mainStruct.WebUser                 `json:"user,omitempty"`
+	Settings             *cfg.GeneralCfg                     `json:"settings,omitempty"`
+	Daemon               *mainStruct.DaemonState             `json:"daemon,omitempty"`
+	Items                *map[int64]string                   `json:"items,omitempty"`
+	List                 *map[int64]map[int64]string         `json:"list,omitempty"`
+	Item                 *Item                               `json:"item,omitempty"`
+	Error                string                              `json:"error,omitempty"`
+	Id                   *int64                              `json:"id,omitempty"`
+	AffectedId           *int64                              `json:"affected_id,omitempty"`
+	Modules              *altStruct.Configurations           `json:"modules,omitempty"`
+	Module               *altStruct.Configurations           `json:"module,omitempty"`
+	Exists               *bool                               `json:"exists,omitempty"`
+	DialplanContexts     *map[int64]*mainStruct.Context      `json:"dialplan_contexts,omitempty"`
+	DialplanSettings     *mainStruct.Dialplans               `json:"dialplan_settings,omitempty"`
+	DialplanExtensions   *[]*mainStruct.Extension            `json:"dialplan_extensions,omitempty"`
+	DialplanConditions   *map[int64]*[]*mainStruct.Condition `json:"dialplan_conditions,omitempty"`
+	DialplanDetails      *map[int64]*DialplanDetails         `json:"dialplan_details,omitempty"`
+	Dashboard            *mainStruct.Dashboard               `json:"dashboard_data,omitempty"`
+	WebUsers             *map[int64]*mainStruct.WebUser      `json:"web_users,omitempty"`
+	WebUsersGroups       *map[int]mainStruct.WebUserGroup    `json:"web_users_groups,omitempty"`
+	Options              *[]string                           `json:"options,omitempty"`
+	AltOptions           *[]string                           `json:"alt_options,omitempty"`
+	PhoneCreds           *PhoneCreds                         `json:"phone_creds,omitempty"`
+	NoToken              *bool                               `json:"no_token,omitempty"`
+	DialplanDebug        *mainStruct.DialplanDebug           `json:"dialplan_debug,omitempty"`
+	Enabled              *bool                               `json:"enabled,omitempty"`
+	CallcenterAgentsList *map[int64]*mainStruct.Agent        `json:"callcenter_agents_list,omitempty"`
+	Total                *int                                `json:"total,omitempty"`
+	AltTotal             *int                                `json:"alt_total,omitempty"`
+	WebSettings          *map[string]string                  `json:"web_settings,omitempty"`
 
 	CDR            *[]map[string]interface{}  `json:"cdr,omitempty"`
 	Logs           *[]map[string]*interface{} `json:"logs,omitempty"`
@@ -237,11 +184,7 @@ type UserResponse struct {
 	HEPsDetails    *[]map[string]*interface{} `json:"hep_details,omitempty"`
 	AdditionalData *map[int64]*interface{}    `json:"additional_data,omitempty"`
 
-	GlobalVariables             *map[int64]*mainStruct.GlobalVariable             `json:"global_variables,omitempty"`
-	ModuleTags                  *map[int64]*mainStruct.ModuleTag                  `json:"module_tags,omitempty"`
-	VoicemailSettings           *map[int64]*mainStruct.VoicemailSettingsParameter `json:"voicemail_settings,omitempty"`
-	VoicemailProfiles           *map[int64]*mainStruct.VoicemailProfile           `json:"voicemail_profiles,omitempty"`
-	VoicemailProfilesParameters *map[int64]*mainStruct.VoicemailProfilesParameter `json:"voicemail_profiles_parameters,omitempty"`
+	GlobalVariables *map[int64]*mainStruct.GlobalVariable `json:"global_variables,omitempty"`
 
 	Data interface{} `json:"data,omitempty"`
 }
@@ -262,29 +205,6 @@ type DialplanDetails struct {
 	DialplanActions     *[]*mainStruct.Action     `json:"actions,omitempty"`
 	DialplanAntiActions *[]*mainStruct.AntiAction `json:"antiactions,omitempty"`
 	DialplanRegexes     *[]*mainStruct.Regex      `json:"regexes,omitempty"`
-}
-
-type DomainDetails struct {
-	Params map[int64]*mainStruct.DomainParam    `json:"parameters,omitempty"`
-	Vars   map[int64]*mainStruct.DomainVariable `json:"variables,omitempty"`
-}
-
-type GatewayDetails struct {
-	Params map[int64]*mainStruct.GatewayParam    `json:"parameters,omitempty"`
-	Vars   map[int64]*mainStruct.GatewayVariable `json:"variables,omitempty"`
-}
-
-type SofiaGatewayDetails struct {
-	Params map[int64]*mainStruct.SofiaGatewayParam    `json:"parameters,omitempty"`
-	Vars   map[int64]*mainStruct.SofiaGatewayVariable `json:"variables,omitempty"`
-}
-
-type UserDetails struct {
-	Params      map[int64]*mainStruct.UserParam    `json:"parameters,omitempty"`
-	Vars        map[int64]*mainStruct.UserVariable `json:"variables,omitempty"`
-	Cache       uint                               `json:"cache"`
-	Cidr        string                             `json:"cidr"`
-	NumberAlias string                             `json:"number_alias"`
 }
 
 type Item struct {
@@ -413,7 +333,6 @@ func (m *MessageData) Trim() {
 	m.Value = strings.TrimSpace(m.Value)
 	m.Default = strings.TrimSpace(m.Default)
 	m.Uuid = strings.TrimSpace(m.Uuid)
-	m.Node.Name = strings.TrimSpace(m.Node.Name)
 	m.Node.Type = strings.TrimSpace(m.Node.Type)
 	m.Node.Domain = strings.TrimSpace(m.Node.Domain)
 	m.Node.Cidr = strings.TrimSpace(m.Node.Cidr)
@@ -449,8 +368,6 @@ func (m *MessageData) Trim() {
 	m.Condition.Mon = strings.TrimSpace(m.Condition.Mon)
 	m.Condition.Mweek = strings.TrimSpace(m.Condition.Mweek)
 	m.Condition.Wday = strings.TrimSpace(m.Condition.Wday)
-	m.Field.Column = strings.TrimSpace(m.Field.Column)
-	m.Field.Var = strings.TrimSpace(m.Field.Var)
 	m.Table.Name = strings.TrimSpace(m.Table.Name)
 	m.Table.LogLeg = strings.TrimSpace(m.Table.LogLeg)
 	m.OdbcCdrField.Name = strings.TrimSpace(m.OdbcCdrField.Name)

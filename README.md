@@ -31,7 +31,13 @@ make front-serve
 ```  
 Check Makefile for more options.
 
-Also Docker version available currently for test only. You can start DB + Freeswitch + Custompbx by replacing token ``- SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``  in ``docker-compose.yml`` and command:
+Also Docker version available currently for test only.
+In ``docker-compose.yml``:
+- replace token ``- SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``
+- replace host if needed ``WS_BACKGROUND_OVERRIDE=wss://127.0.0.1:8080/ws``
+- start containers, open ``https://127.0.0.1:8080/cweb`` (or your docker host) and allow self signed certs
+  
+You can start Docker for PostgresDB + Freeswitch + Custompbx by command:
 ```
 docker compose up -d
 ```

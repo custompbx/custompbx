@@ -12,3 +12,5 @@ src/custompbx/Gopkg.toml
 /.idea
 /src/custompbx/Gopkg.lock
 /src/custompbx/Gopkg.toml
+/src/pkg/
+/pkg/
