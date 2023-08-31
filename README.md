@@ -1,58 +1,56 @@
 # CustomPBX
 
-**CustomPBX** (under development) is API server and Web GUI for [FreeSwitch](https://github.com/signalwire/freeswitch).
-Providing pure FreeSWITCH experience and can be installed on existing systems with import existing configuration.
-Built in the single [binary file](https://github.com/custompbx/custompbx/releases).
+**CustomPBX** (currently in development) is an API server and Web GUI for [FreeSwitch](https://github.com/signalwire/freeswitch), offering a pure FreeSWITCH experience. It can be installed on existing systems, allowing for the import of existing configurations. The system is encapsulated within a single [binary file](https://github.com/custompbx/custompbx/releases).
 
-The project is under development, not tested well and can have security issues.  
+Please note that this project is still in development, has not undergone extensive testing, and may potentially have security vulnerabilities.
 
-**Backend** created with Golang v.1.19 located in ``src/custompbx``.
+The **Backend** is developed using Golang v.1.19 and is located in the ``src/custompbx`` directory.
 
-**Frontend** with Angular v.15 located in ``src/cweb-app``.
+The **Frontend**, built with Angular v.15, can be found in the ``src/cweb-app`` directory.
 
 ---
-Service requirements:  
-* OS Linux (amd64)  
-* FreeSWITCH  
+System Requirements:
+* Linux OS (amd64)
+* FreeSWITCH
 * Postgres Database
 ---
-### Build
-To build run:  
+### Build Process
+To initiate the build process, execute the following command:
 ```
 make install
 ```
-To rebuild after resolved dependencies:  
+For rebuilding after resolving dependencies, use:
 ```
 make build
 ``` 
-To run frontend locally build+test set backend websocket url ``export WS_BACKGROUND_OVERRIDE=wss://HOST:PORT/ws`` and run:  
+To locally run the frontend, perform the following steps: build and test the project, set the backend websocket URL using the command ``export WS_BACKGROUND_OVERRIDE=wss://HOST:PORT/ws``, and finally execute:
 ```
 make front-serve
 ```  
-Check Makefile for more options.
+Additional options can be found in the Makefile.
 
-Also Docker version available currently for test only.
-In ``docker-compose.yml``:
-- replace token ``- SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``
-- replace host if needed ``WS_BACKGROUND_OVERRIDE=wss://127.0.0.1:8080/ws``
-- start containers, open ``https://127.0.0.1:8080/cweb`` (or your docker host) and allow self signed certs
-  
-You can start Docker for PostgresDB + Freeswitch + Custompbx by command:
+A Docker version of the project is also available, currently intended for testing purposes only.
+In the ``docker-compose.yml`` file:
+- Replace the token with ``- SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``
+- Modify the host if necessary: ``WS_BACKGROUND_OVERRIDE=wss://127.0.0.1:8080/ws``
+- Start the containers and open ``https://127.0.0.1:8080/cweb`` (or your Docker host), making sure to allow self-signed certificates.
+
+You can start Docker with PostgresDB + Freeswitch + Custompbx by using the command:
 ```
 docker compose up -d
 ```
 
-Built binary file can be found in ``bin/`` directory and can be used according [Documentation](https://github.com/custompbx/custompbx/wiki).
+The compiled binary file is located in the ``bin/`` directory and can be used as outlined in the [Documentation](https://github.com/custompbx/custompbx/wiki).
 
-Or just use precompiled binary from **[Releases Page](https://github.com/custompbx/custompbx/releases)**
+Alternatively, you can utilize the precompiled binary available on the **[Releases Page](https://github.com/custompbx/custompbx/releases)**.
 
-Feel free to contact via **[discussions](https://github.com/custompbx/custompbx/discussions)** or open an **[issue](https://github.com/custompbx/custompbx/issues)**!
+If you have any questions or feedback, don't hesitate to get in touch through the **[discussions](https://github.com/custompbx/custompbx/discussions)** or by opening an **[issue](https://github.com/custompbx/custompbx/issues)**!
 
 ---
 ### Documentation
-For **Installation** and **Configuration** manuals follow project's **[Wiki Page](https://github.com/custompbx/custompbx/wiki)**
+For detailed instructions on **Installation** and **Configuration**, please refer to the project's **[Wiki Page](https://github.com/custompbx/custompbx/wiki)**.
 
-![scheme](https://github.com/custompbx/doc/raw/master/img/Diagram1.png)
+![system diagram](https://github.com/custompbx/doc/raw/master/img/Diagram1.png)
 
 ---
 ### GUI Demo
