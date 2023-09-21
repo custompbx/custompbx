@@ -104,6 +104,14 @@ func init() {
 		fmt.Printf("ERROR: Could not read configuration file: "+configFile+", cause: %v\n", err.Error())
 		os.Exit(1)
 	}
+
+	if CustomPbx.XMLCurl.Route == "" || CustomPbx.XMLCurl.Route[:1] != "/" {
+		CustomPbx.XMLCurl.Route = "/" + CustomPbx.XMLCurl.Route
+	}
+
+	if CustomPbx.Web.Route == "" || CustomPbx.Web.Route[:1] != "/" {
+		CustomPbx.Web.Route = "/" + CustomPbx.Web.Route
+	}
 }
 
 func createConfig() GeneralCfg {

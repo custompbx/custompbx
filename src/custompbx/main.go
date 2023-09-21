@@ -120,32 +120,54 @@ func main() {
 
 	log.Println("Web Handlers")
 	rCurl := chi.NewRouter()
-	rCurl.Use(middleware.RequestID)
-	rCurl.Use(middleware.RealIP)
-	rCurl.Use(middleware.Logger)
-	rCurl.Use(middleware.Recoverer)
-	rCurl.Use(render.SetContentType(render.ContentTypeJSON))
-	rCurl.Use(middleware.Timeout(60 * time.Second))
-
-	if cfg.CustomPbx.XMLCurl.Route[:1] != "/" {
-		cfg.CustomPbx.XMLCurl.Route = "/" + cfg.CustomPbx.XMLCurl.Route
-	}
+	configureMiddleware(rCurl)
 	rCurl.Post(cfg.CustomPbx.XMLCurl.Route, func(w http.ResponseWriter, r *http.Request) { dispatcher(w, r, eventChannel) })
 
 	r := chi.NewRouter()
+	configureMiddleware(r)
+	r.Get(cfg.CustomPbx.Web.Route, web.StartWS)
+	r.Post("/api/v1", web.PostAPIRequest)
+	configureStaticRoutes(r)
+
+	go turnServer()
+	startServers(r)
+}
+
+func startServers(r chi.Router) {
+	curlCert, curlKey, webCert, webKey := checkAndCreateCerts()
+
+	fmt.Println("Starting XMLCurl Server...")
+	go startServer(r, curlCert, curlKey, cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port))
+
+	fmt.Println("Starting Web Server...")
+	startServer(r, webCert, webKey, cfg.CustomPbx.Web.Host+":"+strconv.Itoa(cfg.CustomPbx.Web.Port))
+}
+
+func startServer(r chi.Router, cert, key, socket string) {
+	if cert != "" {
+		err := http.ListenAndServeTLS(socket, cert, key, r)
+		if err != nil {
+			log.Println(err)
+			log.Println("Insecure Web Server")
+			log.Fatal(http.ListenAndServe(socket, r))
+		}
+	} else {
+		log.Println("Insecure Web Server")
+		log.Fatal(http.ListenAndServe(socket, r))
+	}
+}
+
+func configureMiddleware(r chi.Router) {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 	r.Use(middleware.Timeout(60 * time.Second))
+}
 
-	if cfg.CustomPbx.Web.Route[:1] != "/" {
-		cfg.CustomPbx.Web.Route = "/" + cfg.CustomPbx.Web.Route
-	}
-	r.Get(cfg.CustomPbx.Web.Route, web.StartWS)
-	r.Post("/api/v1", web.PostAPIRequest)
-
+func configureStaticRoutes(r chi.Router) {
+	// Define other routes here
 	r.Route("/cweb", func(r chi.Router) {
 		r.Get("/{any1}/{any2}/{any3}/{any4}/{any5}/{any6}/{any7}/{any8}/{any9}", Web)
 		r.Get("/{any1}/{any2}/{any3}/{any4}/{any5}/{any6}/{any7}/{any8}", Web)
@@ -163,45 +185,6 @@ func main() {
 			r.Get("/assets/img/{img}", Web)
 			r.Get("/{file}", Web)*/
 	})
-
-	go turnServer()
-
-	var curlCert, curlKey, webCert, webKey = checkAndCreateCerts()
-
-	go func() {
-		if curlCert != "" {
-			log.Println("Secure XMLCurl Server")
-			err := http.ListenAndServeTLS(
-				cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port),
-				curlCert,
-				curlKey,
-				rCurl,
-			)
-			if err != nil {
-				log.Println(err)
-				log.Println("Insecure XMLCurl Server")
-				log.Fatal(http.ListenAndServe(cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port), rCurl))
-			}
-		} else {
-			log.Println("Insecure XMLCurl Server")
-			log.Fatal(http.ListenAndServe(cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port), rCurl))
-		}
-	}()
-
-	if webCert != "" {
-		log.Println("Secure Web Server")
-		err := http.ListenAndServeTLS(
-			cfg.CustomPbx.Web.Host+":"+strconv.Itoa(cfg.CustomPbx.Web.Port),
-			webCert,
-			webKey,
-			r,
-		)
-		if err != nil {
-			log.Println(err)
-		}
-	}
-	log.Println("Insecure Web Server")
-	log.Fatal(http.ListenAndServe(cfg.CustomPbx.Web.Host+":"+strconv.Itoa(cfg.CustomPbx.Web.Port), r))
 }
 
 func dispatcher(w http.ResponseWriter, r *http.Request, events chan interface{}) {
