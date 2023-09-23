@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetSndfile} from '../../store/config/sndfile/config.actions.sndfile';
@@ -9,7 +9,7 @@ import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetConfigSndfileDataService implements Resolve<void> {
+export class GetConfigSndfileDataService  {
 
   constructor(
     private store: Store<AppState>,

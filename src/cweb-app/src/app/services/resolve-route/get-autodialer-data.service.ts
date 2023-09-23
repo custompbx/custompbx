@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {WsDataService} from '../ws-data.service';
@@ -10,7 +10,7 @@ import {GetDirectoryDomains} from '../../store/directory/directory.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetAutodialerDataService implements Resolve<void> {
+export class GetAutodialerDataService  {
 
   constructor(
     private store: Store<AppState>,

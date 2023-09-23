@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Router, CanActivate} from '@angular/router';
+import { Router } from '@angular/router';
 import {Store} from '@ngrx/store';
 import { AppState } from '../store/app.states';
 import {WsDataService} from './ws-data.service';
@@ -7,7 +7,7 @@ import { RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import {CookiesStorageService} from './cookies-storage.service';
 
 @Injectable()
-export class AuthGuardService implements CanActivate {
+export class AuthGuardService  {
 
   isAuthenticated: false;
   noConnect = false;

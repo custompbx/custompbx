@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetSangomaCodec} from '../../store/config/sangoma_codec/config.actions.sangoma_codec';
@@ -9,7 +9,7 @@ import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetConfigSangomaCodecDataService implements Resolve<void> {
+export class GetConfigSangomaCodecDataService  {
 
   constructor(
     private store: Store<AppState>,

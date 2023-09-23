@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetOdbcCdr} from '../../store/config/odbc_cdr/config.actions.odbc-cdr';
@@ -9,7 +9,7 @@ import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetConfigOdbcCdrDataService implements Resolve<void> {
+export class GetConfigOdbcCdrDataService  {
 
   constructor(
     private store: Store<AppState>,

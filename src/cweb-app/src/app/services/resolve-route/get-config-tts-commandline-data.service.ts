@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetTtsCommandline} from '../../store/config/tts_commandline/config.actions.tts_commandline';
@@ -9,7 +9,7 @@ import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetConfigTtsCommandlineDataService implements Resolve<void> {
+export class GetConfigTtsCommandlineDataService  {
 
   constructor(
     private store: Store<AppState>,

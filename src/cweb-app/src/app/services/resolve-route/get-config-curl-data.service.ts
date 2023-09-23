@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetCurl} from '../../store/config/curl/config.actions.curl';
@@ -9,7 +9,7 @@ import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetConfigCurlDataService implements Resolve<void> {
+export class GetConfigCurlDataService  {
 
   constructor(
     private store: Store<AppState>,

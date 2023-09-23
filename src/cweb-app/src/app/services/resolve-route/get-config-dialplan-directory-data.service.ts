@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetDialplanDirectory} from '../../store/config/dialplan_directory/config.actions.dialplan_directory';
@@ -9,7 +9,7 @@ import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetConfigDialplanDirectoryDataService implements Resolve<void> {
+export class GetConfigDialplanDirectoryDataService  {
 
   constructor(
     private store: Store<AppState>,

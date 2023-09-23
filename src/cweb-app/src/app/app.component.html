@@ -3,7 +3,9 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav mode="side" [opened]="userService.isAuthenticated && !login">
     <mat-nav-list>
-      <app-sidenav></app-sidenav>
+      <div class="menu-sidenav">
+        <app-sidenav></app-sidenav>
+      </div>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>

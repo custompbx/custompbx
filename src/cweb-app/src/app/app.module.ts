@@ -16,7 +16,6 @@ import {reducers} from './store/app.states';
 import {ErrorInterceptor} from './services/token.interceptor';
 import {AuthGuardService as AuthGuard} from './services/auth-guard.service';
 import {NotFoundComponent} from './components/not-found/not-found.component';
-import {CookieService} from 'ngx-cookie-service';
 import {HeaderComponent} from './components/header/header.component';
 import {SidenavComponent} from './components/sidenav/sidenav.component';
 import {WebsocketModule} from './services/websocket';
@@ -179,6 +178,7 @@ import {AutodialerComponent} from './components/apps/autodialer/autodialer.compo
 import {KeyValuePadPositionComponent} from './components/key-value-pad-position/key-value-pad-position.component';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {APP_BASE_HREF} from '@angular/common';
+import {MatIconRegistry} from "@angular/material/icon";
 
 @NgModule({
   declarations: [
@@ -364,7 +364,6 @@ import {APP_BASE_HREF} from '@angular/common';
   ],
   providers: [
     AuthGuard,
-    CookieService,
     GetSettingsDataService,
     GetDirectoryDomainsDataService,
     GetDirectoryUsersDataService,
@@ -389,4 +388,7 @@ import {APP_BASE_HREF} from '@angular/common';
   bootstrap: [AppComponent]
 })
 export class AppModule {
+  constructor(iconRegistry: MatIconRegistry) {
+    iconRegistry.setDefaultFontSetClass('material-icons-outlined');
+  }
 }

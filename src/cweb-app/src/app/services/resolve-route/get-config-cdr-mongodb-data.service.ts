@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetCdrMongodb} from '../../store/config/cdr_mongodb/config.actions.cdr_mongodb';
@@ -9,7 +9,7 @@ import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetConfigCdrMongodbDataService implements Resolve<void> {
+export class GetConfigCdrMongodbDataService  {
 
   constructor(
     private store: Store<AppState>,

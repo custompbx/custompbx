@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {WsDataService} from '../ws-data.service';
@@ -9,7 +9,7 @@ import {GetModules} from '../../store/config/config.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetDataFlowDataService implements Resolve<void> {
+export class GetDataFlowDataService  {
 
   constructor(
     private store: Store<AppState>,

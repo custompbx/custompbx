@@ -34,9 +34,4 @@
 </mat-toolbar>
 <app-lazy-wrapper *ngIf="showPhone" [hidden]="hidePhone" type="phone"></app-lazy-wrapper>
 
-<ng-container>
-  <!--div class="over-component" cdkDrag-->
-  <div class="over-component">
-    <template #componentContainer></template>
-  </div>
-</ng-container>
+<ng-container #componentContainer></ng-container>

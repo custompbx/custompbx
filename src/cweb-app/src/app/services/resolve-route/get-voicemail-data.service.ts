@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {WsDataService} from '../ws-data.service';
@@ -9,7 +9,7 @@ import {GetVoicemailProfiles} from '../../store/config/voicemail/config.actions.
 @Injectable({
   providedIn: 'root'
 })
-export class GetVoicemailDataService implements Resolve<void> {
+export class GetVoicemailDataService  {
 
   constructor(
     private store: Store<AppState>,

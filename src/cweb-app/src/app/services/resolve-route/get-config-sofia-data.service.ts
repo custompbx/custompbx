@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetSofiaProfiles} from '../../store/config/sofia/config.actions.sofia';
@@ -9,7 +9,7 @@ import {SubscriptionList, UnSubscribe} from '../../store/dataFlow/dataFlow.actio
 @Injectable({
   providedIn: 'root'
 })
-export class GetConfigSofiaDataService implements Resolve<void> {
+export class GetConfigSofiaDataService  {
 
   constructor(
     private store: Store<AppState>,

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {WsDataService} from '../ws-data.service';
@@ -9,7 +9,7 @@ import {GetPostLoadModules} from '../../store/config/post_load_modules/config.ac
 @Injectable({
   providedIn: 'root'
 })
-export class GetPostLoadModulesDataService implements Resolve<void> {
+export class GetPostLoadModulesDataService  {
 
   constructor(
     private store: Store<AppState>,

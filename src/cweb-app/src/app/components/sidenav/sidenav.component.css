@@ -19,7 +19,7 @@
   text-decoration: none;
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 0 10px 16px;
+  padding: 12px 0 6px 35px;
 }
 
 .menu-sub-item:hover {
@@ -71,4 +71,14 @@ mat-panel-title {
 
 .menu-panel {
   border-radius: 0;
+}
+.menu-title {
+  margin-bottom: 8px;
+}
+
+.menu-item-active {
+  background-color: #eef1ff;
+}
+.menu-item-active:hover {
+  background-color: #e3e8ff;
 }

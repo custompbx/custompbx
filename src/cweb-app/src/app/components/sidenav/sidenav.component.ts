@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Iuser} from '../../store/auth/auth.reducers';
 import {UserService} from '../../services/user.service';
 import {Subscription} from 'rxjs';
+import {IsActiveMatchOptions, Router} from "@angular/router";
 
 @Component({
   selector: 'app-sidenav',
@@ -16,6 +17,7 @@ export class SidenavComponent implements OnInit {
 
   constructor(
     private userService: UserService,
+    private router: Router,
   ) {
     this.user = this.userService.user;
   }
@@ -27,6 +29,12 @@ export class SidenavComponent implements OnInit {
     });
   }
 
+  isRouteActive(route: string): boolean {
+    if (!route) {
+      return false
+    }
+    return this.router.isActive(route, <IsActiveMatchOptions>{paths: 'subset', queryParams: 'subset', fragment: 'ignored', matrixParams: 'ignored'});
+  }
   getMenuItems(id): Array<IMenuItemExpand> {
     if (!id) {
       return [];

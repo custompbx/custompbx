@@ -1,7 +1,6 @@
 import {
   Component,
-  ComponentFactory,
-  ComponentFactoryResolver, ComponentRef,
+  ComponentRef,
   Input,
   OnDestroy,
   OnInit,
@@ -31,7 +30,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private userService: UserService,
-    private resolver: ComponentFactoryResolver
+    private resolver: ViewContainerRef
   ) {
     this.user = this.userService.user;
   }
@@ -71,16 +70,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
       return;
     }
     this.container.clear();
-    let factory: ComponentFactory<any>;
     if (typeof this.currentComponent.getChildComponentFactory === 'function') {
-      factory = this.currentComponent.getChildComponentFactory();
+      const componentClass = this.currentComponent.getChildComponentFactory().componentType;
+      this.componentRef = this.resolver.createComponent(componentClass);
     } else {
-      factory = this.resolver.resolveComponentFactory(this.currentComponent.constructor);
+      this.componentRef = this.resolver.createComponent(this.currentComponent.constructor);
     }
-
-    this.componentRef = this.container.createComponent(factory);
-    // this.componentRef.instance.type = type;
-    // this.componentRef.instance.output.subscribe(event => console.log(event));
+    const hostElement = this.componentRef.location.nativeElement;
+    hostElement.classList.add('over-component');
   }
 
 }

@@ -1,7 +1,6 @@
 import {
   Attribute,
-  Component, ComponentFactory,
-  ComponentFactoryResolver,
+  Component, ComponentRef,
   OnInit,
   ViewChild,
   ViewContainerRef
@@ -86,12 +85,12 @@ export class LazyWrapperComponent implements OnInit {
     'not-found';
   private prePath: string;
 
-  private componentFactory = null;
+  private componentRef = null;
 
   constructor(
               @Attribute('type') private atrType,
               private router: Router,
-              private cfr: ComponentFactoryResolver
+              private cfr: ViewContainerRef
   ) {
     this.prePath = '';
     if (atrType) {
@@ -186,17 +185,16 @@ export class LazyWrapperComponent implements OnInit {
       return;
     }
     const lazyContentComponent = await import(`../${this.prePath}${this.type}/${this.type}.component`);
-    const componentClassName = lazyContentComponent[`${this.capitalize(this.type)}Component`];
-    this.componentFactory = this.cfr.resolveComponentFactory(componentClassName);
-    this.lazyContentContainer.createComponent(this.componentFactory);
+    const componentClass = lazyContentComponent[`${this.capitalize(this.type)}Component`];
+    this.componentRef = this.cfr.createComponent(componentClass);
   }
 
   private capitalize(value: string): string {
     return `${value.charAt(0).toUpperCase()}${value.slice(1).toLowerCase().replace(/([-_].)/g, function (x) { return x[1].toUpperCase(); })}`;
   }
 
-  public getChildComponentFactory(): ComponentFactory<any> {
-    return this.componentFactory;
+  public getChildComponentFactory(): ComponentRef<any> {
+    return this.componentRef;
   }
 
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetDirectoryUsers, GetWebUsersByDirectory} from '../../store/directory/directory.actions';
@@ -9,7 +9,7 @@ import {GetDashboard, SubscriptionList, UnSubscribe} from '../../store/dataFlow/
 @Injectable({
   providedIn: 'root'
 })
-export class GetDirectoryUsersDataWithSubscriptionService implements Resolve<void> {
+export class GetDirectoryUsersDataWithSubscriptionService  {
 
   constructor(
     private store: Store<AppState>,

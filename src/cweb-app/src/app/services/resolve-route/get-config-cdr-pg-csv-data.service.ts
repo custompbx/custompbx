@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetCdrPgCsv} from '../../store/config/cdr_pg_csv/config.actions.cdr-pg-csv';
@@ -9,7 +9,7 @@ import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 @Injectable({
   providedIn: 'root'
 })
-export class GetConfigCdrPgCsvDataService implements Resolve<void> {
+export class GetConfigCdrPgCsvDataService  {
 
   constructor(
     private store: Store<AppState>,
