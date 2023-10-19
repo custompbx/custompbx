@@ -53,7 +53,7 @@ export class SidenavComponent implements OnInit {
                 name: 'Dashboard',
               },
               {
-                route: 'dashboard/users-panel',
+                route: 'monitoring/users-panel',
                 icon: 'navigate_next',
                 name: 'Users Panel',
               },
@@ -187,7 +187,7 @@ export class SidenavComponent implements OnInit {
       case 2:
         return [
             {
-            route: 'dashboard/users-panel',
+            route: 'monitoring/users-panel',
             icon: 'navigate_next',
             name: 'Users Panel',
               subMenu: null,

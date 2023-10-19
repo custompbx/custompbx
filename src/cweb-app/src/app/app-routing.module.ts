@@ -449,8 +449,8 @@ const routes: Routes = [
     resolve: {reconnectUpdater: GetDialplanContextsDataService}
   },
   {
-    path: 'dashboard/users-panel',
-    title: 'dashboard/users-panel',
+    path: 'monitoring/users-panel',
+    title: 'monitoring/users-panel',
     component: LazyWrapperComponent,
     canActivate: [AuthGuard],
     resolve: {reconnectUpdater: GetDirectoryUsersDataWithSubscriptionService}

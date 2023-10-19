@@ -56,7 +56,7 @@ import {PhoneEffects} from './store/phone/phone.effects';
 import {environment} from '../environments/environment';
 import {ResizeInputDirective} from './directives/resize-input.directive';
 import {KeyValuePadComponent} from './components/key-value-pad/key-value-pad.component';
-import {UsersPanelComponent} from './components/dashboard/users-panel/users-panel.component';
+import {UsersPanelComponent} from './components/monitoring/users-panel/users-panel.component';
 import {FormatTimerPipe} from './pipes/format-timer.pipe';
 import {VertoComponent} from './components/configuration/verto/verto.component';
 import {GetConfigCallcenterDataService} from './services/resolve-route/get-config-callcenter-data.service';

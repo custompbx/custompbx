@@ -596,6 +596,7 @@ func moduleHandler(event string, id int, eventChannel chan interface{}) {
 	}
 
 	module.Loaded = eventMap[EventName] == NameModuleLoad
+	pbxcache.ConfigurationCache.FillConfigurations(module)
 
 	conf := &altStruct.Configurations{}
 	conf.GetConfigurationAndUpdate(module.Name, module)

@@ -31,7 +31,7 @@ Additional options can be found in the Makefile.
 
 A Docker version of the project is also available, currently intended for testing purposes only.
 In the ``docker-compose.yml`` file:
-- Replace the token with ``- SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``
+- Replace the token with yours ``- SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``
 - Modify the host if necessary: ``WS_BACKGROUND_OVERRIDE=wss://127.0.0.1:8080/ws``
 - Start the containers and open ``https://127.0.0.1:8080/cweb`` (or your Docker host), making sure to allow self-signed certificates.
 

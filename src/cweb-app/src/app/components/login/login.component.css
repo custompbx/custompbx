@@ -25,3 +25,7 @@ button {
 .second {
   display: inline-block;
 }
+
+.logo-big {
+  margin-bottom: 20px;
+}
