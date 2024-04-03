@@ -29,6 +29,12 @@ make front-serve
 ```  
 Additional options can be found in the Makefile.
 
+The compiled binary file is located in the ``bin/`` directory and can be used as outlined in the [Documentation](https://github.com/custompbx/custompbx/wiki).
+
+Alternatively, you can utilize the precompiled binary available on the **[Releases Page](https://github.com/custompbx/custompbx/releases)**.
+
+---
+#### Build with Docker (TEST ONLY)
 A Docker version of the project is also available, currently intended for testing purposes only.
 In the ``docker-compose.yml`` file:
 - Replace the token with yours ``- SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``
@@ -40,15 +46,11 @@ You can start Docker with PostgresDB + Freeswitch + Custompbx by using the comma
 docker compose up -d
 ```
 
-The compiled binary file is located in the ``bin/`` directory and can be used as outlined in the [Documentation](https://github.com/custompbx/custompbx/wiki).
-
-Alternatively, you can utilize the precompiled binary available on the **[Releases Page](https://github.com/custompbx/custompbx/releases)**.
-
-If you have any questions or feedback, don't hesitate to get in touch through the **[discussions](https://github.com/custompbx/custompbx/discussions)** or by opening an **[issue](https://github.com/custompbx/custompbx/issues)**!
-
 ---
 ### Documentation
 For detailed instructions on **Installation** and **Configuration**, please refer to the project's **[Wiki Page](https://github.com/custompbx/custompbx/wiki)**.
+
+If you have any questions or feedback, don't hesitate to get in touch through the **[discussions](https://github.com/custompbx/custompbx/discussions)** or by opening an **[issue](https://github.com/custompbx/custompbx/issues)**!
 
 ![system diagram](https://github.com/custompbx/doc/raw/master/img/Diagram1.png)
 
