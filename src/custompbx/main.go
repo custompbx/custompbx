@@ -130,16 +130,16 @@ func main() {
 	configureStaticRoutes(r)
 
 	go turnServer()
-	startServers(r)
+	startServers(r, rCurl)
 }
 
-func startServers(r chi.Router) {
+func startServers(r chi.Router, cr chi.Router) {
 	curlCert, curlKey, webCert, webKey := checkAndCreateCerts()
 
-	fmt.Println("Starting XMLCurl Server...")
-	go startServer(r, curlCert, curlKey, cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port))
+	log.Println("Starting XMLCurl Server...")
+	go startServer(cr, curlCert, curlKey, cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port))
 
-	fmt.Println("Starting Web Server...")
+	log.Println("Starting Web Server...")
 	startServer(r, webCert, webKey, cfg.CustomPbx.Web.Host+":"+strconv.Itoa(cfg.CustomPbx.Web.Port))
 }
 
@@ -482,7 +482,7 @@ func checkAndCreateCerts() (string, string, string, string) {
 	var webKey = cfg.CustomPbx.Web.KeyPath
 
 	var err error
-	log.Println("Checking XMLCurl cert")
+	log.Println("Checking certs")
 	curlCert, curlKey, err = loadCertificateAndKey(curlCert, curlKey)
 	if err != nil {
 		curlCert = "./cert.pem"
