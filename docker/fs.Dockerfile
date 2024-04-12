@@ -43,7 +43,7 @@ RUN echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] htt
 RUN echo "deb-src [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://freeswitch.signalwire.com/repo/deb/debian-release/ $(lsb_release -sc) main" >> /etc/apt/sources.list.d/freeswitch.list
 
 # Install FreeSWITCH
-RUN apt-get update && apt-get install -y --no-install-recommends freeswitch-meta-all
+RUN apt-get update && apt-get install -y --no-install-recommends freeswitch-meta-all freeswitch-mod-cdr-pg-csv
 
 # Create default modules.conf.xml file if it doesn't exist
 RUN if [ ! -f /etc/freeswitch/autoload_configs/modules.conf.xml ]; then \

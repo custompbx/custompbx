@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
-import {Iitem, IsimpleModule} from '../../../store/config/config.state.struct';
+import {Iitem, IsimpleModule, IvertoParameterItem} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {AbstractControl} from '@angular/forms';
@@ -13,8 +13,20 @@ import {
   StoreNewHttpCacheParameter,
   StoreDropNewHttpCacheParameter,
   SwitchHttpCacheParameter,
-  UpdateHttpCacheParameter
+  UpdateHttpCacheParameter,
+  GetHttpCacheProfileParameters,
+  AddHttpCacheProfile,
+  UpdateHttpCacheProfileDomain,
+  StoreDropNewHttpCacheProfileDomain,
+  StoreNewHttpCacheProfileDomain,
+  DelHttpCacheProfileDomain,
+  AddHttpCacheProfileDomain,
+  SwitchHttpCacheProfileDomain,
+  DelHttpCacheProfile,
+  RenameHttpCacheProfile, UpdateHttpCacheProfileAws, UpdateHttpCacheProfileAzure
 } from '../../../store/config/http_cache/config.actions.http_cache';
+
+import {ConfirmBottomSheetComponent} from "../../confirm-bottom-sheet/confirm-bottom-sheet.component";
 
 @Component({
   selector: 'app-http-cache',
@@ -30,6 +42,10 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
   private lastErrorMessage: string;
   public loadCounter: number;
   public globalSettingsDispatchers: object;
+  public ProfileDomainsDispatchers: object;
+  public ProfileDomainsMask: object;
+  private panelCloser = [];
+  private newProfileName: string;
 
   constructor(
     private store: Store<AppState>,
@@ -47,6 +63,7 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
       this.list = configs.http_cache;
       this.lastErrorMessage = configs.http_cache && configs.http_cache.errorMessage || null;
       if (!this.lastErrorMessage) {
+        this.newProfileName = '';
       } else {
         this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
           duration: 3000,
@@ -63,6 +80,17 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
       updateItem: this.updateHttpCacheParam.bind(this),
       pasteItems: null,
     };
+    this.ProfileDomainsDispatchers = {
+      addNewItemField: this.addNewProfileDomain.bind(this),
+      switchItem: this.switchProfileDomain.bind(this),
+      addItem: this.newProfileDomain.bind(this),
+      dropNewItem: this.dropNewProfileDomain.bind(this),
+      deleteItem: this.deleteProfileDomain.bind(this),
+      updateItem: this.updateProfileDomain.bind(this),
+      pasteItems: null,
+      dropActionItem: null,
+    };
+    this.ProfileDomainsMask = {name: {name: 'name'}};
   }
 
   ngOnDestroy() {
@@ -136,4 +164,106 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
     return nameObject && valueObject && nameObject.valid && valueObject.valid;
   }
 
+  GetHttpCacheProfileParameters(id) {
+    this.panelCloser['profile' + id] = true;
+    this.store.dispatch(new GetHttpCacheProfileParameters({id: id}));
+  }
+
+  updateProfileDomain(param: IvertoParameterItem) {
+    this.store.dispatch(new UpdateHttpCacheProfileDomain({param: param}));
+  }
+
+  switchProfileDomain(param: IvertoParameterItem) {
+    const newParam = <IvertoParameterItem>{...param};
+    newParam.enabled = !newParam.enabled;
+    this.store.dispatch(new SwitchHttpCacheProfileDomain({param: newParam}));
+  }
+
+  newProfileDomain(parentId: number, index: number, name: string, value: string, secure: string) {
+    const param = <IvertoParameterItem>{};
+    param.enabled = true;
+    param.name = name;
+    param.value = value;
+    param.secure = secure;
+
+    this.store.dispatch(new AddHttpCacheProfileDomain({id: parentId, index: index, param: param}));
+  }
+
+  deleteProfileDomain(param: IvertoParameterItem) {
+    this.store.dispatch(new DelHttpCacheProfileDomain({param: param}));
+  }
+
+  addNewProfileDomain(parentId: number) {
+    this.store.dispatch(new StoreNewHttpCacheProfileDomain({id: parentId}));
+  }
+
+  dropNewProfileDomain(parentId: number, index: number) {
+    this.store.dispatch(new StoreDropNewHttpCacheProfileDomain({id: parentId, index: index}));
+  }
+
+  updateItemAws(item) {
+    item.expires = Number(item.expires)
+    this.store.dispatch(new UpdateHttpCacheProfileAws({aws_s3: item}));
+  }
+  updateItemAzure(item) {
+    this.store.dispatch(new UpdateHttpCacheProfileAzure({azure: item}));
+  }
+
+  onlyValues(obj: object): Array<any> {
+    if (!obj) {
+      return [];
+    }
+    return Object.values(obj);
+  }
+  firstElement(obj: object) {
+    if (!obj) {
+      return {};
+    }
+    const res= Object.values(obj);
+    if (res.length === 0) {
+      return {}
+    }
+    return res[0]
+  }
+
+  onProfileSubmit() {
+    this.store.dispatch(new AddHttpCacheProfile({name: this.newProfileName}));
+  }
+
+  openBottomSheetProfile(id, newName, oldName, action): void {
+    const config = {
+      data:
+        {
+          newName: newName,
+          oldName: oldName,
+          action: action,
+          case1Text: 'Are you sure you want to delete profile "' + oldName + '"?',
+          case2Text: 'Are you sure you want to rename profile "' + oldName + '" to "' + newName + '"?',
+        }
+    };
+    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    sheet.afterDismissed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      if (action === 'delete') {
+        this.store.dispatch(new DelHttpCacheProfile({id: id}));
+      } else if (action === 'rename') {
+        this.store.dispatch(new RenameHttpCacheProfile({id: id, name: newName}));
+      }
+    });
+  }
+
+  getFirstElement(obj): any {
+    console.log(obj)
+    if (!obj) {
+      return {}
+    }
+    const keys = Object.keys(obj);
+    if (keys.length === 0) {
+      return {}; // return empty object if the input object is empty
+    }
+    const firstKey = keys[0];
+    return obj[firstKey];
+  }
 }

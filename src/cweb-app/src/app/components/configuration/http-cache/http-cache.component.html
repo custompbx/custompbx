@@ -1,19 +1,155 @@
 <app-inner-header name="Http cache" [loadCounter]="loadCounter"></app-inner-header>
 <app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
-  <mat-card *ngIf="list && list.exists !== false">
-  <mat-card-header>
-    <mat-card-subtitle>Settings</mat-card-subtitle>
-  </mat-card-header>
-  <mat-card-content>
-      <h3>Params:</h3>
-      <app-key-value-pad-2 [exist]="list.settings"
-                           [items]="list.settings"
-                           [newItems]="list.settings?.new"
-                           [id]="null"
-                           [toCopy]="null"
-                           [dispatchersCallbacks]="globalSettingsDispatchers"
-      >
-      </app-key-value-pad-2>
-  </mat-card-content>
-  </mat-card>
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
+               *ngIf="list && list.exists !== false">
+  <mat-tab label="List">
+    <mat-card *ngIf="list && list.exists !== false">
+      <mat-card-header>
+        <mat-card-subtitle>Settings</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <h3>Params:</h3>
+        <app-key-value-pad-2 [exist]="list.settings"
+                             [items]="list.settings"
+                             [newItems]="list.settings?.new"
+                             [id]="null"
+                             [toCopy]="null"
+                             [dispatchersCallbacks]="globalSettingsDispatchers"
+        >
+        </app-key-value-pad-2>
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header>
+        <mat-card-subtitle>Profiles</mat-card-subtitle>
+      </mat-card-header>
 
+      <mat-card-content>
+        <div *ngFor="let item of onlyValues(list.profiles); trackBy: trackByFn" class="panel-wrapper">
+          <mat-expansion-panel (opened)="GetHttpCacheProfileParameters(item.id)"
+                               [expanded]="panelCloser['profile' + item.id]">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{item.name}}
+              </mat-panel-title>
+              <mat-panel-description>
+                Click to get details
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <ng-container *ngIf="!firstElement(item.azure).secret_access_key">
+              <h3>AWS:</h3>
+              <mat-form-field hideRequiredMarker>
+                <mat-label>access_key_id</mat-label>
+                <input matInput [placeholder]="access_key_id"
+                       [(ngModel)]="firstElement(item.aws_s3).access_key_id" required
+                       [name]="'access_key_id' + firstElement(item.aws_s3).id"
+                       appResizeInput
+                       [resizeOnString]="firstElement(item.aws_s3).access_key_id"
+                >
+              </mat-form-field>
+              <mat-form-field hideRequiredMarker>
+                <mat-label>secret_access_key</mat-label>
+                <input matInput [placeholder]="secret_access_key"
+                       [(ngModel)]="firstElement(item.aws_s3).secret_access_key" required
+                       [name]="'secret_access_key' + firstElement(item.aws_s3).id"
+                       appResizeInput
+                       [resizeOnString]="firstElement(item.aws_s3).secret_access_key"
+                >
+              </mat-form-field>
+              <mat-form-field hideRequiredMarker>
+                <mat-label>base_domain</mat-label>
+                <input matInput [placeholder]="base_domain"
+                       [(ngModel)]="firstElement(item.aws_s3).base_domain" required
+                       [name]="'base_domain' + firstElement(item.aws_s3).id"
+                       appResizeInput
+                       [resizeOnString]="firstElement(item.aws_s3).base_domain"
+                >
+              </mat-form-field>
+              <mat-form-field hideRequiredMarker>
+                <mat-label>region</mat-label>
+                <input matInput [placeholder]="region"
+                       [(ngModel)]="firstElement(item.aws_s3).region" required
+                       [name]="'region' + firstElement(item.aws_s3).id"
+                       appResizeInput
+                       [resizeOnString]="firstElement(item.aws_s3).region"
+                >
+              </mat-form-field>
+              <mat-form-field hideRequiredMarker>
+                <mat-label>expires</mat-label>
+                <input matInput [placeholder]="expires"
+                       [(ngModel)]="firstElement(item.aws_s3).expires" required
+                       [name]="'expires' + firstElement(item.aws_s3).id"
+                       appResizeInput
+                       [resizeOnString]="firstElement(item.aws_s3).expires"
+                >
+              </mat-form-field>
+              <!-- [disabled]="!(form.controls['access_key_id' + onlyValues(item.aws_s3)[0].id].dirty || form.controls['secret_access_key' + item.id].dirty || form.controls['base_domain' + item.id].dirty || form.controls['region' + item.id].dirty || form.controls['expires' + item.id].dirty)" -->
+              <button mat-button color="accent" class="but-spacer-left"
+                      (click)="updateItemAws(firstElement(item.aws_s3))">
+                Update
+              </button>
+            </ng-container>
+            <ng-container *ngIf="!firstElement(item.aws_s3).secret_access_key">
+              <h3>AZURE:</h3>
+              <mat-form-field hideRequiredMarker>
+                <mat-label>secret_access_key</mat-label>
+                <input matInput [placeholder]="secret_access_key"
+                       [(ngModel)]="firstElement(item.azure).secret_access_key" required
+                       [name]="'secret_access_key' + firstElement(item.azure).id"
+                       appResizeInput
+                       [resizeOnString]="firstElement(item.azure).secret_access_key"
+                >
+              </mat-form-field>
+              <button mat-button color="accent" class="but-spacer-left"
+                      (click)="updateItemAzure(firstElement(item.azure))">
+                Update
+              </button>
+            </ng-container>
+            <h3>Domains:</h3>
+            <app-key-value-pad-position [exist]="item.domains"
+                                        [items]="item.domains"
+                                        [newItems]="item.domains?.new"
+                                        [id]="item.id"
+                                        [toCopy]="toCopyProfile"
+                                        [dispatchersCallbacks]="ProfileDomainsDispatchers"
+                                        [fieldsMask]="ProfileDomainsMask"
+            >
+            </app-key-value-pad-position>
+
+          </mat-expansion-panel>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Add">
+    <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
+      <mat-form-field hideRequiredMarker>
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Submit</button>
+    </form>
+  </mat-tab>
+
+  <mat-tab label="Delete/Rename">
+    <form class="spacer spacerb" #deleteForm="ngForm">
+      <h3>Profiles:</h3>
+      <div *ngFor="let profile of onlyValues(list.profiles); trackBy: trackByFn">
+        <mat-form-field hideRequiredMarker>
+          <mat-label>Profile name</mat-label>
+          <input matInput name="Profile name" required [ngModel]="profile.name"
+                 [name]="'profile::' + profile.id">
+        </mat-form-field>
+        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
+                (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list.profiles[profile.id].name, 'rename')">
+          Update
+        </button>
+        <button mat-raised-button color="warn"
+                (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list.profiles[profile.id].name, 'delete')">
+          Delete
+        </button>
+      </div>
+    </form>
+  </mat-tab>
+</mat-tab-group>

@@ -53,7 +53,7 @@ import {reducer as postLoadReducer} from './post_load_modules/config.reducer.Pos
 import {reducer as voicemail} from './voicemail/config.reducer.voicemail';
 
 import {
-  initialState,
+  initialState, Iverto,
   State
 } from './config.state.struct';
 
@@ -470,4 +470,68 @@ export function reducer(state = initialState, action: any): State {
       return state;
     }
   }
+}
+
+export function increaseStateLoadField(state: State): State {
+  return {
+    ...state,
+    loadCounter: state.loadCounter++,
+  };
+}
+export function decreaseStateLoadField(state: State): State {
+  return {
+    ...state,
+    loadCounter: Math.max(state.loadCounter - 1, 0),
+  };
+}
+export function updateStateItem<State>(fieldName: keyof State, fieldValue: State[keyof State], state: State): State {
+  return {
+    ...state,
+    [fieldName]: {
+      ...state[fieldName],
+      ...fieldValue,
+    },
+  };
+}
+export function updateStateWithFieldValue(objectKey: string, fieldName: string, fieldValue: any, state: State): State {
+  if (state[objectKey] && typeof state[objectKey] === 'object') {
+    return {
+      ...state,
+      [objectKey]: {
+        ...state[objectKey],
+        [fieldName]: fieldValue,
+      },
+    };
+  }
+  return state;
+}
+export function removeFromObject<T extends object>(obj: T, propertyName: keyof T) {
+  const { [propertyName]: toDel, ...rest } = obj;
+  return rest;
+}
+export function updateNestedState<State>(
+  state: State,
+  updates: { path: string[], value: any }[]
+): State {
+  let newState = { ...state };
+
+  updates.forEach(update => {
+    const { path, value } = update;
+    let current = newState;
+
+    for (let i = 0; i < path.length - 1; i++) {
+      const key = path[i];
+      if (current.hasOwnProperty(key) && typeof current[key] === 'object' && current[key] !== null) {
+        current = current[key];
+      } else {
+        // Create intermediate objects if they don't exist
+        current[key] = {};
+        current = current[key];
+      }
+    }
+
+    current[path[path.length - 1]] = value;
+  });
+
+  return newState;
 }

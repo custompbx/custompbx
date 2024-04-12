@@ -13,7 +13,7 @@
                [resizeOnString]="item[fieldsMask.name.name]"
         >
       </mat-form-field>
-      <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.value?.style">
+      <mat-form-field hideRequiredMarker *ngIf="fieldsMask.value" [ngStyle]="fieldsMask.value?.style">
         <mat-label>{{fieldsMask.value.name}}</mat-label>
         <input matInput [placeholder]="fieldsMask.value.name"
                [(ngModel)]="item[fieldsMask.value.name]"
@@ -45,7 +45,7 @@
       </mat-form-field>
       <button mat-button color="accent" class="but-spacer-left"
               [disabled]="!isReadyToSend(form.controls['itemName' + item.id], form.controls['itemValue' + item.id], form.controls['itemExtraField1' + item.id], form.controls['itemExtraField2' + item.id])"
-              (click)="updateItem(item); form.controls['itemName' + item.id].markAsPristine(); form.controls['itemValue' + item.id].markAsPristine();">
+              (click)="updateItem(item); form.controls['itemName' + item.id].markAsPristine(); form.controls['itemValue' + item.id]?.markAsPristine();">
         Update
       </button>
       <button *ngIf="item.enabled" mat-raised-button color="accent"
@@ -77,7 +77,7 @@
                  [resizeOnString]="item.name"
           >
         </mat-form-field>
-        <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.value?.style">
+        <mat-form-field hideRequiredMarker *ngIf="fieldsMask.value" [ngStyle]="fieldsMask.value?.style">
           <mat-label>{{fieldsMask.value.name}}</mat-label>
           <input matInput
                  [placeholder]="fieldsMask.value.name"
@@ -111,7 +111,7 @@
         </mat-form-field>
         <button mat-button color="accent" class="but-spacer-left"
                 [disabled]="!isNewReadyToSend(form.controls['newItemName' + i], form.controls['newItemValue' + i], form.controls['newItemExtraField1' + i], form.controls['newItemExtraField2' + i])"
-                (click)="addItem(i, form.controls['newItemName' + i].value, form.controls['newItemValue' + i].value, form.controls['newItemExtraField1' + i]?.value, form.controls['newItemExtraField2' + i]?.value)">
+                (click)="addItem(i, form.controls['newItemName' + i].value, form.controls['newItemValue' + i]?.value, form.controls['newItemExtraField1' + i]?.value, form.controls['newItemExtraField2' + i]?.value)">
           Update
         </button>
         <button mat-button color="warn" class="but-spacer-left"

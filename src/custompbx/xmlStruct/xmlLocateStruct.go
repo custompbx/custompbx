@@ -727,8 +727,20 @@ type Profile struct {
 	SoftKeySetSets *SoftKeySetSets `xml:"soft-key-set-sets,omitempty" json:"soft-key-set-sets,omitempty"`
 	Synthparams    *Synthparams    `xml:"synthparams,omitempty" json:"synthparams,omitempty"`
 	User           []*User         `xml:"user,omitempty" json:"user,omitempty"`
+	AWSS3          *AWSS3          `xml:"aws-s3,omitempty"`
+	AzureBlob      *AzureBlob      `xml:"azure-blob,omitempty"`
+}
+type AWSS3 struct {
+	AccessKeyID     string `xml:"access-key-id"`
+	SecretAccessKey string `xml:"secret-access-key"`
+	BaseDomain      string `xml:"base-domain,omitempty"`
+	Region          string `xml:"region"`
+	Expires         int64  `xml:"expires"`
 }
 
+type AzureBlob struct {
+	SecretAccessKey string `xml:"secret-access-key"`
+}
 type Profiles struct {
 	XMLName xml.Name   `xml:"profiles,omitempty" json:"profiles,omitempty"`
 	Profile []*Profile `xml:"profile,omitempty" json:"profile,omitempty"`

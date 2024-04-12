@@ -570,6 +570,30 @@ func GetConfNameAndInstanceByStruct(structure interface{}, par interface{}) (str
 			parent = nil
 		}
 		return mainStruct.ConfHttpCache, &altStruct.ConfigHttpCacheSetting{Parent: parent}
+	case altStruct.ConfigHttpCacheProfile, *altStruct.ConfigHttpCacheProfile:
+		parent, ok := par.(*altStruct.ConfigurationsList)
+		if !ok {
+			parent = nil
+		}
+		return mainStruct.ConfHttpCache, &altStruct.ConfigHttpCacheProfile{Parent: parent}
+	case altStruct.ConfigHttpCacheProfileDomain, *altStruct.ConfigHttpCacheProfileDomain:
+		parent, ok := par.(*altStruct.ConfigHttpCacheProfile)
+		if !ok {
+			parent = nil
+		}
+		return mainStruct.ConfHttpCache, &altStruct.ConfigHttpCacheProfileDomain{Parent: parent}
+	case altStruct.ConfigHttpCacheProfileAWSS3, *altStruct.ConfigHttpCacheProfileAWSS3:
+		parent, ok := par.(*altStruct.ConfigHttpCacheProfile)
+		if !ok {
+			parent = nil
+		}
+		return mainStruct.ConfHttpCache, &altStruct.ConfigHttpCacheProfileAWSS3{Parent: parent}
+	case altStruct.ConfigHttpCacheProfileAzureBlob, *altStruct.ConfigHttpCacheProfileAzureBlob:
+		parent, ok := par.(*altStruct.ConfigHttpCacheProfile)
+		if !ok {
+			parent = nil
+		}
+		return mainStruct.ConfHttpCache, &altStruct.ConfigHttpCacheProfileAzureBlob{Parent: parent}
 	case altStruct.ConfigLcrSetting, *altStruct.ConfigLcrSetting:
 		parent, ok := par.(*altStruct.ConfigurationsList)
 		if !ok {
@@ -1529,6 +1553,42 @@ func XMLHttpCache(name string) *mainStruct.Configuration {
 		&altStruct.ConfigHttpCacheSetting{Parent: &altStruct.ConfigurationsList{Id: c.Id}, Enabled: true},
 		map[string]bool{"Parent": true, "Enabled": true},
 	)
+
+	profiles, _ := intermediateDB.GetByValue(
+		&altStruct.ConfigHttpCacheProfile{Parent: &altStruct.ConfigurationsList{Id: c.Id}, Enabled: true},
+		map[string]bool{"Parent": true, "Enabled": true},
+	)
+
+	var listLists []interface{}
+	for _, profile := range profiles {
+		profile, ok := profile.(altStruct.ConfigHttpCacheProfile)
+		if !ok {
+			continue
+		}
+		profileAWS, _ := intermediateDB.GetByValue(
+			&altStruct.ConfigHttpCacheProfileAWSS3{Parent: &altStruct.ConfigHttpCacheProfile{Id: profile.Id}, Enabled: true},
+			map[string]bool{"Parent": true, "Enabled": true},
+		)
+		profileAZURE, _ := intermediateDB.GetByValue(
+			&altStruct.ConfigHttpCacheProfileAzureBlob{Parent: &altStruct.ConfigHttpCacheProfile{Id: profile.Id}, Enabled: true},
+			map[string]bool{"Parent": true, "Enabled": true},
+		)
+		profileDomains, _ := intermediateDB.GetByValue(
+			&altStruct.ConfigHttpCacheProfileDomain{Parent: &altStruct.ConfigHttpCacheProfile{Id: profile.Id}, Enabled: true},
+			map[string]bool{"Parent": true, "Enabled": true},
+		)
+		listLists = append(listLists, struct {
+			*altStruct.ConfigHttpCacheProfile
+			AWS     interface{} `xml:"aws-s3"`
+			AZURE   interface{} `xml:"azure-blob"`
+			Domains interface{} `xml:"domains>domain"`
+		}{
+			&profile,
+			profileAWS,
+			profileAZURE,
+			profileDomains,
+		})
+	}
 	currentConfig := mainStruct.Configuration{
 		Name:        name,
 		Description: "HttpCache Config",
@@ -1537,6 +1597,12 @@ func XMLHttpCache(name string) *mainStruct.Configuration {
 				XMLName xml.Name    `xml:"settings,omitempty"`
 				Inner   interface{} `xml:"param"`
 			}{Inner: &ptimes},
+			struct {
+				XMLName xml.Name    `xml:"profiles,omitempty"`
+				Inner   interface{} `xml:"profile"`
+			}{
+				Inner: &listLists,
+			},
 		},
 	}
 	return &currentConfig
@@ -3126,6 +3192,42 @@ func SetConfigHttpCacheSetting(c *altStruct.ConfigurationsList, name, value stri
 		Name:    name,
 		Value:   value,
 		Parent:  c,
+		Enabled: true,
+	})
+}
+
+func SetConfigHttpCacheProfile(c *altStruct.ConfigurationsList, name string) (int64, error) {
+	return intermediateDB.InsertItem(&altStruct.ConfigHttpCacheProfile{
+		Name:    name,
+		Parent:  c,
+		Enabled: true,
+	})
+}
+
+func SetConfigHttpCacheProfileAWSS3(parentId int64, AccessKeyId, SecretAccessKey, BaseDomain, Region string, Expires int64) (int64, error) {
+	return intermediateDB.InsertItem(&altStruct.ConfigHttpCacheProfileAWSS3{
+		AccessKeyId:     AccessKeyId,
+		SecretAccessKey: SecretAccessKey,
+		BaseDomain:      BaseDomain,
+		Region:          Region,
+		Expires:         Expires,
+		Parent:          &altStruct.ConfigHttpCacheProfile{Id: parentId},
+		Enabled:         true,
+	})
+}
+
+func SetConfigHttpCacheProfileAzureBlob(parentId int64, SecretAccessKey string) (int64, error) {
+	return intermediateDB.InsertItem(&altStruct.ConfigHttpCacheProfileAzureBlob{
+		SecretAccessKey: SecretAccessKey,
+		Parent:          &altStruct.ConfigHttpCacheProfile{Id: parentId},
+		Enabled:         true,
+	})
+}
+
+func SetConfigHttpCacheProfileDomain(parentId int64, name string) (int64, error) {
+	return intermediateDB.InsertItem(&altStruct.ConfigHttpCacheProfileDomain{
+		Name:    name,
+		Parent:  &altStruct.ConfigHttpCacheProfile{Id: parentId},
 		Enabled: true,
 	})
 }

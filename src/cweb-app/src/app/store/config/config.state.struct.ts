@@ -18,7 +18,7 @@ export interface State {
   opus: IsimpleModule;
   python: IsimpleModule;
   tts_commandline: IsimpleModule;
-  http_cache: IsimpleModule;
+  http_cache: Ihttpcache;
   alsa: IsimpleModule;
   amr: IsimpleModule;
   amrwb: IsimpleModule;
@@ -169,6 +169,55 @@ export interface Iverto {
   exists?: boolean;
   errorMessage: string | null;
   loaded?: boolean;
+}
+
+export interface Ihttpcache {
+  settings: Iparameter;
+  profiles: {
+    [index: number]: {
+      id: number;
+      enabled: boolean;
+      name: string;
+      aws_s3: IhttpcacheS3Item;
+      azure: IvertoAzureItem;
+      domains: IhttpcacheDomain;
+      started?: boolean;
+      state?: string;
+    }
+  };
+  id?: number;
+  enabled?: boolean;
+  exists?: boolean;
+  errorMessage: string | null;
+  loaded?: boolean;
+}
+
+export interface IhttpcacheDomain {
+  [index: number]: IhttpcacheDomainItem;
+
+  new: Array<object>;
+}
+
+export interface IhttpcacheDomainItem {
+  id: number;
+  name: string;
+  enabled: boolean;
+}
+
+export interface IhttpcacheS3Item {
+  id: number;
+  AccessKeyId: string;
+  SecretAccessKey: string;
+  BaseDomain: string;
+  Region: string;
+  Expires: number;
+  enabled: boolean;
+}
+
+export interface IvertoAzureItem {
+  id: number;
+  SecretAccessKey: string;
+  enabled: boolean;
 }
 
 export interface Ilcr {
@@ -603,7 +652,7 @@ export const initialState: State = {
   opus: <IsimpleModule>null,
   python: <IsimpleModule>null,
   tts_commandline: <IsimpleModule>null,
-  http_cache: <IsimpleModule>null,
+  http_cache: <Ihttpcache>null,
   alsa: <IsimpleModule>null,
   amr: <IsimpleModule>null,
   amrwb: <IsimpleModule>null,

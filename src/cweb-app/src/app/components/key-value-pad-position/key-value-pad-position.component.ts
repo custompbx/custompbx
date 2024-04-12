@@ -17,7 +17,7 @@ export class KeyValuePadPositionComponent implements OnInit {
   @Input() dispatchersCallbacks: any;
   @Input() fieldsMask: {
     name: {name: string, style?: object, depend?: string, value?: string},
-    value: {name: string, style?: object, depend?: string, value?: string},
+    value?: {name: string, style?: object, depend?: string, value?: string},
     extraField1?: {name: string, style?: object, depend?: string, value?: string},
     extraField2?: {name: string, style?: object, depend?: string, value?: string},
   };
@@ -34,25 +34,33 @@ export class KeyValuePadPositionComponent implements OnInit {
   isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl, valueObject1: AbstractControl, valueObject2: AbstractControl): boolean {
     let obj1 = false;
     let obj2 = false;
+    let value = true;
     if (valueObject1) {
       obj1 = valueObject1.dirty && valueObject1.valid;
     }
     if (valueObject2) {
       obj2 = valueObject2.dirty && valueObject2.valid;
     }
-    return nameObject && valueObject && nameObject.valid && valueObject.valid && ((nameObject.dirty || valueObject.dirty) || obj1 || obj2 );
+    if (valueObject) {
+      value = valueObject.dirty && valueObject.valid;
+    }
+    return nameObject && nameObject.valid && (nameObject.dirty || obj1 || obj2 || value);
   }
 
   isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl, valueObject1: AbstractControl, valueObject2: AbstractControl): boolean {
     let obj1 = true;
     let obj2 = true;
+    let value = true;
     if (valueObject1 && !valueObject1.disabled) {
       obj1 = valueObject1.valid;
     }
     if (valueObject2 && !valueObject1.disabled) {
       obj2 = valueObject2.valid;
     }
-    return nameObject && valueObject && nameObject.valid && valueObject.valid && obj1 && obj2;
+    if (valueObject && !valueObject.disabled) {
+      value = valueObject.valid;
+    }
+    return nameObject && nameObject.valid && value && obj1 && obj2;
   }
 
   isArray(obj: any): boolean {
@@ -115,32 +123,23 @@ export class KeyValuePadPositionComponent implements OnInit {
     this.dispatchersCallbacks['pasteItems'](this.id);
   }
 
-  addItem(index: number, name: string, value: string, extraField1: string, extraField2: string) {
+  addItem(index: number, name: string, value?: string, extraField1?: string, extraField2?: string) {
     if (!this.dispatchersCallbacks || !this.dispatchersCallbacks['addItem']) {
       return;
     }
-    if (this.id === null) {
-      if (this.fieldsMask.extraField1 && this.fieldsMask.extraField2) {
-        this.dispatchersCallbacks['addItem'](index, name, value, extraField2, extraField2);
-        return;
-      }
-      if (this.fieldsMask.extraField1) {
-        this.dispatchersCallbacks['addItem'](index, name, value, extraField1);
-        return;
-      }
-      this.dispatchersCallbacks['addItem'](index, name, value);
-      return;
-    }
 
-    if (this.fieldsMask.extraField1 && this.fieldsMask.extraField2) {
-      this.dispatchersCallbacks['addItem'](this.id, index, name, value, extraField2, extraField2);
-      return;
+    const args = [this.id, index, name];
+    if (value !== undefined) {
+      args.push(value);
     }
     if (this.fieldsMask.extraField1) {
-      this.dispatchersCallbacks['addItem'](this.id, index, name, value, extraField1);
-      return;
+      args.push(extraField1);
     }
-    this.dispatchersCallbacks['addItem'](this.id, index, name, value);
+    if (this.fieldsMask.extraField2) {
+      args.push(extraField2 || extraField1); // If extraField2 is not provided, fallback to extraField1
+    }
+
+    this.dispatchersCallbacks['addItem'](...args);
   }
 
   dropNewItem(index: number) {

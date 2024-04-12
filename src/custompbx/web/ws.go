@@ -1950,7 +1950,12 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Response:{"MessageType":"GetHttpCache","data":{"1":{"id":1,"position":1,"enabled":true,"name":"enable-file-formats","value":"false","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"max-urls","value":"10000","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"3":{"id":3,"position":3,"enabled":true,"name":"location","value":"/var/cache/freeswitch","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"4":{"id":4,"position":4,"enabled":true,"name":"default-max-age","value":"86400","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"5":{"id":5,"position":5,"enabled":true,"name":"prefetch-thread-count","value":"8","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"6":{"id":6,"position":6,"enabled":true,"name":"prefetch-queue-size","value":"100","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"7":{"id":7,"position":7,"enabled":true,"name":"ssl-cacert","value":"/etc/freeswitch/tls/cacert.pem","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"8":{"id":8,"position":8,"enabled":true,"name":"ssl-verifypeer","value":"true","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"9":{"id":9,"position":9,"enabled":true,"name":"ssl-verifyhost","value":"true","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}}
 	//Errors:
 	case "GetHttpCache":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigHttpCacheSetting{}, onlyAdminGroup())
+		resp1 := getUserForConfig(msg, getConfig, &altStruct.ConfigHttpCacheSetting{}, onlyAdminGroup())
+		resp2 := getUserForConfig(msg, getConfig, &altStruct.ConfigHttpCacheProfile{}, onlyAdminGroup())
+		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
+			S interface{} `json:"settings"`
+			P interface{} `json:"profiles"`
+		}{S: resp1.Data, P: resp2.Data}}
 	//Request:{"event":"UpdateHttpCacheParameter","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","param":{"id":9,"name":"ssl-verifyhost","value":"false"}}}
 	//Response:{"MessageType":"UpdateHttpCacheParameter","data":{"id":9,"position":9,"enabled":true,"name":"ssl-verifyhost","value":"false","description":"","parent":{"id":23,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:
@@ -1977,6 +1982,59 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Errors:
 	case "DelHttpCacheParameter":
 		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigHttpCacheSetting{Id: msg.Param.Id}, onlyAdminGroup())
+	case "GetHttpCacheProfile":
+		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigHttpCacheProfile{}, onlyAdminGroup())
+	case "AddHttpCacheProfile":
+		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigHttpCacheProfile{Name: msg.Name, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigHttpCacheProfile{}))}, onlyAdminGroup())
+	case "RenameHttpCacheProfile":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigHttpCacheProfile{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
+	case "DelHttpCacheProfile":
+		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigHttpCacheProfile{Id: msg.Id}, onlyAdminGroup())
+	case "GetHttpCacheProfileParameters":
+		resp1 := getUserForConfig(msg, getConfig, &altStruct.ConfigHttpCacheProfileDomain{}, onlyAdminGroup())
+		resp2 := getUserForConfig(msg, getConfig, &altStruct.ConfigHttpCacheProfileAzureBlob{}, onlyAdminGroup())
+		resp3 := getUserForConfig(msg, getConfig, &altStruct.ConfigHttpCacheProfileAWSS3{}, onlyAdminGroup())
+		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
+			S interface{} `json:"domains"`
+			P interface{} `json:"azure"`
+			R interface{} `json:"aws_s3"`
+		}{S: resp1.Data, P: resp2.Data, R: resp3.Data}}
+	case "AddHttpCacheProfileDomain":
+		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigHttpCacheProfileDomain{Name: msg.Param.Name, Enabled: true, Parent: &altStruct.ConfigHttpCacheProfile{Id: msg.Id}}, onlyAdminGroup())
+	case "DelHttpCacheProfileDomain":
+		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigHttpCacheProfileDomain{Id: msg.Param.Id}, onlyAdminGroup())
+	case "SwitchHttpCacheProfileDomain":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigHttpCacheProfileDomain{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
+	case "UpdateHttpCacheProfileDomain":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigHttpCacheProfileDomain{Id: msg.Param.Id, Name: msg.Param.Name}, []string{"Name"}}, onlyAdminGroup())
+	case "UpdateHttpCacheProfileAws":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigHttpCacheProfileAWSS3{Id: msg.AwsS3.Id,
+			AccessKeyId:     msg.AwsS3.AccessKeyId,
+			SecretAccessKey: msg.AwsS3.SecretAccessKey,
+			BaseDomain:      msg.AwsS3.BaseDomain,
+			Region:          msg.AwsS3.Region,
+			Expires:         msg.AwsS3.Expires,
+		}, []string{"AccessKeyId", "SecretAccessKey", "BaseDomain", "Region", "Expires"}}, onlyAdminGroup())
+	case "UpdateHttpCacheProfileAzure":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigHttpCacheProfileAzureBlob{Id: msg.Azure.Id,
+			SecretAccessKey: msg.Azure.SecretAccessKey,
+		}, []string{"SecretAccessKey"}}, onlyAdminGroup())
+
 	//### Opus
 	//Request:{"event":"GetOpus","data":{"token":"3c2f3200f73699a28c96783a15dff1d7"}}
 	//Response:{"MessageType":"GetOpus","data":{"1":{"id":1,"position":1,"enabled":true,"name":"use-vbr","value":"1","description":"","parent":{"id":31,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"complexity","value":"10","description":"","parent":{"id":31,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"3":{"id":3,"position":3,"enabled":true,"name":"keep-fec-enabled","value":"1","description":"","parent":{"id":31,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"4":{"id":4,"position":4,"enabled":true,"name":"maxaveragebitrate","value":"0","description":"","parent":{"id":31,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"5":{"id":5,"position":5,"enabled":true,"name":"maxplaybackrate","value":"0","description":"","parent":{"id":31,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}}

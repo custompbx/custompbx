@@ -3135,6 +3135,37 @@ func setConfigHttpCache(conf *xmlStruct.Configuration) error {
 			}
 		}
 	}
+	if conf.Profiles != nil {
+		for _, profile := range conf.Profiles.Profile {
+			profileId, err := altData.SetConfigHttpCacheProfile(mod, profile.Attrname)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			if profile.AWSS3 != nil {
+				_, err = altData.SetConfigHttpCacheProfileAWSS3(profileId, profile.AWSS3.AccessKeyID, profile.AWSS3.SecretAccessKey, profile.AWSS3.BaseDomain, profile.AWSS3.Region, profile.AWSS3.Expires)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+			}
+			if profile.AzureBlob != nil {
+				_, err = altData.SetConfigHttpCacheProfileAzureBlob(profileId, profile.AzureBlob.SecretAccessKey)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+			}
+			if profile.Domains != nil {
+				for _, domain := range profile.Domains.Domain {
+					_, err := altData.SetConfigHttpCacheProfileDomain(profileId, domain.Attrname)
+					if err != nil {
+						continue
+					}
+				}
+			}
+		}
+	}
 	return nil
 }
 
@@ -3699,9 +3730,6 @@ func setConfigDirectory(conf *xmlStruct.Configuration) error {
 			}
 		}
 	}
-	log.Println(conf)
-	log.Println(conf.Profiles)
-	log.Println(conf.Profiles.Profile)
 	if conf.Profiles == nil {
 		return nil
 	}
