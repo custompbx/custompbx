@@ -123,14 +123,14 @@ func main() {
 	configureMiddleware(rCurl)
 	rCurl.Post(cfg.CustomPbx.XMLCurl.Route, func(w http.ResponseWriter, r *http.Request) { dispatcher(w, r, eventChannel) })
 
-	r := chi.NewRouter()
-	configureMiddleware(r)
-	r.Get(cfg.CustomPbx.Web.Route, web.StartWS)
-	r.Post("/api/v1", web.PostAPIRequest)
-	configureStaticRoutes(r)
+	rWeb := chi.NewRouter()
+	configureMiddleware(rWeb)
+	rWeb.Get(cfg.CustomPbx.Web.Route, web.StartWS)
+	rWeb.Post("/api/v1", web.PostAPIRequest)
+	configureStaticRoutes(rWeb)
 
 	go turnServer()
-	startServers(r, rCurl)
+	startServers(rWeb, rCurl)
 }
 
 func startServers(r chi.Router, cr chi.Router) {
@@ -144,14 +144,14 @@ func startServers(r chi.Router, cr chi.Router) {
 }
 
 func startServer(r chi.Router, cert, key, socket string) {
-	if cert != "" {
-		err := http.ListenAndServeTLS(socket, cert, key, r)
-		if err != nil {
-			log.Println(err)
-			log.Println("Insecure Web Server")
-			log.Fatal(http.ListenAndServe(socket, r))
-		}
-	} else {
+	if cert == "" {
+		log.Println("Insecure Web Server")
+		log.Fatal(http.ListenAndServe(socket, r))
+		return
+	}
+	err := http.ListenAndServeTLS(socket, cert, key, r)
+	if err != nil {
+		log.Println(err)
 		log.Println("Insecure Web Server")
 		log.Fatal(http.ListenAndServe(socket, r))
 	}
@@ -485,6 +485,7 @@ func checkAndCreateCerts() (string, string, string, string) {
 	log.Println("Checking certs")
 	curlCert, curlKey, err = loadCertificateAndKey(curlCert, curlKey)
 	if err != nil {
+		log.Println("Certs Error: ", err.Error())
 		curlCert = "./cert.pem"
 		curlKey = curlCert
 		_, err := os.ReadFile(curlCert)
@@ -500,6 +501,7 @@ func checkAndCreateCerts() (string, string, string, string) {
 	log.Println("Checking Web cert", webCert, webKey)
 	webCert, webKey, err = loadCertificateAndKey(webCert, webKey)
 	if err != nil {
+		log.Println("Certs Error: ", err.Error())
 		webCert = "./cert.pem"
 		webKey = webCert
 		_, err := os.ReadFile(webCert)

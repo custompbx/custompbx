@@ -45,18 +45,6 @@ RUN echo "deb-src [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg]
 # Install FreeSWITCH
 RUN apt-get update && apt-get install -y --no-install-recommends freeswitch-meta-all freeswitch-mod-cdr-pg-csv
 
-# Create default modules.conf.xml file if it doesn't exist
-RUN if [ ! -f /etc/freeswitch/autoload_configs/modules.conf.xml ]; then \
-    echo '<include>' > /etc/freeswitch/autoload_configs/modules.conf.xml && \
-    echo '  <extension name="modules.conf" dialplan="XML" include-subdirs="true" reload="true"/>' >> /etc/freeswitch/autoload_configs/modules.conf.xml && \
-    echo '</include>' >> /etc/freeswitch/autoload_configs/modules.conf.xml; \
-  fi
-
-# Modify the modules.conf.xml file to load mod_xml_curl
-RUN if [ -f /etc/freeswitch/autoload_configs/modules.conf.xml ]; then \
-    sed -i '/<!-- <load module="mod_xml_curl"\/> -->/ s/<!-- \(<load module="mod_xml_curl"\/>\) -->/\1/' /etc/freeswitch/autoload_configs/modules.conf.xml; \
-  fi
-
 RUN if [ -f /etc/freeswitch/autoload_configs/event_socket.conf.xml ]; then \
     sed -i 's/<param name="listen-ip" value="::"\/>/<param name="listen-ip" value="freeswitch-host"\/>/g' /etc/freeswitch/autoload_configs/event_socket.conf.xml; \
     sed -i 's|<!--<param name="apply-inbound-acl" value="loopback.auto"/>-->|<param name="apply-inbound-acl" value="localnet.auto"/>|' /etc/freeswitch/autoload_configs/event_socket.conf.xml; \
@@ -78,10 +66,17 @@ RUN sed -i 's|<X-PRE-PROCESS cmd="stun-set" data="external_rtp_ip=stun:stun.free
 RUN rm /etc/freeswitch/sip_profiles/internal-ipv6.xml
 RUN rm /etc/freeswitch/sip_profiles/external-ipv6.xml
 
-COPY ./docker/fs_conf/cdr_pg_csv.conf.xml /etc/freeswitch/autoload_configs/
-
 # Left some mediaports for expose
-RUN sed -i '/<!-- <param name="rtp-start-port" value="16384"\/> -->/{n;s/<!-- <param name="rtp-start-port" value="16384"\/> -->/<param name="rtp-start-port" value="16384"\/>/}; /<!-- <param name="rtp-end-port" value="32768"\/> -->/{n;s/<!-- <param name="rtp-end-port" value="32768"\/> -->/<param name="rtp-end-port" value="16399"\/>/}' /etc/freeswitch/autoload_configs/switch.conf.xml
+RUN sed -i 's|<!-- <param name="rtp-start-port" value="16384"/> -->|<param name="rtp-start-port" value="16384"/>|' /etc/freeswitch/autoload_configs/switch.conf.xml && \
+    sed -i 's|<!-- <param name="rtp-end-port" value="32768"\/> -->|<param name="rtp-end-port" value="16399"/>|' /etc/freeswitch/autoload_configs/switch.conf.xml
+
+RUN sed -i 's/<param name="sip-capture" value="no"\/>/<param name="sip-capture" value="yes"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
+RUN sed -i 's/<param name="rtp-ip" value="\$\${local_ip_v4}"\/>/<param name="rtp-ip" value="freeswitch-host"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
+RUN sed -i 's/<param name="sip-ip" value="\$\${local_ip_v4}"\/>/<param name="sip-ip" value="freeswitch-host"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
+
+COPY ./docker/fs_conf/sofia.conf.xml /etc/freeswitch/autoload_configs/
+COPY ./docker/fs_conf/modules.conf.xml /etc/freeswitch/autoload_configs/
+COPY ./docker/fs_conf/cdr_pg_csv.conf.xml /etc/freeswitch/autoload_configs/
 
 # Volumes
 VOLUME ["/var/log/freeswitch/log"]
