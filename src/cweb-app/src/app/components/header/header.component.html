@@ -32,6 +32,8 @@
     </button>
   </mat-menu>
 </mat-toolbar>
-<app-lazy-wrapper *ngIf="showPhone" [hidden]="hidePhone" type="phone"></app-lazy-wrapper>
+<div [hidden]="hidePhone">
+  <app-lazy-wrapper *ngIf="startPhone" type="phone"></app-lazy-wrapper>
+</div>
 
 <ng-container #componentContainer></ng-container>

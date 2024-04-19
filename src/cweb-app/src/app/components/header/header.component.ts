@@ -19,8 +19,8 @@ import {Subscription} from 'rxjs';
 export class HeaderComponent implements OnInit, OnDestroy {
 
   public user: Iuser;
-  public showPhone: boolean;
-  private hidePhone = true;
+  public startPhone: boolean;
+  public hidePhone = true;
   public getState$: Subscription;
   public clone = true;
 
@@ -53,8 +53,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   showHidePhone() {
-    if (!this.showPhone) {
-      this.showPhone = true;
+    if (!this.startPhone) {
+      this.startPhone = true;
     }
     this.hidePhone = !this.hidePhone;
   }
