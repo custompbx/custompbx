@@ -535,3 +535,12 @@ export function updateNestedState<State>(
 
   return newState;
 }
+
+export function getParentId(data: any): number {
+  if (data.id) {
+    return data?.parent?.id || 0;
+  } else {
+    const firstKey = Object.keys(data)[0];
+    return data[firstKey]?.parent?.id || 0;
+  }
+}
