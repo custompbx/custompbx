@@ -25,6 +25,7 @@ services:
       - 5432:5432
     volumes:
       - /var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - local_network
 

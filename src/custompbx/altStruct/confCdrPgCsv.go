@@ -19,7 +19,8 @@ type ConfigCdrPgCsvSchema struct {
 	Position    int64               `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
 	Var         string              `xml:"var,attr" json:"var" customsql:"var;unique;check(var <> '')"`
-	Column      string              `xml:"column,attr" json:"column" customsql:"column_name;check(column_name <> '')"`
+	Column      string              `xml:"column,attr" json:"column" customsql:"column_name"`
+	Quote       string              `xml:"quote,attr" json:"quote" customsql:"quote"`
 	Description string              `xml:"-" json:"description" customsql:"description"`
 	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
 }

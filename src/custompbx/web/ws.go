@@ -1189,7 +1189,7 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Response:{"MessageType":"[Config][Add] Cdr_Pg_Csv Field","data":{"id":21,"position":1,"enabled":true,"var":"var","column":"column","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:
 	case "[Config][Add] Cdr_Pg_Csv Field":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigCdrPgCsvSchema{Var: msg.Field.Var, Column: msg.Field.Column, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigCdrPgCsvSchema{}))}, onlyAdminGroup())
+		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigCdrPgCsvSchema{Var: msg.Field.Var, Column: msg.Field.Column, Quote: msg.Field.Quote, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigCdrPgCsvSchema{}))}, onlyAdminGroup())
 	//Request:{"event":"[Config][Update] Cdr_Pg_Csv Field","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","field":{"id":21,"var":"var2","column":"column2"}}}
 	//Response:{"MessageType":"[Config][Update] Cdr_Pg_Csv Field","data":{"id":21,"position":1,"enabled":true,"var":"var2","column":"column2","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:
@@ -1197,7 +1197,7 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 		resp = getUserForConfig(msg, updateConfig, struct {
 			S interface{}
 			A []string
-		}{&altStruct.ConfigCdrPgCsvSchema{Id: msg.Field.Id, Var: msg.Field.Var, Column: msg.Field.Column}, []string{"Var", "Column"}}, onlyAdminGroup())
+		}{&altStruct.ConfigCdrPgCsvSchema{Id: msg.Field.Id, Var: msg.Field.Var, Column: msg.Field.Column, Quote: msg.Field.Quote}, []string{"Var", "Column", "Quote"}}, onlyAdminGroup())
 	//Request:{"event":"[Config][Switch] Cdr_Pg_Csv Field","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","field":{"id":21,"enabled":false}}}
 	//Response:{"MessageType":"[Config][Switch] Cdr_Pg_Csv Field","data":{"id":21,"position":1,"enabled":false,"var":"var2","column":"column2","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:

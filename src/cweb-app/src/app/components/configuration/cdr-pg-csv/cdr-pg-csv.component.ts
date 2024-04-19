@@ -78,7 +78,7 @@ export class CdrPgCsvComponent implements OnInit, OnDestroy {
       updateItem: this.updateField.bind(this),
       pasteItems: null,
     };
-    this.schemaFieldMask = {name: {name: 'var'}, value: {name: 'column'}};
+    this.schemaFieldMask = {name: {name: 'var'}, value: {name: 'column'}, extraField1: {name: 'quote', style: {'max-width': '71px'}}};
   }
 
   ngOnDestroy() {
@@ -113,11 +113,12 @@ export class CdrPgCsvComponent implements OnInit, OnDestroy {
     this.store.dispatch(new AddCdrPgCsvParam({index: index, param: param}));
   }
 
-  newField(index: number, variable: string, column: string) {
+  newField(index: number, variable: string, column: string, quote: string) {
     const field = <Ifield>{};
     field.enabled = true;
     field.var = variable;
     field.column = column;
+    field.quote = quote;
 
     this.store.dispatch(new AddCdrPgCsvField({index: index, field: field}));
   }

@@ -2381,7 +2381,7 @@ func setConfigCdrPgCsv(conf *xmlStruct.Configuration) error {
 
 	if conf.Schema != nil {
 		for _, field := range conf.Schema.Field {
-			_, err := altData.SetConfCdrPgCsvSchemaField(mod, field.Attrvar, field.Attrcolumn)
+			_, err := altData.SetConfCdrPgCsvSchemaField(mod, field.Attrvar, field.Attrcolumn, field.Attrquote)
 			if err != nil {
 				continue
 			}

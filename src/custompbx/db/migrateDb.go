@@ -105,6 +105,14 @@ func Migrate(switchName string) (bool, error) {
 		}
 		updated = true
 		fallthrough
+	case "0.0.105":
+		log.Println("Updating schema from 0.0.105")
+		err = migrateForV0v0v106(instanceId)
+		if err != nil {
+			return false, err
+		}
+		updated = true
+		fallthrough
 	case mainStruct.Version:
 		return updated, nil
 	}
@@ -187,6 +195,33 @@ DO $$
 	}
 	_, err = tx.ExecContext(ctx, "ALTER TABLE IF EXISTS web_users DROP CONSTRAINT IF EXISTS web_users_ipk")
 	_, err = tx.ExecContext(ctx, "ALTER TABLE IF EXISTS web_users ADD CONSTRAINT web_users_ipk FOREIGN KEY (instance_id) REFERENCES fs_instances (id) ON DELETE CASCADE ")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	err = UpdateVersionRequest(instanceId, tx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+
+	return nil
+}
+
+func migrateForV0v0v106(instanceId int64) error {
+	if instanceId == 0 {
+		return errors.New("no id")
+	}
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	_, err = tx.ExecContext(ctx, "ALTER TABLE IF EXISTS config_cdr_pg_csv_schema ADD COLUMN IF NOT EXISTS quote VARCHAR")
+	_, err = tx.ExecContext(ctx, "ALTER TABLE IF EXISTS config_cdr_pg_csv_schema DROP CONSTRAINT IF EXISTS config_cdr_pg_csv_schema_column_name_check")
+
 	if err != nil {
 		tx.Rollback()
 		return err

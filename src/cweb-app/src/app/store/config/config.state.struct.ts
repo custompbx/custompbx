@@ -608,6 +608,7 @@ export interface Ifield {
   id: number;
   var: string;
   column: string;
+  quote: string;
   enabled: boolean;
 }
 

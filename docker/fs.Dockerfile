@@ -78,6 +78,8 @@ RUN sed -i 's|<X-PRE-PROCESS cmd="stun-set" data="external_rtp_ip=stun:stun.free
 RUN rm /etc/freeswitch/sip_profiles/internal-ipv6.xml
 RUN rm /etc/freeswitch/sip_profiles/external-ipv6.xml
 
+COPY ./docker/fs_conf/cdr_pg_csv.conf.xml /etc/freeswitch/autoload_configs/
+
 # Left some mediaports for expose
 RUN sed -i '/<!-- <param name="rtp-start-port" value="16384"\/> -->/{n;s/<!-- <param name="rtp-start-port" value="16384"\/> -->/<param name="rtp-start-port" value="16384"\/>/}; /<!-- <param name="rtp-end-port" value="32768"\/> -->/{n;s/<!-- <param name="rtp-end-port" value="32768"\/> -->/<param name="rtp-end-port" value="16399"\/>/}' /etc/freeswitch/autoload_configs/switch.conf.xml
 

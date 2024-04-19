@@ -3026,10 +3026,11 @@ func SetConfCdrPgCsvSetting(c *altStruct.ConfigurationsList, name, value string)
 	})
 }
 
-func SetConfCdrPgCsvSchemaField(c *altStruct.ConfigurationsList, variable, colunm string) (int64, error) {
+func SetConfCdrPgCsvSchemaField(c *altStruct.ConfigurationsList, variable, colunm, quote string) (int64, error) {
 	return intermediateDB.InsertItem(&altStruct.ConfigCdrPgCsvSchema{
 		Var:     variable,
 		Column:  colunm,
+		Quote:   quote,
 		Parent:  c,
 		Enabled: true,
 	})
