@@ -1415,16 +1415,11 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
   }
 }
 
-function getParentId (data): number {
-  let id = 0;
+function getParentId(data: any): number {
   if (data.id) {
-    id = data?.parent?.id || 0;
+    return data?.parent?.id || 0;
   } else {
-    const ids = Object.keys(data);
-    if (ids.length === 0) {
-      return id;
-    }
-    id = data[ids[0]]?.parent?.id || 0;
+    const firstKey = Object.keys(data)[0];
+    return data[firstKey]?.parent?.id || 0;
   }
-  return id;
 }

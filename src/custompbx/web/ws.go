@@ -792,28 +792,28 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 			}{&altStruct.ConfigPostLoadModule{Id: postloadMod.Id, Enabled: !postloadMod.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
 		}
 	//### Acl
-	//Request:{"event":"[Config] Get_acl_lists","data":{"token":"3c2f3200f73699a28c96783a15dff1d7"}}
-	//Response:{"MessageType":"[Config] Get_acl_lists","data":{"1":{"id":1,"position":1,"enabled":true,"name":"lan","default":"allow","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"domains","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}}
+	//Request:{"event":"GetAclLists","data":{"token":"3c2f3200f73699a28c96783a15dff1d7"}}
+	//Response:{"MessageType":"GetAclLists","data":{"1":{"id":1,"position":1,"enabled":true,"name":"lan","default":"allow","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"domains","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}}
 	//Errors:
-	case "[Config] Get_acl_lists":
+	case "GetAclLists":
 		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigAclList{}, onlyAdminGroup())
-	//Request:{"event":"[Config] Add_acl_list","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","name":"dddd","default":"deny"}}
-	//Response:{"MessageType":"[Config] Add_acl_list","data":{"id":4,"position":3,"enabled":true,"name":"dddd","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
+	//Request:{"event":"AddAclList","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","name":"dddd","default":"deny"}}
+	//Response:{"MessageType":"AddAclList","data":{"id":4,"position":3,"enabled":true,"name":"dddd","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:
-	case "[Config] Add_acl_list":
+	case "AddAclList":
 		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigAclList{Name: msg.Name, Default: msg.Default, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigAclList{}))}, onlyAdminGroup())
-	//Request:{"event":"[Config] Update_acl_list","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":4,"name":"dddd2"}}
-	//Response:{"MessageType":"[Config] Update_acl_list","data":{"id":4,"position":3,"enabled":true,"name":"dddd2","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
+	//Request:{"event":"UpdateAclList","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":4,"name":"dddd2"}}
+	//Response:{"MessageType":"UpdateAclList","data":{"id":4,"position":3,"enabled":true,"name":"dddd2","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:
-	case "[Config] Update_acl_list":
+	case "UpdateAclList":
 		resp = getUserForConfig(msg, updateConfig, struct {
 			S interface{}
 			A []string
 		}{&altStruct.ConfigAclList{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Del_acl_list","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":4}}
-	//Response:{"MessageType":"[Config] Del_acl_list","data":{"id":4,"position":3,"enabled":true,"name":"dddd2","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
+	//Request:{"event":"DelAclList","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":4}}
+	//Response:{"MessageType":"DelAclList","data":{"id":4,"position":3,"enabled":true,"name":"dddd2","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:
-	case "[Config] Del_acl_list":
+	case "DelAclList":
 		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigAclList{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"[Config] Update_acl_list_default","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","value":"allow","id":5}}
 	//Response:{"MessageType":"[Config] Update_acl_list_default","data":{"id":5,"position":3,"enabled":true,"name":"ccc","default":"allow","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
@@ -823,33 +823,33 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 			S interface{}
 			A []string
 		}{&altStruct.ConfigAclList{Id: msg.Id, Default: msg.Value}, []string{"Default"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Get_acl_nodes","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":1}}
-	//Response:{"MessageType":"[Config] Get_acl_nodes","data":{"1":{"id":1,"position":1,"enabled":true,"type":"deny","cidr":"192.168.42.0/24","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}},"2":{"id":2,"position":4,"enabled":true,"type":"allow","cidr":"192.168.42.42/32","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}},"7":{"id":7,"position":5,"enabled":false,"type":"2","cidr":"2","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}}
+	//Request:{"event":"GetAclNodes","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":1}}
+	//Response:{"MessageType":"GetAclNodes","data":{"1":{"id":1,"position":1,"enabled":true,"type":"deny","cidr":"192.168.42.0/24","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}},"2":{"id":2,"position":4,"enabled":true,"type":"allow","cidr":"192.168.42.42/32","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}},"7":{"id":7,"position":5,"enabled":false,"type":"2","cidr":"2","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}}
 	//Errors:
-	case "[Config] Get_acl_nodes":
+	case "GetAclNodes":
 		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigAclNode{}, onlyAdminGroup())
-	//Request:{"event":"[Config] Add_acl_node","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":1,"node":{"type":"allow","cidr":"0.0.0.0","domain":""}}}
-	//Response:{"MessageType":"[Config] Add_acl_node","data":{"id":9,"position":6,"enabled":true,"type":"allow","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
+	//Request:{"event":"AddAclNode","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":1,"node":{"type":"allow","cidr":"0.0.0.0","domain":""}}}
+	//Response:{"MessageType":"AddAclNode","data":{"id":9,"position":6,"enabled":true,"type":"allow","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
 	//Errors:
-	case "[Config] Add_acl_node":
+	case "AddAclNode":
 		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigAclNode{Type: msg.Node.Type, Cidr: msg.Node.Cidr, Domain: msg.Node.Domain, Enabled: true, Parent: &altStruct.ConfigAclList{Id: msg.Id}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Del_acl_node","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":9}}
-	//Response:{"MessageType":"[Config] Del_acl_node","data":{"id":9,"position":6,"enabled":true,"type":"allow","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
+	//Request:{"event":"DelAclNode","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":9}}
+	//Response:{"MessageType":"DelAclNode","data":{"id":9,"position":6,"enabled":true,"type":"allow","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
 	//Errors:
-	case "[Config] Del_acl_node":
+	case "DelAclNode":
 		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigAclNode{Id: msg.Id}, onlyAdminGroup())
-	//Request:{"event":"[Config] Update_acl_node","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","node":{"id":7,"type":"deny","cidr":"0.0.0.0","domain":""}}}
-	//Response:{"MessageType":"[Config] Update_acl_node","data":{"id":7,"position":5,"enabled":true,"type":"deny","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
+	//Request:{"event":"UpdateAclNode","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","node":{"id":7,"type":"deny","cidr":"0.0.0.0","domain":""}}}
+	//Response:{"MessageType":"UpdateAclNode","data":{"id":7,"position":5,"enabled":true,"type":"deny","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
 	//Errors:
-	case "[Config] Update_acl_node":
+	case "UpdateAclNode":
 		resp = getUserForConfig(msg, updateConfig, struct {
 			S interface{}
 			A []string
 		}{&altStruct.ConfigAclNode{Id: msg.Node.Id, Type: msg.Node.Type, Cidr: msg.Node.Cidr, Domain: msg.Node.Domain}, []string{"Type", "Cidr", "Domain"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Switch_acl_node","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","node":{"id":7,"enabled":false}}}
-	//Response:{"MessageType":"[Config] Switch_acl_node","data":{"id":7,"position":5,"enabled":false,"type":"deny","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
+	//Request:{"event":"SwitchAclNode","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","node":{"id":7,"enabled":false}}}
+	//Response:{"MessageType":"SwitchAclNode","data":{"id":7,"position":5,"enabled":false,"type":"deny","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
 	//Errors:
-	case "[Config] Switch_acl_node":
+	case "SwitchAclNode":
 		resp = getUserForConfig(msg, updateConfig, struct {
 			S interface{}
 			A []string

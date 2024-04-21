@@ -1,25 +1,44 @@
 import {
-  ConfigActionTypes,
-  All,
+  AddAclList,
+  AddAclNode,
+  DelAclList,
+  DelAclNode,
+  DropAclList, StoreDelAclNode,
+  DropNewAclNode,
+  GetAclLists,
+  GetAclNodes,
+  MoveAclListNode,
+  StoreAclList,
+  StoreAclLists,
+  StoreAclNode,
+  StoreAclNodes,
+  StoreGotAclError,
+  StoreMoveAclListNode,
+  StoreNewAclNode,
+  StoreSwitchAclNode,
+  StoreUpdatedAclList,
+  StoreUpdatedAclListDefault,
+  StoreUpdatedAclNode,
+  SwitchAclNode,
+  UpdateAclList,
+  UpdateAclListDefault,
+  UpdateAclNode,
 } from './config.actions.acl';
-import {
-  initialState, Inode, Inodes,
-  State
-} from '../config.state.struct';
+import {initialState, Inode, Inodes, State} from '../config.state.struct';
 
-export function reducer(state = initialState, action: All): State {
+export function reducer(state = initialState, action): State {
   switch (action.type) {
-    case ConfigActionTypes.MoveAclListNode:
-    case ConfigActionTypes.ADD_ACL_LIST:
-    case ConfigActionTypes.UPDATE_ACL_LIST:
-    case ConfigActionTypes.UPDATE_ACL_LIST_DEFAULT:
-    case ConfigActionTypes.DEL_ACL_LIST:
-    case ConfigActionTypes.GET_ACL_NODES:
-    case ConfigActionTypes.ADD_ACL_NODE:
-    case ConfigActionTypes.UPDATE_ACL_NODE:
-    case ConfigActionTypes.DEL_ACL_NODE:
-    case ConfigActionTypes.SWITCH_ACL_NODE:
-    case ConfigActionTypes.GET_ACL_LISTS: {
+    case MoveAclListNode.type:
+    case AddAclList.type:
+    case UpdateAclList.type:
+    case UpdateAclListDefault.type:
+    case DelAclList.type:
+    case GetAclNodes.type:
+    case AddAclNode.type:
+    case UpdateAclNode.type:
+    case DelAclNode.type:
+    case SwitchAclNode.type:
+    case GetAclLists.type: {
       return {
         ...state,
         acl: {
@@ -29,26 +48,27 @@ export function reducer(state = initialState, action: All): State {
       };
     }
 
-    case ConfigActionTypes.StoreGotAclError: {
+    case StoreGotAclError.type: {
       return {
         ...state,
         acl: {
           ...state.acl,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: Math.max(0, state.loadCounter - 1),
       };
     }
 
-    case ConfigActionTypes.STORE_ACL_LISTS: {
-      if (action.payload.response.exists === false) {
+    case StoreAclLists.type: {
+      const { response } = action.payload;
+      let { data, error, exists } = response;
+      if (exists === false) {
         return {
           ...state,
-          acl: {...state.acl, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          acl: {...state.acl, exists: exists},
+          loadCounter: Math.max(0, state.loadCounter - 1)
         };
       }
-      let data = action.payload.response.data;
       if (data && data.id) {
         data = {[data.id]: data};
       }
@@ -59,26 +79,27 @@ export function reducer(state = initialState, action: All): State {
           lists: {
             ...data
           },
-          exists: action.payload.response.exists,
-          errorMessage: action.payload.response.error || null,
+          exists: exists,
+          errorMessage: error || null,
         },
         loadCounter: 0,
       };
     }
 
-    case ConfigActionTypes.STORE_UPDATED_ACL_LIST_DEFAULT:
-    case ConfigActionTypes.STORE_UPDATED_ACL_LIST:
-    case ConfigActionTypes.STORE_ACL_LIST: {
-      let data = action.payload.response.data || {};
+    case StoreUpdatedAclListDefault.type:
+    case StoreUpdatedAclList.type:
+    case StoreAclList.type: {
+      const { response } = action.payload;
+      let { data, error, exists } = response;
       if (!data.id) {
         const ids = Object.keys(data);
         if (ids.length === 0) {
-          return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+          return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
         }
         data = data[ids[0]];
       }
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
       if (state.acl.lists[data.id]) {
         data.nodes = state.acl.lists[data.id].nodes;
@@ -88,16 +109,16 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         acl: {
           ...state.acl, lists: {...state.acl.lists, [data.id]: data},
-          errorMessage: action.payload.response.error || null,
+          errorMessage: error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: Math.max(0, state.loadCounter - 1),
       };
     }
 
-    case ConfigActionTypes.DROP_ACL_LIST: {
+    case DropAclList.type: {
       const id = action.payload.response.data?.id;
       if (!state.acl.lists[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
 
       const {[id]: toDel, ...rest} = state.acl.lists;
@@ -110,13 +131,13 @@ export function reducer(state = initialState, action: All): State {
             {...rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: Math.max(0, state.loadCounter - 1),
       };
     }
 
-    case ConfigActionTypes.StoreMoveAclListNode:
-    case ConfigActionTypes.STORE_ACL_NODES: {
-      let parent_id = action.payload.id;
+    case StoreMoveAclListNode.type:
+    case StoreAclNodes.type: {
+      let { parent_id } = action.payload;
       const data = action.payload.response.data || {};
 
       if (!parent_id && Object.keys(data).length > 0) {
@@ -124,7 +145,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.acl.lists[parent_id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
 
       return {
@@ -133,16 +154,16 @@ export function reducer(state = initialState, action: All): State {
           ...state.acl, lists: {...state.acl.lists, [parent_id]: {...state.acl.lists[parent_id], nodes: data}},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: Math.max(0, state.loadCounter - 1),
       };
     }
 
-    case ConfigActionTypes.STORE_SWITCH_ACL_NODE:
-    case ConfigActionTypes.STORE_UPDATED_ACL_NODE: {
+    case StoreSwitchAclNode.type:
+    case StoreUpdatedAclNode.type: {
       const data = action.payload.response.data || {};
       const parent_id = data.parent?.id || 0;
       if (!parent_id || !state.acl.lists[parent_id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
 
       return {
@@ -158,15 +179,15 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: Math.max(0, state.loadCounter - 1),
       };
     }
 
-    case ConfigActionTypes.DROP_ACL_NODE: {
+    case StoreDelAclNode.type: {
       const data = action.payload.response.data || {};
       const parent_id = data.parent?.id || 0;
       if (!parent_id || !state.acl.lists[parent_id] || !state.acl.lists[parent_id].nodes[data.id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
 
       const {[data.id]: toDel, ...rest} = state.acl.lists[parent_id].nodes;
@@ -174,17 +195,18 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         acl: {
-          ...state.acl, lists: {...state.acl.lists, [parent_id]: {...state.acl.lists[parent_id], nodes: <Inodes>{...rest}}},
+          ...state.acl,
+          lists: {...state.acl.lists, [parent_id]: {...state.acl.lists[parent_id], nodes: <Inodes>{...rest}}},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: Math.max(0, state.loadCounter - 1),
       };
     }
 
-    case ConfigActionTypes.STORE_NEW_ACL_NODE: {
-      const id = action.payload;
+    case StoreNewAclNode.type: {
+      const { id } = action.payload;
       if (!state.acl.lists[id].nodes) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
 
       const rest = [
@@ -195,17 +217,18 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         acl: {
-          ...state.acl, lists: {...state.acl.lists, [id]: {...state.acl.lists[id], nodes: {...state.acl.lists[id].nodes, new: rest}}},
+          ...state.acl,
+          lists: {...state.acl.lists, [id]: {...state.acl.lists[id], nodes: {...state.acl.lists[id].nodes, new: rest}}},
           errorMessage: null
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: Math.max(0, state.loadCounter - 1),
       };
     }
 
-    case ConfigActionTypes.DROP_NEW_ACL_NODE: {
-      const id = action.payload.id;
+    case DropNewAclNode.type: {
+      const { id } = action.payload;
       if (!state.acl.lists[id].nodes || !state.acl.lists[id].nodes.new) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
 
       const rest = [
@@ -224,25 +247,25 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: Math.max(0, state.loadCounter - 1),
       };
     }
 
-    case ConfigActionTypes.STORE_ACL_NODE: {
+    case StoreAclNode.type: {
       let data = action.payload.response.data || {};
       let id: any = 0;
       if (!data.id) {
         const ids = Object.keys(data);
         if (ids.length === 0) {
-          return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+          return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
         }
         data = data[ids[0]];
       }
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
       if (!data.parent?.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
       id = data.parent.id;
       data = {[id]: data};
@@ -262,7 +285,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: Math.max(0, state.loadCounter - 1),
       };
     }
 

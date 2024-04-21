@@ -1,4 +1,4 @@
-import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
@@ -6,11 +6,15 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {AbstractControl} from '@angular/forms';
 import {
   AddAclList,
-  AddAclNode, DelAclList,
-  DelAclNode, DropNewAclNode,
-  GetAclNodes, MoveAclListNode,
+  AddAclNode,
+  DelAclList,
+  DelAclNode,
+  DropNewAclNode,
+  GetAclNodes,
+  MoveAclListNode,
   StoreNewAclNode,
-  SwitchAclNode, UpdateAclList,
+  SwitchAclNode,
+  UpdateAclList,
   UpdateAclListDefault,
   UpdateAclNode
 } from '../../../store/config/acl/config.actions.acl';
@@ -68,13 +72,13 @@ export class AclComponent implements OnInit, OnDestroy {
     this.configs$.unsubscribe();
     if (this.route.snapshot?.data?.reconnectUpdater) {
       if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
+        this.route.snapshot.data.reconnectUpdater.unsubscribe();
+      }
     }
   }
 
   getDetails(id) {
-    this.store.dispatch(new GetAclNodes(id));
+    this.store.dispatch(GetAclNodes({id}));
   }
 
   checkDirty(condition: AbstractControl): boolean {
@@ -99,34 +103,35 @@ export class AclComponent implements OnInit, OnDestroy {
   }
 
   updateNode(node: Inode) {
-    this.store.dispatch(new UpdateAclNode({node: node}));
+    this.store.dispatch(UpdateAclNode({node: node}));
   }
 
   updateDefault(id: number, valueObject: AbstractControl) {
     const value = valueObject.value;
     valueObject.reset();
-    this.store.dispatch(new UpdateAclListDefault({value: value, id: id}));
+    this.store.dispatch(UpdateAclListDefault({value: value, id: id}));
   }
 
   switchNode(node: Inode) {
     const newNode = <Inode>{...node};
     newNode.enabled = !node.enabled;
-    this.store.dispatch(new SwitchAclNode({node: newNode}));
+    this.store.dispatch(SwitchAclNode({node: newNode}));
   }
 
   deleteNode(node: Inode) {
-    this.store.dispatch(new DelAclNode({id: node.id}));
+    this.store.dispatch(DelAclNode({id: node.id}));
   }
+
   clearDetails(id) {
-    //  this.store.dispatch(new ClearDetails(id));
+    //  this.store.dispatch(ClearDetails(id));
   }
 
   addAclNodeField(id) {
-    this.store.dispatch(new StoreNewAclNode(id));
+    this.store.dispatch(StoreNewAclNode({id}));
   }
 
   dropNewNode(id: number, index: number) {
-    this.store.dispatch(new DropNewAclNode({id: id, index: index}));
+    this.store.dispatch(DropNewAclNode({id: id, index: index}));
   }
 
   newNode(id: number, index: number, type: string, cidr: AbstractControl, domain: AbstractControl) {
@@ -140,11 +145,11 @@ export class AclComponent implements OnInit, OnDestroy {
     if (domain) {
       node.domain = domain.value;
     }
-    this.store.dispatch(new AddAclNode({id: id, index: index, node: node}));
+    this.store.dispatch(AddAclNode({id: id, index: index, node: node}));
   }
 
   onAclListSubmit() {
-    this.store.dispatch(new AddAclList({name: this.newItemName, default: this.defaultBehavior}));
+    this.store.dispatch(AddAclList({name: this.newItemName, default: this.defaultBehavior}));
   }
 
   isArray(obj: any): boolean {
@@ -180,9 +185,9 @@ export class AclComponent implements OnInit, OnDestroy {
         return;
       }
       if (action === 'delete') {
-        this.store.dispatch(new DelAclList({id: id}));
+        this.store.dispatch(DelAclList({id}));
       } else if (action === 'rename') {
-        this.store.dispatch(new UpdateAclList({id: id, name: newName}));
+        this.store.dispatch(UpdateAclList({id: id, name: newName}));
       }
     });
   }
@@ -216,7 +221,7 @@ export class AclComponent implements OnInit, OnDestroy {
     if (parent[event.previousIndex].position === parent[event.currentIndex].position) {
       return;
     }
-    this.store.dispatch(new MoveAclListNode({
+    this.store.dispatch(MoveAclListNode({
       previous_index: parent[event.previousIndex].position,
       current_index: parent[event.currentIndex].position,
       id: parent[event.previousIndex].id

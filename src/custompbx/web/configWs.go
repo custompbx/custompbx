@@ -16,7 +16,6 @@ import (
 )
 
 func getConfParent(name string) *altStruct.ConfigurationsList {
-	log.Printf("%+v", name)
 	conf, err := altData.GetModuleByName(mainStruct.GetModuleNameByConfName(name))
 	if err != nil {
 		return nil
