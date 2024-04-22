@@ -207,7 +207,7 @@
                       <mat-optgroup *ngFor="let domain of directoryDomains | keyvalue" [label]="domain.value.name"
                                     [disabled]="domain.disabled">
                         <mat-option *ngFor="let directoryUser of onlyValuesByParent(directoryUsers, domain.key)" [value]="directoryUser.id">
-                          {{directoryUser.name}}@{{domain.value.name}}
+                          {{directoryUser.name}}&#64;{{domain.value.name}}
                         </mat-option>
                       </mat-optgroup>
                     </mat-select>
@@ -416,7 +416,7 @@
           <mat-expansion-panel *ngFor="let template of onlyValues(usersTemplates); trackBy: trackById;" class="tabbed-panel"
                                (opened)="getWebUsersTemplateDetails(template.id)">
             <mat-expansion-panel-header>
-              <mat-panel-title>{{template.name}}@{{directoryDomains[template.domain.id].name}}</mat-panel-title>
+              <mat-panel-title>{{template.name}}&#64;{{directoryDomains[template.domain.id].name}}</mat-panel-title>
               <mat-panel-description>
                 Click to get details
               </mat-panel-description>

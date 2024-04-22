@@ -206,14 +206,13 @@ export function reducer(state = initialState, action): State {
     case StoreNewAclNode.type: {
       const { id } = action.payload;
       if (!state.acl.lists[id].nodes) {
-        return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
+        state.acl.lists[id].nodes = {new: []}
       }
 
       const rest = [
         ...state.acl.lists[id].nodes?.new || [],
         <Inode>{}
       ];
-
       return {
         ...state,
         acl: {

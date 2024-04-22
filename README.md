@@ -6,7 +6,7 @@ Please note that this project is still in development, has not undergone extensi
 
 The **Backend** is developed using Golang v.1.19 and is located in the ``src/custompbx`` directory.
 
-The **Frontend**, built with Angular v.16, can be found in the ``src/cweb-app`` directory.
+The **Frontend**, built with Angular v.17, can be found in the ``src/cweb-app`` directory.
 
 ---
 System Requirements:

@@ -11,7 +11,7 @@
             *ngIf="company.id">
             <mat-expansion-panel-header>
               <mat-panel-title>
-                {{company?.name || ''}}@{{domainsList[company.domain.id]?.name}}
+                {{company?.name || ''}}&#64;{{domainsList[company.domain.id]?.name}}
               </mat-panel-title>
               <mat-panel-description>
                 Click to get details
@@ -181,7 +181,7 @@
                         </mat-option>
                         <mat-option *ngFor="let directoryUser of onlyValuesByParent(userList, company?.domain?.id)"
                                     [value]="directoryUser.id">
-                          {{directoryUser.name}}@{{domainsList[directoryUser.parent?.id].name}}
+                          {{directoryUser.name}}&#64;{{domainsList[directoryUser.parent?.id].name}}
                         </mat-option>
                       </mat-select>
                     </mat-form-field>

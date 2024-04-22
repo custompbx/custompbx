@@ -1,6 +1,7 @@
 version: "3.9"
 
 volumes:
+  freeswitch-recordings:
   fsdata:
     driver_opts:
       type: none
@@ -55,6 +56,7 @@ services:
     volumes:
       - /var/log/freeswitch/log
       - /usr/local/freeswitch/db
+      - freeswitch-recordings:/var/lib/freeswitch/recordings
     networks:
       - local_network
 
@@ -76,6 +78,7 @@ services:
     volumes:
       - /app
       - ./docker/config.json:/app/config.json
+      - freeswitch-recordings:/app/recordings
     networks:
       - local_network
 

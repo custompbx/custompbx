@@ -1,7 +1,7 @@
 #docker build . -t cpbx --build-arg WS_BACKGROUND_OVERRIDE="wss://host:8080/ws"
 
 ### STAGE 1: Build Angular frontend ###
-FROM node:16 AS frontend
+FROM node:20 AS frontend
 WORKDIR /app
 
 # Copy package.json and package-lock.json

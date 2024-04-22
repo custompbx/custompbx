@@ -92,21 +92,21 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "cweb-app:build"
+            "buildTarget": "cweb-app:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "cweb-app:build:production"
+              "buildTarget": "cweb-app:build:production"
             },
             "dev": {
-              "browserTarget": "cweb-app:build:dev"
+              "buildTarget": "cweb-app:build:dev"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "cweb-app:build"
+            "buildTarget": "cweb-app:build"
           }
         },
         "test": {
