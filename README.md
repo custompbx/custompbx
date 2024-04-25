@@ -23,7 +23,7 @@ For rebuilding after resolving dependencies, use:
 ```
 make build
 ``` 
-To locally run the frontend, perform the following steps: build and test the project, set the backend websocket URL using the command ``export WS_BACKGROUND_OVERRIDE=wss://HOST:PORT/ws``, and finally execute:
+To locally run the frontend, perform the following steps: build and test the project, set the backend websocket URL using the command ``export WS_BACKEND_OVERRIDE=wss://HOST:PORT/ws``, and finally execute:
 ```
 make front-serve
 ```  
@@ -38,7 +38,6 @@ Alternatively, you can utilize the precompiled binary available on the **[Releas
 A Docker version of the project is also available, currently intended for testing purposes only.
 In the ``docker-compose.yml`` file:
 - Replace the token with yours ``- SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``
-- Modify the host if necessary: ``WS_BACKGROUND_OVERRIDE=wss://127.0.0.1:8080/ws``
 - Start the containers and open ``https://127.0.0.1:8080/cweb`` (or your Docker host), making sure to allow self-signed certificates.
 
 You can start Docker with PostgresDB + Freeswitch + Custompbx by using the command:

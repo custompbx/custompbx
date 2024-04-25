@@ -21,7 +21,7 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
   private connection$: Observer<boolean>;
   private wsMessages$: Subject<IWsMessage<any>>;
   private reconnectInterval: number;
-  readonly reconnectAttempts: number;
+  private reconnectAttempts: number;
   private isConnected: boolean;
 
   public status: Observable<boolean>;

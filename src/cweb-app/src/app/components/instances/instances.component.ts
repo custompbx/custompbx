@@ -64,14 +64,6 @@ export class InstancesComponent implements OnInit, OnDestroy {
     }
     window.open('https://' + this.list[id].host + ':' + String(this.list[id].port) + '/cweb', '_blank').focus();
     return;
-
-/*    this.ws.connectToAnotherHost('wss://' + this.list[id].host + ':' + String(this.list[id].port) + '/ws').subscribe(
-      connected => {
-        if (connected) {
-          this.store.dispatch(new GetInstances(null));
-        }
-      }
-    );*/
   }
 
   checkDirty(condition: AbstractControl): boolean {

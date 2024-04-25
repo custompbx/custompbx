@@ -36,7 +36,7 @@ build: front back
 		@ echo build started at: $(shell date)
 
 front:
-		@ cd $(web_path) && npm run build --omit=dev
+		@ cd $(web_path) && npm run build
 		@ cd $(web_path) && go-bindata -pkg cweb -prefix dist/cweb-app -o ../custompbx/cweb/cweb.go dist/cweb-app/...
 
 back:
@@ -44,9 +44,9 @@ back:
 		@ echo build finished at: $(shell date)
 
 front-serve:
-		@ [ "${WS_BACKGROUND_OVERRIDE}" ] || ( echo ">> WS_BACKGROUND_OVERRIDE is not set (syntax wss://HOST:PORT/ws) " )
-		@ cd $(web_path) && echo "export function getWs() { return '${WS_BACKGROUND_OVERRIDE}'; }" > env.js
-		@ cd $(web_path) && npm start
+		@ [ "${WS_BACKGROUND_OVERRIDE}" ] || ( echo ">> WS_BACKEND_OVERRIDE is not set (syntax wss://HOST:PORT/ws) " )
+		@ cd $(web_path) && sed -i "s#WSServ: \"[^\"]*\"#WSServ: \"${WS_BACKEND_OVERRIDE}\"#g" src/environments/environment.ts
+		@ cd $(web_path) && npm run start_dev
 
 install-node:
 		@ apt-get -y install curl

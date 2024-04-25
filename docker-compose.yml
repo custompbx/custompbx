@@ -65,8 +65,6 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-      args:
-        - WS_BACKGROUND_OVERRIDE=wss://127.0.0.1:8080/ws
     depends_on:
       postgres:
         condition: service_started

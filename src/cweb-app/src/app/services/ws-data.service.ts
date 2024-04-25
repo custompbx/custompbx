@@ -28,31 +28,6 @@ export class WsDataService {
     });
   }
 
-  connectToAnotherHost(url: string): Observable<any> {
-    // this.websocketService.reconnectToAnotherHost(url);
-    this.websocketService.close();
-    this.websocketService = new WebsocketService({url: url});
-    return this.websocketService.status;
-  }
-
-/*
-  connectToAnotherHost2(url: string): Observable<any> {
-      const newWebsocketService = new WebsocketService({url: url});
-      newWebsocketService.status.subscribe(
-        connected => {
-          if (!connected) {
-            newWebsocketService.close();
-          } else {
-            this.websocketService.close();
-            this.websocketService = newWebsocketService;
-          }
-
-          return this.websocketService.status;
-        }
-      );
-    }
-*/
-
   logIn(login: string, password: string): Observable<any> {
     this.websocketService.send(WS.ON.LOGIN, {login, password});
     return this.websocketService.on<IMessage>(WS.ON.LOGIN);

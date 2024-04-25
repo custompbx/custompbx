@@ -1,4 +1,4 @@
-#docker build . -t cpbx --build-arg WS_BACKGROUND_OVERRIDE="wss://host:8080/ws"
+#docker build . -t cpbx
 
 ### STAGE 1: Build Angular frontend ###
 FROM node:20 AS frontend
@@ -15,10 +15,6 @@ COPY src/cweb-app/tslint.json ./
 
 # Install frontend dependencies
 RUN npm install
-
-# Create a file with the value passed to the build command
-ARG WS_BACKGROUND_OVERRIDE
-RUN echo "export function getWs() { return '${WS_BACKGROUND_OVERRIDE}'; }" > env.js
 
 # Build frontend
 RUN npm run build --omit=dev
