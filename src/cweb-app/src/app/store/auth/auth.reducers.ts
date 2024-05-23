@@ -35,6 +35,12 @@ export function reducer(state = initialState, action: (All | SettingsAll)): Stat
       };
     }
 
+    case SettingsActionTypes.StoreUpdateWebUserGroup:
+    case SettingsActionTypes.STORE_UPDATE_WEB_USER_STUN:
+    case SettingsActionTypes.STORE_UPDATE_WEB_USER_WEBRTC_LIB:
+    case SettingsActionTypes.STORE_UPDATE_WEB_USER_VERTO_WS:
+    case SettingsActionTypes.STORE_UPDATE_WEB_USER_WS:
+    case SettingsActionTypes.STORE_RENAME_WEB_USER:
     case SettingsActionTypes.STORE_CLEAR_WEB_USER_AVATAR:
     case SettingsActionTypes.STORE_UPDATE_WEB_USER_AVATAR: {
       const data = action.payload.response['web_users'] || {};
@@ -44,37 +50,18 @@ export function reducer(state = initialState, action: (All | SettingsAll)): Stat
           errorMessage: action.payload.response.error,
         };
       }
-      const ids = Object.keys(data);
-      if (ids.length === 0) {
-        return {...state};
-      }
-      const id = ids[0];
-      let format = data[id].avatar_format;
-      if (format.length) {
-        format = format + '?' + (+new Date());
-      }
-      return {
-        ...state,
-        user: {...state.user, avatar_format: format},
-      };
-    }
 
-    case SettingsActionTypes.STORE_RENAME_WEB_USER: {
-      const data = action.payload.response['web_users'] || {};
-      if (!data) {
-        return {
-          ...state,
-          errorMessage: action.payload.response.error,
-        };
+      const updatedUser = data[state.user.id]
+      if (!updatedUser) {
+        return {...state}
       }
-      const ids = Object.keys(data);
-      if (ids.length === 0) {
-        return {...state};
+
+      if (updatedUser?.avatar_format?.length) {
+        updatedUser.avatar_format += '?' + (+new Date());
       }
-      const id = ids[0];
       return {
         ...state,
-        user: {...state.user, login: data[id].login},
+        user: {...state.user, ...updatedUser},
       };
     }
 
