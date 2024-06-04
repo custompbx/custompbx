@@ -19,7 +19,8 @@
     "port": 8080,
     "stun_port": 3478,
     "cert_path": "",
-    "key_path": ""
+    "key_path": "",
+    "secure": true
   },
   "xml_curl_server": {
     "route": "/conf/config",
@@ -27,7 +28,8 @@
     "port": 8081,
     "stun_port": 0,
     "cert_path": "",
-    "key_path": ""
+    "key_path": "",
+    "secure": true
   },
   "database": {
     "name": "custompbx",

@@ -136,24 +136,24 @@ func main() {
 func startServers(r chi.Router, cr chi.Router) {
 	curlCert, curlKey, webCert, webKey := checkAndCreateCerts()
 
-	log.Println("Starting XMLCurl Server...")
-	go startServer(cr, curlCert, curlKey, cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port))
-
-	log.Println("Starting Web Server...")
-	startServer(r, webCert, webKey, cfg.CustomPbx.Web.Host+":"+strconv.Itoa(cfg.CustomPbx.Web.Port))
-}
-
-func startServer(r chi.Router, cert, key, socket string) {
-	if cert == "" {
-		log.Println("Insecure Web Server")
-		log.Fatal(http.ListenAndServe(socket, r))
-		return
+	if cfg.CustomPbx.XMLCurl.Secure {
+		log.Println("Starting XMLCurl Secure Server...")
+		go func() {
+			log.Fatal(http.ListenAndServeTLS(cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port), curlCert, curlKey, cr))
+		}()
+	} else {
+		log.Println("Starting XMLCurl Insecure Server...")
+		go func() {
+			log.Fatal(http.ListenAndServe(cfg.CustomPbx.XMLCurl.Host+":"+strconv.Itoa(cfg.CustomPbx.XMLCurl.Port), cr))
+		}()
 	}
-	err := http.ListenAndServeTLS(socket, cert, key, r)
-	if err != nil {
-		log.Println(err)
-		log.Println("Insecure Web Server")
-		log.Fatal(http.ListenAndServe(socket, r))
+
+	if cfg.CustomPbx.Web.Secure {
+		log.Println("Starting Web Secure Server...")
+		log.Fatal(http.ListenAndServeTLS(cfg.CustomPbx.Web.Host+":"+strconv.Itoa(cfg.CustomPbx.Web.Port), webCert, webKey, r))
+	} else {
+		log.Println("Starting Web Insecure Server...")
+		log.Fatal(http.ListenAndServe(cfg.CustomPbx.Web.Host+":"+strconv.Itoa(cfg.CustomPbx.Web.Port), r))
 	}
 }
 

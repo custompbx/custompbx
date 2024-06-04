@@ -40,6 +40,7 @@ type WebServer struct {
 	StunPort int    `json:"stun_port"`
 	CertPath string `json:"cert_path"`
 	KeyPath  string `json:"key_path"`
+	Secure   bool   `json:"secure"`
 }
 
 type Database struct {
@@ -136,11 +137,13 @@ func createConfig() GeneralCfg {
 	item.Web.StunPort = 3478
 	item.Web.CertPath = ""
 	item.Web.KeyPath = ""
+	item.Web.Secure = true
 	item.XMLCurl.Route = "/conf/config"
 	item.XMLCurl.Host = "127.0.0.1"
 	item.XMLCurl.Port = 8081
 	item.XMLCurl.CertPath = ""
 	item.XMLCurl.KeyPath = ""
+	item.XMLCurl.Secure = true
 
 	return item
 }
