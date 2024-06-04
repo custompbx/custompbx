@@ -44,7 +44,7 @@ export class DomainsComponent implements OnInit, OnDestroy {
   public selectedIndex: number;
   public lastErrorMessage: string;
   public loadCounter: number;
-  private toCopy: number;
+  public toCopy: number;
   public domainParamDispatchers: object;
   public domainVarDispatchers: object;
   public XMLBody: string;

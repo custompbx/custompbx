@@ -8,13 +8,13 @@ import (
 	"log"
 )
 
-func GetGlobalVariables(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetGlobalVariables(data *webStruct.MessageData) webStruct.UserResponse {
 	items := pbxcache.GetGlobalVariableList()
 
 	return webStruct.UserResponse{GlobalVariables: &items, MessageType: data.Event}
 }
 
-func UpdateGlobalVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func UpdateGlobalVariable(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Variable.Id == 0 || data.Variable.Name == "" || data.Variable.Value == "" {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -44,7 +44,7 @@ func UpdateGlobalVariable(data *webStruct.MessageData, user *mainStruct.WebUser)
 	return webStruct.UserResponse{MessageType: data.Event, GlobalVariables: &item}
 }
 
-func SwitchGlobalVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func SwitchGlobalVariable(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Variable.Id == 0 {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -75,7 +75,7 @@ func SwitchGlobalVariable(data *webStruct.MessageData, user *mainStruct.WebUser)
 	return webStruct.UserResponse{MessageType: data.Event, GlobalVariables: &item}
 }
 
-func AddGlobalVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func AddGlobalVariable(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Variable.Id != 0 || data.Variable.Name == "" {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -104,7 +104,7 @@ func AddGlobalVariable(data *webStruct.MessageData, user *mainStruct.WebUser) we
 	return webStruct.UserResponse{MessageType: data.Event, GlobalVariables: &item}
 }
 
-func DelGlobalVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func DelGlobalVariable(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Variable.Id == 0 {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -129,13 +129,13 @@ func DelGlobalVariable(data *webStruct.MessageData, user *mainStruct.WebUser) we
 	return webStruct.UserResponse{MessageType: data.Event, Id: &res}
 }
 
-func ImportGlobalVariables(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func ImportGlobalVariables(data *webStruct.MessageData) webStruct.UserResponse {
 	fsesl.ImportGlobalVariables()
 	SaveGlobalVarsToFile(false)
-	return GetGlobalVariables(data, user)
+	return GetGlobalVariables(data)
 }
 
-func MoveGlobalVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func MoveGlobalVariable(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}

@@ -1,4 +1,4 @@
-import {All, AuthActionTypes} from './phone.actions';
+import {All, AuthActionTypes, StoreTicker} from './phone.actions';
 
 export interface Icreds {
   user_name: string;
@@ -11,6 +11,7 @@ export interface Icreds {
 export interface State {
   phoneCreds: Icreds;
   phoneStatus: Istatuses;
+  timer: number;
   callTo: string;
   errorMessage: string | null;
   lastActionName: string;
@@ -18,11 +19,15 @@ export interface State {
 
 export interface Istatuses {
   isRunning: boolean;
+  inCall: boolean;
+  registered: boolean;
+  state: 'answered' | 'ringing' | '';
 }
 
 export const initialState: State = {
   phoneCreds: null,
   phoneStatus: <Istatuses>{},
+  timer: 0,
   callTo: '',
   errorMessage: null,
   lastActionName: '',
@@ -37,30 +42,48 @@ export function reducer(state = initialState, action: All): State {
       };
     }
 
-    case AuthActionTypes.STORE_GET_PHONE_CREDS: {
+    case AuthActionTypes.StoreGetPhoneCreds: {
       return {
         ...state,
         phoneCreds: action.payload.response['phone_creds'],
         errorMessage: action.payload.response.error ||  '',
         callTo: '',
-        lastActionName: AuthActionTypes.STORE_GET_PHONE_CREDS,
+        lastActionName: AuthActionTypes.StoreGetPhoneCreds,
       };
     }
 
-    case AuthActionTypes.STORE_PHONE_STATUS: {
+    case AuthActionTypes.StorePhoneStatus: {
       return {
         ...state,
         phoneStatus: {...state.phoneStatus, ...action.payload.phoneStatus},
         callTo: '',
-        lastActionName: AuthActionTypes.STORE_PHONE_STATUS,
+        lastActionName: AuthActionTypes.StorePhoneStatus,
       };
     }
 
-    case AuthActionTypes.STORE_MAKE_PHONE_CALL: {
+    case AuthActionTypes.StoreMakePhoneCall: {
       return {
         ...state,
         callTo: action.payload.user,
-        lastActionName: AuthActionTypes.STORE_MAKE_PHONE_CALL,
+        lastActionName: AuthActionTypes.StoreMakePhoneCall,
+      };
+    }
+    case StoreTicker.type: {
+      const targetString = action.payload.date;
+      if (!targetString) {
+        return {
+          ...state,
+          timer: 0,
+          lastActionName: StoreTicker.type,
+        };
+      }
+      const targetDate = new Date(targetString);
+      const currentDate = new Date();
+      const timeDifference = currentDate.getTime() - targetDate.getTime() || 0;
+      return {
+        ...state,
+        timer:  Math.floor(timeDifference / 1000),
+        lastActionName: StoreTicker.type,
       };
     }
 

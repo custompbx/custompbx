@@ -2,12 +2,11 @@ package apps
 
 import (
 	"custompbx/db"
-	"custompbx/mainStruct"
 	"custompbx/webStruct"
 	"github.com/custompbx/customorm"
 )
 
-var WebCases map[string]func(*webStruct.MessageData, *mainStruct.WebUser) webStruct.UserResponse
+var WebCases map[string]func(*webStruct.MessageData) webStruct.UserResponse
 
 func InitApps() {
 	InitTables()
@@ -27,7 +26,7 @@ func InitTables() {
 }
 
 func InitCases() {
-	WebCases = make(map[string]func(*webStruct.MessageData, *mainStruct.WebUser) webStruct.UserResponse)
+	WebCases = make(map[string]func(*webStruct.MessageData) webStruct.UserResponse)
 	WebCases["GetAutoDialerCompanies"] = GetAutoDialerCompanies
 	WebCases["AddAutoDialerCompany"] = AddAutoDialerCompany
 	WebCases["DelAutoDialerCompany"] = DelAutoDialerCompany

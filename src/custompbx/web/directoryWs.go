@@ -5,7 +5,6 @@ import (
 	"custompbx/altStruct"
 	"custompbx/fsesl"
 	"custompbx/intermediateDB"
-	"custompbx/mainStruct"
 	"custompbx/webStruct"
 	"github.com/custompbx/customorm"
 	"regexp"
@@ -60,12 +59,12 @@ func getDirectoryById(data *webStruct.MessageData, item interface{}) webStruct.U
 	return webStruct.UserResponse{Data: res, MessageType: data.Event}
 }
 
-func importDirectory(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func importDirectory(data *webStruct.MessageData) webStruct.UserResponse {
 	fsesl.GetXMLDirectory()
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func ImportXMLDomain(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func ImportXMLDomain(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.File == "" {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -79,7 +78,7 @@ func ImportXMLDomain(data *webStruct.MessageData, user *mainStruct.WebUser) webS
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func addNewUser(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func addNewUser(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -163,7 +162,7 @@ func addNewUser(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct
 	return webStruct.UserResponse{Data: &item, MessageType: data.Event}
 }
 
-func ImportXMLDomainUser(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func ImportXMLDomainUser(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}

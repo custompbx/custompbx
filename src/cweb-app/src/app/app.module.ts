@@ -178,7 +178,9 @@ import {AutodialerComponent} from './components/apps/autodialer/autodialer.compo
 import {KeyValuePadPositionComponent} from './components/key-value-pad-position/key-value-pad-position.component';
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {APP_BASE_HREF} from '@angular/common';
-import {MatIconRegistry} from "@angular/material/icon";
+import {MatIconRegistry} from '@angular/material/icon';
+import {ConversationsComponent} from './components/conversations/conversations.component';
+import {ConversationsEffects} from "./store/conversations/conversations.effects";
 
 @NgModule({
   declarations: [
@@ -271,6 +273,7 @@ import {MatIconRegistry} from "@angular/material/icon";
     LazyWrapperComponent,
     VoicemailComponent,
     AutodialerComponent,
+    ConversationsComponent,
   ],
   imports: [
     HttpClientModule,
@@ -346,6 +349,7 @@ import {MatIconRegistry} from "@angular/material/icon";
       ConfigEffectsPostLoadModules,
       ConfigEffectsVoicemail,
       AutodialerEffects,
+      ConversationsEffects,
     ]),
     StoreModule.forRoot({}, {
       runtimeChecks: {

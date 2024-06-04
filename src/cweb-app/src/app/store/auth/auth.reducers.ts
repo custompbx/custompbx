@@ -14,6 +14,7 @@ export interface Iuser {
   group_id?: number;
   token?: string;
   avatar_format?: string;
+  sip_id?: object;
 }
 
 export const initialState: State = {

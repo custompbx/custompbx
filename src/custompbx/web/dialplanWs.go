@@ -7,13 +7,13 @@ import (
 	"custompbx/webStruct"
 )
 
-func importDialplan(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func importDialplan(data *webStruct.MessageData) webStruct.UserResponse {
 	fsesl.GetXMLDialplan()
 
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func SwitchDialplanNoProceed(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func SwitchDialplanNoProceed(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Enabled == nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
 	}
@@ -24,7 +24,7 @@ func SwitchDialplanNoProceed(data *webStruct.MessageData, user *mainStruct.WebUs
 	return webStruct.UserResponse{MessageType: data.Event, DialplanSettings: pbxcache.GetDialplan()}
 }
 
-func DialplanGetSettings(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func DialplanGetSettings(data *webStruct.MessageData) webStruct.UserResponse {
 	items := pbxcache.GetDialplan()
 	if items == nil {
 		return webStruct.UserResponse{MessageType: data.Event}
@@ -33,7 +33,7 @@ func DialplanGetSettings(data *webStruct.MessageData, user *mainStruct.WebUser) 
 	return webStruct.UserResponse{DialplanSettings: items, MessageType: data.Event}
 }
 
-func getDialplanContexts(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func getDialplanContexts(data *webStruct.MessageData) webStruct.UserResponse {
 	items, exists := pbxcache.GetContexts()
 	if !exists {
 		return webStruct.UserResponse{Exists: &exists, MessageType: data.Event}
@@ -42,7 +42,7 @@ func getDialplanContexts(data *webStruct.MessageData, user *mainStruct.WebUser) 
 	return webStruct.UserResponse{DialplanContexts: &items, MessageType: data.Event}
 }
 
-func getDialplanExtensions(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func getDialplanExtensions(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -57,7 +57,7 @@ func getDialplanExtensions(data *webStruct.MessageData, user *mainStruct.WebUser
 	return webStruct.UserResponse{MessageType: data.Event, DialplanExtensions: &extensions, Id: &context.Id}
 }
 
-func getDialplanConditions(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func getDialplanConditions(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -73,7 +73,7 @@ func getDialplanConditions(data *webStruct.MessageData, user *mainStruct.WebUser
 	return webStruct.UserResponse{MessageType: data.Event, DialplanConditions: &item, Id: &extension.Context.Id}
 }
 
-func getDialplanExtenDetails(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func getDialplanExtenDetails(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -92,7 +92,7 @@ func getDialplanExtenDetails(data *webStruct.MessageData, user *mainStruct.WebUs
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &condition.Extension.Context.Id, AffectedId: &condition.Extension.Id}
 }
 
-func moveDialplanExtension(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func moveDialplanExtension(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -116,7 +116,7 @@ func moveDialplanExtension(data *webStruct.MessageData, user *mainStruct.WebUser
 	return webStruct.UserResponse{MessageType: data.Event, DialplanExtensions: &extensions, Id: &extension.Context.Id}
 }
 
-func moveDialplanCondition(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func moveDialplanCondition(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -141,7 +141,7 @@ func moveDialplanCondition(data *webStruct.MessageData, user *mainStruct.WebUser
 	return webStruct.UserResponse{MessageType: data.Event, DialplanConditions: &item, Id: &condition.Extension.Context.Id}
 }
 
-func moveDialplanAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func moveDialplanAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -166,7 +166,7 @@ func moveDialplanAction(data *webStruct.MessageData, user *mainStruct.WebUser) w
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &action.Condition.Extension.Context.Id, AffectedId: &action.Condition.Extension.Id}
 }
 
-func moveDialplanAntiAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func moveDialplanAntiAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -191,7 +191,7 @@ func moveDialplanAntiAction(data *webStruct.MessageData, user *mainStruct.WebUse
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &antiAction.Condition.Extension.Context.Id, AffectedId: &antiAction.Condition.Extension.Id}
 }
 
-func addRegex(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func addRegex(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -216,7 +216,7 @@ func addRegex(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.U
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &regex.Condition.Extension.Context.Id, AffectedId: &regex.Condition.Extension.Id}
 }
 
-func addAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func addAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -241,7 +241,7 @@ func addAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &action.Condition.Extension.Context.Id, AffectedId: &action.Condition.Extension.Id}
 }
 
-func addAntiAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func addAntiAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -266,7 +266,7 @@ func addAntiAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &antiAction.Condition.Extension.Context.Id, AffectedId: &antiAction.Condition.Extension.Id}
 }
 
-func delRegex(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func delRegex(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Regex.Id == 0 {
 		return webStruct.UserResponse{Error: "regex not found", MessageType: data.Event}
 	}
@@ -287,7 +287,7 @@ func delRegex(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.U
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &regex.Condition.Extension.Context.Id, AffectedId: &regex.Condition.Extension.Id}
 }
 
-func delAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func delAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Action.Id == 0 {
 		return webStruct.UserResponse{Error: "action not found", MessageType: data.Event}
 	}
@@ -308,7 +308,7 @@ func delAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &action.Condition.Extension.Context.Id, AffectedId: &action.Condition.Extension.Id}
 }
 
-func delAntiAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func delAntiAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.AntiAction.Id == 0 {
 		return webStruct.UserResponse{Error: "action not found", MessageType: data.Event}
 	}
@@ -329,7 +329,7 @@ func delAntiAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &antiAction.Condition.Extension.Context.Id, AffectedId: &antiAction.Condition.Extension.Id}
 }
 
-func updateRegex(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateRegex(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Regex.Id == 0 {
 		return webStruct.UserResponse{Error: "regex not found", MessageType: data.Event}
 	}
@@ -350,7 +350,7 @@ func updateRegex(data *webStruct.MessageData, user *mainStruct.WebUser) webStruc
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &regex.Condition.Extension.Context.Id, AffectedId: &regex.Condition.Extension.Id}
 }
 
-func updateAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Action.Id == 0 {
 		return webStruct.UserResponse{Error: "action not found", MessageType: data.Event}
 	}
@@ -371,7 +371,7 @@ func updateAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStru
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &action.Condition.Extension.Context.Id, AffectedId: &action.Condition.Extension.Id}
 }
 
-func updateAntiAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateAntiAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.AntiAction.Id == 0 {
 		return webStruct.UserResponse{Error: "antiAction not found", MessageType: data.Event}
 	}
@@ -392,7 +392,7 @@ func updateAntiAction(data *webStruct.MessageData, user *mainStruct.WebUser) web
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &antiAction.Condition.Extension.Context.Id, AffectedId: &antiAction.Condition.Extension.Id}
 }
 
-func switchRegex(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func switchRegex(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Regex.Id == 0 {
 		return webStruct.UserResponse{Error: "regex not found", MessageType: data.Event}
 	}
@@ -413,7 +413,7 @@ func switchRegex(data *webStruct.MessageData, user *mainStruct.WebUser) webStruc
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &regex.Condition.Extension.Context.Id, AffectedId: &regex.Condition.Extension.Id}
 }
 
-func switchAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func switchAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Action.Id == 0 {
 		return webStruct.UserResponse{Error: "action not found", MessageType: data.Event}
 	}
@@ -434,7 +434,7 @@ func switchAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStru
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &action.Condition.Extension.Context.Id, AffectedId: &action.Condition.Extension.Id}
 }
 
-func switchAntiAction(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func switchAntiAction(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.AntiAction.Id == 0 {
 		return webStruct.UserResponse{Error: "antiAction not found", MessageType: data.Event}
 	}
@@ -455,7 +455,7 @@ func switchAntiAction(data *webStruct.MessageData, user *mainStruct.WebUser) web
 	return webStruct.UserResponse{MessageType: data.Event, DialplanDetails: &item, Id: &antiAction.Condition.Extension.Context.Id, AffectedId: &antiAction.Condition.Extension.Id}
 }
 
-func addContext(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func addContext(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Name == "" {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -470,7 +470,7 @@ func addContext(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct
 	return webStruct.UserResponse{DialplanContexts: &items, MessageType: data.Event}
 }
 
-func addExtension(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func addExtension(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -493,7 +493,7 @@ func addExtension(data *webStruct.MessageData, user *mainStruct.WebUser) webStru
 	return webStruct.UserResponse{DialplanExtensions: &items, Id: &context.Id, MessageType: data.Event}
 }
 
-func addCondition(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func addCondition(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -513,7 +513,7 @@ func addCondition(data *webStruct.MessageData, user *mainStruct.WebUser) webStru
 	return webStruct.UserResponse{MessageType: data.Event, DialplanConditions: &item, Id: &condition.Extension.Context.Id}
 }
 
-func renameContext(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func renameContext(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -537,7 +537,7 @@ func renameContext(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	return webStruct.UserResponse{DialplanContexts: &items, MessageType: data.Event}
 }
 
-func renameExtension(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func renameExtension(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -560,7 +560,7 @@ func renameExtension(data *webStruct.MessageData, user *mainStruct.WebUser) webS
 	return webStruct.UserResponse{DialplanExtensions: &items, Id: &extension.Context.Id, MessageType: data.Event}
 }
 
-func deleteContext(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func deleteContext(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -578,7 +578,7 @@ func deleteContext(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	return webStruct.UserResponse{Id: &context.Id, MessageType: data.Event}
 }
 
-func deleteExtension(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func deleteExtension(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -596,7 +596,7 @@ func deleteExtension(data *webStruct.MessageData, user *mainStruct.WebUser) webS
 	return webStruct.UserResponse{AffectedId: &extension.Id, Id: &extension.Context.Id, MessageType: data.Event}
 }
 
-func switchExtensionContinue(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func switchExtensionContinue(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -620,7 +620,7 @@ func switchExtensionContinue(data *webStruct.MessageData, user *mainStruct.WebUs
 	return webStruct.UserResponse{DialplanExtensions: &items, Id: &extension.Context.Id, MessageType: data.Event}
 }
 
-func updateCondition(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateCondition(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Condition.Id == 0 {
 		return webStruct.UserResponse{Error: "condition not found", MessageType: data.Event}
 	}
@@ -661,7 +661,7 @@ func updateCondition(data *webStruct.MessageData, user *mainStruct.WebUser) webS
 	return webStruct.UserResponse{MessageType: data.Event, DialplanConditions: &item, Id: &condition.Extension.Context.Id}
 }
 
-func switchCondition(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func switchCondition(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Condition.Id == 0 {
 		return webStruct.UserResponse{Error: "condition not found", MessageType: data.Event}
 	}
@@ -682,7 +682,7 @@ func switchCondition(data *webStruct.MessageData, user *mainStruct.WebUser) webS
 	return webStruct.UserResponse{MessageType: data.Event, DialplanConditions: &item, Id: &condition.Extension.Context.Id}
 }
 
-func deleteCondition(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func deleteCondition(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Condition.Id == 0 {
 		return webStruct.UserResponse{Error: "condition not found", MessageType: data.Event}
 	}
@@ -703,12 +703,12 @@ func deleteCondition(data *webStruct.MessageData, user *mainStruct.WebUser) webS
 	return webStruct.UserResponse{MessageType: data.Event, DialplanConditions: &item, Id: &condition.Extension.Context.Id}
 }
 
-func getDialplanDebug(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func getDialplanDebug(data *webStruct.MessageData) webStruct.UserResponse {
 	enabled := pbxcache.GetDialplanDebug()
 	return webStruct.UserResponse{MessageType: data.Event, Enabled: &enabled}
 }
 
-func switchDialplanDebug(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func switchDialplanDebug(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Enabled == nil {
 		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
 	}

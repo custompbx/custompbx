@@ -20,17 +20,18 @@ RUN npm install
 RUN npm run build --omit=dev
 
 ### STAGE 2: Build Golang backend ###
-FROM golang:1.19 AS backend
+FROM golang:1.22 AS backend
 WORKDIR /app
 
 # Copy go.mod and go.sum
 COPY src/custompbx/go.mod src/custompbx/go.sum ./
 
-# Download backend dependencies
-RUN go mod download
-
 # Copy backend files
 COPY src/custompbx/ ./
+
+# Download backend dependencies
+#RUN go mod edit -replace github.com/custompbx/customorm=./customorm/
+RUN go mod download
 
 # Copy frontend assets
 COPY --from=frontend /app/dist/* ./dist/cweb-app

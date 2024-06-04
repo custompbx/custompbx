@@ -8,12 +8,12 @@ type ConfigurationsList struct {
 	Id          int64                  `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                  `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                   `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string                 `xml:"-" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string                 `xml:"-" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Module      string                 `xml:"-" json:"module"`
 	Loaded      bool                   `xml:"-" json:"loaded"`
 	Unloadable  bool                   `xml:"-" json:"unloadable" customsql:"unloadable;default=FALSE"`
 	Description string                 `xml:"-" json:"description,omitempty" customsql:"description"`
-	Parent      *mainStruct.FsInstance `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *mainStruct.FsInstance `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigurationsList) GetTableName() string {

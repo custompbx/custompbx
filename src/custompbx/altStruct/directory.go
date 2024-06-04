@@ -6,9 +6,9 @@ type DirectoryDomain struct {
 	Id          int64                  `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                  `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                   `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string                 `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string                 `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Description string                 `xml:"-" json:"description,omitempty" customsql:"description"`
-	Parent      *mainStruct.FsInstance `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *mainStruct.FsInstance `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 
 	SipRegsCounter int `xml:"-" json:"sip_regs_counter"`
 }
@@ -21,10 +21,10 @@ type DirectoryDomainParameter struct {
 	Id          int64            `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64            `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool             `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string           `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string           `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Value       string           `xml:"value,attr" json:"value" customsql:"value"`
 	Description string           `xml:"-" json:"description" customsql:"description"`
-	Parent      *DirectoryDomain `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *DirectoryDomain `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *DirectoryDomainParameter) GetTableName() string {
@@ -35,10 +35,10 @@ type DirectoryDomainVariable struct {
 	Id          int64            `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64            `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool             `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string           `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string           `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Value       string           `xml:"value,attr" json:"value" customsql:"value"`
 	Description string           `xml:"-" json:"description" customsql:"description"`
-	Parent      *DirectoryDomain `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *DirectoryDomain `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *DirectoryDomainVariable) GetTableName() string {
@@ -49,12 +49,12 @@ type DirectoryDomainUser struct {
 	Id          int64            `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64            `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool             `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string           `xml:"id,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string           `xml:"id,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Cache       uint             `xml:"cacheable,attr,omitempty" json:"cache" customsql:"cache"`
 	Cidr        string           `xml:"cidr,attr,omitempty" json:"cidr" customsql:"cidr"`
 	NumberAlias string           `xml:"number-alias,attr,omitempty" json:"number_alias" customsql:"number_alias"`
 	Description string           `xml:"-" json:"description" customsql:"description"`
-	Parent      *DirectoryDomain `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *DirectoryDomain `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 
 	CallDate      int64  `xml:"-" json:"call_date"`
 	InCall        bool   `xml:"-" json:"in_call"`
@@ -74,10 +74,10 @@ type DirectoryDomainUserParameter struct {
 	Id          int64                `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                 `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string               `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string               `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Value       string               `xml:"value,attr" json:"value" customsql:"value"`
 	Description string               `xml:"-" json:"description" customsql:"description"`
-	Parent      *DirectoryDomainUser `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *DirectoryDomainUser `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *DirectoryDomainUserParameter) GetTableName() string {
@@ -88,10 +88,10 @@ type DirectoryDomainUserVariable struct {
 	Id          int64                `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                 `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string               `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string               `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Value       string               `xml:"value,attr" json:"value" customsql:"value"`
 	Description string               `xml:"-" json:"description" customsql:"description"`
-	Parent      *DirectoryDomainUser `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *DirectoryDomainUser `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *DirectoryDomainUserVariable) GetTableName() string {
@@ -102,9 +102,9 @@ type DirectoryDomainUserGateway struct {
 	Id          int64                `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                 `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string               `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string               `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Description string               `xml:"-" json:"description" customsql:"description"`
-	Parent      *DirectoryDomainUser `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *DirectoryDomainUser `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *DirectoryDomainUserGateway) GetTableName() string {
@@ -115,10 +115,10 @@ type DirectoryDomainUserGatewayParameter struct {
 	Id          int64                       `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                       `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                        `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string                      `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string                      `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Value       string                      `xml:"value,attr" json:"value" customsql:"value"`
 	Description string                      `xml:"-" json:"description" customsql:"description"`
-	Parent      *DirectoryDomainUserGateway `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *DirectoryDomainUserGateway `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *DirectoryDomainUserGatewayParameter) GetTableName() string {
@@ -129,11 +129,11 @@ type DirectoryDomainUserGatewayVariable struct {
 	Id          int64                       `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                       `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                        `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string                      `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string                      `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Value       string                      `xml:"value,attr" json:"value" customsql:"value"`
 	Direction   string                      `xml:"direction,attr" json:"direction" customsql:"direction"`
 	Description string                      `xml:"-" json:"description" customsql:"description"`
-	Parent      *DirectoryDomainUserGateway `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *DirectoryDomainUserGateway `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *DirectoryDomainUserGatewayVariable) GetTableName() string {
@@ -144,9 +144,9 @@ type DirectoryDomainGroup struct {
 	Id          int64            `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64            `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool             `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string           `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string           `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Description string           `xml:"-" json:"description" customsql:"description"`
-	Parent      *DirectoryDomain `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *DirectoryDomain `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *DirectoryDomainGroup) GetTableName() string {

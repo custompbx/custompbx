@@ -79,6 +79,9 @@ type MessageData struct {
 	AwsS3            altStruct.ConfigHttpCacheProfileAWSS3     `json:"aws_s3,omitempty"`
 	Azure            altStruct.ConfigHttpCacheProfileAzureBlob `json:"azure,omitempty"`
 
+	Text     string    `json:"text,omitempty"`
+	UpToTime time.Time `json:"up_to_time,omitempty"`
+
 	Data     json.RawMessage `json:"data,omitempty"`
 	IntSlice []int64         `json:"-"`
 	//WebDirectoryUsersTemplate          mainStruct.WebDirectoryUsersTemplate          `json:"web_directory_users_template,omitempty"`
@@ -98,26 +101,27 @@ type MessageDataVariable struct {
 	Type      string `json:"type"`
 }
 
-type MessageDataParameter struct {
-}
-
+// Subscriptions manages a set of subscriptions with thread-safe operations.
 type Subscriptions struct {
 	mx     sync.RWMutex
 	byName map[string]bool
 }
 
+// Get retrieves the subscription status for a given name.
 func (s *Subscriptions) Get(name string) bool {
 	s.mx.RLock()
 	defer s.mx.RUnlock()
 	return s.byName[name]
 }
 
+// Set adds a subscription for a given name.
 func (s *Subscriptions) Set(name string) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 	s.byName[name] = true
 }
 
+// Del removes a subscription for a given name.
 func (s *Subscriptions) Del(name string) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
@@ -127,10 +131,11 @@ func (s *Subscriptions) Del(name string) {
 	s.byName[name] = false
 }
 
+// Clear removes all subscriptions.
 func (s *Subscriptions) Clear() {
 	s.mx.Lock()
 	defer s.mx.Unlock()
-	s.byName = map[string]bool{}
+	s.byName = make(map[string]bool)
 }
 
 type Param struct {
@@ -226,17 +231,25 @@ type ErroeResponse struct {
 	MessageType string `json:"MessageType"`
 }
 
+// WsContext represents a WebSocket context with its connection, subscriptions, and send channel.
 type WsContext struct {
 	ws            *websocket.Conn
 	Subscriptions *Subscriptions
 	SendChannel   chan *UserResponse
+	User          *mainStruct.WebUser
 }
 
-func (c *WsContext) Close() {
-	c.ws.Close()
+// Close closes the WebSocket connection and clears the send channel.
+func (c *WsContext) Close() error {
+	err := c.ws.Close()
+	if err != nil {
+		return fmt.Errorf("failed to close WebSocket: %w", err)
+	}
 	c.SendChannel = nil
+	return nil
 }
 
+// SendWaiter listens on the SendChannel and sends messages through the WebSocket connection.
 func (c *WsContext) SendWaiter() {
 	for event := range c.SendChannel {
 		// log.Printf("[WEBSOCKET] Send message: %+v\n", v)
@@ -263,6 +276,7 @@ func (c *WsContext) SendWaiter() {
 	}
 }
 
+// ReadWaiter listens for incoming messages on the WebSocket connection and handles them using the provided handler function.
 func (c *WsContext) ReadWaiter(handler func(*Message, *WsContext)) {
 	for {
 		var msg *Message
@@ -290,10 +304,12 @@ func (c *WsContext) ReadWaiter(handler func(*Message, *WsContext)) {
 	}
 }
 
+// WsHub manages a collection of WebSocket contexts and provides broadcast capabilities.
 type WsHub struct {
 	Hub []*WsContext
 }
 
+// Broadcast sends a UserResponse message to all subscribed WebSocket contexts in the hub.
 func (h *WsHub) Broadcast(data UserResponse) {
 	for i := 0; i < len(h.Hub); i++ {
 		if h.Hub[i] == nil || h.Hub[i].SendChannel == nil {
@@ -313,13 +329,41 @@ func (h *WsHub) Broadcast(data UserResponse) {
 			// fmt.Println("sent message", msg)
 		default:
 			h.Hub[i].Close()
-			fmt.Println("Cant Send")
+			fmt.Println("Can't Send")
 			h.Drop(i)
 			i--
 		}
 	}
 }
 
+// Unicast sends a UserResponse message to all WebSocket contexts belonging to one or more specified users.
+func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) {
+	userIDs := make(map[int64]bool)
+	for _, user := range users {
+		userIDs[user.Id] = true
+	}
+
+	for i := 0; i < len(h.Hub); i++ {
+		if h.Hub[i] == nil || h.Hub[i].SendChannel == nil {
+			h.Drop(i)
+			i--
+			continue
+		}
+
+		if h.Hub[i].User != nil && userIDs[h.Hub[i].User.Id] {
+			select {
+			case h.Hub[i].SendChannel <- &data:
+			default:
+				h.Hub[i].Close()
+				fmt.Println("Can't Send")
+				h.Drop(i)
+				i--
+			}
+		}
+	}
+}
+
+// Drop removes a WebSocket context at the specified index from the hub.
 func (h *WsHub) Drop(index int) {
 	if len(h.Hub) == index+1 {
 		h.Hub = h.Hub[:index]
@@ -328,6 +372,7 @@ func (h *WsHub) Drop(index int) {
 	h.Hub = append(h.Hub[:index], h.Hub[index+1:]...)
 }
 
+// Trim removes leading and trailing white spaces from various fields in MessageData.
 func (m *MessageData) Trim() {
 	m.Login = strings.TrimSpace(m.Login)
 	//m.Id = strings.TrimSpace(m.Id)
@@ -383,10 +428,12 @@ func (m *MessageData) Trim() {
 	m.DistributorNode.Weight = strings.TrimSpace(m.DistributorNode.Weight)
 }
 
+// newSubscriptions creates and returns a new Subscriptions instance.
 func newSubscriptions() *Subscriptions {
 	return &Subscriptions{byName: make(map[string]bool)}
 }
 
+// CreateWsContext creates a new WsContext with the provided WebSocket connection.
 func CreateWsContext(ws *websocket.Conn) *WsContext {
 	return &WsContext{
 		ws:            ws,

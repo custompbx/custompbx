@@ -4,10 +4,10 @@ type ConfigCallcenterSetting struct {
 	Id          int64               `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64               `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string              `xml:"name,attr" json:"name" customsql:"param_name;unique;check(param_name <> '')"`
+	Name        string              `xml:"name,attr" json:"name" customsql:"param_name;unique_1;check(param_name <> '')"`
 	Value       string              `xml:"value,attr" json:"value" customsql:"param_value"`
 	Description string              `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigCallcenterSetting) GetTableName() string {
@@ -18,9 +18,9 @@ type ConfigCallcenterQueue struct {
 	Id          int64               `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64               `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string              `xml:"name,attr" json:"name" customsql:"queue_name;unique;check(queue_name <> '')"`
+	Name        string              `xml:"name,attr" json:"name" customsql:"queue_name;unique_1;check(queue_name <> '')"`
 	Description string              `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigCallcenterQueue) GetTableName() string {
@@ -31,10 +31,10 @@ type ConfigCallcenterQueueParameter struct {
 	Id          int64                  `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                  `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                   `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string                 `xml:"name,attr" json:"name" customsql:"param_name;unique;check(param_name <> '')"`
+	Name        string                 `xml:"name,attr" json:"name" customsql:"param_name;unique_1;check(param_name <> '')"`
 	Value       string                 `xml:"value,attr" json:"value" customsql:"param_value"`
 	Description string                 `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigCallcenterQueue `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigCallcenterQueue `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigCallcenterQueueParameter) GetTableName() string {

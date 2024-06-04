@@ -66,6 +66,10 @@ type WebUser struct {
 	GroupId      int           `json:"group_id"`
 }
 
+func (w *WebUser) GetTableName() string {
+	return "web_users"
+}
+
 type WebUserGroup struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`

@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Iuser} from '../../store/auth/auth.reducers';
 import {UserService} from '../../services/user.service';
 import {Subscription} from 'rxjs';
-import {IsActiveMatchOptions, Router} from "@angular/router";
+import {IsActiveMatchOptions, Router} from '@angular/router';
 
 @Component({
   selector: 'app-sidenav',

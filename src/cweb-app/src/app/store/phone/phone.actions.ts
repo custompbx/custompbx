@@ -1,12 +1,13 @@
 import { Action } from '@ngrx/store';
 import {CDRActionTypes} from '../cdr/cdr.actions';
+import {createActionHelper} from "../../services/rxjs-helper/actions-helper";
 
 export enum AuthActionTypes {
   UPDATE_FAILURE = '[Phone] Failure',
   GET_PHONE_CREDS = '[Phone][Get] Creds',
-  STORE_GET_PHONE_CREDS = '[Phone][Store][Get] Creds',
-  STORE_PHONE_STATUS = '[Phone][Store] Status',
-  STORE_MAKE_PHONE_CALL = '[Phone][Store][Make] Call',
+  StoreGetPhoneCreds = 'StoreGetPhoneCreds',
+  StorePhoneStatus = 'StorePhoneStatus',
+  StoreMakePhoneCall = 'StoreMakePhoneCall',
 }
 
 export class Failure implements Action {
@@ -20,19 +21,21 @@ export class GetPhoneCreds implements Action {
 }
 
 export class StoreGetPhoneCreds implements Action {
-  readonly type = AuthActionTypes.STORE_GET_PHONE_CREDS;
+  readonly type = AuthActionTypes.StoreGetPhoneCreds;
   constructor(public payload: any) {}
 }
 
 export class StorePhoneStatus implements Action {
-  readonly type = AuthActionTypes.STORE_PHONE_STATUS;
+  readonly type = AuthActionTypes.StorePhoneStatus;
   constructor(public payload: any) {}
 }
 
 export class StoreMakePhoneCall implements Action {
-  readonly type = AuthActionTypes.STORE_MAKE_PHONE_CALL;
+  readonly type = AuthActionTypes.StoreMakePhoneCall;
   constructor(public payload: any) {}
 }
+
+export const StoreTicker = createActionHelper('StoreTicker')
 
 export type All =
   | Failure

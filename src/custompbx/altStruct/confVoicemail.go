@@ -4,10 +4,10 @@ type ConfigVoicemailSetting struct {
 	Id          int64               `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64               `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string              `xml:"name,attr" json:"name" customsql:"param_name;unique;check(param_name <> '')"`
+	Name        string              `xml:"name,attr" json:"name" customsql:"param_name;unique_1;check(param_name <> '')"`
 	Value       string              `xml:"value,attr" json:"value" customsql:"param_value"`
 	Description string              `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigVoicemailSetting) GetTableName() string {
@@ -18,9 +18,9 @@ type ConfigVoicemailProfile struct {
 	Id          int64               `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64               `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string              `xml:"name,attr" json:"name" customsql:"profile_name;unique;check(profile_name <> '')"`
+	Name        string              `xml:"name,attr" json:"name" customsql:"profile_name;unique_1;check(profile_name <> '')"`
 	Description string              `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigVoicemailProfile) GetTableName() string {
@@ -31,10 +31,10 @@ type ConfigVoicemailProfileParameter struct {
 	Id          int64                   `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                   `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                    `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string                  `xml:"name,attr" json:"name" customsql:"param_name;unique;check(param_name <> '')"`
+	Name        string                  `xml:"name,attr" json:"name" customsql:"param_name;unique_1;check(param_name <> '')"`
 	Value       string                  `xml:"value,attr" json:"value" customsql:"param_value"`
 	Description string                  `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigVoicemailProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigVoicemailProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigVoicemailProfileParameter) GetTableName() string {
@@ -45,10 +45,10 @@ type ConfigVoicemailProfileEmailParameter struct {
 	Id          int64                   `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                   `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                    `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string                  `xml:"name,attr" json:"name" customsql:"param_name;unique;check(param_name <> '')"`
+	Name        string                  `xml:"name,attr" json:"name" customsql:"param_name;unique_1;check(param_name <> '')"`
 	Value       string                  `xml:"value,attr" json:"value" customsql:"param_value"`
 	Description string                  `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigVoicemailProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigVoicemailProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigVoicemailProfileEmailParameter) GetTableName() string {

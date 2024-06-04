@@ -82,6 +82,7 @@ export class LazyWrapperComponent implements OnInit {
     'post-load-modules' |
     'voicemail' |
     'autodialer' |
+    'conversations' |
     'not-found';
   private prePath: string;
 
@@ -170,6 +171,7 @@ export class LazyWrapperComponent implements OnInit {
           case 'post-load-modules':
           case 'voicemail':
           case 'autodialer':
+          case 'conversations':
             this.type = pathName;
             break;
           default:

@@ -5,7 +5,7 @@ import {Verto} from 'vertojs/dist';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectPhoneState} from '../../store/app.states';
 import {Observable, Subscription} from 'rxjs';
-import {AuthActionTypes, GetPhoneCreds, StorePhoneStatus} from '../../store/phone/phone.actions';
+import {AuthActionTypes, GetPhoneCreds, StorePhoneStatus, StoreTicker} from '../../store/phone/phone.actions';
 
 @Component({
   selector: 'app-phone',
@@ -35,6 +35,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
     number: '',
     timer: <any>null,
     totalTime: 0,
+    startedAt: <Date>null,
     domain: '',
     uaParams: {
       uri: null,
@@ -144,7 +145,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
       if (phone.errorMessage) {
       }
       if (
-        phone.lastActionName === AuthActionTypes.STORE_GET_PHONE_CREDS &&
+        phone.lastActionName === AuthActionTypes.StoreGetPhoneCreds &&
         !this.data.UA
       ) {
         if (
@@ -168,6 +169,11 @@ export class PhoneComponent implements OnInit, OnDestroy {
       if (phone.callTo) {
         this.panelCall(phone.callTo);
       }
+      this.data.registered = phone.phoneStatus.registered;
+      this.data.inCall = phone.phoneStatus.inCall;
+      this.data.ringing = phone.phoneStatus.status === 'ringing';
+      this.data.answered = phone.phoneStatus.status === 'answered';
+      this.data.totalTime = phone.timer;
     });
     this.store.dispatch(new GetPhoneCreds(null));
   }
@@ -282,7 +288,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
     } else if (this.vertoLib === this.vertoLib) {
       this.vertoCall(this.data.number);
     }
-    this.data.inCall = true;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true}}));
   }
 
   answer() {
@@ -292,9 +298,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
     }
     this.resetTimer();
     this.startTimer();
-    this.data.ringing = false;
-    this.data.answered = true;
-    this.data.inCall = true;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true, state: 'answered'}}));
     if (this.libName === this.sipjsLib) {
       this.data.session.accept();
     } else if (this.libName === this.vertoLib) {
@@ -312,14 +316,11 @@ export class PhoneComponent implements OnInit, OnDestroy {
   hangup() {
     this.sourceList['ring']?.stop();
     if (!this.data.session) {
-      this.data.answered = false;
-      this.data.inCall = false;
+      this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
       return;
     }
     try {
-      this.data.inCall = false;
-      this.data.answered = false;
-      this.data.ringing = false;
+      this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
       if (this.libName === this.sipjsLib) {
         switch (this.data.session.state) {
           case SIP.SessionState.Initial:
@@ -344,8 +345,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
 
     this.stopTimer();
 
-    this.data.answered = false;
-    this.data.inCall = false;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
     this.data.session = null;
   }
 
@@ -438,48 +438,42 @@ export class PhoneComponent implements OnInit, OnDestroy {
         }
       }
     );
-    this.data.ringing = true;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {state: 'ringing'}}));
   }
 
   eventRegistered() {
-    this.data.registered = true;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {registered: true}}));
   }
 
   eventUnregistered() {
-    this.data.registered = false;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {registered: false}}));
     console.log('unRegistered');
   }
 
   eventProgress() {
     this.setupRemoteMedia();
     console.log('eventProgress');
-    this.data.inCall = true;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true}}));
   }
 
   eventAccepted() {
     console.log('ACCEPTED');
     this.sourceList['ring']?.stop();
-    this.data.answered = true;
-    this.data.inCall = true;
-    this.data.ringing = false;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true, state: 'answered'}}));
     this.setupRemoteMedia.bind(this)();
   }
 
   eventFailed() {
     this.sourceList['ring']?.stop();
     console.log('eventFailed');
-    this.data.answered = false;
-    this.data.inCall = false;
-    this.data.ringing = false;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
     this.stopTimer();
   }
 
   eventTerminated() {
     this.sourceList['ring']?.stop();
     console.log('eventTerminated');
-    this.data.answered = false;
-    this.data.inCall = false;
-    this.data.ringing = false;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
     this.stopTimer();
   }
 
@@ -490,9 +484,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
       this.hangup();
     }
     this.data.onHold = false;
-    this.data.answered = false;
-    this.data.inCall = false;
-    this.data.ringing = false;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
     this.stopStream();
     this.stopTimer();
   }
@@ -538,22 +530,24 @@ export class PhoneComponent implements OnInit, OnDestroy {
   }
 
   startTimer(): void {
+    this.data.startedAt = new Date();
     this.data.timer = setInterval(() => this.countdown(), 1000);
   }
 
   stopTimer(): void {
     clearInterval(this.data.timer);
     this.data.timer = null;
+    this.data.startedAt = null;
   }
 
   resetTimer(): void {
-    this.data.totalTime = 0;
+    this.data.startedAt = null;
     clearInterval(this.data.timer);
     this.data.timer = null;
   }
 
   countdown(): void {
-    this.data.totalTime++;
+    this.store.dispatch(StoreTicker({date: this.data.startedAt?.toString()}))
   }
 
   removeLastDigit() {
@@ -569,7 +563,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
     }
     this.resetTimer();
     this.startTimer();
-    this.data.inCall = true;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true}}));
     if (this.libName === this.sipjsLib) {
       this.sipjsCaller(user);
     } else if (this.libName === this.vertoLib) {
@@ -598,7 +592,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
     this.data.session.subscribeEvent('track', this.vertoTrack.bind(this));
     this.data.session.subscribeEvent('answer', this.vertoAccepted.bind(this));
     this.data.session.subscribeEvent('bye', this.eventBye.bind(this));
-    this.data.ringing = true;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {state: 'ringing'}}));
   }
 
   vertoTrack(track) {
@@ -613,9 +607,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
   vertoAccepted() {
     console.log('ACCEPTED');
     this.sourceList['ring']?.stop();
-    this.data.answered = true;
-    this.data.inCall = true;
-    this.data.ringing = false;
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true, state: 'answered'}}));
   }
 
   vertoCall(user: string) {

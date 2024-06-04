@@ -16,7 +16,6 @@ export function createEffectForActions(
     actions.pipe(
       ofType(action1.type),
       switchMap((action: any) => {
-        console.log(action.payload)
         return ws.universalSender(action.type, action.payload).pipe(
           map((response: any) => {
             if (response.error) {
@@ -28,7 +27,7 @@ export function createEffectForActions(
               case 'id':
                 return action2({id: action.payload.id, response});
               default:
-                return action2({response});
+                return action2({response, payload: action.payload});
             }
           }),
           catchError((error) => {

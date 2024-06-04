@@ -100,6 +100,7 @@ func main() {
 		db.InitLogDB()
 		db.InitWebDB(cache.GetCurrentInstanceId())
 		db.InitGlobalVariablesDB()
+		nocache.InitServicesDB()
 
 		pbxcache.InitPBXCache()
 		webcache.InitUsersCache(cache.GetCurrentInstanceId())

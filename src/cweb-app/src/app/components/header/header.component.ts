@@ -1,15 +1,18 @@
 import {
   Component,
-  ComponentRef,
+  ComponentRef, EventEmitter,
   Input,
   OnDestroy,
-  OnInit,
+  OnInit, Output,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
 import {UserService} from '../../services/user.service';
 import {Iuser} from '../../store/auth/auth.reducers';
-import {Subscription} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
+import {select, Store} from "@ngrx/store";
+import {AppState, selectHeader, selectPhoneState} from "../../store/app.states";
+import {StartPhone, ToggleShowPhone} from "../../store/header/header.actions";
 
 @Component({
   selector: 'app-header',
@@ -23,26 +26,36 @@ export class HeaderComponent implements OnInit, OnDestroy {
   public hidePhone = true;
   public getState$: Subscription;
   public clone = true;
+  public phoneState: Observable<any>;
+  public phoneState$: Subscription;
 
   @Input() currentComponent;
-  @ViewChild('componentContainer', { read: ViewContainerRef }) container: ViewContainerRef;
+  @Output() showRightSideNav = new EventEmitter<boolean>();
+  @ViewChild('componentContainer', {read: ViewContainerRef}) container: ViewContainerRef;
   componentRef: ComponentRef<any>;
 
   constructor(
     private userService: UserService,
-    private resolver: ViewContainerRef
+    private resolver: ViewContainerRef,
+    private store: Store<AppState>,
   ) {
     this.user = this.userService.user;
+    this.phoneState = this.store.pipe(select(selectHeader));
   }
 
   ngOnInit() {
     this.getState$ = this.userService.getState.subscribe((state) => {
       this.user = state.user;
     });
+    this.phoneState$ = this.phoneState.subscribe((phone) => {
+      this.startPhone = phone.phone.started;
+      this.hidePhone = !phone.phone.shown;
+    });
   }
 
   ngOnDestroy() {
     this.getState$.unsubscribe();
+    this.phoneState$.unsubscribe();
     if (this.componentRef) {
       this.componentRef.destroy();
     }
@@ -54,9 +67,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   showHidePhone() {
     if (!this.startPhone) {
-      this.startPhone = true;
+      this.store.dispatch(StartPhone(null))
     }
-    this.hidePhone = !this.hidePhone;
+    this.store.dispatch(ToggleShowPhone(null))
+  }
+
+  showHideConversations() {
+    this.showRightSideNav.emit(true);
   }
 
   cloneComponent() {

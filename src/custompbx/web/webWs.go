@@ -5,6 +5,7 @@ import (
 	"custompbx/altStruct"
 	"custompbx/cache"
 	"custompbx/daemonCache"
+	"custompbx/db"
 	"custompbx/intermediateDB"
 	"custompbx/mainStruct"
 	"custompbx/webStruct"
@@ -12,11 +13,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/custompbx/customorm"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"math/rand"
 	"regexp"
-	"runtime/debug"
+	"time"
 )
 
 type templateItem struct {
@@ -49,10 +51,11 @@ func checkLogin(data *webStruct.MessageData) webStruct.UserResponse {
 		return webStruct.UserResponse{Error: "Cant set token", MessageType: data.Event}
 	}
 
+	data.Context.User = user
 	return webStruct.UserResponse{User: user, Token: token, MessageType: data.Event}
 }
 
-func createAPIToken(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func createAPIToken(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -71,7 +74,7 @@ func createAPIToken(data *webStruct.MessageData, user *mainStruct.WebUser) webSt
 	return webStruct.UserResponse{Id: &neededUser.Id, TokensList: &tokSlice, MessageType: data.Event}
 }
 
-func GetUserTokens(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetUserTokens(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -84,7 +87,7 @@ func GetUserTokens(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	return webStruct.UserResponse{Id: &neededUser.Id, TokensList: &staff, MessageType: data.Event}
 }
 
-func RemoveUserToken(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func RemoveUserToken(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -97,80 +100,88 @@ func RemoveUserToken(data *webStruct.MessageData, user *mainStruct.WebUser) webS
 	return webStruct.UserResponse{Id: &userId, AffectedId: &data.Id, MessageType: data.Event}
 }
 
-func UserGetOwnTokens(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	staff := webcache.GetWebUserTokens(user)
+func UserGetOwnTokens(data *webStruct.MessageData) webStruct.UserResponse {
+	staff := webcache.GetWebUserTokens(data.Context.User)
 
-	return webStruct.UserResponse{Id: &user.Id, TokensList: &staff, MessageType: data.Event}
+	return webStruct.UserResponse{Id: &data.Context.User.Id, TokensList: &staff, MessageType: data.Event}
 }
 
-func loginOut(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	err := webcache.DelWebUserToken(user, data.Token)
+func loginOut(data *webStruct.MessageData) webStruct.UserResponse {
+	err := webcache.DelWebUserToken(data.Context.User, data.Token)
 	if err != nil {
 		return webStruct.UserResponse{Error: "Cant delete token", MessageType: data.Event}
 	}
 
+	data.Context.User = nil
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func getUser(data *webStruct.MessageData, foo func(*webStruct.MessageData, *mainStruct.WebUser) webStruct.UserResponse, groupList []int) webStruct.UserResponse {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Println("Recovered in getUser", r)
-			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
-		}
-	}()
+func findUser(data *webStruct.MessageData) (*mainStruct.WebUser, webStruct.UserResponse) {
 	user, err := webcache.GetWebUserByToken(data.Token)
 	if err != nil || user == nil || user.Login == "" {
+		log.Println("EVENT: ", data.Event, "NO SUER BY TOKEN")
 		if data.Context != nil {
 			data.Context.Subscriptions.Clear()
 		}
 		noToken := true
-		return webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "connection", NoToken: &noToken}
+		return nil, webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "connection", NoToken: &noToken}
 	}
+	if data.Context.User == nil {
+		data.Context.User = user
+	}
+	if user.Id != data.Context.User.Id {
+		log.Println("EVENT: ", data.Event, "USER: ", user.Login, " ACCESS DENIED! User changed in a single ws connection without logout")
+		noToken := true
+		return nil, webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "connection", NoToken: &noToken}
+	}
+	return user, webStruct.UserResponse{}
+}
+
+func checkAccessGroup(data *webStruct.MessageData, groupList []int) *webStruct.UserResponse {
+	if data.Context.User == nil {
+		log.Println("EVENT: ", data.Event, "no user!")
+		return &webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "no_access"}
+	}
+	user := data.Context.User
 	group := mainStruct.GetWebUserGroup(user.GroupId)
 	if !group.ValidateGroupAccess(groupList) {
 		log.Println("GROUP: ", user.GroupId, group, user.GroupId)
 		log.Println("EVENT: ", data.Event, "USER: ", user.Login, " ACCESS DENIED!")
-		return webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "no_access"}
+		return &webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "no_access"}
 	}
 
-	log.Println("EVENT: ", data.Event, "USER: ", user.Login)
+	return nil
+}
+
+func subscribeUser(data *webStruct.MessageData) *webStruct.UserResponse {
+	if data.Context.User == nil {
+		log.Println("EVENT: ", data.Event, "no user!")
+		return &webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "no_access"}
+	}
+	log.Println("EVENT: ", data.Event, "USER: ", data.Context.User.Login)
 	if data.KeepSubscription != nil && *data.KeepSubscription {
 		data.Context.Subscriptions.Set(data.Event)
 	}
-	return foo(data, user)
+	return nil
+}
+
+func getUser(data *webStruct.MessageData, foo func(*webStruct.MessageData) webStruct.UserResponse, groupList []int) webStruct.UserResponse {
+	resp := checkAccessGroup(data, groupList)
+	if resp != nil {
+		return *resp
+	}
+	return foo(data)
 }
 
 func getUserForConfig(data *webStruct.MessageData, foo func(*webStruct.MessageData, interface{}) webStruct.UserResponse, conf interface{}, groupList []int) webStruct.UserResponse {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Println("Recovered in getUser", r)
-			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
-		}
-	}()
-	user, err := webcache.GetWebUserByToken(data.Token)
-	if err != nil || user == nil || user.Login == "" {
-		if data.Context != nil {
-			data.Context.Subscriptions.Clear()
-		}
-		noToken := true
-		return webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "connection", NoToken: &noToken}
-	}
-	group := mainStruct.GetWebUserGroup(user.GroupId)
-	if !group.ValidateGroupAccess(groupList) {
-		log.Println("GROUP: ", user.GroupId, group, user.GroupId)
-		log.Println("EVENT: ", data.Event, "USER: ", user.Login, " ACCESS DENIED!")
-		return webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "no_access"}
-	}
-
-	log.Println("EVENT: ", data.Event, "USER: ", user.Login)
-	if data.KeepSubscription != nil && *data.KeepSubscription {
-		data.Context.Subscriptions.Set(data.Event)
+	resp := checkAccessGroup(data, groupList)
+	if resp != nil {
+		return *resp
 	}
 	return foo(data, conf)
 }
 
-func getWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func getWebUsers(data *webStruct.MessageData) webStruct.UserResponse {
 	items := webcache.GetWebUsers()
 	wssUris := webcache.GetWebMetaData().GetWssUris()
 	VertoWsUris := webcache.GetWebMetaData().GetVertoWsUris()
@@ -178,12 +189,12 @@ func getWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruc
 	return webStruct.UserResponse{WebUsers: &items, WebUsersGroups: &groups, Options: &wssUris, AltOptions: &VertoWsUris, MessageType: data.Event}
 }
 
-func GetWebUsersByDirectory(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetWebUsersByDirectory(data *webStruct.MessageData) webStruct.UserResponse {
 	items := webcache.GetWebUsersByDirectory()
 	return webStruct.UserResponse{AdditionalData: &items, MessageType: data.Event}
 }
 
-func addWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func addWebUsers(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Login == "" || data.Password == "" {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -207,7 +218,7 @@ func addWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruc
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func renameWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func renameWebUsers(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -230,7 +241,7 @@ func renameWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webSt
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func deleteWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func deleteWebUsers(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -242,7 +253,7 @@ func deleteWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webSt
 	if webUser == nil {
 		return webStruct.UserResponse{Error: "user not found", MessageType: data.Event}
 	}
-	if webUser.Id == user.Id {
+	if webUser.Id == data.Context.User.Id {
 		return webStruct.UserResponse{Error: "you can't delete yourself", MessageType: data.Event}
 	}
 
@@ -254,7 +265,7 @@ func deleteWebUsers(data *webStruct.MessageData, user *mainStruct.WebUser) webSt
 	return webStruct.UserResponse{MessageType: data.Event, Id: &webUser.Id}
 }
 
-func switchWebUser(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func switchWebUser(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -270,7 +281,7 @@ func switchWebUser(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	if webUser == nil {
 		return webStruct.UserResponse{Error: "user not found", MessageType: data.Event}
 	}
-	if webUser.Id == user.Id && !*data.Enabled {
+	if webUser.Id == data.Context.User.Id && !*data.Enabled {
 		return webStruct.UserResponse{Error: "you can't disable yourself", MessageType: data.Event}
 	}
 
@@ -287,7 +298,7 @@ func switchWebUser(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func updateWebUsersPassword(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateWebUsersPassword(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -313,7 +324,7 @@ func updateWebUsersPassword(data *webStruct.MessageData, user *mainStruct.WebUse
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func updateWebUsersLang(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateWebUsersLang(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -332,7 +343,7 @@ func updateWebUsersLang(data *webStruct.MessageData, user *mainStruct.WebUser) w
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func updateWebUsersSipUser(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateWebUsersSipUser(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -351,7 +362,7 @@ func updateWebUsersSipUser(data *webStruct.MessageData, user *mainStruct.WebUser
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func updateWebUsersWs(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateWebUsersWs(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -370,7 +381,7 @@ func updateWebUsersWs(data *webStruct.MessageData, user *mainStruct.WebUser) web
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func updateWebUsersVertoWs(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateWebUsersVertoWs(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -389,7 +400,7 @@ func updateWebUsersVertoWs(data *webStruct.MessageData, user *mainStruct.WebUser
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func UpdateWebUserWebRTCLib(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func UpdateWebUserWebRTCLib(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -408,7 +419,7 @@ func UpdateWebUserWebRTCLib(data *webStruct.MessageData, user *mainStruct.WebUse
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func updateWebUsersStun(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateWebUsersStun(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -427,7 +438,7 @@ func updateWebUsersStun(data *webStruct.MessageData, user *mainStruct.WebUser) w
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func updateWebUsersAvatar(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func updateWebUsersAvatar(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -465,7 +476,7 @@ func updateWebUsersAvatar(data *webStruct.MessageData, user *mainStruct.WebUser)
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func clearWebUsersAvatar(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func clearWebUsersAvatar(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -488,7 +499,7 @@ func clearWebUsersAvatar(data *webStruct.MessageData, user *mainStruct.WebUser) 
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
-func GetWebSettings(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetWebSettings(data *webStruct.MessageData) webStruct.UserResponse {
 	args := data.WebSettings
 	if args == nil {
 		return webStruct.UserResponse{Error: "empty request", MessageType: data.Event}
@@ -500,7 +511,7 @@ func GetWebSettings(data *webStruct.MessageData, user *mainStruct.WebUser) webSt
 	return webStruct.UserResponse{WebSettings: &webSettings, MessageType: data.Event}
 }
 
-func SaveWebSettings(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func SaveWebSettings(data *webStruct.MessageData) webStruct.UserResponse {
 	args := data.WebSettings
 	if args == nil {
 		return webStruct.UserResponse{Error: "empty request", MessageType: data.Event}
@@ -519,11 +530,11 @@ func SaveWebSettings(data *webStruct.MessageData, user *mainStruct.WebUser) webS
 	return webStruct.UserResponse{WebSettings: &webSettings, MessageType: data.Event}
 }
 
-func UpdateWebUserGroup(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func UpdateWebUserGroup(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
-	if data.Id == user.Id {
+	if data.Id == data.Context.User.Id {
 		return webStruct.UserResponse{Error: "not allow to change own group", MessageType: data.Event}
 	}
 	webUser := webcache.GetWebUserById(data.Id)
@@ -542,7 +553,7 @@ func UpdateWebUserGroup(data *webStruct.MessageData, user *mainStruct.WebUser) w
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////
-func GetWebDirectoryUsersTemplates(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetWebDirectoryUsersTemplates(data *webStruct.MessageData) webStruct.UserResponse {
 	res, err := intermediateDB.GetAllFromDBAsMap(&altStruct.WebDirectoryUsersTemplate{})
 	if err != nil {
 		return webStruct.UserResponse{Error: "can't get", MessageType: data.Event}
@@ -551,7 +562,7 @@ func GetWebDirectoryUsersTemplates(data *webStruct.MessageData, user *mainStruct
 	return webStruct.UserResponse{MessageType: data.Event, Data: &res}
 }
 
-func AddWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func AddWebDirectoryUsersTemplate(data *webStruct.MessageData) webStruct.UserResponse {
 	item := altStruct.WebDirectoryUsersTemplate{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -573,7 +584,7 @@ func AddWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.
 	return webStruct.UserResponse{MessageType: data.Event, Data: &result}
 }
 
-func DelWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func DelWebDirectoryUsersTemplate(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
@@ -586,7 +597,7 @@ func DelWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.
 	return webStruct.UserResponse{MessageType: data.Event, Id: &data.Id}
 }
 
-func SwitchWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func SwitchWebDirectoryUsersTemplate(data *webStruct.MessageData) webStruct.UserResponse {
 	item := altStruct.WebDirectoryUsersTemplate{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -610,7 +621,7 @@ func SwitchWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStru
 	return webStruct.UserResponse{MessageType: data.Event, Data: &result}
 }
 
-func UpdateWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func UpdateWebDirectoryUsersTemplate(data *webStruct.MessageData) webStruct.UserResponse {
 	item := altStruct.WebDirectoryUsersTemplate{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -632,7 +643,7 @@ func UpdateWebDirectoryUsersTemplate(data *webStruct.MessageData, user *mainStru
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////
-func GetWebDirectoryUsersTemplateParameters(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetWebDirectoryUsersTemplateParameters(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
@@ -648,7 +659,7 @@ func GetWebDirectoryUsersTemplateParameters(data *webStruct.MessageData, user *m
 	return webStruct.UserResponse{MessageType: data.Event, Data: &res}
 }
 
-func AddWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func AddWebDirectoryUsersTemplateParameter(data *webStruct.MessageData) webStruct.UserResponse {
 	item := altStruct.WebDirectoryUsersTemplateParameter{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -670,7 +681,7 @@ func AddWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *ma
 	return webStruct.UserResponse{MessageType: data.Event, Data: &result}
 }
 
-func DelWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func DelWebDirectoryUsersTemplateParameter(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
@@ -683,7 +694,7 @@ func DelWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *ma
 	return webStruct.UserResponse{MessageType: data.Event, Id: &data.Id}
 }
 
-func SwitchWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func SwitchWebDirectoryUsersTemplateParameter(data *webStruct.MessageData) webStruct.UserResponse {
 	item := altStruct.WebDirectoryUsersTemplateParameter{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -707,7 +718,7 @@ func SwitchWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user 
 	return webStruct.UserResponse{MessageType: data.Event, Data: &result}
 }
 
-func UpdateWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func UpdateWebDirectoryUsersTemplateParameter(data *webStruct.MessageData) webStruct.UserResponse {
 	item := altStruct.WebDirectoryUsersTemplateParameter{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -728,7 +739,7 @@ func UpdateWebDirectoryUsersTemplateParameter(data *webStruct.MessageData, user 
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////
-func GetWebDirectoryUsersTemplateVariables(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetWebDirectoryUsersTemplateVariables(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
@@ -744,7 +755,7 @@ func GetWebDirectoryUsersTemplateVariables(data *webStruct.MessageData, user *ma
 	return webStruct.UserResponse{MessageType: data.Event, Data: &res}
 }
 
-func AddWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func AddWebDirectoryUsersTemplateVariable(data *webStruct.MessageData) webStruct.UserResponse {
 	item := altStruct.WebDirectoryUsersTemplateVariable{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -765,7 +776,7 @@ func AddWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mai
 	return webStruct.UserResponse{MessageType: data.Event, Data: &result}
 }
 
-func DelWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func DelWebDirectoryUsersTemplateVariable(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
@@ -778,7 +789,7 @@ func DelWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mai
 	return webStruct.UserResponse{MessageType: data.Event, Id: &item.Id}
 }
 
-func SwitchWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func SwitchWebDirectoryUsersTemplateVariable(data *webStruct.MessageData) webStruct.UserResponse {
 	item := altStruct.WebDirectoryUsersTemplateVariable{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -802,7 +813,7 @@ func SwitchWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *
 	return webStruct.UserResponse{MessageType: data.Event, Data: &result}
 }
 
-func UpdateWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func UpdateWebDirectoryUsersTemplateVariable(data *webStruct.MessageData) webStruct.UserResponse {
 	item := altStruct.WebDirectoryUsersTemplateVariable{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -822,16 +833,16 @@ func UpdateWebDirectoryUsersTemplateVariable(data *webStruct.MessageData, user *
 	return webStruct.UserResponse{MessageType: data.Event, Data: &result}
 }
 
-func GetWebDirectoryUsersTemplatesList(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetWebDirectoryUsersTemplatesList(data *webStruct.MessageData) webStruct.UserResponse {
 	var err error
 	var res interface{}
-	if user.GroupId == mainStruct.GetAdminId() {
+	if data.Context.User.GroupId == mainStruct.GetAdminId() {
 		res, err = intermediateDB.GetAllFromDBAsMap(&altStruct.WebDirectoryUsersTemplate{})
 	} else {
 		var userI interface{}
 		userI, err = intermediateDB.GetByIdArg(
 			&altStruct.DirectoryDomainUser{},
-			user.SipId.Int64,
+			data.Context.User.SipId.Int64,
 		)
 		sipUser, ok := userI.(altStruct.DirectoryDomainUser)
 		if !ok || sipUser.Id == 0 {
@@ -852,7 +863,7 @@ func GetWebDirectoryUsersTemplatesList(data *webStruct.MessageData, user *mainSt
 	return webStruct.UserResponse{MessageType: data.Event, Data: &result}
 }
 
-func GetWebDirectoryUsersTemplateForm(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetWebDirectoryUsersTemplateForm(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
@@ -860,11 +871,11 @@ func GetWebDirectoryUsersTemplateForm(data *webStruct.MessageData, user *mainStr
 	var res map[int64]interface{}
 	var resStruct = templateObj{Id: data.Id}
 
-	if user.GroupId != mainStruct.GetAdminId() {
+	if data.Context.User.GroupId != mainStruct.GetAdminId() {
 		var userI interface{}
 		userI, err = intermediateDB.GetByIdArg(
 			&altStruct.DirectoryDomainUser{},
-			user.SipId.Int64,
+			data.Context.User.SipId.Int64,
 		)
 		sipUser, ok := userI.(altStruct.DirectoryDomainUser)
 		if !ok || sipUser.Id == 0 {
@@ -940,7 +951,7 @@ func GetWebDirectoryUsersTemplateForm(data *webStruct.MessageData, user *mainStr
 }
 
 // ¯\_(ツ)_/¯
-func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData) webStruct.UserResponse {
 	item := templateObj{}
 	err := json.Unmarshal(data.Data, &item)
 	if err != nil {
@@ -957,8 +968,8 @@ func CreateWebDirectoryUsersByTemplate(data *webStruct.MessageData, user *mainSt
 	var template altStruct.WebDirectoryUsersTemplate
 	var searchStruct = &altStruct.WebDirectoryUsersTemplate{Id: item.Id}
 	var searchFields = map[string]bool{"Id": true}
-	if user.GroupId != mainStruct.GetAdminId() {
-		sipUserI, err := intermediateDB.GetByIdFromDB(&altStruct.DirectoryDomainUser{Id: user.SipId.Int64})
+	if data.Context.User.GroupId != mainStruct.GetAdminId() {
+		sipUserI, err := intermediateDB.GetByIdFromDB(&altStruct.DirectoryDomainUser{Id: data.Context.User.SipId.Int64})
 		if err != nil || sipUserI == nil {
 			return webStruct.UserResponse{Error: "no directory sip user", MessageType: data.Event}
 		}
@@ -1102,4 +1113,153 @@ func HashPassword(password string) string {
 func CheckPassword(password string, hash []byte) bool {
 	err := bcrypt.CompareHashAndPassword(hash, []byte(password))
 	return err == nil
+}
+
+func GetConversationRoomMessages(data *webStruct.MessageData) webStruct.UserResponse {
+	var err error
+	var res interface{}
+	if data.Id == 0 {
+		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
+	}
+	var filter = customorm.Filters{}
+	filter.SetLimit(20).
+		SetOrder([]string{"created_at"}, true).
+		EqualToValue("id", data.Id)
+	if !data.UpToTime.IsZero() {
+		filter.LessToValue("created_at", data.UpToTime)
+	}
+
+	if filter.Error != nil {
+		return webStruct.UserResponse{Error: "wrong search data", MessageType: data.Event}
+	}
+	res, err = intermediateDB.GetByFilteredValues(&altStruct.ConversationRoomMessage{}, filter)
+	if err != nil {
+		return webStruct.UserResponse{Error: "can't get", MessageType: data.Event}
+	}
+
+	return webStruct.UserResponse{MessageType: data.Event, Data: &res}
+}
+
+func GetConversationPrivateMessages(data *webStruct.MessageData) webStruct.UserResponse {
+	if data.Id == 0 {
+		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
+	}
+	var upToTime string
+	var args = []interface{}{data.Context.User.Id, data.Id, data.Id, data.Context.User.Id}
+	if !data.UpToTime.IsZero() {
+		upToTime = " AND created_at < $5"
+		args = append(args, data.UpToTime)
+	}
+	sqlLine := fmt.Sprintf(`SELECT id, created_at, text, sender_id, receiver_id 
+FROM conversation_private_messages 
+WHERE ((sender_id = $1 AND receiver_id = $2) OR (sender_id = $3 AND receiver_id = $4)) %s ORDER BY created_at DESC  LIMIT 20;`, upToTime)
+
+	r, err := db.GetDB().Query(sqlLine, args...)
+	if err != nil {
+		return webStruct.UserResponse{Error: "can't get", MessageType: data.Event}
+	}
+	defer r.Close()
+	var res []altStruct.ConversationPrivateMessage
+	for r.Next() {
+		mes := altStruct.ConversationPrivateMessage{Sender: &mainStruct.WebUser{}, Receiver: &mainStruct.WebUser{}}
+		err := r.Scan(&mes.Id, &mes.CreatedAt, &mes.Text, &mes.Sender.Id, &mes.Receiver.Id)
+		if err != nil {
+			log.Println(err.Error())
+			continue
+		}
+		res = append(res, mes)
+	}
+
+	return webStruct.UserResponse{MessageType: data.Event, Data: &res}
+}
+
+func SendConversationPrivateMessage(data *webStruct.MessageData) webStruct.UserResponse {
+	if data.Id == 0 || data.Text == "" {
+		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
+	}
+	receiver := webcache.GetWebUserById(data.Id)
+	if receiver == nil {
+		return webStruct.UserResponse{Error: "unknown receiver id", MessageType: data.Event}
+	}
+	if len(data.Text) > 7000 {
+		return webStruct.UserResponse{Error: "too big message", MessageType: data.Event}
+	}
+
+	msg := altStruct.ConversationPrivateMessage{
+		Sender:    data.Context.User,
+		Receiver:  receiver,
+		Text:      data.Text,
+		CreatedAt: time.Now(),
+	}
+	res, err := intermediateDB.InsertItem(&msg)
+	if err != nil {
+		return webStruct.UserResponse{Error: "can't send", MessageType: data.Event}
+	}
+	mes, err := intermediateDB.GetByIdArg(msg, res)
+	if err != nil {
+		return webStruct.UserResponse{Error: "can't send", MessageType: data.Event}
+	}
+	b.Unicast(webStruct.UserResponse{MessageType: "NewMessage", Data: mes}, []*mainStruct.WebUser{{Id: data.Context.User.Id}, {Id: data.Id}})
+
+	return webStruct.UserResponse{MessageType: data.Event}
+}
+
+func SendConversationRoomMessage(data *webStruct.MessageData) webStruct.UserResponse {
+	if data.Id == 0 || data.Text == "" {
+		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
+	}
+
+	receiver, err := intermediateDB.GetByIdArg(&altStruct.ConversationRoom{}, data.Id)
+	if err != nil || receiver == nil {
+		return webStruct.UserResponse{Error: "unknown room id", MessageType: data.Event}
+	}
+	if len(data.Text) > 7000 {
+		return webStruct.UserResponse{Error: "too big message", MessageType: data.Event}
+	}
+
+	room, ok := receiver.(altStruct.ConversationRoom)
+	if !ok || room.Id == 0 {
+		return webStruct.UserResponse{Error: "unknown room", MessageType: data.Event}
+	}
+
+	roomParticipant, err := intermediateDB.GetByValueAsMap(
+		&altStruct.ConversationRoomParticipant{
+			Room: &room,
+		},
+		map[string]bool{"room_id": true},
+	)
+	var sendTo []*mainStruct.WebUser
+	var author *altStruct.ConversationRoomParticipant
+	for _, v := range roomParticipant {
+		participant, ok := v.(altStruct.ConversationRoomParticipant)
+		if !ok {
+			continue
+		}
+		sendTo = append(sendTo, participant.User)
+		if participant.User.Id == data.Context.User.Id {
+			author = &participant
+		}
+	}
+	if author == nil {
+		return webStruct.UserResponse{Error: "author is not participant of the room", MessageType: data.Event}
+	}
+
+	msg := altStruct.ConversationRoomMessage{
+		Room:        &room,
+		Participant: author,
+		Text:        data.Text,
+		CreatedAt:   time.Now(),
+	}
+	res, err := intermediateDB.InsertItem(&msg)
+	if err != nil {
+		return webStruct.UserResponse{Error: "can't send", MessageType: data.Event}
+	}
+	mes, err := intermediateDB.GetByIdArg(msg, res)
+	if err != nil {
+		return webStruct.UserResponse{Error: "can't send", MessageType: data.Event}
+	}
+
+	b.Unicast(webStruct.UserResponse{MessageType: "NewMessage", Data: mes}, sendTo)
+
+	return webStruct.UserResponse{MessageType: data.Event}
 }

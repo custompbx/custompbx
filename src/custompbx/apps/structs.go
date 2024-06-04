@@ -7,11 +7,11 @@ import (
 type AutoDialerCompany struct {
 	Id          int64                      `json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                      `json:"position" customsql:"position;position"`
-	Name        string                     `json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string                     `json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Enabled     bool                       `json:"enabled" customsql:"enabled;default=TRUE"`
 	Predictive  bool                       `json:"predictive" customsql:"predictive;default=FALSE"`
 	Description string                     `json:"description,omitempty" customsql:"description"`
-	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique;check(parent_id <> 0)"`
+	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique_1;check(parent_id <> 0)"`
 	Reducer     *AutoDialerReducer         `json:"reducer,omitempty" customsql:"fkey:reducer_id;null"`
 	Team        *AutoDialerTeam            `json:"team,omitempty" customsql:"fkey:team_id;null"`
 	List        *AutoDialerList            `json:"list,omitempty" customsql:"fkey:list_id;null"`
@@ -24,10 +24,10 @@ func (w *AutoDialerCompany) GetTableName() string {
 type AutoDialerTeam struct {
 	Id          int64                      `json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                      `json:"position" customsql:"position;position"`
-	Name        string                     `json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string                     `json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Enabled     bool                       `json:"enabled" customsql:"enabled;default=TRUE"`
 	Description string                     `json:"description,omitempty" customsql:"description"`
-	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique;check(parent_id <> 0)"`
+	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *AutoDialerTeam) GetTableName() string {
@@ -40,8 +40,8 @@ type AutoDialerTeamMember struct {
 	Position    int64                          `json:"position" customsql:"position;position"`
 	Enabled     bool                           `json:"enabled" customsql:"enabled;default=TRUE"`
 	Description string                         `json:"description,omitempty" customsql:"description"`
-	User        *altStruct.DirectoryDomainUser `json:"user,omitempty" customsql:"fkey:user_id;unique;check(user_id <> 0)"`
-	Parent      *AutoDialerTeam                `json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	User        *altStruct.DirectoryDomainUser `json:"user,omitempty" customsql:"fkey:user_id;unique_1;check(user_id <> 0)"`
+	Parent      *AutoDialerTeam                `json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *AutoDialerTeamMember) GetTableName() string {
@@ -51,10 +51,10 @@ func (w *AutoDialerTeamMember) GetTableName() string {
 type AutoDialerList struct {
 	Id          int64                      `json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                      `json:"position" customsql:"position;position"`
-	Name        string                     `json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string                     `json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Enabled     bool                       `json:"enabled" customsql:"enabled;default=TRUE"`
 	Description string                     `json:"description,omitempty" customsql:"description"`
-	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique;check(parent_id <> 0)"`
+	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *AutoDialerList) GetTableName() string {
@@ -84,10 +84,10 @@ func (w *AutoDialerListMember) GetTableName() string {
 type AutoDialerReducer struct {
 	Id          int64                      `json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                      `json:"position" customsql:"position;position"`
-	Name        string                     `json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string                     `json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Enabled     bool                       `json:"enabled" customsql:"enabled;default=TRUE"`
 	Description string                     `json:"description,omitempty" customsql:"description"`
-	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique;check(domain_id <> 0)""`
+	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique_1;check(domain_id <> 0)""`
 }
 
 func (w *AutoDialerReducer) GetTableName() string {
@@ -101,7 +101,7 @@ type AutoDialerReducerMember struct {
 	Data        string             `json:"data,omitempty" customsql:"data"`
 	Enabled     bool               `json:"enabled" customsql:"enabled;default=TRUE"`
 	Description string             `json:"description,omitempty" customsql:"description"`
-	Parent      *AutoDialerReducer `json:"parent,omitempty" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *AutoDialerReducer `json:"parent,omitempty" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *AutoDialerReducerMember) GetTableName() string {
@@ -113,8 +113,8 @@ type AutoDialerProceed struct {
 	Started bool  `json:"running" customsql:"running"`
 	Running bool  `json:"running" customsql:"running"`
 
-	Parent *AutoDialerCompany    `json:"parent,omitempty" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
-	Member *AutoDialerListMember `json:"member,omitempty" customsql:"fkey:member_id;unique;check(member_id <> 0)"`
+	Parent *AutoDialerCompany    `json:"parent,omitempty" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
+	Member *AutoDialerListMember `json:"member,omitempty" customsql:"fkey:member_id;unique_1;check(member_id <> 0)"`
 }
 
 func (w *AutoDialerProceed) GetTableName() string {

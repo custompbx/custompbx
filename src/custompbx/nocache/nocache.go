@@ -6,8 +6,11 @@ import (
 )
 
 func InitDB() {
-	//db.InitDirectoryDB()
 	intermediateDB.InitDirectoryDB()
 	intermediateDB.InitConfDB()
 	db.InitDialplanDB()
+}
+
+func InitServicesDB() {
+	intermediateDB.InitServicesDB()
 }

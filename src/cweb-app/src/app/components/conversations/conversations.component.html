@@ -1,0 +1,88 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav mode="side" opened [fixedInViewport]="true" [fixedTopGap]="fixedTopGapScrolled" class="contact-list">
+    <div class="users-nav-list">
+      <mat-form-field style="padding-top: 7px">
+        <mat-label>User name</mat-label>
+        <input matInput [(ngModel)]="searchUser">
+      </mat-form-field>
+      @for (user of getLogins(searchUser); track user.id) {
+        <div [class]="{'chat-contact': true, 'chat-contact-active': currentChat === user.id}" (click)="enterChat(user)">
+          <div class="list-avatar">
+            @if (!user.avatar_format) {
+              <mat-icon class="avatar-image">face</mat-icon>
+            } @else {
+              <img class="avatar-image" [src]="'./assets/img/avatar/' + user.id + '.' + user.avatar_format">
+            }
+          </div>
+          <div class="contact-user">{{ user.login }}</div>
+        </div>
+      }
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content style="margin-left: 237px"> <!-- sidenav do not pushing content on opened on start-->
+    @if (userList[currentChat]) {
+      <mat-progress-bar mode="indeterminate" *ngIf="loadCounter > 0"></mat-progress-bar>
+      <mat-toolbar>
+        <span>{{ 'Conversation with ' + userList[currentChat].login }}</span>
+        @if (userList[currentChat].sip_id?.Valid) {
+          <button mat-icon-button color="primary" aria-label="Example icon button with a menu icon"
+                  [disabled]="!user?.sip_id?.Valid" (click)="voiceCall()">
+            <mat-icon>keyboard_voice</mat-icon>
+          </button>
+        }
+      </mat-toolbar>
+    } @else {
+      <app-inner-header name="Conversations" [loadCounter]="loadCounter"></app-inner-header>
+    }
+    @if (!currentChat) {
+      <div class="msg-placeholder">
+        <mat-icon class="centered-child">question_answer</mat-icon>
+      </div>
+    } @else if (currentVoice === currentChat && toChat) {
+      <div class="msg-placeholder">
+        <div class="centred">
+          @if (!userList[currentVoice].avatar_format) {
+            <mat-icon class="centered-child">account_circle</mat-icon>
+          } @else {
+            <img class="centered-child awa" [src]="'./assets/img/avatar/' + user.id + '.' + user.avatar_format">
+          }
+          <div>
+            <h3>{{ totalTime | formatTimer }}</h3>
+          </div>
+          <div>
+            <button class="margin-fab" mat-fab color="warn" aria-label="icon button">
+              <mat-icon>phone</mat-icon>
+            </button>
+            <button class="margin-fab" mat-fab color="basic" aria-label="icon button" (click)="backToChat()">
+              <mat-icon>chat</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="msg-chat">
+        <div class="msg-view" #scrollContainer>
+          <mat-card-content class="chat-content">
+            @for (message of messages[currentChat]; track message.id) {
+              <mat-card [attr.data-index]="message.id"
+                [class]="{'msg-in': message.receiver_id.id == user.id,'msg-out': message.receiver_id.id != user.id}">
+                {{ message.text }}
+                <mat-card-footer
+                  [class]="{'footer-msg-in': message.receiver_id.id == user.id,'footer-msg-out': message.receiver_id.id != user.id}">
+                  {{ convertDate(message.created_at) }}
+                </mat-card-footer>
+              </mat-card>
+            }
+          </mat-card-content>
+        </div>
+        <div class="msg-input">
+          <mat-form-field class="msg-input-form">
+            <mat-label>Text</mat-label>
+            <input matInput [(ngModel)]="newMsg" (keydown.enter)="sendMsg()">
+            <mat-icon matSuffix color="primary" class="send-btn" (click)="sendMsg()">send</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+    }
+  </mat-sidenav-content>
+</mat-sidenav-container>

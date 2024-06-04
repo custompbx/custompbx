@@ -174,7 +174,7 @@ func updateConfig(data *webStruct.MessageData, item interface{}) webStruct.UserR
 	return webStruct.UserResponse{Data: &result, MessageType: data.Event}
 }
 
-func GetConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetConfModules(data *webStruct.MessageData) webStruct.UserResponse {
 	res, err := intermediateDB.GetByValue(
 		&altStruct.ConfigurationsList{Parent: &mainStruct.FsInstance{Id: cache.GetCurrentInstanceId()}},
 		map[string]bool{"Parent": true},
@@ -188,7 +188,7 @@ func GetConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) webSt
 	return webStruct.UserResponse{MessageType: data.Event, Modules: result}
 }
 
-func reloadConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func reloadConfModules(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "configuration not found", MessageType: data.Event}
 	}
@@ -216,7 +216,7 @@ func reloadConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) we
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func unloadConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func unloadConfModules(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "configuration not found", MessageType: data.Event}
 	}
@@ -245,7 +245,7 @@ func unloadConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) we
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func loadConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func loadConfModules(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "configuration not found", MessageType: data.Event}
 	}
@@ -274,7 +274,7 @@ func loadConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) webS
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func switchConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func switchConfModules(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 || data.Enabled == nil {
 		return webStruct.UserResponse{Error: "configuration not found", MessageType: data.Event}
 	}
@@ -300,7 +300,7 @@ func switchConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) we
 	return webStruct.UserResponse{MessageType: data.Event, Modules: result}
 }
 
-func importConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func importConfModules(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Name == "" {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -314,7 +314,7 @@ func importConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) we
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func TruncateModuleConfig(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func TruncateModuleConfig(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "configuration not found", MessageType: data.Event}
 	}
@@ -336,7 +336,7 @@ func TruncateModuleConfig(data *webStruct.MessageData, user *mainStruct.WebUser)
 	return webStruct.UserResponse{MessageType: data.Event, Modules: result}
 }
 
-func ImportXMLModuleConfig(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func ImportXMLModuleConfig(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.File == "" {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -359,13 +359,13 @@ func ImportXMLModuleConfig(data *webStruct.MessageData, user *mainStruct.WebUser
 	return webStruct.UserResponse{MessageType: data.Event, Modules: result}
 }
 
-func importConfAllModules(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func importConfAllModules(data *webStruct.MessageData) webStruct.UserResponse {
 	fsesl.GetXMLConfigurations()
 
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func fromScratchConfModules(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func fromScratchConfModules(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Name == "" {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -376,7 +376,7 @@ func fromScratchConfModules(data *webStruct.MessageData, user *mainStruct.WebUse
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
-func runProfileCommand(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func runProfileCommand(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}
@@ -420,7 +420,7 @@ func runProfileCommand(data *webStruct.MessageData, user *mainStruct.WebUser) we
 }
 
 /*
-	func ImportCallcenterAgentsAdnTiers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+	func ImportCallcenterAgentsAdnTiers(data *webStruct.MessageData) webStruct.UserResponse {
 		fsesl.GetCallcenterAgents()
 		fsesl.GetCallcenterTiers()
 		//fsesl.GetCallcenterMembers()
@@ -432,13 +432,13 @@ func runProfileCommand(data *webStruct.MessageData, user *mainStruct.WebUser) we
 		return resp
 	}
 */
-func ImportCallcenterAgentsAdnTiers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func ImportCallcenterAgentsAdnTiers(data *webStruct.MessageData) webStruct.UserResponse {
 	fsesl.GetCallcenterAgents()
 	fsesl.GetCallcenterTiers()
 	return webStruct.UserResponse{}
 }
 
-func runCallcenterQueueCommand(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func runCallcenterQueueCommand(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}

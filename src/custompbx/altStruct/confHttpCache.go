@@ -4,10 +4,10 @@ type ConfigHttpCacheSetting struct {
 	Id          int64               `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64               `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string              `xml:"name,attr" json:"name" customsql:"param_name;unique;check(param_name <> '')"`
+	Name        string              `xml:"name,attr" json:"name" customsql:"param_name;unique_1;check(param_name <> '')"`
 	Value       string              `xml:"value,attr" json:"value" customsql:"param_value"`
 	Description string              `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigHttpCacheSetting) GetTableName() string {
@@ -18,9 +18,9 @@ type ConfigHttpCacheProfile struct {
 	Id          int64               `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64               `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string              `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string              `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Description string              `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigHttpCacheProfile) GetTableName() string {
@@ -37,7 +37,7 @@ type ConfigHttpCacheProfileAWSS3 struct {
 	Region          string                  `xml:"region" json:"region" customsql:"region;check(region <> '')"`
 	Expires         int64                   `xml:"expires" json:"expires" customsql:"expires"`
 	Description     string                  `xml:"-" json:"description" customsql:"description"`
-	Parent          *ConfigHttpCacheProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent          *ConfigHttpCacheProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigHttpCacheProfileAWSS3) GetTableName() string {
@@ -50,7 +50,7 @@ type ConfigHttpCacheProfileAzureBlob struct {
 	Enabled         bool                    `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
 	SecretAccessKey string                  `xml:"secret-access-key" json:"secret_access_key" customsql:"secret_access_key;check(secret_access_key <> '')"`
 	Description     string                  `xml:"-" json:"description" customsql:"description"`
-	Parent          *ConfigHttpCacheProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent          *ConfigHttpCacheProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigHttpCacheProfileAzureBlob) GetTableName() string {
@@ -61,9 +61,9 @@ type ConfigHttpCacheProfileDomain struct {
 	Id          int64                   `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                   `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                    `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string                  `xml:"name,attr" json:"name" customsql:"name;unique;check(name <> '')"`
+	Name        string                  `xml:"name,attr" json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Description string                  `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigHttpCacheProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigHttpCacheProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigHttpCacheProfileDomain) GetTableName() string {

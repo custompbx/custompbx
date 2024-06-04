@@ -3,7 +3,7 @@
     <div *ngIf="item.id && !isArray(item)">
       <mat-form-field hideRequiredMarker>
         <mat-label>Name</mat-label>
-        <input matInput placeholder="name" [(ngModel)]="item.name" required
+        <input matInput placeholder="name" [ngModel]="item.name" required
                [disabled]="!item.enabled"
                [name]="'itemName' + item.id"
                appResizeInput
@@ -12,7 +12,7 @@
       </mat-form-field>
       <mat-form-field hideRequiredMarker>
         <mat-label>Value</mat-label>
-        <input matInput placeholder="value" [(ngModel)]="item.value" required
+        <input matInput placeholder="value" [ngModel]="item.value" required
                [disabled]="!item.enabled"
                [name]="'itemValue' + item.id"
                appResizeInput
@@ -45,7 +45,7 @@
       <div *ngIf="item">
         <mat-form-field hideRequiredMarker>
           <mat-label>Name</mat-label>
-          <input matInput placeholder="name" [(ngModel)]="item.name" required
+          <input matInput placeholder="name" [ngModel]="item.name" required
                  [name]="'newItemName' + i"
                  appResizeInput
                  [resizeOnString]="item.name"
@@ -53,7 +53,7 @@
         </mat-form-field>
         <mat-form-field hideRequiredMarker>
           <mat-label>Value</mat-label>
-          <input matInput placeholder="value" [(ngModel)]="item.value" required
+          <input matInput placeholder="value" [ngModel]="item.value" required
                  [name]="'newItemValue' + i"
                  appResizeInput
                  [resizeOnString]="item.value"

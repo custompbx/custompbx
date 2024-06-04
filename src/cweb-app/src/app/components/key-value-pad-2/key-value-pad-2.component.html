@@ -4,7 +4,7 @@
       <mat-form-field hideRequiredMarker  [ngStyle]="fieldsMask.name?.style">
         <mat-label>{{fieldsMask.name.name}}</mat-label>
         <input matInput [placeholder]="fieldsMask.name.name"
-               [(ngModel)]="item[fieldsMask.name.name]" required
+               [ngModel]="item[fieldsMask.name.name]" required
                [disabled]="!item.enabled || disIf(item[fieldsMask.name.depend], fieldsMask.name.value)"
                [name]="'itemName' + item.id"
                appResizeInput
@@ -14,7 +14,7 @@
       <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.value?.style">
         <mat-label>{{fieldsMask.value.name}}</mat-label>
         <input matInput [placeholder]="fieldsMask.value.name"
-               [(ngModel)]="item[fieldsMask.value.name]"
+               [ngModel]="item[fieldsMask.value.name]"
                [disabled]="!item.enabled || disIf(item[fieldsMask.value.depend], fieldsMask.value.value)"
                [name]="'itemValue' + item.id"
                appResizeInput
@@ -24,7 +24,7 @@
       <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField1" [ngStyle]="fieldsMask.extraField1?.style">
         <mat-label>{{fieldsMask.extraField1.name}}</mat-label>
         <input matInput [placeholder]="fieldsMask.extraField1.name"
-               [(ngModel)]="item[fieldsMask.extraField1.name]"
+               [ngModel]="item[fieldsMask.extraField1.name]"
                [disabled]="!item.enabled || disIf(item[fieldsMask.extraField1.depend], fieldsMask.extraField1.value)"
                [name]="'itemExtraField1' + item.id"
                appResizeInput
@@ -34,7 +34,7 @@
       <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField2" [ngStyle]="fieldsMask.extraField2?.style">
         <mat-label>{{fieldsMask.extraField2.name}}</mat-label>
         <input matInput [placeholder]="fieldsMask.extraField2.name"
-               [(ngModel)]="item[fieldsMask.extraField2.name]"
+               [ngModel]="item[fieldsMask.extraField2.name]"
                [disabled]="!item.enabled || disIf(item[fieldsMask.extraField2.depend], fieldsMask.extraField2.value)"
                [name]="'itemExtraField2' + item.id"
                appResizeInput
@@ -69,7 +69,7 @@
           <mat-label>{{fieldsMask.name.name}}</mat-label>
           <input matInput
                  [placeholder]="fieldsMask.name.name"
-                 [(ngModel)]="item.name" required
+                 [ngModel]="item.name" required
                  [name]="'newItemName' + i"
                  appResizeInput
                  [resizeOnString]="item.name"
@@ -79,7 +79,7 @@
           <mat-label>{{fieldsMask.value.name}}</mat-label>
           <input matInput
                  [placeholder]="fieldsMask.value.name"
-                 [(ngModel)]="item.value"
+                 [ngModel]="item.value"
                  [name]="'newItemValue' + i"
                  appResizeInput
                  [resizeOnString]="item.value"
@@ -89,7 +89,7 @@
           <mat-label>{{fieldsMask.extraField1.name}}</mat-label>
           <input matInput
                  [placeholder]="fieldsMask.extraField1.name"
-                 [(ngModel)]="item[fieldsMask.extraField1.name]"
+                 [ngModel]="item[fieldsMask.extraField1.name]"
                  [name]="'newItemExtraField1' + i"
                  [disabled]="disIf(item[fieldsMask.extraField1.depend], fieldsMask.extraField1.value)"
                  appResizeInput
@@ -100,7 +100,7 @@
           <mat-label>{{fieldsMask.extraField2.name}}</mat-label>
           <input matInput
                  [placeholder]="fieldsMask.extraField2.name"
-                 [(ngModel)]="item[fieldsMask.extraField2.name]"
+                 [ngModel]="item[fieldsMask.extraField2.name]"
                  [name]="'newItemExtraField2' + i"
                  [disabled]="disIf(item[fieldsMask.extraField2.depend], fieldsMask.extraField2.value)"
                  appResizeInput

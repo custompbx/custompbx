@@ -10,7 +10,7 @@ import (
 	"custompbx/webcache"
 )
 
-func getDashboardData(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func getDashboardData(data *webStruct.MessageData) webStruct.UserResponse {
 	webcache.DashBoardSetSipRegs(cache.GetDomainSipRegsCounter())
 
 	profiles, gateways := altData.GetSofiaProfilesAndGateways()

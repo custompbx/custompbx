@@ -24,9 +24,17 @@ import (
 	"log"
 	"net/http"
 	"reflect"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"time"
+)
+
+const (
+	eventLogin            = "login"
+	eventSubscriptionList = "SubscriptionList"
+	eventRelogin          = "relogin"
+	eventLogOut           = "[Auth] Logout"
 )
 
 var eventChannel chan interface{}
@@ -111,7 +119,8 @@ func StartWS(w http.ResponseWriter, r *http.Request) {
 
 func PostAPIRequest(w http.ResponseWriter, r *http.Request) {
 	if r.Body == nil {
-		w.Write([]byte("empty body\n"))
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("400 Bad Request"))
 		return
 	}
 	defer r.Body.Close()
@@ -119,23 +128,33 @@ func PostAPIRequest(w http.ResponseWriter, r *http.Request) {
 	var msg webStruct.Message
 	err := decoder.Decode(&msg)
 	if err != nil {
-		w.Write([]byte("can't parse request\n"))
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("400 Bad Request"))
 		return
 	}
 
 	var resp webStruct.UserResponse
 	msg.Data.Trim()
 	msg.Data.Event = msg.Event
+
+	// find user by token
+	user, _ := findUser(msg.Data)
+	if user == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("401 Unauthorized"))
+		return
+	}
+
 	resp = messageMainHandler(msg.Data)
 	res, err := json.Marshal(resp)
 	if err != nil {
-		res = []byte("can't marshal response\n")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 Server Error"))
 		return
 	}
 	_, err = w.Write(res)
 	if err != nil {
 		log.Printf("%+v", err)
-		res = []byte("can't send response\n")
 	}
 }
 
@@ -146,6 +165,12 @@ func tokenGenerator() string {
 }
 
 func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("Recovered in getUser", r)
+			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
+		}
+	}()
 	if !daemonCache.State.DatabaseConnection {
 		wsContext.SendChannel <- &webStruct.UserResponse{Daemon: daemonCache.State, MessageType: webStruct.BroadcastConnection}
 		return
@@ -154,24 +179,51 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 	msg.Data.Trim()
 	msg.Data.Event = msg.Event
 	msg.Data.Context = wsContext
+
+	// first check if it login request
+	if msg.Event == eventLogin {
+		resp := checkLogin(msg.Data)
+		wsContext.SendChannel <- &resp
+		return
+	}
+	// allow without token
+	if msg.Event == "get_status" {
+		resp := webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "connection"}
+		wsContext.SendChannel <- &resp
+		return
+	}
+	log.Println("EVENT: ", msg.Event)
+
+	// find user by token
+	user, response := findUser(msg.Data)
+	if user == nil {
+		log.Println("EVENT: ", msg.Event, "NO USER")
+		wsContext.SendChannel <- &response
+		return
+	}
+	subsResp := subscribeUser(msg.Data)
+	if subsResp != nil {
+		log.Println("EVENT: ", msg.Event, "NO SUBS")
+		wsContext.SendChannel <- subsResp
+		return
+	}
+
 	var resp webStruct.UserResponse
 	switch msg.Event {
-	case "login":
-		resp = checkLogin(msg.Data)
-	case "[Auth] Logout":
+	case eventLogOut:
 		wsContext.Subscriptions.Clear()
 		resp = getUser(msg.Data, loginOut, onlyAdminGroup())
-	case "relogin":
+	case eventRelogin:
 		resp = getUser(msg.Data, checkRelogin, onlyAdminGroup())
 	case webStruct.DialplanDebug:
 		resp = getUser(msg.Data, getDialplanDebug, onlyAdminGroup())
 	case webStruct.SubscribeHepPackages:
 		resp = getUser(msg.Data, getDialplanDebug, onlyAdminGroup())
-	case "SubscriptionList":
+	case eventSubscriptionList:
 		resp = getUser(
 			msg.Data,
-			func(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-				resp.MessageType = "SubscriptionList"
+			func(data *webStruct.MessageData) webStruct.UserResponse {
+				resp.MessageType = eventSubscriptionList
 				wsContext.Subscriptions.Clear()
 				if len(msg.Data.ArrVal) > 10 || len(msg.Data.ArrVal) == 0 {
 					resp.Error = "can't subscribe!"
@@ -187,14 +239,14 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 	case webStruct.Unsubscribe:
 		resp = getUser(
 			msg.Data,
-			func(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+			func(data *webStruct.MessageData) webStruct.UserResponse {
 				if msg.Data.Name != "" {
 					wsContext.Subscriptions.Del(msg.Data.Name)
 				} else {
 					wsContext.Subscriptions.Clear()
 				}
 				resp.MessageType = "OK"
-				resp.MessageType = "SubscriptionList"
+				resp.MessageType = eventSubscriptionList
 				return resp
 			},
 			onlyAdminGroup(),
@@ -4036,11 +4088,6 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Request:
 	//Response:
 	//Errors:
-	case "get_status":
-		resp = webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "connection"}
-	//Request:
-	//Response:
-	//Errors:
 	case "SendFSCLICommand":
 		resp = getUser(msg, runCLICommand, onlyAdminGroup())
 	//Request:
@@ -4157,6 +4204,27 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Request:
 	//Response:
 	//Errors:
+	case "GetConversationPrivateMessages":
+		resp = getUser(msg, GetConversationPrivateMessages, onlyAdminGroup())
+	//Request:
+	//Response:
+	//Errors:
+	case "GetConversationRoomMessages":
+		resp = getUser(msg, GetConversationRoomMessages, onlyAdminGroup())
+	//Request:
+	//Response:
+	//Errors:
+	case "SendConversationPrivateMessage":
+		resp = getUser(msg, SendConversationPrivateMessage, onlyAdminGroup())
+	//Request:
+	//Response:
+	//Errors:
+	case "SendConversationRoomMessage":
+		resp = getUser(msg, SendConversationRoomMessage, onlyAdminGroup())
+
+	//Request:
+	//Response:
+	//Errors:
 	case "UpdateAutoDialerListMember":
 		resp = UpdateAutoDialerListMember(msg)
 	//Request:
@@ -4180,15 +4248,15 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	return resp
 }
 
-func checkRelogin(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	return webStruct.UserResponse{User: user, Token: data.Token, MessageType: "relogin"}
+func checkRelogin(data *webStruct.MessageData) webStruct.UserResponse {
+	return webStruct.UserResponse{User: data.Context.User, Token: data.Token, MessageType: "relogin"}
 }
 
-func checkSettings(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func checkSettings(data *webStruct.MessageData) webStruct.UserResponse {
 	return webStruct.UserResponse{Settings: &cfg.CustomPbx, MessageType: "settings"}
 }
 
-func setSettings(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func setSettings(data *webStruct.MessageData) webStruct.UserResponse {
 	log.Println(data.Payload)
 	if data.Payload.Fs.Esl.Pass == "" || data.Payload.Fs.Esl.Port == 0 || data.Payload.Fs.Esl.Host == "" ||
 		data.Payload.Db.Host == "" || data.Payload.Db.Port == 0 || data.Payload.Db.Name == "" ||
@@ -4210,7 +4278,7 @@ func setSettings(data *webStruct.MessageData, user *mainStruct.WebUser) webStruc
 	return webStruct.UserResponse{Settings: &conf, MessageType: "settings"}
 }
 
-func getCDR(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func getCDR(data *webStruct.MessageData) webStruct.UserResponse {
 	limit := data.DBRequest.Limit
 	if limit == 0 || limit > 250 {
 		limit = 25
@@ -4228,12 +4296,12 @@ func getCDR(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.Use
 	return webStruct.UserResponse{CDR: &cdr, MessageType: data.Event}
 }
 
-func getPhoneCreds(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
-	if !user.SipId.Valid {
+func getPhoneCreds(data *webStruct.MessageData) webStruct.UserResponse {
+	if !data.Context.User.SipId.Valid {
 		return webStruct.UserResponse{Error: "no config", MessageType: data.Event}
 	}
 
-	userI, err := intermediateDB.GetByIdFromDB(&altStruct.DirectoryDomainUser{Id: user.SipId.Int64})
+	userI, err := intermediateDB.GetByIdFromDB(&altStruct.DirectoryDomainUser{Id: data.Context.User.SipId.Int64})
 	if err != nil || userI == nil {
 		return webStruct.UserResponse{Error: "user not found", MessageType: data.Event}
 	}
@@ -4280,7 +4348,7 @@ func getPhoneCreds(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 
 		password = domainParam.Value
 	}
-	if password == "" || (user.Ws == "" && user.VertoWs == "") /*|| user.Stun == ""*/ {
+	if password == "" || (data.Context.User.Ws == "" && data.Context.User.VertoWs == "") /*|| user.Stun == ""*/ {
 		return webStruct.UserResponse{Error: "no enough params params", MessageType: data.Event}
 	}
 
@@ -4288,10 +4356,10 @@ func getPhoneCreds(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	creds.UserName = directoryUser.Name
 	creds.Password = password
 	creds.Domain = domain.Name
-	creds.WebRTCLib = user.WebRTCLib
-	creds.Ws = user.Ws
-	creds.VertoWs = user.VertoWs
-	creds.Stun = user.Stun
+	creds.WebRTCLib = data.Context.User.WebRTCLib
+	creds.Ws = data.Context.User.Ws
+	creds.VertoWs = data.Context.User.VertoWs
+	creds.Stun = data.Context.User.Stun
 	if creds.Stun == "" && daemonCache.State.StunServerStatus {
 		creds.Stun = "stun:" + cfg.CustomPbx.Web.Host + ":" + strconv.Itoa(cfg.CustomPbx.Web.StunPort)
 	}
@@ -4299,7 +4367,7 @@ func getPhoneCreds(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	return webStruct.UserResponse{PhoneCreds: &creds, MessageType: data.Event}
 }
 
-func runCLICommand(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func runCLICommand(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Name == "" {
 		return webStruct.UserResponse{Error: "empty command", MessageType: data.Event}
 	}
@@ -4308,7 +4376,7 @@ func runCLICommand(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	return webStruct.UserResponse{MessageType: data.Event, Response: &res}
 }
 
-func RealFSCLIConnect(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func RealFSCLIConnect(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Name == "" {
 		return webStruct.UserResponse{Error: "empty command", MessageType: data.Event}
 	}
@@ -4317,7 +4385,7 @@ func RealFSCLIConnect(data *webStruct.MessageData, user *mainStruct.WebUser) web
 	return webStruct.UserResponse{MessageType: data.Event, Response: &res}
 }
 
-func RealFSCLICommand(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func RealFSCLICommand(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Name == "" {
 		return webStruct.UserResponse{Error: "empty command", MessageType: data.Event}
 	}
@@ -4326,7 +4394,7 @@ func RealFSCLICommand(data *webStruct.MessageData, user *mainStruct.WebUser) web
 	return webStruct.UserResponse{MessageType: data.Event, Response: &res}
 }
 
-func GetLogs(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetLogs(data *webStruct.MessageData) webStruct.UserResponse {
 	limit := data.DBRequest.Limit
 	if limit == 0 || limit > 5000 {
 		limit = 250
@@ -4340,7 +4408,7 @@ func GetLogs(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.Us
 	return webStruct.UserResponse{Logs: &logs, MessageType: data.Event}
 }
 
-func getHEP(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func getHEP(data *webStruct.MessageData) webStruct.UserResponse {
 	limit := data.DBRequest.Limit
 	if limit == 0 || limit > 5000 {
 		limit = 250
@@ -4354,7 +4422,7 @@ func getHEP(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.Use
 	return webStruct.UserResponse{HEPs: &heps, MessageType: data.Event}
 }
 
-func GetHEPDetails(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetHEPDetails(data *webStruct.MessageData) webStruct.UserResponse {
 	if len(data.ArrVal) == 0 {
 		return webStruct.UserResponse{Error: "empty data", MessageType: data.Event}
 	}
@@ -4366,14 +4434,14 @@ func GetHEPDetails(data *webStruct.MessageData, user *mainStruct.WebUser) webStr
 	return webStruct.UserResponse{HEPsDetails: &heps, MessageType: data.Event}
 }
 
-func GetInstances(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func GetInstances(data *webStruct.MessageData) webStruct.UserResponse {
 	cache.UpdateCacheInstances()
 	var res = cache.GetFSInstances().GetList()
 	var currentId = cache.GetCurrentInstanceId()
 	return webStruct.UserResponse{FSInstances: &res, MessageType: "GetInstances", Id: &currentId}
 }
 
-func UpdateInstanceDescription(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func UpdateInstanceDescription(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "no id", MessageType: data.Event}
 	}
@@ -4526,7 +4594,7 @@ func getByStruct(data *webStruct.MessageData, item interface{}) webStruct.UserRe
 	return webStruct.UserResponse{Data: res, MessageType: data.Event}
 }
 
-func AddAutoDialerListMembers(data *webStruct.MessageData, user *mainStruct.WebUser) webStruct.UserResponse {
+func AddAutoDialerListMembers(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
 	}

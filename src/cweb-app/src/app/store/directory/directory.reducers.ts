@@ -113,7 +113,6 @@ const isNumeric = (val: string): boolean => {
 
 export function reducer(state = initialState, action: All | SettingsAll): State {
   switch (action.type) {
-
     case DirectoryActionTypes.ReduceLoadCounter: {
       return {
         ...state,

@@ -53,6 +53,10 @@ export class WsDataService {
     return this.websocketService.on<IMessage>(method);
   }
 
+  proceedMessageType(method: string): Observable<any> {
+    return this.websocketService.on<IMessage>(method);
+  }
+
   waitDaemonData(): Observable<any> {
     this.websocketService.send('get_status', {});
     return this.websocketService.on<IMessage>(WS.ON.CONNECTION);

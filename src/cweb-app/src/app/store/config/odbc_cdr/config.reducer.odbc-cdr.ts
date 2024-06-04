@@ -290,7 +290,6 @@ export function reducer(state = initialState, action: All): State {
 
     case ConfigActionTypes.StoreNewOdbcCdrField: {
       const table = state.odbc_cdr.tables[action.payload.id];
-      console.log(action.payload);
       if (!table) {
         return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
       }
@@ -299,7 +298,6 @@ export function reducer(state = initialState, action: All): State {
         <Iitem>{}
       ];
 
-      console.log(rest);
       return {
         ...state,
         odbc_cdr: {

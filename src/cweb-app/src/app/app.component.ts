@@ -12,6 +12,7 @@ export class AppComponent implements OnInit {
 
   login = true;
   public currentComponent;
+  public showRightNav = false;
 
   constructor(
     private router: Router,
@@ -25,9 +26,10 @@ export class AppComponent implements OnInit {
       } else {
         this.login = false;
       }
-/*      if (this.userService.isAuthenticated && event.url === '/login') {
-        this.router.navigateByUrl('dashboard');
-      }*/
+      /*      if (this.userService.isAuthenticated && event.url === '/login') {
+              this.router.navigateByUrl('dashboard');
+            }*/
+      this.showRightNav = false;
     });
   }
 
@@ -36,5 +38,9 @@ export class AppComponent implements OnInit {
 
   onRouterOutletActivate(event: any) {
     this.currentComponent = event;
+  }
+
+  toggleRightSideNav($event) {
+    this.showRightNav = !this.showRightNav
   }
 }

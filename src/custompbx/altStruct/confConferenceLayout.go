@@ -4,10 +4,10 @@ type ConfigConferenceLayout struct {
 	Id             int64               `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position       int64               `xml:"-" json:"position" customsql:"position;position"`
 	Enabled        bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name           string              `xml:"name,attr" json:"name" customsql:"layout_name;unique;check(layout_name <> '')"`
+	Name           string              `xml:"name,attr" json:"name" customsql:"layout_name;unique_1;check(layout_name <> '')"`
 	Auto3dPosition string              `xml:"auto-3d-position,attr" json:"auto-3d-position" customsql:"auto_3d_position"`
 	Description    string              `xml:"-" json:"description" customsql:"description"`
-	Parent         *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent         *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigConferenceLayout) GetTableName() string {
@@ -28,7 +28,7 @@ type ConfigConferenceLayoutImage struct {
 	ReservationId string                  `xml:"reservation_id,attr"  json:"reservation_id" customsql:"image_reservation_id"`
 	Zoom          string                  `xml:"zoom,attr"  json:"zoom" customsql:"image_zoom"`
 	Description   string                  `xml:"-" json:"description" customsql:"description"`
-	Parent        *ConfigConferenceLayout `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent        *ConfigConferenceLayout `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigConferenceLayoutImage) GetTableName() string {
@@ -39,9 +39,9 @@ type ConfigConferenceLayoutGroup struct {
 	Id          int64               `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64               `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Name        string              `xml:"name,attr" json:"name" customsql:"param_name;unique;check(param_name <> '')"`
+	Name        string              `xml:"name,attr" json:"name" customsql:"param_name;unique_1;check(param_name <> '')"`
 	Description string              `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigurationsList `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigConferenceLayoutGroup) GetTableName() string {
@@ -52,9 +52,9 @@ type ConfigConferenceLayoutGroupLayout struct {
 	Id          int64                        `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64                        `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool                         `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Body        string                       `xml:",chardata"  json:"body" customsql:"layout_body;unique"`
+	Body        string                       `xml:",chardata"  json:"body" customsql:"layout_body;unique_1"`
 	Description string                       `xml:"-" json:"description" customsql:"description"`
-	Parent      *ConfigConferenceLayoutGroup `xml:"-" json:"parent" customsql:"fkey:parent_id;unique;check(parent_id <> 0)"`
+	Parent      *ConfigConferenceLayoutGroup `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }
 
 func (w *ConfigConferenceLayoutGroupLayout) GetTableName() string {

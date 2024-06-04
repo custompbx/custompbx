@@ -15,6 +15,8 @@ import * as fscli from './fscli/fscli.reducers';
 import * as hep from './hep/hep.reducers';
 import {State as appsState} from './apps/apps.state.struct';
 import {reducer as appsReducer} from './apps/apps.reducers';
+import * as conversations from './conversations/conversations.reducer';
+import * as header from './header/header.reducer';
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 
 export interface AppState {
@@ -33,6 +35,8 @@ export interface AppState {
   instances: instances.State;
   globalVariables: globalVariables.State;
   apps: appsState;
+  conversations: conversations.State;
+  header: header.State;
 }
 
 export const reducers = {
@@ -51,6 +55,8 @@ export const reducers = {
   instances: instances.reducer,
   globalVariables: globalVariables.reducer,
   apps: appsReducer,
+  conversations: conversations.reducer,
+  header: header.reducer,
 };
 
 export const selectState = createFeatureSelector<AppState>('app');
@@ -70,4 +76,6 @@ export const selectHEPState = createSelector(selectState, (state: AppState) => s
 export const selectInstancesState = createSelector(selectState, (state: AppState) => state.instances);
 export const selectGlobalVariablesState = createSelector(selectState, (state: AppState) => state.globalVariables);
 export const selectApps = createSelector(selectState, (state: AppState) => state.apps);
+export const selectConversations = createSelector(selectState, (state: AppState) => state.conversations);
+export const selectHeader = createSelector(selectState, (state: AppState) => state.header);
 
