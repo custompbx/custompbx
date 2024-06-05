@@ -21,7 +21,7 @@ export interface Istatuses {
   isRunning: boolean;
   inCall: boolean;
   registered: boolean;
-  state: 'answered' | 'ringing' | '';
+  status: 'answered' | 'ringing' | '';
 }
 
 export const initialState: State = {

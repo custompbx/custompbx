@@ -298,7 +298,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
     }
     this.resetTimer();
     this.startTimer();
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true, state: 'answered'}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true, status: 'answered'}}));
     if (this.libName === this.sipjsLib) {
       this.data.session.accept();
     } else if (this.libName === this.vertoLib) {
@@ -316,11 +316,11 @@ export class PhoneComponent implements OnInit, OnDestroy {
   hangup() {
     this.sourceList['ring']?.stop();
     if (!this.data.session) {
-      this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
+      this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, status: ''}}));
       return;
     }
     try {
-      this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
+      this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, status: ''}}));
       if (this.libName === this.sipjsLib) {
         switch (this.data.session.state) {
           case SIP.SessionState.Initial:
@@ -345,7 +345,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
 
     this.stopTimer();
 
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, status: ''}}));
     this.data.session = null;
   }
 
@@ -438,7 +438,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
         }
       }
     );
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {state: 'ringing'}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {status: 'ringing'}}));
   }
 
   eventRegistered() {
@@ -459,21 +459,21 @@ export class PhoneComponent implements OnInit, OnDestroy {
   eventAccepted() {
     console.log('ACCEPTED');
     this.sourceList['ring']?.stop();
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true, state: 'answered'}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true, status: 'answered'}}));
     this.setupRemoteMedia.bind(this)();
   }
 
   eventFailed() {
     this.sourceList['ring']?.stop();
     console.log('eventFailed');
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, status: ''}}));
     this.stopTimer();
   }
 
   eventTerminated() {
     this.sourceList['ring']?.stop();
     console.log('eventTerminated');
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, status: ''}}));
     this.stopTimer();
   }
 
@@ -484,7 +484,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
       this.hangup();
     }
     this.data.onHold = false;
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, state: ''}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: false, status: ''}}));
     this.stopStream();
     this.stopTimer();
   }
@@ -592,7 +592,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
     this.data.session.subscribeEvent('track', this.vertoTrack.bind(this));
     this.data.session.subscribeEvent('answer', this.vertoAccepted.bind(this));
     this.data.session.subscribeEvent('bye', this.eventBye.bind(this));
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {state: 'ringing'}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {status: 'ringing'}}));
   }
 
   vertoTrack(track) {
@@ -607,7 +607,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
   vertoAccepted() {
     console.log('ACCEPTED');
     this.sourceList['ring']?.stop();
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true, state: 'answered'}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {inCall: true, status: 'answered'}}));
   }
 
   vertoCall(user: string) {

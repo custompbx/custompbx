@@ -5,7 +5,7 @@
         <mat-label>User name</mat-label>
         <input matInput [(ngModel)]="searchUser">
       </mat-form-field>
-      @for (webUser of getLogins(searchUser); track user.id) {
+      @for (webUser of getLogins(searchUser); track webUser.id) {
         <div [class]="{'chat-contact': true, 'chat-contact-active': currentChat === webUser.id}" (click)="enterChat(webUser)">
           <div class="list-avatar">
             @if (!webUser.avatar_format) {
