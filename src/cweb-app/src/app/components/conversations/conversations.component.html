@@ -44,13 +44,17 @@
           @if (!userList[currentVoice].avatar_format) {
             <mat-icon class="centered-child">account_circle</mat-icon>
           } @else {
-            <img class="centered-child awa" [src]="'./assets/img/avatar/' + user.id + '.' + user.avatar_format">
+            <img class="centered-child awa" [src]="'./assets/img/avatar/' + userList[currentVoice].id + '.' + user.avatar_format">
           }
           <div>
             <h3>{{ totalTime | formatTimer }}</h3>
           </div>
           <div>
-            <button class="margin-fab" mat-fab color="warn" aria-label="icon button">
+            <button class="margin-fab" mat-fab
+                    [color]="inConversationsCall? '' : inCall ? 'warn' : 'green'"
+                    [disabled]="inCall && !inConversationsCall"
+                    (click)="connectToUser()"
+                    aria-label="icon button">
               <mat-icon>phone</mat-icon>
             </button>
             <button class="margin-fab" mat-fab color="basic" aria-label="icon button" (click)="backToChat()">

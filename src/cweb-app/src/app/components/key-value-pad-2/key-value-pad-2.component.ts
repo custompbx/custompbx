@@ -93,9 +93,17 @@ export class KeyValuePad2Component implements OnInit {
     this.dispatchersCallbacks['deleteItem'](obj);
   }
 
-  updateItem(obj: object) {
+  updateItem(id: number, name: string, value: string, exta1?: string, exta2?: string) {
     if (!this.dispatchersCallbacks || !this.dispatchersCallbacks['updateItem']) {
       return;
+    }
+    const obj = {id: id, name: name, value: value}
+
+    if (this.fieldsMask.extraField1) {
+      obj[this.fieldsMask.extraField1.name] = exta1;
+    }
+    if (this.fieldsMask.extraField2) {
+      obj[this.fieldsMask.extraField2.name] = exta2;
     }
     this.dispatchersCallbacks['updateItem'](obj);
   }

@@ -9,7 +9,7 @@ import {debounceTime, Observable, Subject, Subscription, take} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {
   AppState,
-  selectConversations, selectHeader,
+  selectConversations, selectDirectoryState, selectHeader,
   selectPhoneState,
   selectSettingsState
 } from '../../store/app.states';
@@ -28,6 +28,7 @@ import {Iuser} from "../../store/auth/auth.reducers";
 import {UserService} from "../../services/user.service";
 import {StartPhone, ToggleShowPhone} from "../../store/header/header.actions";
 import {filter, map, switchMap, tap} from "rxjs/operators";
+import {GetDirectoryUsers} from "../../store/directory/directory.actions";
 
 const scrollTop = 64;
 
@@ -61,10 +62,15 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   public user: Iuser;
   public totalTime: 0;
   public inCall: boolean;
+  public inConversationsCall: boolean;
   public isMouseOverChat: boolean;
   private wheelEvent$ = new Subject<WheelEvent>();
   public isUpdatingChat: boolean;
   private previousScrollItemIndex: number | null = null;
+  public directory$: Subscription;
+  public directory: Observable<any>;
+  public directoryDomains: object;
+  private directoryUsers: object;
 
   @ViewChild('scrollContainer') scrollContainer: ElementRef;
 
@@ -79,6 +85,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     this.phone = this.store.pipe(select(selectPhoneState));
     this.webUsers = this.store.pipe(select(selectSettingsState));
     this.pmessages = this.store.pipe(select(selectConversations));
+    this.directory = this.store.pipe(select(selectDirectoryState));
   }
 
   ngOnInit() {
@@ -86,12 +93,18 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     if (this.ws.isConnected) {
       this.store.dispatch(new SubscriptionList({values: [new GetWebUsers(null).type, StoreGetNewConversationMessage.type]}));
       this.store.dispatch(new GetWebUsers(null));
+      if (Object.entries(this.directoryUsers).length === 0) {
+        this.store.dispatch(new GetDirectoryUsers(null));
+      }
     }
 
     this.ws.websocketService.status.subscribe(connected => {
       if (connected) {
         this.store.dispatch(new SubscriptionList({values: [new GetWebUsers(null).type, StoreGetNewConversationMessage.type]}));
         this.store.dispatch(new GetWebUsers(null));
+        if (Object.entries(this.directoryUsers).length === 0) {
+          this.store.dispatch(new GetDirectoryUsers(null));
+        }
       }
     });
     this.getState$ = this.userService.getState.subscribe((state) => {
@@ -110,6 +123,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
         });
       }
     });
+    // PHONE
     this.phone$ = this.phone.subscribe((phone) => {
       this.phoneStatus = phone.phoneStatus.isRunning;
       if (phone.phoneCreds) {
@@ -118,6 +132,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       this.totalTime = phone.timer;
       this.inCall = phone.phoneStatus.inCall;
     });
+
     this.pmessages$ = this.pmessages.subscribe((mes) => {
       this.messages = mes ? mes.conversations : {};
       this.lastErrorMessage =  mes ? mes.errorMessage : null;
@@ -136,6 +151,19 @@ export class ConversationsComponent implements OnInit, OnDestroy {
         this.isUpdatingChat = false;
       }
     });
+
+    //directory users
+    this.directory$ = this.directory.subscribe((users) => {
+      this.directoryDomains = users.domains;
+      this.directoryUsers = users.users;
+      if (users.errorMessage) {
+        this._snackBar.open('Error: ' + users.errorMessage + '!', null, {
+          duration: 3000,
+          panelClass: ['error-snack'],
+        });
+      }
+    });
+
     this.wheelEvent$
       .pipe(
         debounceTime(100), // Debounce to avoid too many events in a short time
@@ -188,15 +216,21 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     }
   }
 
-  connectToUser(user: object, domainName: string) {
-    if (!this.phoneStatus || this.phoneUser === user['name'] || user['name'] === '') {
+  connectToUser() {
+    if (!this.userList[this.currentVoice]) {
       return;
     }
-    const fullName = user['name'] + '@' + domainName;
-
-    if (user['sip_register'] || user['verto_register']) {
-      this.store.dispatch(new StoreMakePhoneCall({user: user['name']}));
+    if (!this.userList[this.currentVoice].sip_id?.Valid) {
+      return;
     }
+    const sipUser = this.directoryUsers[this.userList[this.currentVoice].sip_id.Int64];
+    const domainName = this.directoryDomains[sipUser.parent.id]?.name;
+    const fullName = sipUser.name + '@' + domainName;
+    console.log(sipUser)
+    if (!this.directoryUsers[this.userList[this.currentVoice].sip_id.Int64]) {
+      return;
+    }
+    this.store.dispatch(new StoreMakePhoneCall({user: fullName}));
   }
 
   getLogins(filterString: string = ''): any[] {

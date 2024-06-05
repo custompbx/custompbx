@@ -266,7 +266,7 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
       if (user['in_call'] && user['last_uuid']) {
         this.store.dispatch(new StoreMakePhoneCall({user: 'eavesdrop::' + user['last_uuid']}));
       } else if (user['sip_register'] || user['verto_register']) {
-        this.store.dispatch(new StoreMakePhoneCall({user: user['name']}));
+        this.store.dispatch(new StoreMakePhoneCall({user: fullName}));
       }
   }
 

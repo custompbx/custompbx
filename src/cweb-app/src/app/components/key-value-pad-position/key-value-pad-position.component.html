@@ -45,7 +45,7 @@
       </mat-form-field>
       <button mat-button color="accent" class="but-spacer-left"
               [disabled]="!isReadyToSend(form.controls['itemName' + item.id], form.controls['itemValue' + item.id], form.controls['itemExtraField1' + item.id], form.controls['itemExtraField2' + item.id])"
-              (click)="updateItem(item); form.controls['itemName' + item.id].markAsPristine(); form.controls['itemValue' + item.id]?.markAsPristine();">
+              (click)="updateItem(item.id, form.controls['itemName' + item.id].value, form.controls['itemValue' + item.id].value, form.controls['itemExtraField1' + item.id]?.value, form.controls['itemExtraField2' + item.id]?.value); form.controls['itemName' + item.id].markAsPristine(); form.controls['itemValue' + item.id].markAsPristine();">
         Update
       </button>
       <button *ngIf="item.enabled" mat-raised-button color="accent"

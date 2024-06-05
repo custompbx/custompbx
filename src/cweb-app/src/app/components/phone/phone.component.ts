@@ -226,7 +226,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
       });
   }
 
-  sipjsCaller(dest) {
+  sipjsCaller(dest: string) {
     const target = SIP.UserAgent.makeURI('sip:' + dest);
     const inviteOptions = {
       earlyMedia: true,
