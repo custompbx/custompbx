@@ -17,8 +17,8 @@ export interface State {
 
 export interface Messages {
   id: number;
-  sender_id: number;
-  receiver_id: number;
+  sender_id: {id: number};
+  receiver_id: {id: number};
   text: string;
   timestamp: number;
   new: boolean;

@@ -59,6 +59,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:ma
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
 github.com/custompbx/customorm v0.0.0-20221113194633-26ea5c4b0afa h1:uy/YAgNvX+KXrGis5b2Z1IosCqcO7XV4tIUt8MQrlRI=
 github.com/custompbx/customorm v0.0.0-20221113194633-26ea5c4b0afa/go.mod h1:FqSwy0N9c4yuCp1B4moMNDXJh5s6COiylxG3NuHxtpc=
+github.com/custompbx/customorm v0.0.0-20240604205339-ef13a8616d01 h1:CJfzjdJWdIqSuoYehKUhogf/7D/vq9PJvTxIv2WnO30=
+github.com/custompbx/customorm v0.0.0-20240604205339-ef13a8616d01/go.mod h1:FqSwy0N9c4yuCp1B4moMNDXJh5s6COiylxG3NuHxtpc=
 github.com/custompbx/hepparser v0.0.0-20210703103246-b2623287868f h1:bU2+HDWoRxflyA1vCdq3H5HfoefcvxD8cgjYEMbxwr0=
 github.com/custompbx/hepparser v0.0.0-20210703103246-b2623287868f/go.mod h1:JVkRgmYfVb3k1Y55qlMrDNNffxlLfuniudWIThLoGKg=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

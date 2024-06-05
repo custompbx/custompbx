@@ -8,7 +8,7 @@ export interface State {
   errorMessage: string | null;
 }
 export interface Iuser {
-  id?: string;
+  id?: any;
   login?: string;
   password?: string;
   group_id?: number;

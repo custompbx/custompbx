@@ -93,10 +93,10 @@ export class ConversationsComponent implements OnInit, OnDestroy {
         this.store.dispatch(new SubscriptionList({values: [new GetWebUsers(null).type, StoreGetNewConversationMessage.type]}));
         this.store.dispatch(new GetWebUsers(null));
       }
-      this.getState$ = this.userService.getState.subscribe((state) => {
-        this.user = state.user;
-        this.store.dispatch(StoreCurrentUser({user: this.user}));
-      });
+    });
+    this.getState$ = this.userService.getState.subscribe((state) => {
+      this.user = state.user;
+      this.store.dispatch(StoreCurrentUser({user: this.user}));
     });
 
     this.webUsers$ = this.webUsers.subscribe((users) => {
@@ -226,6 +226,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   }
 
   enterChat(user) {
+    this.previousScrollItemIndex = null;
     this.isUpdatingChat = false;
     if (this.currentChat !== user.id) {
       this.currentChat = user.id;

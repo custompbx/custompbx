@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Masterminds/squirrel v1.1.0
-	github.com/custompbx/customorm v0.0.0-20221113194633-26ea5c4b0afa
+	github.com/custompbx/customorm v0.0.0-20240604205339-ef13a8616d01
 	github.com/custompbx/hepparser v0.0.0-20210703103246-b2623287868f
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-chi/render v1.0.3

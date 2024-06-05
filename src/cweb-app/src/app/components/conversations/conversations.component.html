@@ -5,16 +5,16 @@
         <mat-label>User name</mat-label>
         <input matInput [(ngModel)]="searchUser">
       </mat-form-field>
-      @for (user of getLogins(searchUser); track user.id) {
-        <div [class]="{'chat-contact': true, 'chat-contact-active': currentChat === user.id}" (click)="enterChat(user)">
+      @for (webUser of getLogins(searchUser); track user.id) {
+        <div [class]="{'chat-contact': true, 'chat-contact-active': currentChat === webUser.id}" (click)="enterChat(webUser)">
           <div class="list-avatar">
-            @if (!user.avatar_format) {
+            @if (!webUser.avatar_format) {
               <mat-icon class="avatar-image">face</mat-icon>
             } @else {
-              <img class="avatar-image" [src]="'./assets/img/avatar/' + user.id + '.' + user.avatar_format">
+              <img class="avatar-image" [src]="'./assets/img/avatar/' + webUser.id + '.' + webUser.avatar_format">
             }
           </div>
-          <div class="contact-user">{{ user.login }}</div>
+          <div class="contact-user">{{ webUser.login }}</div>
         </div>
       }
     </div>
