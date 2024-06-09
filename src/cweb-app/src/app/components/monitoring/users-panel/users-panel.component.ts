@@ -6,7 +6,7 @@ import {AppState, selectConfigurationState, selectDirectoryState, selectPhoneSta
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
-import {StoreMakePhoneCall} from '../../../store/phone/phone.actions';
+import {StoreCommand} from '../../../store/phone/phone.actions';
 import {
   GetCallcenterQueues,
   SubscribeCallcenterAgents,
@@ -264,9 +264,9 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
       const fullName = user['name'] + '@' + domainName;
 
       if (user['in_call'] && user['last_uuid']) {
-        this.store.dispatch(new StoreMakePhoneCall({user: 'eavesdrop::' + user['last_uuid']}));
+        this.store.dispatch(StoreCommand({callTo: 'eavesdrop::' + user['last_uuid']}));
       } else if (user['sip_register'] || user['verto_register']) {
-        this.store.dispatch(new StoreMakePhoneCall({user: fullName}));
+        this.store.dispatch(StoreCommand({callTo: fullName}));
       }
   }
 

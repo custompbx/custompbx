@@ -249,3 +249,7 @@
 .send-btn{
   cursor: pointer;
 }
+
+.msg-call {
+  background-color: #38a8c8;
+}

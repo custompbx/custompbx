@@ -6,7 +6,8 @@
         <input matInput [(ngModel)]="searchUser">
       </mat-form-field>
       @for (webUser of getLogins(searchUser); track webUser.id) {
-        <div [class]="{'chat-contact': true, 'chat-contact-active': currentChat === webUser.id}" (click)="enterChat(webUser)">
+        <div [class]="{'chat-contact': true, 'chat-contact-active': currentChat === webUser.id}"
+             (click)="enterChat(webUser)">
           <div class="list-avatar">
             @if (!webUser.avatar_format) {
               <mat-icon class="avatar-image">face</mat-icon>
@@ -44,19 +45,29 @@
           @if (!userList[currentVoice].avatar_format) {
             <mat-icon class="centered-child">account_circle</mat-icon>
           } @else {
-            <img class="centered-child awa" [src]="'./assets/img/avatar/' + userList[currentVoice].id + '.' + user.avatar_format">
+            <img class="centered-child awa"
+                 [src]="'./assets/img/avatar/' + userList[currentVoice].id + '.' + user.avatar_format">
           }
           <div>
             <h3>{{ totalTime | formatTimer }}</h3>
           </div>
           <div>
             <button class="margin-fab" mat-fab
-                    [color]="inConversationsCall? '' : inCall ? 'warn' : 'green'"
-                    [disabled]="inCall && !inConversationsCall"
+                    [color]="inConversationsCall ? 'warn' : inCall ? '' : 'green'"
+                    [disabled]="(inCall && !inConversationsCall) || (isInbound && !isRinging)"
                     (click)="connectToUser()"
                     aria-label="icon button">
               <mat-icon>phone</mat-icon>
             </button>
+            @if (isInbound) {
+              <button class="margin-fab" mat-fab
+                      color="warn"
+                      [disabled]="!isRinging && !inCall"
+                      (click)="hangup()"
+                      aria-label="icon button">
+                <mat-icon>phone_disabled</mat-icon>
+              </button>
+            }
             <button class="margin-fab" mat-fab color="basic" aria-label="icon button" (click)="backToChat()">
               <mat-icon>chat</mat-icon>
             </button>
@@ -67,10 +78,20 @@
       <div class="msg-chat">
         <div class="msg-view" #scrollContainer>
           <mat-card-content class="chat-content">
-            @for (message of messages[currentChat]; track message.id) {
+            @for (message of showItems[currentChat]; track message.id) {
               <mat-card [attr.data-index]="message.id"
-                [class]="{'msg-in': message.receiver_id.id == user.id,'msg-out': message.receiver_id.id != user.id}">
+                        [class]="{'msg-call': message.duration === 0 || message.duration,'msg-in': message.receiver_id.id == user.id,'msg-out': message.receiver_id.id != user.id}">
                 {{ message.text }}
+                @if (message.duration === 0 || message.duration) {
+                  <div style="display: flex;align-items: center;">
+                    @if (message.receiver_id.id == user.id) {
+                      <span>Incoming call</span>
+                    } @else {
+                      <span>Outgoing call</span>
+                    }
+                    <mat-icon>phone</mat-icon>
+                  </div>
+                }
                 <mat-card-footer
                   [class]="{'footer-msg-in': message.receiver_id.id == user.id,'footer-msg-out': message.receiver_id.id != user.id}">
                   {{ convertDate(message.created_at) }}

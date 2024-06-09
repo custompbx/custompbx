@@ -1,4 +1,4 @@
-import {All, AuthActionTypes, StoreTicker} from './phone.actions';
+import {All, AuthActionTypes, StoreCommand, StoreTicker} from './phone.actions';
 
 export interface Icreds {
   user_name: string;
@@ -12,7 +12,7 @@ export interface State {
   phoneCreds: Icreds;
   phoneStatus: Istatuses;
   timer: number;
-  callTo: string;
+  command: Icommand;
   errorMessage: string | null;
   lastActionName: string;
 }
@@ -24,11 +24,23 @@ export interface Istatuses {
   status: 'answered' | 'ringing' | '';
 }
 
+export interface Icommand {
+  callTo: string,
+  hangup: boolean,
+  register: boolean,
+  answer: boolean,
+}
+
 export const initialState: State = {
   phoneCreds: null,
   phoneStatus: <Istatuses>{},
   timer: 0,
-  callTo: '',
+  command: {
+    callTo: '',
+    hangup: false,
+    register: false,
+    answer: false,
+  },
   errorMessage: null,
   lastActionName: '',
 };
@@ -47,7 +59,7 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         phoneCreds: action.payload.response['phone_creds'],
         errorMessage: action.payload.response.error ||  '',
-        callTo: '',
+        command: <Icommand>{},
         lastActionName: AuthActionTypes.StoreGetPhoneCreds,
       };
     }
@@ -56,18 +68,19 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         phoneStatus: {...state.phoneStatus, ...action.payload.phoneStatus},
-        callTo: '',
+        command: <Icommand>{},
         lastActionName: AuthActionTypes.StorePhoneStatus,
       };
     }
 
-    case AuthActionTypes.StoreMakePhoneCall: {
+    case StoreCommand.type: {
       return {
         ...state,
-        callTo: action.payload.user,
-        lastActionName: AuthActionTypes.StoreMakePhoneCall,
+        command: <Icommand>{...state.command, ...action.payload},
+        lastActionName: StoreCommand.type,
       };
     }
+
     case StoreTicker.type: {
       const targetString = action.payload.date;
       if (!targetString) {
@@ -90,7 +103,7 @@ export function reducer(state = initialState, action: All): State {
     default: {
       return {
         ...state,
-        callTo: '',
+        command: <Icommand>{},
         lastActionName: '',
       };
     }

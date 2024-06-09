@@ -72,3 +72,9 @@ input[type=number]::-webkit-outer-spin-button {
   position: absolute;
   right: 30px;
 }
+
+.reg-button {
+  height: 35px;
+  width: 35px;
+  box-shadow: none;
+}

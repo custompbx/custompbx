@@ -53,3 +53,29 @@ type ConversationPrivateMessage struct {
 func (w *ConversationPrivateMessage) GetTableName() string {
 	return "conversation_private_messages"
 }
+
+type ConversationPrivateCall struct {
+	Id        int64               `json:"id" customsql:"pkey:id;check(id <> 0)"`
+	Sender    *mainStruct.WebUser `json:"sender_id" customsql:"fkey:sender_id;check(user_id <> 0)"`
+	Receiver  *mainStruct.WebUser `json:"receiver_id" customsql:"fkey:receiver_id;check(user_id <> 0)"`
+	CreatedAt time.Time           `json:"created_at" customsql:"created_at;index"`
+	DeletedAt time.Time           `json:"deleted_at" customsql:"deleted_at;index"`
+	Duration  uint                `json:"duration" customsql:"duration;default=0"`
+}
+
+func (w *ConversationPrivateCall) GetTableName() string {
+	return "conversation_private_calls"
+}
+
+type ConversationPrivateCallMessage struct {
+	Id        int64                    `json:"id" customsql:"pkey:id;check(id <> 0)"`
+	Sender    *mainStruct.WebUser      `json:"sender_id" customsql:"fkey:sender_id;check(user_id <> 0)"`
+	Receiver  *mainStruct.WebUser      `json:"receiver_id" customsql:"fkey:receiver_id;check(user_id <> 0)"`
+	CreatedAt time.Time                `json:"created_at" customsql:"created_at;index"`
+	Text      string                   `json:"text" customsql:"text"`
+	Call      *ConversationPrivateCall `xml:"-" json:"call" customsql:"fkey:call_id;check(call_id <> 0)"`
+}
+
+func (w *ConversationPrivateCallMessage) GetTableName() string {
+	return "conversation_private_call_messages"
+}

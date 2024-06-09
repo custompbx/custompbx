@@ -1199,9 +1199,69 @@ func SendConversationPrivateMessage(data *webStruct.MessageData) webStruct.UserR
 	if err != nil {
 		return webStruct.UserResponse{Error: "can't send", MessageType: data.Event}
 	}
-	b.Unicast(webStruct.UserResponse{MessageType: "NewMessage", Data: mes}, []*mainStruct.WebUser{{Id: data.Context.User.Id}, {Id: data.Id}})
+	sent := b.Unicast(webStruct.UserResponse{MessageType: "NewMessage", Data: mes}, []*mainStruct.WebUser{{Id: data.Context.User.Id}, {Id: data.Id}})
 
-	return webStruct.UserResponse{MessageType: data.Event}
+	return webStruct.UserResponse{MessageType: data.Event, Data: sent}
+}
+
+func GetConversationPrivateCalls(data *webStruct.MessageData) webStruct.UserResponse {
+	if data.Id == 0 {
+		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
+	}
+	var upToTime string
+	var args = []interface{}{data.Context.User.Id, data.Id, data.Id, data.Context.User.Id}
+	if !data.UpToTime.IsZero() {
+		upToTime = " AND created_at < $5"
+		args = append(args, data.UpToTime)
+	}
+	sqlLine := fmt.Sprintf(`SELECT id, created_at, duration, sender_id, receiver_id 
+FROM conversation_private_calls 
+WHERE ((sender_id = $1 AND receiver_id = $2) OR (sender_id = $3 AND receiver_id = $4)) %s ORDER BY created_at DESC  LIMIT 20;`, upToTime)
+
+	r, err := db.GetDB().Query(sqlLine, args...)
+	if err != nil {
+		return webStruct.UserResponse{Error: "can't get", MessageType: data.Event}
+	}
+	defer r.Close()
+	var res []altStruct.ConversationPrivateCall
+	for r.Next() {
+		mes := altStruct.ConversationPrivateCall{Sender: &mainStruct.WebUser{}, Receiver: &mainStruct.WebUser{}}
+		err := r.Scan(&mes.Id, &mes.CreatedAt, &mes.Duration, &mes.Sender.Id, &mes.Receiver.Id)
+		if err != nil {
+			log.Println(err.Error())
+			continue
+		}
+		res = append(res, mes)
+	}
+
+	return webStruct.UserResponse{MessageType: data.Event, Data: &res}
+}
+
+func SendConversationPrivateCall(data *webStruct.MessageData) webStruct.UserResponse {
+	if data.Id == 0 {
+		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
+	}
+	receiver := webcache.GetWebUserById(data.Id)
+	if receiver == nil {
+		return webStruct.UserResponse{Error: "unknown receiver id", MessageType: data.Event}
+	}
+
+	msg := altStruct.ConversationPrivateCall{
+		Sender:    data.Context.User,
+		Receiver:  receiver,
+		CreatedAt: time.Now(),
+	}
+	res, err := intermediateDB.InsertItem(&msg)
+	if err != nil {
+		return webStruct.UserResponse{Error: "can't send", MessageType: data.Event}
+	}
+	mes, err := intermediateDB.GetByIdArg(msg, res)
+	if err != nil {
+		return webStruct.UserResponse{Error: "can't send", MessageType: data.Event}
+	}
+	sent := b.Unicast(webStruct.UserResponse{MessageType: "NewMessage", Data: mes}, []*mainStruct.WebUser{{Id: data.Context.User.Id}, {Id: data.Id}})
+
+	return webStruct.UserResponse{MessageType: data.Event, Data: sent}
 }
 
 func SendConversationRoomMessage(data *webStruct.MessageData) webStruct.UserResponse {
@@ -1259,7 +1319,7 @@ func SendConversationRoomMessage(data *webStruct.MessageData) webStruct.UserResp
 		return webStruct.UserResponse{Error: "can't send", MessageType: data.Event}
 	}
 
-	b.Unicast(webStruct.UserResponse{MessageType: "NewMessage", Data: mes}, sendTo)
+	sent := b.Unicast(webStruct.UserResponse{MessageType: "NewMessage", Data: mes}, sendTo)
 
-	return webStruct.UserResponse{MessageType: data.Event}
+	return webStruct.UserResponse{MessageType: data.Event, Data: sent}
 }

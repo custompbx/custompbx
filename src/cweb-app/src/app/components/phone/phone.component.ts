@@ -166,8 +166,17 @@ export class PhoneComponent implements OnInit, OnDestroy {
           }
         }
       }
-      if (phone.callTo) {
-        this.panelCall(phone.callTo);
+      if (phone.command?.callTo) {
+        this.panelCall(phone.command?.callTo);
+      }
+      if (phone.command?.hangup) {
+        this.hangup();
+      }
+      if (phone.command?.answer) {
+        this.answer();
+      }
+      if (phone.command?.register) {
+        this.register();
       }
       this.data.registered = phone.phoneStatus.registered;
       this.data.inCall = phone.phoneStatus.inCall;
@@ -442,12 +451,11 @@ export class PhoneComponent implements OnInit, OnDestroy {
   }
 
   eventRegistered() {
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {registered: true}}));
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {registered: this.data.registerer.state === SIP.RegistererState.Registered}}));
   }
 
   eventUnregistered() {
-    this.store.dispatch(new StorePhoneStatus({phoneStatus: {registered: false}}));
-    console.log('unRegistered');
+    this.store.dispatch(new StorePhoneStatus({phoneStatus: {registered: this.data.registerer.state === SIP.RegistererState.Registered}}));
   }
 
   eventProgress() {

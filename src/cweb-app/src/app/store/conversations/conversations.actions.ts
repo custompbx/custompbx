@@ -8,3 +8,7 @@ export const StoreSendConversationPrivateMessage = createActionHelper('StoreSend
 export const GetNewConversationMessage = createActionHelper('NewMessage')
 export const StoreGetNewConversationMessage = createActionHelper('StoreGetNewConversationMessage')
 export const StoreCurrentUser = createActionHelper('StoreCurrentUser')
+export const SendConversationPrivateCall = createActionHelper('SendConversationPrivateCall')
+export const StoreSendConversationPrivateCall = createActionHelper('StoreSendConversationPrivateCall')
+export const GetConversationPrivateCalls = createActionHelper('GetConversationPrivateCalls')
+export const StoreGetConversationPrivateCalls = createActionHelper('StoreGetConversationPrivateCalls')

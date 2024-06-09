@@ -1,7 +1,11 @@
 import {
   StoreConversationError,
   StoreGetNewConversationMessage,
-  GetConversationPrivateMessages, StoreGetConversationPrivateMessages, StoreCurrentUser,
+  GetConversationPrivateMessages,
+  StoreGetConversationPrivateMessages,
+  StoreCurrentUser,
+  StoreGetConversationPrivateCalls,
+  GetConversationPrivateCalls,
 } from './conversations.actions';
 
 import {isArray} from "chart.js/helpers";
@@ -9,28 +13,45 @@ import {Iuser} from "../auth/auth.reducers";
 
 export interface State {
   conversations: { [index: number]: Array<Messages> };
+  calls: { [index: number]: Array<Messages> };
   loadCounter: number;
   errorMessage: string | null;
   user: Iuser;
   scrollDown: boolean;
+  event: {
+    type: 'new-call' | null;
+    data: any;
+  };
 }
 
 export interface Messages {
   id: number;
+  created_at: string;
   sender_id: {id: number};
   receiver_id: {id: number};
   text: string;
   timestamp: number;
-  new: boolean;
+}
+
+export interface Calls {
+  id: number;
+  created_at: string;
+  sender_id: {id: number};
+  receiver_id: {id: number};
+  duration: number;
 }
 
 export const initialState: State = {
   conversations: {},
+  calls: {},
   loadCounter: 0,
   errorMessage: '',
   user: {},
   scrollDown: false,
+  event: null,
 };
+
+const nullEvent = {type: null, data: null};
 
 export function reducer(state: State = initialState, action): State {
   // TODO: fix this
@@ -38,12 +59,15 @@ export function reducer(state: State = initialState, action): State {
     state = initialState
   }
   switch (action.type) {
+    case GetConversationPrivateMessages.type:
+    case GetConversationPrivateCalls.type:
     case GetConversationPrivateMessages.type: {
       return {
         ...state,
         errorMessage: null,
         loadCounter: state.loadCounter + 1,
         scrollDown: false,
+        event: nullEvent,
       };
     }
 
@@ -53,6 +77,7 @@ export function reducer(state: State = initialState, action): State {
         errorMessage: action.payload.error || null,
         loadCounter: Math.max(0, state.loadCounter - 1),
         scrollDown: false,
+        event: null,
       };
     }
     case StoreCurrentUser.type: {
@@ -61,6 +86,7 @@ export function reducer(state: State = initialState, action): State {
         ...state,
         user: user,
         scrollDown: true,
+        event: nullEvent,
       };
     }
 
@@ -68,9 +94,7 @@ export function reducer(state: State = initialState, action): State {
       const {response, payload} = action.payload;
       const {id} = payload;
       let {data, error} = response;
-      if (isArray(data)) {
-        data.sort((a: any, b: any) => b.created_at - a.created_at).reverse();
-      } else {
+      if (!isArray(data)) {
         data = [];
       }
       const lastMes = state.conversations[id] || [];
@@ -88,6 +112,32 @@ export function reducer(state: State = initialState, action): State {
         errorMessage: error || null,
         loadCounter: 0,
         scrollDown: isFirst === 0,
+        event: nullEvent,
+      };
+    }
+    case StoreGetConversationPrivateCalls.type: {
+      const {response, payload} = action.payload;
+      const {id} = payload;
+      let {data, error} = response;
+      if (!isArray(data)) {
+        data = [];
+      }
+      const lastMes = state.calls[id] || [];
+      const isFirst = lastMes.length;
+      let messages = [...data, ...lastMes];
+      if (!payload.up_to_time) {
+        messages = [...data];
+      }
+      return {
+        ...state,
+        calls: {
+          ...state.calls,
+          [id]: messages,
+        },
+        errorMessage: error || null,
+        loadCounter: 0,
+        scrollDown: isFirst === 0,
+        event: nullEvent,
       };
     }
 
@@ -114,17 +164,29 @@ export function reducer(state: State = initialState, action): State {
           id = rid;
       }
       const conversations = {...state.conversations};
+      const calls = {...state.calls};
       if (!conversations[id]) {
         conversations[id] = [];
       }
-      data.new = true;
-      conversations[id].push(data);
+      if (!calls[id]) {
+        calls[id] = [];
+      }
+      let event = nullEvent;
+      if (data.duration === 0 || data.duration) {
+        calls[id].push(data);
+        event = {type: 'new-call', data: {sid, rid}};
+      } else {
+        conversations[id].push(data);
+      }
+
       return {
         ...state,
         conversations: conversations,
+        calls: calls,
         errorMessage: error || null,
         loadCounter: 0,
         scrollDown: true,
+        event: event,
       };
     }
 

@@ -4,6 +4,10 @@
     Phone
     <span class="example-spacer"></span>
     <mat-icon *ngIf="!data.UA?.transport.isConnected() && !isVeroLogged()" color="warn">wifi_off</mat-icon>
+    <button *ngIf="data.UA?.transport.isConnected() || isVeroLogged()" class="reg-button" mat-mini-fab [color]="!data.registered && libName === sipjsLib ? 'warn' : 'green'" [title]="!data.registered && libName === sipjsLib ? 'enter calls' : 'leave calls'" aria-label="register" (click)="register()" [disabled]="!data.UA?.transport.isConnected()">
+      <mat-icon *ngIf="!data.registered && libName === sipjsLib">phone_callback</mat-icon>
+      <mat-icon *ngIf="data.registered && libName === sipjsLib">phone_disabled</mat-icon>
+    </button>
     <button mat-icon-button (click)="restartUS()" title="restart phone">
       <mat-icon>autorenew</mat-icon>
     </button>
@@ -27,45 +31,33 @@
       <button mat-flat-button (click)="call()" *ngIf="!(data.inCall || data.ringing || data.answered)"
               color="primary" title="call"
               class="phone-action-button"
-              [disabled]="!data.UA?.transport.isConnected() && !isVeroLogged() && !data.number && !data.ringing"
+              [disabled]="(!data.UA?.transport.isConnected() && !isVeroLogged()) || !data.number"
       >
-        <mat-icon>phone</mat-icon>
+        <mat-icon>phone</mat-icon><span>Call</span>
       </button>
       <button mat-flat-button (click)="answer()" *ngIf="data.ringing"
-              color="primary" title="answer" class="phone-action-button"
+              color="green" title="answer" class="phone-action-button"
               [disabled]="!data.UA?.transport.isConnected() && !isVeroLogged()"
       >
-        <mat-icon>phone</mat-icon>
+        <span>Answer: </span><span style="font-size: 20px">{{ data.session?.request?.from?.uri?.user }}</span>
       </button>
       <button mat-flat-button (click)="hangup()" *ngIf="data.inCall || data.ringing || data.answered"
               color="warn" class="phone-action-button"
               [disabled]="!data.UA?.transport.isConnected() && !isVeroLogged()"
       >
-        <mat-icon>call_end</mat-icon>
+        <mat-icon>call_end</mat-icon><span>Hangup</span>
       </button>
       <button mat-flat-button (click)="hold()" *ngIf="data.answered && !data.onHold"
               title="hold" class="phone-action-button mat-blue"
               [disabled]="!data.UA?.transport.isConnected() && !isVeroLogged()"
       >
-        <mat-icon>phone_paused</mat-icon>
+        <mat-icon>phone_paused</mat-icon><span>Hold</span>
       </button>
       <button mat-flat-button (click)="unhold()" *ngIf="data.answered && data.onHold"
               title="unhold" class="phone-action-button mat-blue"
               [disabled]="!data.UA?.transport.isConnected() && !isVeroLogged()"
       >
-        <mat-icon>play_arrow</mat-icon>
-      </button>
-      <button mat-flat-button (click)="register()" *ngIf="!data.registered && libName === sipjsLib" title="enter calls"
-              color="warn" class="phone-action-button"
-              [disabled]="!data.UA?.transport.isConnected()"
-      >
-        <mat-icon>phone_callback</mat-icon>
-      </button>
-      <button mat-flat-button (click)="register()" *ngIf="data.registered && libName === sipjsLib" title="leave calls"
-              class="phone-action-button mat-green"
-              [disabled]="!data.UA?.transport.isConnected()"
-      >
-        <mat-icon>phone_disabled</mat-icon>
+        <mat-icon>play_arrow</mat-icon><span>Unhold</span>
       </button>
     </div>
   </section>

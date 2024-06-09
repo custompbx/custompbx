@@ -7,7 +7,6 @@ export enum AuthActionTypes {
   GET_PHONE_CREDS = '[Phone][Get] Creds',
   StoreGetPhoneCreds = 'StoreGetPhoneCreds',
   StorePhoneStatus = 'StorePhoneStatus',
-  StoreMakePhoneCall = 'StoreMakePhoneCall',
 }
 
 export class Failure implements Action {
@@ -30,17 +29,12 @@ export class StorePhoneStatus implements Action {
   constructor(public payload: any) {}
 }
 
-export class StoreMakePhoneCall implements Action {
-  readonly type = AuthActionTypes.StoreMakePhoneCall;
-  constructor(public payload: any) {}
-}
-
 export const StoreTicker = createActionHelper('StoreTicker')
+export const StoreCommand = createActionHelper('StoreCommand')
 
 export type All =
   | Failure
   | GetPhoneCreds
   | StoreGetPhoneCreds
   | StorePhoneStatus
-  | StoreMakePhoneCall
   ;

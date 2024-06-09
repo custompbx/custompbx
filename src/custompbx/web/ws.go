@@ -4206,6 +4206,8 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Errors:
 	case "GetConversationPrivateMessages":
 		resp = getUser(msg, GetConversationPrivateMessages, onlyAdminGroup())
+	case "GetConversationPrivateCalls":
+		resp = getUser(msg, GetConversationPrivateCalls, onlyAdminGroup())
 	//Request:
 	//Response:
 	//Errors:
@@ -4216,6 +4218,8 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Errors:
 	case "SendConversationPrivateMessage":
 		resp = getUser(msg, SendConversationPrivateMessage, onlyAdminGroup())
+	case "SendConversationPrivateCall":
+		resp = getUser(msg, SendConversationPrivateCall, onlyAdminGroup())
 	//Request:
 	//Response:
 	//Errors:

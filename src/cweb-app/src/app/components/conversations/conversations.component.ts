@@ -16,12 +16,17 @@ import {
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
-import {StoreMakePhoneCall} from '../../store/phone/phone.actions';
+import {StoreCommand} from '../../store/phone/phone.actions';
 import {WsDataService} from "../../services/ws-data.service";
 import {SubscriptionList} from "../../store/dataFlow/dataFlow.actions";
 import {GetWebUsers} from "../../store/settings/settings.actions";
 import {
-  GetConversationPrivateMessages, GetNewConversationMessage, SendConversationPrivateMessage, StoreCurrentUser,
+  GetConversationPrivateCalls,
+  GetConversationPrivateMessages,
+  GetNewConversationMessage,
+  SendConversationPrivateCall,
+  SendConversationPrivateMessage,
+  StoreCurrentUser,
   StoreGetNewConversationMessage
 } from "../../store/conversations/conversations.actions";
 import {Iuser} from "../../store/auth/auth.reducers";
@@ -58,6 +63,9 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   public currentVoice = null;
   public toChat = false;
   public messages = {};
+  public calls = {};
+  public lastCallsAmount = 0;
+  public showItems = {};
   public getState$: Subscription;
   public user: Iuser;
   public totalTime: 0;
@@ -71,6 +79,9 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   public directory: Observable<any>;
   public directoryDomains: object;
   private directoryUsers: object;
+  public isInbound: boolean;
+  public isRinging: boolean;
+  public isRegistered: boolean;
 
   @ViewChild('scrollContainer') scrollContainer: ElementRef;
 
@@ -129,13 +140,26 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       if (phone.phoneCreds) {
         this.phoneUser = phone.phoneCreds.user_name || '';
       }
+      this.isRegistered = phone.phoneStatus.registered;
       this.totalTime = phone.timer;
+      console.log(phone);
+      if (this.isInbound && (
+        (this.isRinging && phone.phoneStatus.status === '') ||
+        (this.inCall && this.inCall !== phone.phoneStatus.inCall))
+      ) {
+        this.isInbound = false;
+      }
       this.inCall = phone.phoneStatus.inCall;
+      this.isRinging = phone.phoneStatus.status === 'ringing';
+      if (!this.inCall && this.inConversationsCall) {
+        this.inConversationsCall = false;
+      }
     });
 
     this.pmessages$ = this.pmessages.subscribe((mes) => {
       this.messages = mes ? mes.conversations : {};
-      this.lastErrorMessage =  mes ? mes.errorMessage : null;
+      this.calls = mes ? mes.calls : {};
+      this.lastErrorMessage = mes ? mes.errorMessage : null;
       if (this.lastErrorMessage) {
         this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
           duration: 3000,
@@ -146,9 +170,34 @@ export class ConversationsComponent implements OnInit, OnDestroy {
         if (mes.scrollDown) {
           this.scrollToBottom();
         } else {
-          setTimeout(() => {this.restoreScrollPosition()},0)
+          setTimeout(() => {
+            this.restoreScrollPosition()
+          }, 0)
         }
         this.isUpdatingChat = false;
+        if (this.messages[this.currentChat].length === 0) {
+          this.showItems[this.currentChat] = mes.calls[this.currentChat] || [];
+        } else if (this.messages[this.currentChat].length <= 20) {
+          this.showItems[this.currentChat] = [...this.messages[this.currentChat], ...(mes.calls[this.currentChat] || [])].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        } else if (this.messages[this.currentChat].length > 20) {
+          const firstMes = this.messages[this.currentChat][0]
+          const lastCall = this.calls[this.currentChat].length >= 20 ? this.calls[this.currentChat][this.calls[this.currentChat].length - 1] : null;
+          if (lastCall && this.lastCallsAmount !== this.calls[this.currentChat].length && lastCall.created_at < firstMes.created_at) {
+            this.lastCallsAmount = this.calls[this.currentChat].length;
+            this.store.dispatch(GetConversationPrivateCalls({id: this.currentChat, up_to_time: lastCall.created_at}));
+          } else {
+            this.showItems[this.currentChat] = [...this.messages[this.currentChat], ...(mes.calls[this.currentChat] || []).filter((a) => a.created_at >= firstMes.created_at)].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+          }
+        }
+      }
+      if (mes.event.type === 'new-call' && this.user.id === mes.event.data.rid) {
+        if (this.currentChat === mes.event.data.sid) {
+          this.voiceCall()
+          this.isInbound = true;
+        }
+        if (!this.isRegistered) {
+          setTimeout(() => this.store.dispatch(StoreCommand({register: true})), 100);
+        }
       }
     });
 
@@ -172,8 +221,8 @@ export class ConversationsComponent implements OnInit, OnDestroy {
         filter(() => !this.isUpdatingChat),
         map(() => {
           const element = this.scrollContainer.nativeElement;
-          if (element && this.hasVerticalScrollbar(element) && element.scrollTop === 0 && this.messages[this.currentChat]) {
-            const message = this.messages[this.currentChat][0];
+          if (element && this.hasVerticalScrollbar(element) && element.scrollTop === 0 && this.showItems[this.currentChat]) {
+            const message = this.showItems[this.currentChat][0];
             for (let i = 0; i < this.scrollContainer.nativeElement.children[0].children.length; i++) {
               const child = this.scrollContainer.nativeElement.children[0].children[i];
               if (child.offsetTop + child.offsetHeight > scrollTop) {
@@ -187,16 +236,19 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       )
       .subscribe();
   }
+
   @HostListener('wheel', ['$event'])
   onScroll(event: WheelEvent) {
     this.wheelEvent$.next(event);
   }
+
   @HostListener('mouseover', ['$event'])
   onMouseOver(event: MouseEvent) {
     if (this.scrollContainer && this.scrollContainer.nativeElement.contains(event.target)) {
       this.isMouseOverChat = true;
     }
   }
+
   @HostListener('mouseout', ['$event'])
   onMouseOut(event: MouseEvent) {
     if (this.scrollContainer && this.scrollContainer.nativeElement.contains(event.target)) {
@@ -217,6 +269,14 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   }
 
   connectToUser() {
+    if (this.isRinging) {
+      this.store.dispatch(StoreCommand({answer: true}));
+      return;
+    }
+    if (this.inConversationsCall) {
+      this.hangup()
+      return;
+    }
     if (!this.userList[this.currentVoice]) {
       return;
     }
@@ -226,15 +286,16 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     const sipUser = this.directoryUsers[this.userList[this.currentVoice].sip_id.Int64];
     const domainName = this.directoryDomains[sipUser.parent.id]?.name;
     const fullName = sipUser.name + '@' + domainName;
-    console.log(sipUser)
     if (!this.directoryUsers[this.userList[this.currentVoice].sip_id.Int64]) {
       return;
     }
-    this.store.dispatch(new StoreMakePhoneCall({user: fullName}));
+    this.store.dispatch(SendConversationPrivateCall({id: this.currentChat}));
+    this.store.dispatch(StoreCommand({callTo: fullName}));
+    this.inConversationsCall = true;
   }
 
   getLogins(filterString: string = ''): any[] {
-    const userArray = Object.values(this.userList);
+    const userArray = Object.values(this.userList || {});
     const filteredUsers = userArray.filter(user => user.login.includes(filterString));
     const sortedUsers = filteredUsers.sort((a, b) => a.id - b.id);
     //return sortedUsers.map(user => ({ id: user.id, login: user.login }));
@@ -242,15 +303,17 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   }
 
   scrollToBottom() {
-    if (this.scrollContainer) {
-      setTimeout(() => {this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;}, 0);
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      setTimeout(() => {
+        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+      }, 0);
     }
   }
 
-  sendMsg(){
-/*    if (!this.messages[this.currentChat]) {
-      return
-    }*/
+  sendMsg() {
+    /*    if (!this.showItems[this.currentChat]) {
+          return
+        }*/
     if (!this.newMsg) {
       return
     }
@@ -260,14 +323,18 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   }
 
   enterChat(user) {
+    this.isInbound = false;
     this.previousScrollItemIndex = null;
     this.isUpdatingChat = false;
     if (this.currentChat !== user.id) {
       this.currentChat = user.id;
+      this.currentVoice = null;
       this.store.dispatch(GetConversationPrivateMessages({id: this.currentChat}));
+      this.store.dispatch(GetConversationPrivateCalls({id: this.currentChat}));
     }
     this.scrollToBottom();
   }
+
   convertDate(timestamp) {
     const f = new Date(timestamp);
     const year = f.getFullYear().toString();
@@ -280,7 +347,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     const time = `${hours}:${minutes}`;
     let res = date + " " + time;
 
-    if (f.toDateString() == new Date().toDateString()){
+    if (f.toDateString() == new Date().toDateString()) {
       res = time
     }
     return res
@@ -298,21 +365,28 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     if (this.inCall) {
       this.store.dispatch(ToggleShowPhone({show: true}))
     }
+    setTimeout(() => this.scrollToBottom(), 0)
   }
+
   hasVerticalScrollbar(element: HTMLElement): boolean {
     return element.scrollHeight > element.clientHeight;
   }
+
   restoreScrollPosition() {
     if (this.previousScrollItemIndex === null) {
       return;
     }
-      const children = this.scrollContainer.nativeElement.children[0].children;
-      for (let i = 0; i < children.length; i++) {
-        let child = children[i];
-        if (parseInt(child.getAttribute('data-index'), 10) === this.previousScrollItemIndex) {
-          this.scrollContainer.nativeElement.scrollTop = child.offsetTop - child.scrollHeight*2;
-          break;
-        }
+    const children = this.scrollContainer.nativeElement.children[0].children;
+    for (let i = 0; i < children.length; i++) {
+      let child = children[i];
+      if (parseInt(child.getAttribute('data-index'), 10) === this.previousScrollItemIndex) {
+        this.scrollContainer.nativeElement.scrollTop = child.offsetTop - child.scrollHeight * 2;
+        break;
       }
+    }
+  }
+
+  hangup() {
+    this.store.dispatch(StoreCommand({hangup: true}));
   }
 }

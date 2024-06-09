@@ -10,4 +10,6 @@ func InitServicesDB() {
 	corm.CreateTable(&altStruct.ConversationRoomParticipant{})
 	corm.CreateTable(&altStruct.ConversationRoomMessage{})
 	corm.CreateTable(&altStruct.ConversationPrivateMessage{})
+	corm.CreateTable(&altStruct.ConversationPrivateCall{})
+	corm.CreateTable(&altStruct.ConversationPrivateCallMessage{})
 }
