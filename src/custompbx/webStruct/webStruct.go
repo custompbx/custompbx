@@ -337,12 +337,13 @@ func (h *WsHub) Broadcast(data UserResponse) {
 }
 
 // Unicast sends a UserResponse message to all WebSocket contexts belonging to one or more specified users.
-func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) {
+func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) []int64 {
 	userIDs := make(map[int64]bool)
 	for _, user := range users {
 		userIDs[user.Id] = true
 	}
 
+	var sent []int64
 	for i := 0; i < len(h.Hub); i++ {
 		if h.Hub[i] == nil || h.Hub[i].SendChannel == nil {
 			h.Drop(i)
@@ -353,6 +354,7 @@ func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) {
 		if h.Hub[i].User != nil && userIDs[h.Hub[i].User.Id] {
 			select {
 			case h.Hub[i].SendChannel <- &data:
+				sent = append(sent, h.Hub[i].User.Id)
 			default:
 				h.Hub[i].Close()
 				fmt.Println("Can't Send")
@@ -361,6 +363,7 @@ func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) {
 			}
 		}
 	}
+	return sent
 }
 
 // Drop removes a WebSocket context at the specified index from the hub.
