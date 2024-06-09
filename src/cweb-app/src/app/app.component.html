@@ -10,9 +10,11 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <div [hidden]="!showRightNav">
-      <app-lazy-wrapper type="conversations"></app-lazy-wrapper>
-    </div>
+    @if (userService.isAuthenticated && !login) {
+      <div [hidden]="!showRightNav">
+        <app-lazy-wrapper type="conversations"></app-lazy-wrapper>
+      </div>
+    }
     <div [hidden]="showRightNav">
       <router-outlet (activate)="onRouterOutletActivate($event)"></router-outlet>
     </div>

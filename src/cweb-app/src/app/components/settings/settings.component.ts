@@ -131,7 +131,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   getWebUsers() {
-    if (Object.entries(this.directoryUsers).length === 0 && this.directoryUsers.constructor === Object) {
+    if (Object.entries(this.directoryUsers || {}).length === 0 && this.directoryUsers.constructor === Object) {
       this.store.dispatch(new GetDirectoryUsers(null));
     }
     this.store.dispatch(new GetWebUsers(null));

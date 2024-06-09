@@ -104,7 +104,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     if (this.ws.isConnected) {
       this.store.dispatch(new SubscriptionList({values: [new GetWebUsers(null).type, StoreGetNewConversationMessage.type]}));
       this.store.dispatch(new GetWebUsers(null));
-      if (Object.entries(this.directoryUsers).length === 0) {
+      if (Object.entries(this.directoryUsers || {}).length === 0) {
         this.store.dispatch(new GetDirectoryUsers(null));
       }
     }
@@ -113,7 +113,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       if (connected) {
         this.store.dispatch(new SubscriptionList({values: [new GetWebUsers(null).type, StoreGetNewConversationMessage.type]}));
         this.store.dispatch(new GetWebUsers(null));
-        if (Object.entries(this.directoryUsers).length === 0) {
+        if (Object.entries(this.directoryUsers || {}).length === 0) {
           this.store.dispatch(new GetDirectoryUsers(null));
         }
       }
@@ -142,7 +142,6 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       }
       this.isRegistered = phone.phoneStatus.registered;
       this.totalTime = phone.timer;
-      console.log(phone);
       if (this.isInbound && (
         (this.isRinging && phone.phoneStatus.status === '') ||
         (this.inCall && this.inCall !== phone.phoneStatus.inCall))
