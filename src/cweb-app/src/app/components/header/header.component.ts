@@ -13,6 +13,7 @@ import {Observable, Subscription} from 'rxjs';
 import {select, Store} from "@ngrx/store";
 import {AppState, selectHeader, selectPhoneState} from "../../store/app.states";
 import {StartPhone, ToggleShowPhone} from "../../store/header/header.actions";
+import {ToggleShowConversations} from "../../store/app/app.actions";
 
 @Component({
   selector: 'app-header',
@@ -30,7 +31,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   public phoneState$: Subscription;
 
   @Input() currentComponent;
-  @Output() showRightSideNav = new EventEmitter<boolean>();
   @ViewChild('componentContainer', {read: ViewContainerRef}) container: ViewContainerRef;
   componentRef: ComponentRef<any>;
 
@@ -73,7 +73,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   showHideConversations() {
-    this.showRightSideNav.emit(true);
+    this.store.dispatch(ToggleShowConversations(null))
   }
 
   cloneComponent() {

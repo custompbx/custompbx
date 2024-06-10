@@ -34,6 +34,7 @@ import {UserService} from "../../services/user.service";
 import {StartPhone, ToggleShowPhone} from "../../store/header/header.actions";
 import {filter, map, switchMap, tap} from "rxjs/operators";
 import {GetDirectoryUsers} from "../../store/directory/directory.actions";
+import {ToggleShowConversations} from "../../store/app/app.actions";
 
 const scrollTop = 64;
 
@@ -193,10 +194,15 @@ export class ConversationsComponent implements OnInit, OnDestroy {
         if (this.currentChat === mes.event.data.sid) {
           this.voiceCall()
           this.isInbound = true;
+        } else {
+          this.snackHandler(this.userList[mes.event.data.sid]?.login + ': Incoming call.', mes.event.data.sid);
         }
         if (!this.isRegistered) {
           setTimeout(() => this.store.dispatch(StoreCommand({register: true})), 100);
         }
+      }
+      if (mes.event.type === 'new-message' && this.user.id === mes.event.data.rid && this.currentChat !== mes.event.data.sid) {
+        this.snackHandler(this.userList[mes.event.data.sid]?.login + ': ' + mes.event.data.text.slice(0, 25), mes.event.data.sid);
       }
     });
 
@@ -387,5 +393,17 @@ export class ConversationsComponent implements OnInit, OnDestroy {
 
   hangup() {
     this.store.dispatch(StoreCommand({hangup: true}));
+  }
+  snackHandler(msg, id) {
+    let ref = this._snackBar.open(msg, 'Show', {
+      duration: 5000,
+      panelClass: ['mat-blue'],
+      horizontalPosition: 'end',
+      verticalPosition: 'bottom',
+    });
+    ref.onAction().subscribe(() => {
+      this.store.dispatch(ToggleShowConversations({showConversations: true}));
+      this.enterChat({id});
+    });
   }
 }

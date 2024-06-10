@@ -17,6 +17,7 @@ import {State as appsState} from './apps/apps.state.struct';
 import {reducer as appsReducer} from './apps/apps.reducers';
 import * as conversations from './conversations/conversations.reducer';
 import * as header from './header/header.reducer';
+import * as app from './app/app.reducer';
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 
 export interface AppState {
@@ -37,6 +38,7 @@ export interface AppState {
   apps: appsState;
   conversations: conversations.State;
   header: header.State;
+  app: app.State;
 }
 
 export const reducers = {
@@ -57,6 +59,7 @@ export const reducers = {
   apps: appsReducer,
   conversations: conversations.reducer,
   header: header.reducer,
+  app: app.reducer,
 };
 
 export const selectState = createFeatureSelector<AppState>('app');
@@ -78,4 +81,5 @@ export const selectGlobalVariablesState = createSelector(selectState, (state: Ap
 export const selectApps = createSelector(selectState, (state: AppState) => state.apps);
 export const selectConversations = createSelector(selectState, (state: AppState) => state.conversations);
 export const selectHeader = createSelector(selectState, (state: AppState) => state.header);
+export const selectApp = createSelector(selectState, (state: AppState) => state.app);
 

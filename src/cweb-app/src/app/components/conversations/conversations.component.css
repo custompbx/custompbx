@@ -217,6 +217,7 @@
   background-color: #c5c5c5;
   border-radius: 13px 13px 13px 0;
   position: relative;
+  overflow-wrap: break-word;
 }
 
 .footer-msg-in {
@@ -235,6 +236,7 @@
   color: white;
   background-color: #384bc8;
   border-radius: 13px 13px 0 13px;
+  overflow-wrap: break-word;
 }
 
 .footer-msg-out {
@@ -252,4 +254,5 @@
 
 .msg-call {
   background-color: #38a8c8;
+  overflow-wrap: break-word;
 }

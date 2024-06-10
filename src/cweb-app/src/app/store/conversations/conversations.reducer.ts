@@ -19,7 +19,7 @@ export interface State {
   user: Iuser;
   scrollDown: boolean;
   event: {
-    type: 'new-call' | null;
+    type: 'new-call' | 'new-message' | null;
     data: any;
   };
 }
@@ -176,6 +176,7 @@ export function reducer(state: State = initialState, action): State {
         calls[id].push(data);
         event = {type: 'new-call', data: {sid, rid}};
       } else {
+        event = {type: 'new-message', data: {sid, rid, text: data.text}};
         conversations[id].push(data);
       }
 
