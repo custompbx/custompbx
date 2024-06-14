@@ -256,3 +256,7 @@
   background-color: #38a8c8;
   overflow-wrap: break-word;
 }
+.msg-text-call {
+  background-color: #c8b038 !important;
+  overflow-wrap: break-word;
+}

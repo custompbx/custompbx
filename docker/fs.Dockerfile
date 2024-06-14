@@ -77,6 +77,7 @@ RUN sed -i 's/<param name="sip-ip" value="\$\${local_ip_v4}"\/>/<param name="sip
 COPY ./docker/fs_conf/sofia.conf.xml /etc/freeswitch/autoload_configs/
 COPY ./docker/fs_conf/modules.conf.xml /etc/freeswitch/autoload_configs/
 COPY ./docker/fs_conf/cdr_pg_csv.conf.xml /etc/freeswitch/autoload_configs/
+COPY ./docker/asr/mod_audio_stream.so /usr/lib/freeswitch/mod/
 
 # Volumes
 VOLUME ["/var/log/freeswitch/log"]

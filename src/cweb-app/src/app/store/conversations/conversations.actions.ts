@@ -12,3 +12,5 @@ export const SendConversationPrivateCall = createActionHelper('SendConversationP
 export const StoreSendConversationPrivateCall = createActionHelper('StoreSendConversationPrivateCall')
 export const GetConversationPrivateCalls = createActionHelper('GetConversationPrivateCalls')
 export const StoreGetConversationPrivateCalls = createActionHelper('StoreGetConversationPrivateCalls')
+export const SendConversationPrivateCommand = createActionHelper('SendConversationPrivateCommand')
+export const StoreSendConversationPrivateCommand = createActionHelper('StoreSendConversationPrivateCommand')

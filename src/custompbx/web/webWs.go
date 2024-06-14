@@ -6,6 +6,7 @@ import (
 	"custompbx/cache"
 	"custompbx/daemonCache"
 	"custompbx/db"
+	"custompbx/fsesl"
 	"custompbx/intermediateDB"
 	"custompbx/mainStruct"
 	"custompbx/webStruct"
@@ -1322,4 +1323,67 @@ func SendConversationRoomMessage(data *webStruct.MessageData) webStruct.UserResp
 	sent := b.Unicast(webStruct.UserResponse{MessageType: "NewMessage", Data: mes}, sendTo)
 
 	return webStruct.UserResponse{MessageType: data.Event, Data: sent}
+}
+
+func SendConversationPrivateCommand(data *webStruct.MessageData) webStruct.UserResponse {
+	if data.Id == 0 {
+		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
+	}
+	receiver := webcache.GetWebUserById(data.Id)
+	if receiver == nil {
+		return webStruct.UserResponse{Error: "unknown receiver id", MessageType: data.Event}
+	}
+	if data.Name != "transcribe" {
+		return webStruct.UserResponse{Error: "wrong command", MessageType: data.Event}
+	}
+	directoryCache := cache.GetDirectoryCache()
+	cUserA := directoryCache.UserCache.GetById(data.Context.User.SipId.Int64)
+	if cUserA == nil {
+		return webStruct.UserResponse{Error: "directory user A not found", MessageType: data.Event}
+	}
+	if cUserA.LastUuid == "" {
+		return webStruct.UserResponse{Error: "A not in call", MessageType: data.Event}
+	}
+	cUserB := directoryCache.UserCache.GetById(receiver.SipId.Int64)
+	if cUserB == nil {
+		return webStruct.UserResponse{Error: "directory user B not found", MessageType: data.Event}
+	}
+	if cUserB.LastUuid == "" {
+		return webStruct.UserResponse{Error: "B not in call", MessageType: data.Event}
+	}
+	asJson, err := fsesl.SendBgapiCmd(fmt.Sprintf("show channels like %s as json", cUserA.LastUuid))
+	channelsA := fsesl.ChannelsAsJson{}
+	err = json.Unmarshal([]byte(asJson), &channelsA)
+	if err != nil || len(channelsA.Channels) == 0 {
+		return webStruct.UserResponse{Error: "call not found", MessageType: data.Event}
+	}
+	channelsB := fsesl.ChannelsAsJson{}
+	asJson, err = fsesl.SendBgapiCmd(fmt.Sprintf("show channels like %s as json", cUserB.LastUuid))
+	err = json.Unmarshal([]byte(asJson), &channelsB)
+	if err != nil || len(channelsB.Channels) == 0 {
+		return webStruct.UserResponse{Error: "call not found", MessageType: data.Event}
+	}
+	if channelsA.Channels[0].CallUuid != channelsB.Channels[0].CallUuid {
+		return webStruct.UserResponse{Error: "A and B not in a same call", MessageType: data.Event}
+	}
+	//set needed channel vars
+	_, err = fsesl.SendBgapiCmd(fmt.Sprintf("uuid_setvar_multi %s STREAM_BUFFER_SIZE=5000;PRIVATE_MESSAGES=%d_%d", cUserA.LastUuid, data.Context.User.Id, data.Id))
+	if err != nil {
+		return webStruct.UserResponse{Error: "command error", MessageType: data.Event}
+	}
+	_, err = fsesl.SendBgapiCmd(fmt.Sprintf("uuid_setvar_multi %s STREAM_BUFFER_SIZE=5000;PRIVATE_MESSAGES=%d_%d", cUserB.LastUuid, data.Id, data.Context.User.Id))
+	if err != nil {
+		return webStruct.UserResponse{Error: "command error", MessageType: data.Event}
+	}
+	//start sending media
+	_, err = fsesl.SendBgapiCmd(fmt.Sprintf("uuid_audio_stream %s start ws://asr-host:8765 mono 16k", cUserA.LastUuid))
+	if err != nil {
+		return webStruct.UserResponse{Error: "command error", MessageType: data.Event}
+	}
+	_, err = fsesl.SendBgapiCmd(fmt.Sprintf("uuid_audio_stream %s start ws://asr-host:8765 mono 16k", cUserB.LastUuid))
+	if err != nil {
+		return webStruct.UserResponse{Error: "command error", MessageType: data.Event}
+	}
+
+	return webStruct.UserResponse{MessageType: data.Event}
 }

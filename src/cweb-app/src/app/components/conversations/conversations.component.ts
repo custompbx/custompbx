@@ -24,7 +24,7 @@ import {
   GetConversationPrivateCalls,
   GetConversationPrivateMessages,
   GetNewConversationMessage,
-  SendConversationPrivateCall,
+  SendConversationPrivateCall, SendConversationPrivateCommand,
   SendConversationPrivateMessage,
   StoreCurrentUser,
   StoreGetNewConversationMessage
@@ -204,6 +204,9 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       if (mes.event.type === 'new-message' && this.user.id === mes.event.data.rid && this.currentChat !== mes.event.data.sid) {
         this.snackHandler(this.userList[mes.event.data.sid]?.login + ': ' + mes.event.data.text.slice(0, 25), mes.event.data.sid);
       }
+      if (mes.event.type === 'new-call-message' && this.user.id === mes.event.data.rid && this.currentChat !== mes.event.data.sid) {
+        this.snackHandler(this.userList[mes.event.data.sid]?.login + ': ' + mes.event.data.text.slice(0, 25), mes.event.data.sid);
+      }
     });
 
     //directory users
@@ -371,6 +374,11 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       this.store.dispatch(ToggleShowPhone({show: true}))
     }
     setTimeout(() => this.scrollToBottom(), 0)
+  }
+
+  asr() {
+    this.store.dispatch(SendConversationPrivateCommand({id: this.currentChat, name: 'transcribe'}));
+    this.backToChat();
   }
 
   hasVerticalScrollbar(element: HTMLElement): boolean {

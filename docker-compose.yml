@@ -77,6 +77,16 @@ services:
       - freeswitch-recordings:/app/recordings
     networks:
       - local_network
+  asr:
+    container_name: asr-host
+    build:
+      context: .
+      dockerfile: docker/asr/Dockerfile
+    restart: always
+    ports:
+      - 8765:8765
+    networks:
+      - local_network
 
 networks:
   local_network:

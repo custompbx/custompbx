@@ -67,6 +67,14 @@
                       aria-label="icon button">
                 <mat-icon>phone_disabled</mat-icon>
               </button>
+              @if (!isRinging && inCall) {
+                <button class="margin-fab" mat-fab
+                        color="basic"
+                        (click)="asr()"
+                        aria-label="icon button">
+                  <mat-icon>textsms</mat-icon>
+                </button>
+              }
             }
             <button class="margin-fab" mat-fab color="basic" aria-label="icon button" (click)="backToChat()">
               <mat-icon>chat</mat-icon>
@@ -80,7 +88,11 @@
           <mat-card-content class="chat-content">
             @for (message of showItems[currentChat]; track message.id) {
               <mat-card [attr.data-index]="message.id"
-                        [class]="{'msg-call': message.duration === 0 || message.duration,'msg-in': message.receiver_id.id == user.id,'msg-out': message.receiver_id.id != user.id}">
+                        [class]="{
+                        'msg-text-call': message.call,
+                        'msg-call': message.duration === 0 || message.duration,
+                        'msg-in': message.receiver_id.id == user.id,
+                        'msg-out': message.receiver_id.id != user.id}">
                 {{ message.text }}
                 @if (message.duration === 0 || message.duration) {
                   <div style="display: flex;align-items: center;">

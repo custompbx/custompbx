@@ -13,7 +13,10 @@ import {
   StoreGetNewConversationMessage,
   StoreSendConversationPrivateMessage,
   SendConversationPrivateCall,
-  StoreSendConversationPrivateCall, StoreGetConversationPrivateCalls, GetConversationPrivateCalls,
+  StoreSendConversationPrivateCall,
+  StoreGetConversationPrivateCalls,
+  GetConversationPrivateCalls,
+  SendConversationPrivateCommand, StoreSendConversationPrivateCommand,
 } from './conversations.actions';
 import {catchError, map, switchMap} from "rxjs/operators";
 
@@ -30,6 +33,7 @@ export class ConversationsEffects {
   SendConversationMessage: Observable<any> = createEffectForActions(this.actions, this.ws, SendConversationPrivateMessage, StoreSendConversationPrivateMessage, StoreConversationError);
   SendConversationPrivateCall: Observable<any> = createEffectForActions(this.actions, this.ws, SendConversationPrivateCall, StoreSendConversationPrivateCall, StoreConversationError);
   GetConversationPrivateCalls: Observable<any> = createEffectForActions(this.actions, this.ws, GetConversationPrivateCalls, StoreGetConversationPrivateCalls, StoreConversationError);
+  SendConversationPrivateCommand: Observable<any> = createEffectForActions(this.actions, this.ws, SendConversationPrivateCommand, StoreSendConversationPrivateCommand, StoreConversationError);
 
   GetNewConversationMessage: Observable<any> = createEffect(() => {
     return this.actions.pipe(

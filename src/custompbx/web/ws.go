@@ -92,6 +92,12 @@ func TimeEvents() {
 				b.Broadcast(webStruct.UserResponse{MessageType: webStruct.BroadcastConnection, Daemon: event.(*mainStruct.DaemonState)})
 			case *hepparser.HEP:
 				// b.Broadcast(webStruct.UserResponse{MessageType: webStruct.SubscribeHepPackages, HEPs: event.(*hepparser.HEP)})
+			case *altStruct.ConversationPrivateCallMessage:
+				ev, ok := event.(*altStruct.ConversationPrivateCallMessage)
+				if !ok || ev.Sender == nil || ev.Receiver == nil {
+					break
+				}
+				b.Unicast(webStruct.UserResponse{MessageType: "NewMessage", Data: ev}, []*mainStruct.WebUser{{Id: ev.Sender.Id}, {Id: ev.Receiver.Id}})
 			default:
 				log.Printf("Unknown event type: %T - %+v\n", event, event)
 			}
@@ -4220,6 +4226,8 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 		resp = getUser(msg, SendConversationPrivateMessage, onlyAdminGroup())
 	case "SendConversationPrivateCall":
 		resp = getUser(msg, SendConversationPrivateCall, onlyAdminGroup())
+	case "SendConversationPrivateCommand":
+		resp = getUser(msg, SendConversationPrivateCommand, onlyAdminGroup())
 	//Request:
 	//Response:
 	//Errors:

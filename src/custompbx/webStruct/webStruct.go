@@ -79,8 +79,9 @@ type MessageData struct {
 	AwsS3            altStruct.ConfigHttpCacheProfileAWSS3     `json:"aws_s3,omitempty"`
 	Azure            altStruct.ConfigHttpCacheProfileAzureBlob `json:"azure,omitempty"`
 
-	Text     string    `json:"text,omitempty"`
-	UpToTime time.Time `json:"up_to_time,omitempty"`
+	Text       string    `json:"text,omitempty"`
+	UpToTime   time.Time `json:"up_to_time,omitempty"`
+	TillToTime time.Time `json:"till_to_time,omitempty"`
 
 	Data     json.RawMessage `json:"data,omitempty"`
 	IntSlice []int64         `json:"-"`

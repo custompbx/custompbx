@@ -5,7 +5,7 @@ import {
   StoreGetConversationPrivateMessages,
   StoreCurrentUser,
   StoreGetConversationPrivateCalls,
-  GetConversationPrivateCalls,
+  GetConversationPrivateCalls, SendConversationPrivateMessage, SendConversationPrivateCommand,
 } from './conversations.actions';
 
 import {isArray} from "chart.js/helpers";
@@ -19,7 +19,7 @@ export interface State {
   user: Iuser;
   scrollDown: boolean;
   event: {
-    type: 'new-call' | 'new-message' | null;
+    type: 'new-call' | 'new-message' | 'new-call-message' | null;
     data: any;
   };
 }
@@ -59,7 +59,8 @@ export function reducer(state: State = initialState, action): State {
     state = initialState
   }
   switch (action.type) {
-    case GetConversationPrivateMessages.type:
+    case SendConversationPrivateCommand.type:
+    case SendConversationPrivateMessage.type:
     case GetConversationPrivateCalls.type:
     case GetConversationPrivateMessages.type: {
       return {
@@ -157,6 +158,7 @@ export function reducer(state: State = initialState, action): State {
           loadCounter: Math.max(0, state.loadCounter - 1),
         };
       }
+      console.log(data);
       const sid = data.sender_id?.id;
       const rid = data.receiver_id?.id;
       let id = sid;
@@ -175,6 +177,11 @@ export function reducer(state: State = initialState, action): State {
       if (data.duration === 0 || data.duration) {
         calls[id].push(data);
         event = {type: 'new-call', data: {sid, rid}};
+      } else if (typeof data.call !== 'undefined') {
+        data.call = data.call || true;
+        event = {type: 'new-call-message', data: {sid, rid, text: data.text}};
+        console.log(data);
+        conversations[id].push(data);
       } else {
         event = {type: 'new-message', data: {sid, rid, text: data.text}};
         conversations[id].push(data);

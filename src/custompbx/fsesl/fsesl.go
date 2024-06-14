@@ -52,7 +52,7 @@ type callsAsJson struct {
 	RowCount int               `json:"row_count"`
 }
 
-type channelsAsJson struct {
+type ChannelsAsJson struct {
 	Channels []mainStruct.Channel `json:"rows"`
 	RowCount int                  `json:"row_count"`
 }
@@ -143,6 +143,7 @@ const (
 	NameModuleUnload       = "MODULE_UNLOAD"
 	NameName               = "name"
 	NameKey                = "key"
+	NameAudioStream        = "CUSTOM mod_audio_stream::json"
 
 	// NameChannelUuid              = "Channel-Call-UUID"
 	NameChannelUuid                  = "Unique-ID"
@@ -507,6 +508,7 @@ func Connect(eventChannel chan interface{}, logsChannel chan mainStruct.LogType)
 		NameCVLogin:            {func(event string, id int) { vertoRegsHandler(event, id, eventChannel) }},
 		NameCVClientDisconnect: {func(event string, id int) { vertoRegsHandler(event, id, eventChannel) }},
 		NameCCallcenter:        {func(event string, id int) { callcenterHandler(event, id, eventChannel) }},
+		NameAudioStream:        {func(event string, id int) { audioStreamHandler(event, id, eventChannel) }},
 		// "CUSTOM sofia::profile_start": {func(event string, id int) { sofiaProfileHandler(event, id, eventChannel) }},
 		// "CUSTOM sofia::profile_stop": {func(event string, id int) { sofiaProfileHandler(event, id, eventChannel) }},
 	}
@@ -1139,7 +1141,7 @@ func GetChannels() {
 		log.Println("cant get channels", err)
 		return
 	}
-	channels := channelsAsJson{}
+	channels := ChannelsAsJson{}
 	err = json.Unmarshal([]byte(asJson), &channels)
 	if err != nil {
 		log.Println("can't marshal channels", err)
@@ -4164,4 +4166,47 @@ func getFPBXContexts() (xmlStruct.Section, bool) {
 func localParseInt(str string) int64 {
 	res, _ := strconv.ParseInt(str, 10, 64)
 	return res
+}
+
+func audioStreamHandler(event string, id int, eventChannel chan interface{}) {
+	eventMap := fsock.EventToMap(event)
+	pm := eventMap["variable_PRIVATE_MESSAGES"]
+
+	pmIds := strings.Split(pm, "_")
+	if len(pmIds) != 2 {
+		return
+	}
+
+	id1, err := strconv.ParseInt(pmIds[0], 10, 64)
+	if err != nil {
+		return
+	}
+	id2, err := strconv.ParseInt(pmIds[1], 10, 64)
+	if err != nil {
+		return
+	}
+	randId, _ := strconv.ParseInt(eventMap["Event-Date-Timestamp"], 10, 64)
+
+	response := eventMap[fsock.EventBodyTag]
+	responseSrt := struct {
+		RecognizedText string `json:"recognized_text"`
+	}{}
+
+	log.Printf("%+v", response)
+	err = json.Unmarshal([]byte(response), &responseSrt)
+	if err != nil {
+		log.Printf("%+v", err.Error())
+		return
+	}
+	log.Printf("%+v", responseSrt)
+
+	msg := &altStruct.ConversationPrivateCallMessage{
+		Sender:    &mainStruct.WebUser{Id: id1},
+		Receiver:  &mainStruct.WebUser{Id: id2},
+		Text:      responseSrt.RecognizedText,
+		CreatedAt: time.Now(),
+		Id:        randId,
+	}
+	log.Printf("%+v", msg)
+	eventChannel <- msg
 }
