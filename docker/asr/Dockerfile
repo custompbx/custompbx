@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir \
     && pip install /app/faster-whisper
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+COPY ./docker/asr/server.py /app
 
 # Expose the port the app runs on
 EXPOSE 8765
