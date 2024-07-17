@@ -1,4 +1,5 @@
 import { Action } from '@ngrx/store';
+import {createActionHelper} from '../../../services/rxjs-helper/actions-helper';
 
 export enum ConfigActionTypes {
   StoreGotConferenceError = 'StoreGotConferenceError',
@@ -425,6 +426,54 @@ export class StoreUpdateConferenceChatPermission implements Action {
   readonly type = ConfigActionTypes.StoreUpdateConferenceChatPermission;
   constructor(public payload: any) {}
 }
+
+export const GetConferenceLayouts = createActionHelper('GetConferenceLayouts');
+export const StoreGetConferenceLayouts = createActionHelper('StoreGetConferenceLayouts');
+export const GetConferenceLayoutImages = createActionHelper('GetConferenceLayoutImages');
+export const StoreGetConferenceLayoutImages = createActionHelper('StoreGetConferenceLayoutImages');
+export const GetConferenceLayoutGroupLayouts = createActionHelper('GetConferenceLayoutGroupLayouts');
+export const StoreGetConferenceLayoutGroupLayouts = createActionHelper('StoreGetConferenceLayoutGroupLayouts');
+
+export const UpdateConferenceLayout = createActionHelper('UpdateConferenceLayout');
+export const StoreUpdateConferenceLayout = createActionHelper('StoreUpdateConferenceLayout');
+export const UpdateConferenceLayout3D = createActionHelper('UpdateConferenceLayout3D');
+export const StoreUpdateConferenceLayout3D = createActionHelper('StoreUpdateConferenceLayout3D');
+export const UpdateConferenceLayoutGroup = createActionHelper('UpdateConferenceLayoutGroup');
+export const StoreUpdateConferenceLayoutGroup = createActionHelper('StoreUpdateConferenceLayoutGroup');
+export const SwitchConferenceLayout = createActionHelper('SwitchConferenceLayout');
+export const StoreSwitchConferenceLayout = createActionHelper('StoreSwitchConferenceLayout');
+export const AddConferenceLayout = createActionHelper('AddConferenceLayout');
+export const StoreAddConferenceLayout = createActionHelper('StoreAddConferenceLayout');
+export const AddConferenceLayoutGroup = createActionHelper('AddConferenceLayoutGroup');
+export const StoreAddConferenceLayoutGroup = createActionHelper('StoreAddConferenceLayoutGroup');
+export const DelConferenceLayout = createActionHelper('DelConferenceLayout');
+export const StoreDelConferenceLayout = createActionHelper('StoreDelConferenceLayout');
+export const DelConferenceLayoutGroup = createActionHelper('DelConferenceLayoutGroup');
+export const StoreDelConferenceLayoutGroup = createActionHelper('StoreDelConferenceLayoutGroup');
+export const UpdateConferenceLayoutGroupLayout = createActionHelper('UpdateConferenceLayoutGroupLayout');
+export const StoreUpdateConferenceLayoutGroupLayout = createActionHelper('StoreUpdateConferenceLayoutGroupLayout');
+export const SwitchConferenceLayoutGroupLayout = createActionHelper('SwitchConferenceLayoutGroupLayout');
+export const StoreSwitchConferenceLayoutGroupLayout = createActionHelper('StoreSwitchConferenceLayoutGroupLayout');
+export const AddConferenceLayoutGroupLayout = createActionHelper('AddConferenceLayoutGroupLayout');
+export const StoreAddConferenceLayoutGroupLayout = createActionHelper('StoreAddConferenceLayoutGroupLayout');
+export const DelConferenceLayoutGroupLayout = createActionHelper('DelConferenceLayoutGroupLayout');
+export const StoreDelConferenceLayoutGroupLayout = createActionHelper('StoreDelConferenceLayoutGroupLayout');
+export const AddConferenceLayoutImage = createActionHelper('AddConferenceLayoutImage');
+export const StoreAddConferenceLayoutImage = createActionHelper('StoreAddConferenceLayoutImage');
+export const DelConferenceLayoutImage = createActionHelper('DelConferenceLayoutImage');
+export const StoreDelConferenceLayoutImage = createActionHelper('StoreDelConferenceLayoutImage');
+export const SwitchConferenceLayoutImage = createActionHelper('SwitchConferenceLayoutImage');
+export const StoreSwitchConferenceLayoutImage = createActionHelper('StoreSwitchConferenceLayoutImage');
+export const UpdateConferenceLayoutImage = createActionHelper('UpdateConferenceLayoutImage');
+export const StoreUpdateConferenceLayoutImage = createActionHelper('StoreUpdateConferenceLayoutImage');
+export const StoreNewConferenceLayoutImage = createActionHelper('StoreNewConferenceLayoutImage');
+export const StoreNewConferenceLayoutGroupLayout = createActionHelper('StoreNewConferenceLayoutGroupLayout');
+export const StoreDropConferenceLayoutImage = createActionHelper('StoreDropConferenceLayoutImage');
+export const StoreDropConferenceLayoutGroupLayout = createActionHelper('StoreDropConferenceLayoutGroupLayout');
+export const StorePasteConferenceLayoutImage = createActionHelper('StorePasteConferenceLayoutImage');
+export const StorePasteConferenceLayoutGroupLayout = createActionHelper('StorePasteConferenceLayoutGroupLayout');
+
+export const StoreConferenceError = createActionHelper('StoreConferenceError');
 
 export type All =
   | GetConference

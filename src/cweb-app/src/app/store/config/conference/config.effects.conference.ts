@@ -63,8 +63,47 @@ import {
   StoreDelConferenceChatPermissionUser,
   StoreUpdateConferenceChatPermission,
   SwitchConferenceChatPermissionUser,
-  UpdateConferenceChatPermissionUser
+  UpdateConferenceChatPermissionUser,
+  GetConferenceLayouts,
+  StoreGetConferenceLayouts,
+  StoreConferenceError,
+  GetConferenceLayoutImages,
+  GetConferenceLayoutGroupLayouts,
+  StoreGetConferenceLayoutImages,
+  StoreGetConferenceLayoutGroupLayouts,
+  UpdateConferenceLayout,
+  SwitchConferenceLayout,
+  StoreSwitchConferenceLayout,
+  AddConferenceLayout,
+  StoreAddConferenceLayout,
+  StoreUpdateConferenceLayout,
+  DelConferenceLayout,
+  StoreDelConferenceLayout,
+  UpdateConferenceLayoutGroupLayout,
+  StoreUpdateConferenceLayoutGroupLayout,
+  SwitchConferenceLayoutGroupLayout,
+  StoreSwitchConferenceLayoutGroupLayout,
+  AddConferenceLayoutGroupLayout,
+  StoreAddConferenceLayoutGroupLayout,
+  DelConferenceLayoutGroupLayout,
+  StoreDelConferenceLayoutGroupLayout,
+  AddConferenceLayoutImage,
+  StoreAddConferenceLayoutImage,
+  DelConferenceLayoutImage,
+  StoreDelConferenceLayoutImage,
+  SwitchConferenceLayoutImage,
+  StoreSwitchConferenceLayoutImage,
+  UpdateConferenceLayoutImage,
+  StoreUpdateConferenceLayoutImage,
+  AddConferenceLayoutGroup,
+  StoreAddConferenceLayoutGroup,
+  UpdateConferenceLayout3D,
+  StoreUpdateConferenceLayout3D,
+  UpdateConferenceLayoutGroup,
+  StoreUpdateConferenceLayoutGroup,
+  DelConferenceLayoutGroup, StoreDelConferenceLayoutGroup
 } from './config.actions.conference';
+import {createEffectForActions} from '../../../services/rxjs-helper/effects-helper';
 
 @Injectable()
 export class ConfigEffectsConference {
@@ -74,6 +113,28 @@ export class ConfigEffectsConference {
     private ws: WsDataService,
   ) {
   }
+
+  GetConferenceLayout: Observable<any> = createEffectForActions(this.actions, this.ws, GetConferenceLayouts, StoreGetConferenceLayouts, StoreConferenceError);
+  GetConferenceLayoutImages: Observable<any> = createEffectForActions(this.actions, this.ws, GetConferenceLayoutImages, StoreGetConferenceLayoutImages, StoreConferenceError);
+
+  UpdateConferenceLayout: Observable<any> = createEffectForActions(this.actions, this.ws, UpdateConferenceLayout, StoreUpdateConferenceLayout, StoreConferenceError);
+  UpdateConferenceLayout3D: Observable<any> = createEffectForActions(this.actions, this.ws, UpdateConferenceLayout3D, StoreUpdateConferenceLayout3D, StoreConferenceError);
+  UpdateConferenceLayoutGroup: Observable<any> = createEffectForActions(this.actions, this.ws, UpdateConferenceLayoutGroup, StoreUpdateConferenceLayoutGroup, StoreConferenceError);
+  SwitchConferenceLayout: Observable<any> = createEffectForActions(this.actions, this.ws, SwitchConferenceLayout, StoreSwitchConferenceLayout, StoreConferenceError);
+  AddConferenceLayout: Observable<any> = createEffectForActions(this.actions, this.ws, AddConferenceLayout, StoreAddConferenceLayout, StoreConferenceError);
+  AddConferenceLayoutGroup: Observable<any> = createEffectForActions(this.actions, this.ws, AddConferenceLayoutGroup, StoreAddConferenceLayoutGroup, StoreConferenceError);
+  DelConferenceLayout: Observable<any> = createEffectForActions(this.actions, this.ws, DelConferenceLayout, StoreDelConferenceLayout, StoreConferenceError);
+  DelConferenceLayoutGroup: Observable<any> = createEffectForActions(this.actions, this.ws, DelConferenceLayoutGroup, StoreDelConferenceLayoutGroup, StoreConferenceError);
+  UpdateConferenceLayoutGroupLayout: Observable<any> = createEffectForActions(this.actions, this.ws, UpdateConferenceLayoutGroupLayout, StoreUpdateConferenceLayoutGroupLayout, StoreConferenceError);
+  SwitchConferenceLayoutGroupLayout: Observable<any> = createEffectForActions(this.actions, this.ws, SwitchConferenceLayoutGroupLayout, StoreSwitchConferenceLayoutGroupLayout, StoreConferenceError);
+  AddConferenceLayoutGroupLayout: Observable<any> = createEffectForActions(this.actions, this.ws, AddConferenceLayoutGroupLayout, StoreAddConferenceLayoutGroupLayout, StoreConferenceError);
+  DelConferenceLayoutGroupLayout: Observable<any> = createEffectForActions(this.actions, this.ws, DelConferenceLayoutGroupLayout, StoreDelConferenceLayoutGroupLayout, StoreConferenceError);
+  AddConferenceLayoutImage: Observable<any> = createEffectForActions(this.actions, this.ws, AddConferenceLayoutImage, StoreAddConferenceLayoutImage, StoreConferenceError);
+  DelConferenceLayoutImage: Observable<any> = createEffectForActions(this.actions, this.ws, DelConferenceLayoutImage, StoreDelConferenceLayoutImage, StoreConferenceError);
+  SwitchConferenceLayoutImage: Observable<any> = createEffectForActions(this.actions, this.ws, SwitchConferenceLayoutImage, StoreSwitchConferenceLayoutImage, StoreConferenceError);
+  UpdateConferenceLayoutImage: Observable<any> = createEffectForActions(this.actions, this.ws, UpdateConferenceLayoutImage, StoreUpdateConferenceLayoutImage, StoreConferenceError);
+
+  GetConferenceLayoutGroupLayouts: Observable<any> = createEffectForActions(this.actions, this.ws, GetConferenceLayoutGroupLayouts, StoreGetConferenceLayoutGroupLayouts, StoreConferenceError);
 
   GetConference: Observable<any> = createEffect(() => {
     return this.actions.pipe(

@@ -3638,6 +3638,108 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Errors:
 	case "DelConferenceChatPermission":
 		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigConferenceChatPermissionProfile{Id: msg.Id}, onlyAdminGroup())
+
+	case "GetConferenceLayouts":
+		msg.Name = "layout"
+		resp1 := getUserForConfig(msg, getConferenceLayoutsConfig, &altStruct.ConfigConferenceLayout{}, onlyAdminGroup())
+		msg.Name = "group"
+		resp2 := getUserForConfig(msg, getConferenceLayoutsConfig, &altStruct.ConfigConferenceLayoutGroup{}, onlyAdminGroup())
+		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
+			A interface{} `json:"conference_layouts"`
+			B interface{} `json:"conference_layouts_groups"`
+		}{A: resp1.Data, B: resp2.Data}}
+	case "UpdateConferenceLayout":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigConferenceLayout{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
+	case "UpdateConferenceLayout3D":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigConferenceLayout{Id: msg.Id, Auto3dPosition: msg.Value}, []string{"Auto3dPosition"}}, onlyAdminGroup())
+	case "SwitchConferenceLayout":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigConferenceLayout{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
+	case "AddConferenceLayout":
+		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigConferenceLayout{Name: msg.Name, Enabled: true, Parent: getConferenceLayoutConfig()}, onlyAdminGroup())
+	case "DelConferenceLayout":
+		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigConferenceLayout{Id: msg.Id}, onlyAdminGroup())
+
+	case "UpdateConferenceLayoutGroup":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigConferenceLayoutGroup{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
+	case "SwitchConferenceLayoutGroup":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigConferenceLayoutGroup{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
+	case "AddConferenceLayoutGroup":
+		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigConferenceLayoutGroup{Name: msg.Name, Enabled: true, Parent: getConferenceLayoutConfig()}, onlyAdminGroup())
+	case "DelConferenceLayoutGroup":
+		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigConferenceLayoutGroup{Id: msg.Id}, onlyAdminGroup())
+
+	case "GetConferenceLayoutGroupLayouts":
+		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigConferenceLayoutGroupLayout{}, onlyAdminGroup())
+	case "AddConferenceLayoutGroupLayout":
+		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigConferenceLayoutGroupLayout{Body: msg.Value, Enabled: true, Parent: &altStruct.ConfigConferenceLayoutGroup{Id: msg.Id}}, onlyAdminGroup())
+	case "DelConferenceLayoutGroupLayout":
+		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigConferenceLayoutGroupLayout{Id: msg.Param.Id}, onlyAdminGroup())
+	case "SwitchConferenceLayoutGroupLayout":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigConferenceLayoutGroupLayout{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
+	case "UpdateConferenceLayoutGroupLayout":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigConferenceLayoutGroupLayout{Id: msg.Param.Id, Body: msg.Param.Name}, []string{"Body"}}, onlyAdminGroup())
+
+	case "GetConferenceLayoutImages":
+		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigConferenceLayoutImage{}, onlyAdminGroup())
+	case "AddConferenceLayoutImage":
+		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigConferenceLayoutImage{
+			X:             msg.LayoutImages.X,
+			Y:             msg.LayoutImages.Y,
+			Scale:         msg.LayoutImages.Scale,
+			Floor:         msg.LayoutImages.Floor,
+			FloorOnly:     msg.LayoutImages.FloorOnly,
+			Hscale:        msg.LayoutImages.Hscale,
+			Overlap:       msg.LayoutImages.Overlap,
+			ReservationId: msg.LayoutImages.ReservationId,
+			Zoom:          msg.LayoutImages.Zoom,
+			Enabled:       true,
+			Parent:        &altStruct.ConfigConferenceLayout{Id: msg.Id},
+		}, onlyAdminGroup())
+	case "DelConferenceLayoutImage":
+		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigConferenceLayoutImage{Id: msg.Param.Id}, onlyAdminGroup())
+	case "SwitchConferenceLayoutImage":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigConferenceLayoutImage{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
+	case "UpdateConferenceLayoutImage":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigConferenceLayoutImage{
+			Id:            msg.LayoutImages.Id,
+			X:             msg.LayoutImages.X,
+			Y:             msg.LayoutImages.Y,
+			Scale:         msg.LayoutImages.Scale,
+			Floor:         msg.LayoutImages.Floor,
+			FloorOnly:     msg.LayoutImages.FloorOnly,
+			Hscale:        msg.LayoutImages.Hscale,
+			Overlap:       msg.LayoutImages.Overlap,
+			ReservationId: msg.LayoutImages.ReservationId,
+			Zoom:          msg.LayoutImages.Zoom,
+		}, []string{"X", "Y", "Scale", "Floor", "FloorOnly", "Hscale", "Overlap", "ReservationId", "Zoom"}}, onlyAdminGroup())
+
 	//### Post Load Modules
 	//Request:{"event":"GetPostLoadModules","data":{"token":"3c2f3200f73699a28c96783a15dff1d7"}}
 	//Response:{"MessageType":"GetPostLoadModules","data":{"1":{"id":1,"position":1,"enabled":false,"name":"mod_sofia","description":" ","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"10":{"id":10,"position":7,"enabled":false,"name":"mod_unicall","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"11":{"id":11,"position":8,"enabled":false,"name":"mod_xml_cdr","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"12":{"id":12,"position":9,"enabled":false,"name":"mod_xml_rpc","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"13":{"id":13,"position":10,"enabled":true,"name":"mod_shout","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"14":{"id":14,"position":11,"enabled":true,"name":"mod_pocketsphinx","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"15":{"id":15,"position":12,"enabled":true,"name":"mod_alsa","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":false,"name":"mod_amr","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"4":{"id":4,"position":3,"enabled":false,"name":"mod_db","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"5":{"id":5,"position":4,"enabled":false,"name":"mod_verto","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"8":{"id":8,"position":5,"enabled":true,"name":"mod_voicemail","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"9":{"id":9,"position":6,"enabled":false,"name":"mod_zeroconf","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}}

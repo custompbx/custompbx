@@ -2528,7 +2528,7 @@ func setConfigConferenceLayouts(conf *xmlStruct.Configuration) error {
 	if err != nil {
 		return err
 	}
-	if conf.LayoutSettings != nil {
+	if conf.LayoutSettings == nil {
 		return nil
 	}
 	if conf.LayoutSettings.Groups != nil {

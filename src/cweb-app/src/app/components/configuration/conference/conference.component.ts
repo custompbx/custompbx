@@ -44,7 +44,31 @@ import {
   StoreNewConferenceChatPermissionUser,
   SwitchConferenceChatPermissionUser,
   DelConferenceChatPermissionUser,
-  UpdateConferenceChatPermissionUser, StorePasteConferenceChatPermissionUsers, DelConferenceChatPermission, UpdateConferenceChatPermission
+  UpdateConferenceChatPermissionUser,
+  StorePasteConferenceChatPermissionUsers,
+  DelConferenceChatPermission,
+  UpdateConferenceChatPermission,
+  GetConferenceLayouts,
+  GetConferenceLayoutImages,
+  GetConferenceLayoutGroupLayouts,
+  StoreNewConferenceLayoutImage,
+  StoreDropConferenceLayoutImage,
+  SwitchConferenceLayoutImage,
+  AddConferenceLayoutImage,
+  StorePasteConferenceLayoutImage,
+  DelConferenceLayoutImage,
+  UpdateConferenceLayoutImage,
+  StoreNewConferenceLayoutGroupLayout,
+  SwitchConferenceLayoutGroupLayout,
+  AddConferenceLayoutGroupLayout,
+  StoreDropConferenceLayoutGroupLayout,
+  DelConferenceLayoutGroupLayout,
+  UpdateConferenceLayoutGroupLayout,
+  StorePasteConferenceLayoutGroupLayout,
+  AddConferenceLayout,
+  AddConferenceLayoutGroup,
+  DelConferenceLayout,
+  UpdateConferenceLayout, DelConferenceLayoutGroup, UpdateConferenceLayoutGroup, UpdateConferenceLayout3D,
 } from '../../../store/config/conference/config.actions.conference';
 
 @Component({
@@ -57,19 +81,19 @@ export class ConferenceComponent implements OnInit, OnDestroy {
   public configs: Observable<any>;
   public configs$: Subscription;
   public list: Iconference;
-  private newProfileName: string;
-  private newControlGroupName: string;
-  private newChatPermissionName: string;
+  public newProfileName: string;
+  public newControlGroupName: string;
+  public newChatPermissionName: string;
   private newGroupName: string;
   public selectedIndex: number;
   private lastErrorMessage: string;
-  private profileId: number;
-  private controlGroupId: number;
-  private chatPermissionId: number;
+  public profileId: number;
+  public controlGroupId: number;
+  public chatPermissionId: number;
   public loadCounter: number;
-  private toCopyProfile: number;
-  private toCopyUser: number;
-  private toCopyGroup: number;
+  public toCopyProfile: number;
+  public toCopyUser: number;
+  public toCopyGroup: number;
   public globalSettingsDispatchers: object;
   public groupSettingsDispatchers: object;
   public profileSettingsDispatchers: object;
@@ -77,6 +101,14 @@ export class ConferenceComponent implements OnInit, OnDestroy {
   public advertiseMask: object;
   public chatPermissionMask: object;
   public controlMask: object;
+  public layoutImageMask: object;
+  public layoutGroupMask: object;
+  public layoutImageDispatchers: object;
+  public layoutGroupDispatchers: object;
+  public toCopylayoutImage: number;
+  public toCopylayoutGroup: number;
+  public newLayoutName: string;
+  public newLayoutGroupName: string;
 
   constructor(
     private store: Store<AppState>,
@@ -97,6 +129,8 @@ export class ConferenceComponent implements OnInit, OnDestroy {
         this.newProfileName = '';
         this.newControlGroupName = '';
         this.newChatPermissionName = '';
+        this.newLayoutName = '';
+        this.newLayoutGroupName = '';
         this.profileId = (this.list && this.list.profiles && this.list.profiles[this.profileId]) ? this.profileId : 0;
         this.controlGroupId = (this.list && this.list.caller_controls && this.list.caller_controls[this.controlGroupId]) ?
           this.controlGroupId : 0;
@@ -145,16 +179,63 @@ export class ConferenceComponent implements OnInit, OnDestroy {
       updateItem: this.updateChatPermissionUser.bind(this),
       pasteItems: this.pasteChatPermissionUsers.bind(this),
     };
+    this.layoutImageDispatchers = {
+      addNewItemField: this.storeNewConferenceLayoutImage.bind(this),
+      switchItem: this.switchConferenceLayoutImage.bind(this),
+      addItem: this.addConferenceLayoutImage.bind(this),
+      dropNewItem: this.storeDropConferenceLayoutImage.bind(this),
+      deleteItem: this.delConferenceLayoutImage.bind(this),
+      updateItem: this.updateConferenceLayoutImage.bind(this),
+      pasteItems: this.storePasteConferenceLayoutImage.bind(this),
+    };
+    this.layoutGroupDispatchers = {
+      addNewItemField: this.storeNewConferenceLayoutGroupLayout.bind(this),
+      switchItem: this.switchConferenceLayoutGroupLayout.bind(this),
+      addItem: this.addConferenceLayoutGroupLayout.bind(this),
+      dropNewItem: this.storeDropConferenceLayoutGroupLayout.bind(this),
+      deleteItem: this.delConferenceLayoutGroupLayout.bind(this),
+      updateItem: this.updateConferenceLayoutGroupLayout.bind(this),
+      pasteItems: this.storePasteConferenceLayoutGroupLayout.bind(this),
+    };
     this.advertiseMask = {name: {name: 'name'}, value: {name: 'status'}};
     this.chatPermissionMask = {name: {name: 'name'}, value: {name: 'commands'}};
     this.controlMask = {name: {name: 'action'}, value: {name: 'digits'}};
+    this.layoutImageMask = {
+      name: {name: 'x'},
+      value: {name: 'y'},
+      extraField1: {name: 'scale'},
+      extraField2: {name: 'hscale'},
+      extraField3: {name: 'zoom'},
+      extraField4: {name: 'floor'},
+      extraField5: {name: 'floor_only'},
+      extraField6: {name: 'overlap'},
+      extraField7: {name: 'reservation_id'},
+    };
+    this.layoutGroupMask = {name: {name: 'body'}};
   }
+/*
+x
+y
+scale
+hscale
 
+zoom
+floor
+floor_only
+overlap
+reservation_id
+*/
   ngOnDestroy() {
     this.configs$.unsubscribe();
     if (this.route.snapshot?.data?.reconnectUpdater) {
        this.route.snapshot.data.reconnectUpdater.unsubscribe();
      }
+  }
+
+  mainTabChanged(event) {
+    if (event === 1) {
+      this.store.dispatch(GetConferenceLayouts(null));
+    }
   }
 
   updateConferenceRoom(param: Iitem) {
@@ -455,4 +536,140 @@ export class ConferenceComponent implements OnInit, OnDestroy {
     return Object.values(obj);
   }
 
+  getConferenceLayoutImages(id) {
+    this.store.dispatch(GetConferenceLayoutImages({id: id}));
+  }
+
+  getConferenceLayoutGroupLayouts(id) {
+    this.store.dispatch(GetConferenceLayoutGroupLayouts({id: id}));
+  }
+
+  updateConferenceLayout3D(id, value) {
+    this.store.dispatch(UpdateConferenceLayout3D({id, value}));
+  }
+
+  copyLayoutImage(key) {
+    if (!this.list.layouts.conference_layouts[key]) {
+      this.toCopylayoutImage = 0;
+      return;
+    }
+    this.toCopylayoutImage = key;
+    this._snackBar.open('Copied!', null, {
+      duration: 700,
+    });
+  }
+
+  copyLayoutGroup(key) {
+    if (!this.list.layouts.conference_layouts_groups[key]) {
+      this.toCopylayoutGroup = 0;
+      return;
+    }
+    this.toCopylayoutGroup = key;
+    this._snackBar.open('Copied!', null, {
+      duration: 700,
+    });
+  }
+
+  storeNewConferenceLayoutImage(parentId: number) {
+    this.store.dispatch(StoreNewConferenceLayoutImage({id: parentId}));
+  }
+  switchConferenceLayoutImage(param: Iitem) {
+    const newUser = <Iitem>{...param};
+    newUser.enabled = !newUser.enabled;
+    this.store.dispatch(SwitchConferenceLayoutImage({param: newUser}));
+  }
+  addConferenceLayoutImage(parentId: number, index: number, x: string, y: string, scale: string, hscale: string, zoom: string, floor: string, floor_only: string, overlap: string, reservation_id: string) {
+    this.store.dispatch(AddConferenceLayoutImage({id: parentId, index: index, layout_images: {x, y, scale, hscale, zoom, floor, floor_only, overlap, reservation_id}}));
+  }
+  storeDropConferenceLayoutImage(parentId: number, index: number) {
+    this.store.dispatch(StoreDropConferenceLayoutImage({id: parentId, index: index}));
+  }
+  delConferenceLayoutImage(param: Iitem) {
+    this.store.dispatch(DelConferenceLayoutImage({param: param}));
+  }
+  updateConferenceLayoutImage(layout_images) {
+    this.store.dispatch(UpdateConferenceLayoutImage({layout_images}));
+  }
+  storePasteConferenceLayoutImage(to: number) {
+    this.store.dispatch(StorePasteConferenceLayoutImage({from_id: this.toCopyUser, to_id: to}));
+  }
+
+  storeNewConferenceLayoutGroupLayout(parentId: number) {
+    this.store.dispatch(StoreNewConferenceLayoutGroupLayout({id: parentId}));
+  }
+  switchConferenceLayoutGroupLayout(param: Iitem) {
+    const newUser = <Iitem>{...param};
+    newUser.enabled = !newUser.enabled;
+    this.store.dispatch(SwitchConferenceLayoutGroupLayout({param: newUser}));
+  }
+  addConferenceLayoutGroupLayout(parentId: number, index: number, body: string) {
+    this.store.dispatch(AddConferenceLayoutGroupLayout({id: parentId, index: index, enabled: true, value: body}));
+  }
+  storeDropConferenceLayoutGroupLayout(parentId: number, index: number) {
+    this.store.dispatch(StoreDropConferenceLayoutGroupLayout({id: parentId, index: index}));
+  }
+  delConferenceLayoutGroupLayout(param: Iitem) {
+    this.store.dispatch(DelConferenceLayoutGroupLayout({param: param}));
+  }
+  updateConferenceLayoutGroupLayout(param: Iitem) {
+    this.store.dispatch(UpdateConferenceLayoutGroupLayout({param: param}));
+  }
+  storePasteConferenceLayoutGroupLayout(to: number) {
+    this.store.dispatch(StorePasteConferenceLayoutGroupLayout({from_id: this.toCopyUser, to_id: to}));
+  }
+
+  onLayoutSubmit() {
+    this.store.dispatch(AddConferenceLayout({name: this.newLayoutName}));
+  }
+
+  onLayoutGroupSubmit() {
+    this.store.dispatch(AddConferenceLayoutGroup({name: this.newLayoutGroupName}));
+  }
+
+  openBottomSheetLayout(id, newName, oldName, action): void {
+    const config = {
+      data:
+        {
+          newName: newName,
+          oldName: oldName,
+          action: action,
+          case1Text: 'Are you sure you want to delete layout "' + oldName + '"?',
+          case2Text: 'Are you sure you want to rename layout "' + oldName + '" to "' + newName + '"?',
+        }
+    };
+    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    sheet.afterDismissed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      if (action === 'delete') {
+        this.store.dispatch(DelConferenceLayout({id: id}));
+      } else if (action === 'rename') {
+        this.store.dispatch(UpdateConferenceLayout({id: id, name: newName}));
+      }
+    });
+  }
+  openBottomSheetLayoutGroup(id, newName, oldName, action): void {
+    const config = {
+      data:
+        {
+          newName: newName,
+          oldName: oldName,
+          action: action,
+          case1Text: 'Are you sure you want to delete layout "' + oldName + '"?',
+          case2Text: 'Are you sure you want to rename layout "' + oldName + '" to "' + newName + '"?',
+        }
+    };
+    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    sheet.afterDismissed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      if (action === 'delete') {
+        this.store.dispatch(DelConferenceLayoutGroup({id: id}));
+      } else if (action === 'rename') {
+        this.store.dispatch(UpdateConferenceLayoutGroup({id: id, name: newName}));
+      }
+    });
+  }
 }

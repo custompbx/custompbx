@@ -79,6 +79,7 @@ export interface Iconference {
       users: IpermissionUsers;
     }
   };
+  layouts: Ilayouts;
   id?: number;
   enabled?: boolean;
   exists?: boolean;
@@ -86,6 +87,30 @@ export interface Iconference {
   loaded?: boolean;
 }
 
+export interface Ilayouts {
+  conference_layouts: {
+    [index: number]: {
+      auto_3d_position: string;
+      description: string;
+      enabled: boolean;
+      id: number;
+      name: string;
+      position: number;
+      images: { [index: number]: object };
+      new: Array<object>;
+    }
+  };
+  conference_layouts_groups: {
+    [index: number]: {
+      id: number;
+      enabled: boolean;
+      name: string;
+      position: number;
+      layouts: { [index: number]: object };
+      new: Array<object>;
+    }
+  };
+}
 export interface Ivoicemail {
   parameters: Iparameter;
   profiles: {

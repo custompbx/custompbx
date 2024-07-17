@@ -101,6 +101,44 @@ func getConfig(data *webStruct.MessageData, item interface{}) webStruct.UserResp
 	return webStruct.UserResponse{Data: res, MessageType: data.Event}
 }
 
+func getConferenceLayoutConfig() *altStruct.ConfigurationsList {
+	parent, _ := altData.GetCurrentConfigByName(mainStruct.ConfConferenceLayouts)
+	return parent
+}
+
+func getConferenceLayoutsConfig(data *webStruct.MessageData, item interface{}) webStruct.UserResponse {
+	if data.Name != "layout" && data.Name != "group" {
+		return webStruct.UserResponse{Error: "wrong usage", MessageType: data.Event}
+	}
+	var parent interface{}
+	filter := map[string]customorm.FilterFields{"Parent": {Flag: true}}
+	parent, err := altData.GetCurrentConfigByName(mainStruct.ConfConferenceLayouts)
+	if err != nil {
+		return webStruct.UserResponse{Error: "parent error", MessageType: data.Event}
+	}
+	if parent == (*altStruct.ConfigurationsList)(nil) {
+		exists := false
+		return webStruct.UserResponse{Exists: &exists, MessageType: data.Event}
+	}
+
+	module := altData.GetConfInstanceByStruct(item, parent)
+	if module == nil {
+		return webStruct.UserResponse{Error: "unknown config", MessageType: data.Event}
+	}
+	var res interface{}
+
+	res, err = intermediateDB.GetByValuesAsMap(
+		module,
+		filter,
+	)
+
+	if err != nil {
+		return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}
+	}
+
+	return webStruct.UserResponse{Data: res, MessageType: data.Event}
+}
+
 func getConfigInnerParent(data *webStruct.MessageData, item interface{}) webStruct.UserResponse {
 	filter := map[string]customorm.FilterFields{"Parent": {Flag: true}}
 	log.Printf("%+v", item)
@@ -311,12 +349,33 @@ func importConfModules(data *webStruct.MessageData) webStruct.UserResponse {
 		return webStruct.UserResponse{MessageType: data.Event, Error: err.Error()}
 	}
 
+	if confName == mainStruct.ConfConference {
+		_ = fsesl.GetXMLModuleConfiguration(mainStruct.ConfConferenceLayouts)
+	}
+
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
 func TruncateModuleConfig(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "configuration not found", MessageType: data.Event}
+	}
+
+	// if conference delete conference layouts too
+	conf, _ := intermediateDB.GetByIdArg(&altStruct.ConfigurationsList{}, data.Id)
+	if conf != nil {
+		r, ok := conf.(altStruct.ConfigurationsList)
+		if ok {
+			if r.Name == mainStruct.ConfConference {
+				conf, _ := intermediateDB.GetByStructValue(&altStruct.ConfigurationsList{Name: mainStruct.ConfConferenceLayouts}, []string{"Name"})
+				if conf != nil && len(conf) > 0 {
+					c, ok := conf[0].(altStruct.ConfigurationsList)
+					if ok && c.Id != 0 {
+						intermediateDB.DeleteById(&altStruct.ConfigurationsList{Id: c.Id})
+					}
+				}
+			}
+		}
 	}
 
 	err := intermediateDB.DeleteById(&altStruct.ConfigurationsList{Id: data.Id})

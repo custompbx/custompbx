@@ -914,7 +914,7 @@ func castConfigurationsList(par interface{}) *altStruct.ConfigurationsList {
 }
 
 func getCurrentModule(confName, modName string) (*altStruct.ConfigurationsList, error) {
-	conf, err := getCurrentConfigByName(confName)
+	conf, err := GetCurrentConfigByName(confName)
 	if err != nil {
 		return nil, err
 	}
@@ -925,7 +925,7 @@ func getCurrentModule(confName, modName string) (*altStruct.ConfigurationsList, 
 	return conf, err
 }
 
-func getCurrentConfigByName(name string) (*altStruct.ConfigurationsList, error) {
+func GetCurrentConfigByName(name string) (*altStruct.ConfigurationsList, error) {
 	if name == "" {
 		return nil, errors.New("no name")
 	}
@@ -950,11 +950,11 @@ func getCurrentConfigByName(name string) (*altStruct.ConfigurationsList, error) 
 }
 
 func GetCurrentConfPostSwitch() (*altStruct.ConfigurationsList, error) {
-	return getCurrentConfigByName(mainStruct.ConfPostLoadSwitch)
+	return GetCurrentConfigByName(mainStruct.ConfPostLoadSwitch)
 }
 
 func XMLPostSwitch(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -992,7 +992,7 @@ func XMLPostSwitch(name string) *mainStruct.Configuration {
 }
 
 func XMLAcl(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1034,7 +1034,7 @@ func XMLAcl(name string) *mainStruct.Configuration {
 }
 
 func XMLCallcenter(name string, arg string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1089,7 +1089,7 @@ func XMLCallcenter(name string, arg string) *mainStruct.Configuration {
 }
 
 func XMLCdrPgCsv(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1119,7 +1119,7 @@ func XMLCdrPgCsv(name string) *mainStruct.Configuration {
 }
 
 func XMLOdbcCdr(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1170,7 +1170,7 @@ func XMLOdbcCdr(name string) *mainStruct.Configuration {
 }
 
 func XMLSofia(name string, arg string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1267,7 +1267,7 @@ func XMLSofia(name string, arg string) *mainStruct.Configuration {
 }
 
 func XMLVerto(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1318,7 +1318,7 @@ func XMLVerto(name string) *mainStruct.Configuration {
 }
 
 func XMLLcr(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1369,7 +1369,7 @@ func XMLLcr(name string) *mainStruct.Configuration {
 }
 
 func XMLShout(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1391,7 +1391,7 @@ func XMLShout(name string) *mainStruct.Configuration {
 }
 
 func XMLRedis(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1413,7 +1413,7 @@ func XMLRedis(name string) *mainStruct.Configuration {
 }
 
 func XMLNibblebill(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1435,7 +1435,7 @@ func XMLNibblebill(name string) *mainStruct.Configuration {
 }
 
 func XMLDb(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1457,7 +1457,7 @@ func XMLDb(name string) *mainStruct.Configuration {
 }
 
 func XMLMemcache(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1479,7 +1479,7 @@ func XMLMemcache(name string) *mainStruct.Configuration {
 }
 
 func XMLAvmd(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1501,7 +1501,7 @@ func XMLAvmd(name string) *mainStruct.Configuration {
 }
 
 func XMLTtsCommandline(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1523,7 +1523,7 @@ func XMLTtsCommandline(name string) *mainStruct.Configuration {
 }
 
 func XMLCdrMongodb(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1545,7 +1545,7 @@ func XMLCdrMongodb(name string) *mainStruct.Configuration {
 }
 
 func XMLHttpCache(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1609,7 +1609,7 @@ func XMLHttpCache(name string) *mainStruct.Configuration {
 }
 
 func XMLOpus(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1631,7 +1631,7 @@ func XMLOpus(name string) *mainStruct.Configuration {
 }
 
 func XMLPython(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1653,7 +1653,7 @@ func XMLPython(name string) *mainStruct.Configuration {
 }
 
 func XMLAlsa(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1675,7 +1675,7 @@ func XMLAlsa(name string) *mainStruct.Configuration {
 }
 
 func XMLAmr(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1697,7 +1697,7 @@ func XMLAmr(name string) *mainStruct.Configuration {
 }
 
 func XMLAmrwb(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1719,7 +1719,7 @@ func XMLAmrwb(name string) *mainStruct.Configuration {
 }
 
 func XMLCepstral(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1741,7 +1741,7 @@ func XMLCepstral(name string) *mainStruct.Configuration {
 }
 
 func XMLCidlookup(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1763,7 +1763,7 @@ func XMLCidlookup(name string) *mainStruct.Configuration {
 }
 
 func XMLCurl(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1785,7 +1785,7 @@ func XMLCurl(name string) *mainStruct.Configuration {
 }
 
 func XMLDialplanDirectory(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1807,7 +1807,7 @@ func XMLDialplanDirectory(name string) *mainStruct.Configuration {
 }
 
 func XMLEasyroute(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1829,7 +1829,7 @@ func XMLEasyroute(name string) *mainStruct.Configuration {
 }
 
 func XMLErlangEvent(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1851,7 +1851,7 @@ func XMLErlangEvent(name string) *mainStruct.Configuration {
 }
 
 func XMLEventMulticast(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1873,7 +1873,7 @@ func XMLEventMulticast(name string) *mainStruct.Configuration {
 }
 
 func XMLFax(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1895,7 +1895,7 @@ func XMLFax(name string) *mainStruct.Configuration {
 }
 
 func XMLLua(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1917,7 +1917,7 @@ func XMLLua(name string) *mainStruct.Configuration {
 }
 
 func XMLMongo(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1939,7 +1939,7 @@ func XMLMongo(name string) *mainStruct.Configuration {
 }
 
 func XMLMsrp(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1961,7 +1961,7 @@ func XMLMsrp(name string) *mainStruct.Configuration {
 }
 
 func XMLOreka(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -1983,7 +1983,7 @@ func XMLOreka(name string) *mainStruct.Configuration {
 }
 
 func XMLPerl(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2005,7 +2005,7 @@ func XMLPerl(name string) *mainStruct.Configuration {
 }
 
 func XMLPocketsphinx(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2027,7 +2027,7 @@ func XMLPocketsphinx(name string) *mainStruct.Configuration {
 }
 
 func XMLSangomaCodec(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2049,7 +2049,7 @@ func XMLSangomaCodec(name string) *mainStruct.Configuration {
 }
 
 func XMLSndfile(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2071,7 +2071,7 @@ func XMLSndfile(name string) *mainStruct.Configuration {
 }
 
 func XMLXmlCdr(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2093,7 +2093,7 @@ func XMLXmlCdr(name string) *mainStruct.Configuration {
 }
 
 func XMLXmlRpc(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2115,7 +2115,7 @@ func XMLXmlRpc(name string) *mainStruct.Configuration {
 }
 
 func XMLZeroconf(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2137,7 +2137,7 @@ func XMLZeroconf(name string) *mainStruct.Configuration {
 }
 
 func XMLDirectory(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2188,7 +2188,7 @@ func XMLDirectory(name string) *mainStruct.Configuration {
 }
 
 func XMLFifo(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2239,7 +2239,7 @@ func XMLFifo(name string) *mainStruct.Configuration {
 }
 
 func XMLOpal(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2290,7 +2290,7 @@ func XMLOpal(name string) *mainStruct.Configuration {
 }
 
 func XMLOsp(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2341,7 +2341,7 @@ func XMLOsp(name string) *mainStruct.Configuration {
 }
 
 func XMLUnicall(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2392,7 +2392,7 @@ func XMLUnicall(name string) *mainStruct.Configuration {
 }
 
 func XMLConference(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2495,7 +2495,7 @@ func XMLConference(name string) *mainStruct.Configuration {
 }
 
 func XMLConferenceLayouts(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2549,9 +2549,10 @@ func XMLConferenceLayouts(name string) *mainStruct.Configuration {
 		Name:        name,
 		Description: "ConferenceLayouts Config",
 		AnyXML: struct {
-			T interface{} `xml:"layout-settings"`
+			XMLName xml.Name `xml:"layout-settings"`
+			T       []interface{}
 		}{
-			[]interface{}{
+			T: []interface{}{
 				struct {
 					XMLName xml.Name    `xml:"layouts,omitempty"`
 					Inner   interface{} `xml:"layout"`
@@ -2567,7 +2568,7 @@ func XMLConferenceLayouts(name string) *mainStruct.Configuration {
 }
 
 func XMLPostLoadModules(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2589,7 +2590,7 @@ func XMLPostLoadModules(name string) *mainStruct.Configuration {
 }
 
 func XMLVoicemail(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2646,7 +2647,7 @@ func XMLVoicemail(name string) *mainStruct.Configuration {
 }
 
 func XMLDistributor(name string) *mainStruct.Configuration {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if err != nil || c == nil || !c.Enabled {
 		return nil
 	}
@@ -2689,7 +2690,7 @@ func XMLDistributor(name string) *mainStruct.Configuration {
 }
 
 func setConf(name string, unloadable bool) (*altStruct.ConfigurationsList, error) {
-	c, err := getCurrentConfigByName(name)
+	c, err := GetCurrentConfigByName(name)
 	if c != nil {
 		return nil, errors.New("already exists")
 	}
@@ -2703,7 +2704,7 @@ func setConf(name string, unloadable bool) (*altStruct.ConfigurationsList, error
 		return nil, err
 	}
 
-	return getCurrentConfigByName(name)
+	return GetCurrentConfigByName(name)
 }
 
 func SetConfAcl() (*altStruct.ConfigurationsList, error) {
@@ -2895,7 +2896,7 @@ func SetConfConference() (*altStruct.ConfigurationsList, error) {
 }
 
 func SetConfConferenceLayouts() (*altStruct.ConfigurationsList, error) {
-	return setConf(mainStruct.ConfConferenceLayouts, false)
+	return setConf(mainStruct.ConfConferenceLayouts, true)
 }
 
 func SetConfPostLoadModules() (*altStruct.ConfigurationsList, error) {
@@ -3879,7 +3880,7 @@ func SetConfCallcenterMember(
 }
 
 func IsSofiaExists() bool {
-	conf, err := getCurrentConfigByName(mainStruct.ConfSofia)
+	conf, err := GetCurrentConfigByName(mainStruct.ConfSofia)
 	if err != nil {
 		return false
 	}
@@ -3887,7 +3888,7 @@ func IsSofiaExists() bool {
 }
 
 func GetSofiaProfileByName(name string) *altStruct.ConfigSofiaProfile {
-	conf, err := getCurrentConfigByName(mainStruct.ConfSofia)
+	conf, err := GetCurrentConfigByName(mainStruct.ConfSofia)
 	if err != nil {
 		return nil
 	}
@@ -3935,7 +3936,7 @@ func GetSofiaProfileGateway(name string) *altStruct.ConfigSofiaProfileGateway {
 		return nil
 	}
 	return &gateway
-	/*conf, err := getCurrentConfigByName(mainStruct.ConfSofia)
+	/*conf, err := GetCurrentConfigByName(mainStruct.ConfSofia)
 		if err != nil {
 			return nil
 		}
@@ -3963,7 +3964,7 @@ func GetSofiaProfileGateway(name string) *altStruct.ConfigSofiaProfileGateway {
 }
 
 func IsVertoExists() bool {
-	conf, err := getCurrentConfigByName(mainStruct.ConfVerto)
+	conf, err := GetCurrentConfigByName(mainStruct.ConfVerto)
 	if err != nil {
 		return false
 	}
@@ -3971,7 +3972,7 @@ func IsVertoExists() bool {
 }
 
 func GetVertoProfileByName(name string) *altStruct.ConfigVertoProfile {
-	conf, err := getCurrentConfigByName(mainStruct.ConfVerto)
+	conf, err := GetCurrentConfigByName(mainStruct.ConfVerto)
 	if err != nil {
 		return nil
 	}
@@ -4005,7 +4006,7 @@ func GetVertoProfileParamByName(id int64, name string) *altStruct.ConfigVertoPro
 }
 
 func IsCallcenterEnabled() bool {
-	conf, err := getCurrentConfigByName(mainStruct.ConfCallcenter)
+	conf, err := GetCurrentConfigByName(mainStruct.ConfCallcenter)
 	if err != nil {
 		return false
 	}

@@ -54,7 +54,7 @@ export class KeyValuePadPositionComponent implements OnInit {
     if (valueObject1 && !valueObject1.disabled) {
       obj1 = valueObject1.valid;
     }
-    if (valueObject2 && !valueObject1.disabled) {
+    if (valueObject2 && !valueObject2.disabled) {
       obj2 = valueObject2.valid;
     }
     if (valueObject && !valueObject.disabled) {
@@ -106,7 +106,7 @@ export class KeyValuePadPositionComponent implements OnInit {
     if (!this.dispatchersCallbacks || !this.dispatchersCallbacks['updateItem']) {
       return;
     }
-    const obj = {id: id, name: name, value: value}
+    const obj = {id: id, name: name, value: value};
 
     if (this.fieldsMask.extraField1) {
       obj[this.fieldsMask.extraField1.name] = exta1;
@@ -144,7 +144,7 @@ export class KeyValuePadPositionComponent implements OnInit {
       args.push(extraField1);
     }
     if (this.fieldsMask.extraField2) {
-      args.push(extraField2 || extraField1); // If extraField2 is not provided, fallback to extraField1
+      args.push(extraField2);
     }
 
     this.dispatchersCallbacks['addItem'](...args);

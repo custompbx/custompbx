@@ -291,6 +291,8 @@ func IsConfName(name string) bool {
 		return true
 	case ConfConference:
 		return true
+	case ConfConferenceLayouts:
+		return true
 	case ConfPostLoadModules:
 		return true
 	case ConfVoicemail:

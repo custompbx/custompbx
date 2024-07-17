@@ -1,39 +1,37 @@
 <app-inner-header name="Conference" [loadCounter]="loadCounter"></app-inner-header>
 <app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
-               *ngIf="list && list.exists !== false">
-  <mat-tab label="List">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Advertise</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Advertise
-            </mat-panel-title>
-            <mat-panel-description>
-              Click to get details
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <h3>Rooms:</h3>
-          <app-key-value-pad-2 [exist]="list.advertise"
-                               [items]="list.advertise"
-                               [newItems]="list.advertise?.new"
-                               [id]="null"
-                               [toCopy]="null"
-                               [dispatchersCallbacks]="globalSettingsDispatchers"
-                               [fieldsMask]="advertiseMask"
-          >
-          </app-key-value-pad-2>
-        </mat-expansion-panel>
-      </mat-card-content>
-    </mat-card>
-
-     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-      <mat-tab label="Caller Control Groups">
-
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" *ngIf="list && list.exists !== false"
+               (selectedIndexChange)="mainTabChanged($event)">
+  <mat-tab label="Conference">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+      <mat-tab label="List">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-subtitle>Advertise</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  Advertise
+                </mat-panel-title>
+                <mat-panel-description>
+                  Click to get details
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <h3>Rooms:</h3>
+              <app-key-value-pad-2 [exist]="list.advertise"
+                                   [items]="list.advertise"
+                                   [newItems]="list.advertise?.new"
+                                   [id]="null"
+                                   [toCopy]="null"
+                                   [dispatchersCallbacks]="globalSettingsDispatchers"
+                                   [fieldsMask]="advertiseMask"
+              >
+              </app-key-value-pad-2>
+            </mat-expansion-panel>
+          </mat-card-content>
+        </mat-card>
         <mat-card>
           <mat-card-header>
             <mat-card-subtitle>Caller Control Groups</mat-card-subtitle>
@@ -43,7 +41,7 @@
               <mat-expansion-panel (opened)="getConferenceCallerControls(item.id)">
                 <mat-expansion-panel-header>
                   <mat-panel-title>
-                    {{item.name}}
+                    {{ item.name }}
                   </mat-panel-title>
                   <mat-panel-description>
                     Click to get details
@@ -68,10 +66,6 @@
             </div>
           </mat-card-content>
         </mat-card>
-
-      </mat-tab>
-      <mat-tab label="Profiles">
-
         <mat-card>
           <mat-card-header>
             <mat-card-subtitle>Profiles</mat-card-subtitle>
@@ -81,7 +75,7 @@
               <mat-expansion-panel (opened)="getConferenceProfilesParams(item.id)">
                 <mat-expansion-panel-header>
                   <mat-panel-title>
-                    {{item.name}}
+                    {{ item.name }}
                   </mat-panel-title>
                   <mat-panel-description>
                     Click to get details
@@ -105,10 +99,6 @@
             </div>
           </mat-card-content>
         </mat-card>
-
-      </mat-tab>
-      <mat-tab label="Chat Permissions">
-
         <mat-card>
           <mat-card-header>
             <mat-card-subtitle>Chat Permissions</mat-card-subtitle>
@@ -118,7 +108,7 @@
               <mat-expansion-panel (opened)="getConferenceChatPermissionsUsers(item.id)">
                 <mat-expansion-panel-header>
                   <mat-panel-title>
-                    {{item.name}}
+                    {{ item.name }}
                   </mat-panel-title>
                   <mat-panel-description>
                     Click to get details
@@ -143,111 +133,256 @@
             </div>
           </mat-card-content>
         </mat-card>
+
+      </mat-tab>
+      <mat-tab label="Add">
+        <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Profile Name</mat-label>
+            <input matInput placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
+          </mat-form-field>
+          <button mat-raised-button color="primary" type="submit">Submit</button>
+        </form>
+        <form class="spacer spacerb" (ngSubmit)="onControlGroupSubmit()">
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Control Group Name</mat-label>
+            <input matInput placeholder="New control group name" required name="name" [(ngModel)]="newControlGroupName">
+          </mat-form-field>
+          <button mat-raised-button color="primary" type="submit">Submit</button>
+        </form>
+        <form class="spacer spacerb" (ngSubmit)="onChatPermissionSubmit()">
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Chat Permission Profile Name</mat-label>
+            <input matInput placeholder="New chat permission profile name" required name="name"
+                   [(ngModel)]="newChatPermissionName">
+          </mat-form-field>
+          <button mat-raised-button color="primary" type="submit">Submit</button>
+        </form>
+      </mat-tab>
+
+      <mat-tab label="Delete/Rename">
+        <form class="spacer spacerb" #deleteForm="ngForm">
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Profile</mat-label>
+            <mat-select required name="profile" [(ngModel)]="profileId" disableOptionCentering>
+              <mat-option *ngFor="let val of onlyValues(list.profiles); trackBy: trackByFn" [value]="val.id">
+                {{ val.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Caller Control Group</mat-label>
+            <mat-select required name="group" [(ngModel)]="controlGroupId" disableOptionCentering>
+              <mat-option *ngFor="let val of onlyValues(list.caller_controls); trackBy: trackByFn" [value]="val.id">
+                {{ val.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Caller Control Group</mat-label>
+            <mat-select required name="chat-profile" [(ngModel)]="chatPermissionId" disableOptionCentering>
+              <mat-option *ngFor="let val of onlyValues(list.chat_profiles); trackBy: trackByFn" [value]="val.id">
+                {{ val.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div *ngIf="list.profiles && list.profiles[profileId]">
+            <h3>Profile:</h3>
+            <mat-form-field hideRequiredMarker>
+              <mat-label>Profile name</mat-label>
+              <input matInput name="Profile name" required [ngModel]="list.profiles[profileId].name"
+                     [name]="'profile::' + profileId">
+            </mat-form-field>
+            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profileId])"
+                    (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list.profiles[profileId].name, 'rename')">
+              Update
+            </button>
+            <button mat-raised-button color="warn"
+                    (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list.profiles[profileId].name, 'delete')">
+              Delete
+            </button>
+          </div>
+          <div *ngIf="list.caller_controls && list.caller_controls[controlGroupId]">
+            <h3>Group:</h3>
+            <mat-form-field hideRequiredMarker>
+              <mat-label>Group name</mat-label>
+              <input matInput name="Group name" required [ngModel]="list.caller_controls[controlGroupId].name"
+                     [name]="'group::' + controlGroupId">
+            </mat-form-field>
+            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['group::' + controlGroupId])"
+                    (click)="openBottomSheetControlGroup(controlGroupId, deleteForm.controls['group::' + controlGroupId].value, list.caller_controls[controlGroupId].name, 'rename')">
+              Update
+            </button>
+            <button mat-raised-button color="warn"
+                    (click)="openBottomSheetControlGroup(controlGroupId, deleteForm.controls['group::' + controlGroupId].value, list.caller_controls[controlGroupId].name, 'delete')">
+              Delete
+            </button>
+          </div>
+          <div *ngIf="list.chat_profiles && list.chat_profiles[chatPermissionId]">
+            <h3>Permission profile:</h3>
+            <mat-form-field hideRequiredMarker>
+              <mat-label>Permission profile name</mat-label>
+              <input matInput name="Permission profile name" required
+                     [ngModel]="list.chat_profiles[chatPermissionId].name"
+                     [name]="'chat-profile::' + chatPermissionId">
+            </mat-form-field>
+            <button mat-button color="accent"
+                    [disabled]="checkDirty(deleteForm.controls['chat-profile::' + chatPermissionId])"
+                    (click)="openBottomSheetChatPermissionProfile(chatPermissionId, deleteForm.controls['chat-profile::' + chatPermissionId].value, list.chat_profiles[chatPermissionId].name, 'rename')">
+              Update
+            </button>
+            <button mat-raised-button color="warn"
+                    (click)="openBottomSheetChatPermissionProfile(chatPermissionId, deleteForm.controls['chat-profile::' + chatPermissionId].value, list.chat_profiles[chatPermissionId].name, 'delete')">
+              Delete
+            </button>
+          </div>
+        </form>
       </mat-tab>
     </mat-tab-group>
   </mat-tab>
+  <mat-tab label="Conference Layouts">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
+      <mat-tab label="List">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-subtitle>Layouts</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngFor="let item of onlyValues(list.layouts?.conference_layouts); trackBy: trackByFn"
+                 class="panel-wrapper">
+              <mat-expansion-panel (opened)="getConferenceLayoutImages(item.id)">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{ item.name }}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    Click to get details
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <button mat-raised-button color="basic" (click)="copyLayoutImage(item.id)"
+                        *ngIf="list.layouts?.conference_layouts[item.id] && (list.layouts?.conference_layouts[item.id].images)">
+                  Copy
+                </button>
+                <h3>Auto 3d Position:</h3>
+                <div class="spacer">
+                  <form #auto3d="ngForm">
+                    <mat-form-field hideRequiredMarker>
+                      <mat-label>Auto 3d Position</mat-label>
+                      <input matInput placeholder="auto_3d_position" [ngModel]="item.auto_3d_position" required
+                             [name]="'auto_3d_position' + item.id">
+                    </mat-form-field>
+                    <button mat-button color="accent"
+                            [disabled]="!isvalueReadyToSend(auto3d.controls['auto_3d_position' + item.id])"
+                            (click)="updateConferenceLayout3D(item.id, auto3d.controls['auto_3d_position' + item.id].value)">
+                      Update
+                    </button>
+                  </form>
+                </div>
+                <h3>Images:</h3>
+                <div>
+                  <app-key-value-pad-2 [exist]="item.images || item.new"
+                                       [items]="item.images"
+                                       [newItems]="item.new"
+                                       [id]="item.id"
+                                       [toCopy]="toCopylayoutImage"
+                                       [dispatchersCallbacks]="layoutImageDispatchers"
+                                       [fieldsMask]="layoutImageMask"
+                  >
+                  </app-key-value-pad-2>
+                </div>
+              </mat-expansion-panel>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card>
+          <mat-card-header>
+            <mat-card-subtitle>Layout's groups</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngFor="let item of onlyValues(list.layouts?.conference_layouts_groups); trackBy: trackByFn"
+                 class="panel-wrapper">
+              <mat-expansion-panel (opened)="getConferenceLayoutGroupLayouts(item.id)">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{ item.name }}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    Click to get details
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <button mat-raised-button color="basic" (click)="copyLayoutGroup(item.id)"
+                        *ngIf="list.layouts?.conference_layouts_groups[item.id] && (list.layouts?.conference_layouts_groups[item.id].layouts)">
+                  Copy
+                </button>
+                <h3>Layouts:</h3>
+                <div>
+                  <app-key-value-pad-2 [exist]="item.layouts || item.new"
+                                       [items]="item.layouts"
+                                       [newItems]="item.new"
+                                       [id]="item.id"
+                                       [toCopy]="toCopylayoutGroup"
+                                       [dispatchersCallbacks]="layoutGroupDispatchers"
+                                       [fieldsMask]="layoutGroupMask"
+                  >
+                  </app-key-value-pad-2>
+                </div>
+              </mat-expansion-panel>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
 
-  <mat-tab label="Add">
-    <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Profile Name</mat-label>
-        <input matInput placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-    <form class="spacer spacerb" (ngSubmit)="onControlGroupSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Control Group Name</mat-label>
-        <input matInput placeholder="New control group name" required name="name" [(ngModel)]="newControlGroupName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-    <form class="spacer spacerb" (ngSubmit)="onChatPermissionSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Chat Permission Profile Name</mat-label>
-        <input matInput placeholder="New chat permission profile name" required name="name"
-               [(ngModel)]="newChatPermissionName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-  </mat-tab>
+      <mat-tab label="Add">
+        <form class="spacer spacerb" (ngSubmit)="onLayoutSubmit()">
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Layout Name</mat-label>
+            <input matInput placeholder="New Layout name" required name="name" [(ngModel)]="newLayoutName">
+          </mat-form-field>
+          <button mat-raised-button color="primary" type="submit">Submit</button>
+        </form>
+        <form class="spacer spacerb" (ngSubmit)="onLayoutGroupSubmit()">
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Group Name</mat-label>
+            <input matInput placeholder="New Group name" required name="name" [(ngModel)]="newLayoutGroupName">
+          </mat-form-field>
+          <button mat-raised-button color="primary" type="submit">Submit</button>
+        </form>
+      </mat-tab>
 
-  <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb" #deleteForm="ngForm">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Profile</mat-label>
-        <mat-select required name="profile" [(ngModel)]="profileId" disableOptionCentering>
-          <mat-option *ngFor="let val of onlyValues(list.profiles); trackBy: trackByFn" [value]="val.id">
-            {{val.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Caller Control Group</mat-label>
-        <mat-select required name="group" [(ngModel)]="controlGroupId" disableOptionCentering>
-          <mat-option *ngFor="let val of onlyValues(list.caller_controls); trackBy: trackByFn" [value]="val.id">
-            {{val.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Caller Control Group</mat-label>
-        <mat-select required name="chat-profile" [(ngModel)]="chatPermissionId" disableOptionCentering>
-          <mat-option *ngFor="let val of onlyValues(list.chat_profiles); trackBy: trackByFn" [value]="val.id">
-            {{val.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <div *ngIf="list.profiles && list.profiles[profileId]">
-        <h3>Profile:</h3>
-        <mat-form-field hideRequiredMarker>
-        <mat-label>Profile name</mat-label>
-        <input matInput name="Profile name" required [ngModel]="list.profiles[profileId].name"
-                 [name]="'profile::' + profileId">
-        </mat-form-field>
-        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profileId])"
-                (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list.profiles[profileId].name, 'rename')">
-          Update
-        </button>
-        <button mat-raised-button color="warn"
-                (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list.profiles[profileId].name, 'delete')">
-          Delete
-        </button>
-      </div>
-      <div *ngIf="list.caller_controls && list.caller_controls[controlGroupId]">
-        <h3>Group:</h3>
-        <mat-form-field hideRequiredMarker>
-        <mat-label>Group name</mat-label>
-        <input matInput name="Group name" required [ngModel]="list.caller_controls[controlGroupId].name"
-                 [name]="'group::' + controlGroupId">
-        </mat-form-field>
-        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['group::' + controlGroupId])"
-                (click)="openBottomSheetControlGroup(controlGroupId, deleteForm.controls['group::' + controlGroupId].value, list.caller_controls[controlGroupId].name, 'rename')">
-          Update
-        </button>
-        <button mat-raised-button color="warn"
-                (click)="openBottomSheetControlGroup(controlGroupId, deleteForm.controls['group::' + controlGroupId].value, list.caller_controls[controlGroupId].name, 'delete')">
-          Delete
-        </button>
-      </div>
-      <div *ngIf="list.chat_profiles && list.chat_profiles[chatPermissionId]">
-        <h3>Permission profile:</h3>
-        <mat-form-field hideRequiredMarker>
-        <mat-label>Permission profile name</mat-label>
-        <input matInput name="Permission profile name" required
-                 [ngModel]="list.chat_profiles[chatPermissionId].name"
-                 [name]="'chat-profile::' + chatPermissionId">
-        </mat-form-field>
-        <button mat-button color="accent"
-                [disabled]="checkDirty(deleteForm.controls['chat-profile::' + chatPermissionId])"
-                (click)="openBottomSheetChatPermissionProfile(chatPermissionId, deleteForm.controls['chat-profile::' + chatPermissionId].value, list.chat_profiles[chatPermissionId].name, 'rename')">
-          Update
-        </button>
-        <button mat-raised-button color="warn"
-                (click)="openBottomSheetChatPermissionProfile(chatPermissionId, deleteForm.controls['chat-profile::' + chatPermissionId].value, list.chat_profiles[chatPermissionId].name, 'delete')">
-          Delete
-        </button>
-      </div>
-    </form>
+      <mat-tab label="Delete/Rename">
+        <form class="spacer spacerb" #deleteForm="ngForm" *ngIf="list.layouts">
+          <h3>Layouts:</h3>
+          <div *ngFor="let item of onlyValues(list.layouts?.conference_layouts); trackBy: trackByFn">
+            <mat-form-field hideRequiredMarker>
+              <mat-label>Layout</mat-label>
+              <input matInput name="Layout name" required [ngModel]="item.name" [name]="'layout::' + item.id">
+            </mat-form-field>
+            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['layout::' + item.id])"
+                    (click)="openBottomSheetLayout(item.id, deleteForm.controls['layout::' + item.id].value, item.name, 'rename')">
+              Update
+            </button>
+            <button mat-raised-button color="warn"
+                    (click)="openBottomSheetLayout(item.id, deleteForm.controls['layout::' + item.id].value, item.name, 'delete')">
+              Delete
+            </button>
+          </div>
+          <h3>Layout Groups:</h3>
+          <div *ngFor="let item of onlyValues(list.layouts?.conference_layouts_groups); trackBy: trackByFn">
+            <mat-form-field hideRequiredMarker>
+              <mat-label>Group</mat-label>
+              <input matInput name="Layout name" required [ngModel]="item.name" [name]="'group::' + item.id">
+            </mat-form-field>
+            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['group::' + item.id])"
+                    (click)="openBottomSheetLayoutGroup(item.id, deleteForm.controls['group::' + item.id].value, item.name, 'rename')">
+              Update
+            </button>
+            <button mat-raised-button color="warn"
+                    (click)="openBottomSheetLayoutGroup(item.id, deleteForm.controls['group::' + item.id].value, item.name, 'delete')">
+              Delete
+            </button>
+          </div>
+        </form>
+      </mat-tab>
+    </mat-tab-group>
   </mat-tab>
 </mat-tab-group>

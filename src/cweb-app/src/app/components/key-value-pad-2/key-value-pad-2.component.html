@@ -1,8 +1,8 @@
 <form *ngIf="exist" #form="ngForm">
   <div class="spacer" *ngFor="let item of onlyValues(items); trackBy: trackByFnId;">
     <div *ngIf="item.id && !isArray(item)">
-      <mat-form-field hideRequiredMarker  [ngStyle]="fieldsMask.name?.style">
-        <mat-label>{{fieldsMask.name.name}}</mat-label>
+      <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.name?.style">
+        <mat-label>{{ fieldsMask.name.name }}</mat-label>
         <input matInput [placeholder]="fieldsMask.name.name"
                [ngModel]="item[fieldsMask.name.name]" required
                [disabled]="!item.enabled || disIf(item[fieldsMask.name.depend], fieldsMask.name.value)"
@@ -11,8 +11,8 @@
                [resizeOnString]="item[fieldsMask.name.name]"
         >
       </mat-form-field>
-      <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.value?.style">
-        <mat-label>{{fieldsMask.value.name}}</mat-label>
+      <mat-form-field hideRequiredMarker *ngIf="fieldsMask.value" [ngStyle]="fieldsMask.value?.style">
+        <mat-label>{{ fieldsMask.value.name }}</mat-label>
         <input matInput [placeholder]="fieldsMask.value.name"
                [ngModel]="item[fieldsMask.value.name]"
                [disabled]="!item.enabled || disIf(item[fieldsMask.value.depend], fieldsMask.value.value)"
@@ -22,7 +22,7 @@
         ><!--(inputType)="item.textarea = $event"-->
       </mat-form-field>
       <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField1" [ngStyle]="fieldsMask.extraField1?.style">
-        <mat-label>{{fieldsMask.extraField1.name}}</mat-label>
+        <mat-label>{{ fieldsMask.extraField1.name }}</mat-label>
         <input matInput [placeholder]="fieldsMask.extraField1.name"
                [ngModel]="item[fieldsMask.extraField1.name]"
                [disabled]="!item.enabled || disIf(item[fieldsMask.extraField1.depend], fieldsMask.extraField1.value)"
@@ -32,7 +32,7 @@
         >
       </mat-form-field>
       <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField2" [ngStyle]="fieldsMask.extraField2?.style">
-        <mat-label>{{fieldsMask.extraField2.name}}</mat-label>
+        <mat-label>{{ fieldsMask.extraField2.name }}</mat-label>
         <input matInput [placeholder]="fieldsMask.extraField2.name"
                [ngModel]="item[fieldsMask.extraField2.name]"
                [disabled]="!item.enabled || disIf(item[fieldsMask.extraField2.depend], fieldsMask.extraField2.value)"
@@ -41,9 +41,81 @@
                [resizeOnString]="item[fieldsMask.extraField2.name]"
         >
       </mat-form-field>
+      <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField3" [ngStyle]="fieldsMask.extraField3?.style">
+        <mat-label>{{ fieldsMask.extraField3.name }}</mat-label>
+        <input matInput [placeholder]="fieldsMask.extraField3.name"
+               [ngModel]="item[fieldsMask.extraField3.name]"
+               [disabled]="!item.enabled || disIf(item[fieldsMask.extraField3.depend], fieldsMask.extraField3.value)"
+               [name]="'itemExtraField3' + item.id"
+               appResizeInput
+               [resizeOnString]="item[fieldsMask.extraField3.name]"
+        >
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField4" [ngStyle]="fieldsMask.extraField4?.style">
+        <mat-label>{{ fieldsMask.extraField4.name }}</mat-label>
+        <input matInput [placeholder]="fieldsMask.extraField4.name"
+               [ngModel]="item[fieldsMask.extraField4.name]"
+               [disabled]="!item.enabled || disIf(item[fieldsMask.extraField4.depend], fieldsMask.extraField4.value)"
+               [name]="'itemExtraField4' + item.id"
+               appResizeInput
+               [resizeOnString]="item[fieldsMask.extraField4.name]"
+        >
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField5" [ngStyle]="fieldsMask.extraField5?.style">
+        <mat-label>{{ fieldsMask.extraField5.name }}</mat-label>
+        <input matInput [placeholder]="fieldsMask.extraField5.name"
+               [ngModel]="item[fieldsMask.extraField5.name]"
+               [disabled]="!item.enabled || disIf(item[fieldsMask.extraField5.depend], fieldsMask.extraField5.value)"
+               [name]="'itemExtraField5' + item.id"
+               appResizeInput
+               [resizeOnString]="item[fieldsMask.extraField5.name]"
+        >
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField6" [ngStyle]="fieldsMask.extraField6?.style">
+        <mat-label>{{ fieldsMask.extraField6.name }}</mat-label>
+        <input matInput [placeholder]="fieldsMask.extraField6.name"
+               [ngModel]="item[fieldsMask.extraField6.name]"
+               [disabled]="!item.enabled || disIf(item[fieldsMask.extraField6.depend], fieldsMask.extraField6.value)"
+               [name]="'itemExtraField6' + item.id"
+               appResizeInput
+               [resizeOnString]="item[fieldsMask.extraField6.name]"
+        >
+      </mat-form-field>
+      <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField7" [ngStyle]="fieldsMask.extraField7?.style">
+        <mat-label>{{ fieldsMask.extraField7.name }}</mat-label>
+        <input matInput [placeholder]="fieldsMask.extraField7.name"
+               [ngModel]="item[fieldsMask.extraField7.name]"
+               [disabled]="!item.enabled || disIf(item[fieldsMask.extraField7.depend], fieldsMask.extraField7.value)"
+               [name]="'itemExtraField7' + item.id"
+               appResizeInput
+               [resizeOnString]="item[fieldsMask.extraField7.name]"
+        >
+      </mat-form-field>
       <button mat-button color="accent" class="but-spacer-left"
-              [disabled]="!isReadyToSend(form.controls['itemName' + item.id], form.controls['itemValue' + item.id], form.controls['itemExtraField1' + item.id], form.controls['itemExtraField2' + item.id])"
-              (click)="updateItem(item.id, form.controls['itemName' + item.id].value, form.controls['itemValue' + item.id].value, form.controls['itemExtraField1' + item.id]?.value, form.controls['itemExtraField2' + item.id]?.value); form.controls['itemName' + item.id].markAsPristine(); form.controls['itemValue' + item.id].markAsPristine();">
+              [disabled]="!isReadyToSend(
+                 form.controls['itemName' + item.id],
+                 form.controls['itemValue' + item.id],
+                 form.controls['itemExtraField1' + item.id],
+                 form.controls['itemExtraField2' + item.id],
+                 form.controls['itemExtraField3' + item.id],
+                 form.controls['itemExtraField4' + item.id],
+                 form.controls['itemExtraField5' + item.id],
+                 form.controls['itemExtraField6' + item.id],
+                 form.controls['itemExtraField7' + item.id]
+                 )"
+              (click)="updateItem(
+                    item.id,
+                    form.controls['itemName' + item.id].value,
+                    form.controls['itemValue' + item.id]?.value,
+                    form.controls['itemExtraField1' + item.id]?.value,
+                    form.controls['itemExtraField2' + item.id]?.value,
+                    form.controls['itemExtraField3' + item.id]?.value,
+                    form.controls['itemExtraField4' + item.id]?.value,
+                    form.controls['itemExtraField5' + item.id]?.value,
+                    form.controls['itemExtraField6' + item.id]?.value,
+                    form.controls['itemExtraField7' + item.id]?.value);
+                    form.controls['itemName' + item.id].markAsPristine();
+                    form.controls['itemValue' + item.id]?.markAsPristine();">
         Update
       </button>
       <button *ngIf="item.enabled" mat-raised-button color="accent"
@@ -66,30 +138,30 @@
     <div class="spacer" *ngFor="let item of newItems; let i = index">
       <div *ngIf="item">
         <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.name?.style">
-          <mat-label>{{fieldsMask.name.name}}</mat-label>
+          <mat-label>{{ fieldsMask.name.name }}</mat-label>
           <input matInput
                  [placeholder]="fieldsMask.name.name"
-                 [ngModel]="item.name" required
+                 [(ngModel)]="item.name" required
                  [name]="'newItemName' + i"
                  appResizeInput
                  [resizeOnString]="item.name"
           >
         </mat-form-field>
-        <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.value?.style">
-          <mat-label>{{fieldsMask.value.name}}</mat-label>
+        <mat-form-field hideRequiredMarker *ngIf="fieldsMask.value" [ngStyle]="fieldsMask.value?.style">
+          <mat-label>{{ fieldsMask.value.name }}</mat-label>
           <input matInput
                  [placeholder]="fieldsMask.value.name"
-                 [ngModel]="item.value"
+                 [(ngModel)]="item.value"
                  [name]="'newItemValue' + i"
                  appResizeInput
                  [resizeOnString]="item.value"
           >
         </mat-form-field>
         <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField1" [ngStyle]="fieldsMask.extraField1?.style">
-          <mat-label>{{fieldsMask.extraField1.name}}</mat-label>
+          <mat-label>{{ fieldsMask.extraField1.name }}</mat-label>
           <input matInput
                  [placeholder]="fieldsMask.extraField1.name"
-                 [ngModel]="item[fieldsMask.extraField1.name]"
+                 [(ngModel)]="item[fieldsMask.extraField1.name]"
                  [name]="'newItemExtraField1' + i"
                  [disabled]="disIf(item[fieldsMask.extraField1.depend], fieldsMask.extraField1.value)"
                  appResizeInput
@@ -97,19 +169,95 @@
           >
         </mat-form-field>
         <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField2" [ngStyle]="fieldsMask.extraField2?.style">
-          <mat-label>{{fieldsMask.extraField2.name}}</mat-label>
+          <mat-label>{{ fieldsMask.extraField2.name }}</mat-label>
           <input matInput
                  [placeholder]="fieldsMask.extraField2.name"
-                 [ngModel]="item[fieldsMask.extraField2.name]"
+                 [(ngModel)]="item[fieldsMask.extraField2.name]"
                  [name]="'newItemExtraField2' + i"
                  [disabled]="disIf(item[fieldsMask.extraField2.depend], fieldsMask.extraField2.value)"
                  appResizeInput
                  [resizeOnString]="item[fieldsMask.extraField2.name]"
           >
         </mat-form-field>
+        <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField3" [ngStyle]="fieldsMask.extraField3?.style">
+          <mat-label>{{ fieldsMask.extraField3.name }}</mat-label>
+          <input matInput
+                 [placeholder]="fieldsMask.extraField3.name"
+                 [(ngModel)]="item[fieldsMask.extraField3.name]"
+                 [name]="'newItemExtraField3' + i"
+                 [disabled]="disIf(item[fieldsMask.extraField3.depend], fieldsMask.extraField3.value)"
+                 appResizeInput
+                 [resizeOnString]="item[fieldsMask.extraField3.name]"
+          >
+        </mat-form-field>
+        <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField4" [ngStyle]="fieldsMask.extraField4?.style">
+          <mat-label>{{ fieldsMask.extraField4.name }}</mat-label>
+          <input matInput
+                 [placeholder]="fieldsMask.extraField4.name"
+                 [(ngModel)]="item[fieldsMask.extraField4.name]"
+                 [name]="'newItemExtraField4' + i"
+                 [disabled]="disIf(item[fieldsMask.extraField4.depend], fieldsMask.extraField4.value)"
+                 appResizeInput
+                 [resizeOnString]="item[fieldsMask.extraField4.name]"
+          >
+        </mat-form-field>
+        <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField5" [ngStyle]="fieldsMask.extraField5?.style">
+          <mat-label>{{ fieldsMask.extraField5.name }}</mat-label>
+          <input matInput
+                 [placeholder]="fieldsMask.extraField5.name"
+                 [(ngModel)]="item[fieldsMask.extraField5.name]"
+                 [name]="'newItemExtraField5' + i"
+                 [disabled]="disIf(item[fieldsMask.extraField5.depend], fieldsMask.extraField5.value)"
+                 appResizeInput
+                 [resizeOnString]="item[fieldsMask.extraField5.name]"
+          >
+        </mat-form-field>
+        <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField6" [ngStyle]="fieldsMask.extraField6?.style">
+          <mat-label>{{ fieldsMask.extraField6.name }}</mat-label>
+          <input matInput
+                 [placeholder]="fieldsMask.extraField6.name"
+                 [(ngModel)]="item[fieldsMask.extraField6.name]"
+                 [name]="'newItemExtraField6' + i"
+                 [disabled]="disIf(item[fieldsMask.extraField6.depend], fieldsMask.extraField6.value)"
+                 appResizeInput
+                 [resizeOnString]="item[fieldsMask.extraField6.name]"
+          >
+        </mat-form-field>
+        <mat-form-field hideRequiredMarker *ngIf="fieldsMask.extraField7" [ngStyle]="fieldsMask.extraField7?.style">
+          <mat-label>{{ fieldsMask.extraField7.name }}</mat-label>
+          <input matInput
+                 [placeholder]="fieldsMask.extraField7.name"
+                 [(ngModel)]="item[fieldsMask.extraField7.name]"
+                 [name]="'newItemExtraField7' + i"
+                 [disabled]="disIf(item[fieldsMask.extraField7.depend], fieldsMask.extraField7.value)"
+                 appResizeInput
+                 [resizeOnString]="item[fieldsMask.extraField7.name]"
+          >
+        </mat-form-field>
         <button mat-button color="accent" class="but-spacer-left"
-                [disabled]="!isNewReadyToSend(form.controls['newItemName' + i], form.controls['newItemValue' + i], form.controls['newItemExtraField1' + i], form.controls['newItemExtraField2' + i])"
-                (click)="addItem(i, form.controls['newItemName' + i].value, form.controls['newItemValue' + i].value, form.controls['newItemExtraField1' + i]?.value, form.controls['newItemExtraField2' + i]?.value)">
+                [disabled]="!isNewReadyToSend(
+                   form.controls['newItemName' + i],
+                   form.controls['newItemValue' + i],
+                   form.controls['newItemExtraField1' + i],
+                   form.controls['newItemExtraField2' + i],
+                   form.controls['newItemExtraField3' + i],
+                   form.controls['newItemExtraField4' + i],
+                   form.controls['newItemExtraField5' + i],
+                   form.controls['newItemExtraField6' + i],
+                   form.controls['newItemExtraField7' + i]
+                   )"
+                (click)="addItem(
+                    i,
+                    form.controls['newItemName' + i].value,
+                    form.controls['newItemValue' + i]?.value,
+                    form.controls['newItemExtraField1' + i]?.value,
+                    form.controls['newItemExtraField2' + i]?.value,
+                    form.controls['newItemExtraField3' + i]?.value,
+                    form.controls['newItemExtraField4' + i]?.value,
+                    form.controls['newItemExtraField5' + i]?.value,
+                    form.controls['newItemExtraField6' + i]?.value,
+                    form.controls['newItemExtraField7' + i]?.value
+                    )">
           Update
         </button>
         <button mat-button color="warn" class="but-spacer-left"

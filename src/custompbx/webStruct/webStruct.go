@@ -78,6 +78,7 @@ type MessageData struct {
 	Ids              []int64                                   `json:"ids,omitempty"`
 	AwsS3            altStruct.ConfigHttpCacheProfileAWSS3     `json:"aws_s3,omitempty"`
 	Azure            altStruct.ConfigHttpCacheProfileAzureBlob `json:"azure,omitempty"`
+	LayoutImages     altStruct.ConfigConferenceLayoutImage     `json:"layout_images,omitempty"`
 
 	Text     string    `json:"text,omitempty"`
 	UpToTime time.Time `json:"up_to_time,omitempty"`

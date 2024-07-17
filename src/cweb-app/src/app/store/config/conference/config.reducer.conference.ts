@@ -1,9 +1,68 @@
-import {Iitem, Iconference, initialState, State} from '../config.state.struct';
-import {All, ConfigActionTypes} from './config.actions.conference';
-import {getParentId} from "../config.reducers";
+import {Iitem, Iconference, initialState, State, Ilayouts} from '../config.state.struct';
+import {
+  AddConferenceLayout, AddConferenceLayoutGroup, AddConferenceLayoutGroupLayout, AddConferenceLayoutImage,
+  All,
+  ConfigActionTypes,
+  DelConferenceLayout,
+  DelConferenceLayoutGroup,
+  DelConferenceLayoutGroupLayout,
+  DelConferenceLayoutImage,
+  GetConferenceLayoutGroupLayouts,
+  GetConferenceLayouts,
+  StoreAddConferenceLayout,
+  StoreAddConferenceLayoutGroup,
+  StoreAddConferenceLayoutGroupLayout,
+  StoreAddConferenceLayoutImage,
+  StoreConferenceError,
+  StoreDelConferenceLayout,
+  StoreDelConferenceLayoutGroup,
+  StoreDelConferenceLayoutGroupLayout,
+  StoreDelConferenceLayoutImage,
+  StoreDropConferenceLayoutGroupLayout,
+  StoreDropConferenceLayoutImage,
+  StoreGetConferenceLayoutGroupLayouts,
+  StoreGetConferenceLayoutImages,
+  StoreGetConferenceLayouts,
+  StoreNewConferenceLayoutGroupLayout,
+  StoreNewConferenceLayoutImage,
+  StoreSwitchConferenceLayoutGroupLayout,
+  StoreSwitchConferenceLayoutImage,
+  StoreUpdateConferenceLayout,
+  StoreUpdateConferenceLayout3D,
+  StoreUpdateConferenceLayoutGroup,
+  StoreUpdateConferenceLayoutGroupLayout,
+  StoreUpdateConferenceLayoutImage,
+  SwitchConferenceLayout,
+  SwitchConferenceLayoutGroupLayout,
+  SwitchConferenceLayoutImage,
+  UpdateConferenceLayout,
+  UpdateConferenceLayout3D,
+  UpdateConferenceLayoutGroup,
+  UpdateConferenceLayoutGroupLayout,
+  UpdateConferenceLayoutImage
+} from './config.actions.conference';
+import {getParentId} from '../config.reducers';
 
 export function reducer(state = initialState, action: All): State {
   switch (action.type) {
+    case GetConferenceLayouts.type:
+    case GetConferenceLayoutGroupLayouts.type:
+    case UpdateConferenceLayout.type:
+    case UpdateConferenceLayoutGroup.type:
+    case UpdateConferenceLayout3D.type:
+    case UpdateConferenceLayoutImage.type:
+    case UpdateConferenceLayoutGroupLayout.type:
+    case DelConferenceLayout.type:
+    case DelConferenceLayoutGroup.type:
+    case DelConferenceLayoutGroupLayout.type:
+    case DelConferenceLayoutImage.type:
+    case SwitchConferenceLayoutImage.type:
+    case SwitchConferenceLayout.type:
+    case SwitchConferenceLayoutGroupLayout.type:
+    case AddConferenceLayout.type:
+    case AddConferenceLayoutGroup.type:
+    case AddConferenceLayoutGroupLayout.type:
+    case AddConferenceLayoutImage.type:
     case ConfigActionTypes.GetConference:
     case ConfigActionTypes.UpdateConferenceRoom:
     case ConfigActionTypes.SwitchConferenceRoom:
@@ -33,13 +92,16 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.AddConferenceChatPermission:
     case ConfigActionTypes.DelConferenceChatPermission:
     case ConfigActionTypes.UpdateConferenceChatPermission: {
-      return {...state,
+      return {
+        ...state,
         conference: {
           ...state.conference,
           errorMessage: null,
-        }, loadCounter: state.loadCounter + 1};
+        }, loadCounter: state.loadCounter + 1
+      };
     }
 
+    case StoreConferenceError.type:
     case ConfigActionTypes.StoreGotConferenceError: {
       return {
         ...state,
@@ -78,6 +140,7 @@ export function reducer(state = initialState, action: All): State {
           caller_controls: {...state.conference.caller_controls, ...ccGroups},
           profiles: {...state.conference.profiles, ...profiles},
           chat_profiles: {...state.conference.chat_profiles, ...chatProfiles},
+          layouts: {...state.conference.layouts},
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
@@ -877,6 +940,457 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         conference: {
           ...state.conference, chat_profiles: {...rest},
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreGetConferenceLayouts.type: {
+      const layouts = action.payload.response.data['conference_layouts'] || {};
+      const groups = action.payload.response.data['conference_layouts_groups'] || {};
+
+      if (!state.conference) {
+        state.conference = <Iconference>{};
+        state.loadCounter = 0;
+      }
+
+      return {
+        ...state,
+        conference: {
+          ...state.conference,
+          layouts: {
+            ...state.conference.layouts,
+            conference_layouts: {...layouts},
+            conference_layouts_groups: {...groups},
+          },
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreGetConferenceLayoutImages.type: {
+      const {data} = action.payload.response || {};
+      const parentId = getParentId(data);
+      if (parentId === 0) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const profile = state.conference.layouts.conference_layouts[parentId];
+      if (!profile) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      return {
+        ...state,
+        conference: <Iconference>{
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts: {
+              ...state.conference.layouts.conference_layouts,
+              [parentId]:
+                {...profile, images: {...data}}
+            }
+          },
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreGetConferenceLayoutGroupLayouts.type: {
+      const {data} = action.payload.response || {};
+      const parentId = getParentId(data);
+      if (parentId === 0) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const profile = state.conference.layouts.conference_layouts_groups[parentId];
+      if (!profile) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      return {
+        ...state,
+        conference: <Iconference>{
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts_groups: {
+              ...state.conference.layouts.conference_layouts_groups,
+              [parentId]:
+                {...profile, layouts: {...data}}
+            }
+          },
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreNewConferenceLayoutImage.type: {
+      const profile = state.conference.layouts.conference_layouts[action.payload.id];
+      if (!profile) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      const rest = profile.new || [];
+      return {
+        ...state,
+        conference: {
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts: {
+              ...state.conference.layouts.conference_layouts,
+              [action.payload.id]:
+                {...profile, new: [...rest, {}]}
+            }
+          },
+          errorMessage: null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreDropConferenceLayoutImage.type: {
+      const profile = state.conference.layouts.conference_layouts[action.payload.id];
+      if (!profile) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const rest = [
+        ...profile.new.slice(0, action.payload.index),
+        null,
+        ...profile.new.slice(action.payload.index + 1)
+      ];
+
+      return {
+        ...state,
+        conference: {
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts: {
+              ...state.conference.layouts.conference_layouts,
+              [action.payload.id]:
+                {...profile, new: rest}
+            }
+          },
+          errorMessage: null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreNewConferenceLayoutGroupLayout.type: {
+      const profile = state.conference.layouts.conference_layouts_groups[action.payload.id];
+      if (!profile) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const rest = profile.new || [];
+      return {
+        ...state,
+        conference: {
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts_groups: {
+              ...state.conference.layouts.conference_layouts_groups,
+              [action.payload.id]:
+                {...profile, new: [ ...rest, {} ]}
+            }
+          },
+          errorMessage: null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreDropConferenceLayoutGroupLayout.type: {
+      const profile = state.conference.layouts.conference_layouts_groups[action.payload.id];
+      if (!profile) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const rest = [
+        ...profile.new.slice(0, action.payload.index),
+        null,
+        ...profile.new.slice(action.payload.index + 1)
+      ];
+
+      return {
+        ...state,
+        conference: {
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts_groups: {
+              ...state.conference.layouts.conference_layouts_groups,
+              [action.payload.id]:
+                {...profile, new: rest}
+            }
+          },
+          errorMessage: null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreSwitchConferenceLayoutImage.type:
+    case StoreUpdateConferenceLayoutImage.type: {
+      const data = action.payload.response.data || {};
+      const parentId = getParentId(data);
+      if (parentId === 0) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const group = state.conference.layouts.conference_layouts[parentId];
+      if (!group) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      return {
+        ...state,
+        conference: <Iconference>{
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts: {
+              ...state.conference.layouts.conference_layouts, [parentId]:
+                {...group, images: {...state.conference.layouts.conference_layouts[parentId].images, [data.id]: data}}
+            }
+          },
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+    case StoreSwitchConferenceLayoutGroupLayout.type:
+    case StoreUpdateConferenceLayoutGroupLayout.type: {
+      const data = action.payload.response.data || {};
+      const parentId = getParentId(data);
+      if (parentId === 0) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const group = state.conference.layouts.conference_layouts_groups[parentId];
+      if (!group) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      return {
+        ...state,
+        conference: <Iconference>{
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts_groups: {
+              ...state.conference.layouts.conference_layouts_groups, [parentId]:
+                {
+                  ...group,
+                  layouts: {...state.conference.layouts.conference_layouts_groups[parentId].layouts, [data.id]: data}
+                }
+            }
+          },
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreAddConferenceLayoutImage.type: {
+      const data = action.payload.response.data || {};
+      const parentId = getParentId(data);
+      if (parentId === 0) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const profile = state.conference.layouts.conference_layouts[parentId];
+      if (!profile) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      let rest = [...profile.new || []];
+      if (action.payload.payload.index !== undefined) {
+        rest = [
+          ...profile.new.slice(0, action.payload.payload.index),
+          null,
+          ...profile.new.slice(action.payload.payload.index + 1)
+        ];
+      }
+
+      return {
+        ...state,
+        conference: <Iconference>{
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts: {
+              ...state.conference.layouts.conference_layouts, [parentId]:
+                {...profile, images: {...profile.images, [data.id]: data}, new: rest}
+            },
+            errorMessage: action.payload.response.error || null,
+          },
+          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        }
+      };
+    }
+    case StoreAddConferenceLayoutGroupLayout.type: {
+      const data = action.payload.response.data || {};
+      const parentId = getParentId(data);
+      if (parentId === 0) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const profile = state.conference.layouts.conference_layouts_groups[parentId];
+      if (!profile) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      let rest = [...profile.new || []];
+      if (action.payload.payload.index !== undefined) {
+        rest = [
+          ...profile.new.slice(0, action.payload.payload.index),
+          null,
+          ...profile.new.slice(action.payload.payload.index + 1)
+        ];
+      }
+
+      return {
+        ...state,
+        conference: <Iconference>{
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts_groups: {
+              ...state.conference.layouts.conference_layouts_groups, [parentId]:
+                {...profile, layouts: {...profile.layouts, [data.id]: data}, new: rest}
+            },
+            errorMessage: action.payload.response.error || null,
+          },
+          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        }
+      };
+    }
+
+    case StoreDelConferenceLayoutImage.type: {
+      const data = action.payload.response.data || {};
+      const parentId = getParentId(data);
+      if (parentId === 0) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const profile = state.conference.layouts.conference_layouts[parentId];
+      if (!profile || !profile.images[data.id]) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      const {[data.id]: toDel, ...rest} = profile.images;
+
+      return {
+        ...state,
+        conference: <Iconference>{
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts: {
+              ...state.conference.layouts.conference_layouts, [parentId]:
+                {...profile, images: {...rest}}
+            }
+          },
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreDelConferenceLayoutGroupLayout.type: {
+      const data = action.payload.response.data || {};
+      const parentId = getParentId(data);
+      if (parentId === 0) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+      const profile = state.conference.layouts.conference_layouts_groups[parentId];
+      if (!profile || !profile.layouts[data.id]) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      const {[data.id]: toDel, ...rest} = profile.layouts;
+
+      return {
+        ...state,
+        conference: <Iconference>{
+          ...state.conference, layouts: {
+            ...state.conference.layouts, conference_layouts_groups: {
+              ...state.conference.layouts.conference_layouts_groups, [parentId]:
+                {...profile, layouts: {...rest}}
+            }
+          },
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreAddConferenceLayout.type:
+    case StoreUpdateConferenceLayout.type:
+    case StoreUpdateConferenceLayout3D.type: {
+      const data = action.payload.response.data || {};
+      if (!data.id) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      if (!state.conference) {
+        state.conference = <Iconference>{};
+        state.loadCounter = 0;
+      }
+      if (!state.conference.layouts) {
+        state.conference.layouts = <Ilayouts>{};
+        state.loadCounter = 0;
+      }
+
+      return {
+        ...state,
+        conference: {
+          ...state.conference,
+          layouts: {...state.conference.layouts, conference_layouts: {
+            ...state.conference.layouts.conference_layouts,
+            [data.id]: {...data, images: {...state.conference.layouts.conference_layouts[data.id]?.images}}}},
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreAddConferenceLayoutGroup.type:
+    case StoreUpdateConferenceLayoutGroup.type: {
+      const data = action.payload.response.data || {};
+      if (!data.id) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      if (!state.conference) {
+        state.conference = <Iconference>{};
+        state.loadCounter = 0;
+      }
+      if (!state.conference.layouts) {
+        state.conference.layouts = <Ilayouts>{};
+        state.loadCounter = 0;
+      }
+
+      return {
+        ...state,
+        conference: {
+          ...state.conference,
+          layouts: {...state.conference.layouts, conference_layouts_groups: {
+            ...state.conference.layouts.conference_layouts_groups,
+            [data.id]: {...data, layouts: {...state.conference.layouts.conference_layouts_groups[data.id]?.layouts}}}},
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreDelConferenceLayout.type: {
+      const id = action.payload.response.data?.id || 0;
+      if (!state.conference.layouts.conference_layouts[id]) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      const {[id]: toDel, ...rest} = state.conference.layouts.conference_layouts;
+
+      return {
+        ...state,
+        conference: {
+          ...state.conference, layouts: {...state.conference.layouts, conference_layouts: {...rest}},
+          errorMessage: action.payload.response.error || null,
+        },
+        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+      };
+    }
+
+    case StoreDelConferenceLayoutGroup.type: {
+      const id = action.payload.response.data?.id || 0;
+      if (!state.conference.layouts.conference_layouts_groups[id]) {
+        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      }
+
+      const {[id]: toDel, ...rest} = state.conference.layouts.conference_layouts_groups;
+
+      return {
+        ...state,
+        conference: {
+          ...state.conference, layouts: {...state.conference.layouts, conference_layouts_groups: {...rest}},
           errorMessage: action.payload.response.error || null,
         },
         loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,

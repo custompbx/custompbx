@@ -58,6 +58,13 @@ func GetByValue(item interface{}, fieldNames map[string]bool) ([]interface{}, er
 	return GetByValues(item, filter)
 }
 
+// GetByStructValue retrieves records from the database that match the given field names and values.
+func GetByStructValue(item interface{}, fieldNames []string) ([]interface{}, error) {
+	theMap := createFieldMap(fieldNames)
+	filter := createFilterFields(theMap)
+	return GetByValues(item, filter)
+}
+
 // GetByValues retrieves records from the database that match the given filter criteria.
 func GetByValues(item interface{}, filter map[string]customorm.FilterFields) ([]interface{}, error) {
 	corm := GetCORM()
