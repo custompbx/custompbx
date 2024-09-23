@@ -11,7 +11,7 @@ endif
 
 .PHONY: install show install-dep build dep-front dep-back front back front-serve install-node install-golang
 
-install: install-dep build
+install: install-golang install-node install-dep build
 
 show:
 		@ echo Timestamp: $(shell date)
@@ -54,5 +54,7 @@ install-node:
 		@ apt-get -y install nodejs
 
 install-golang:
-	wget https://dl.google.com/go/go1.19.2.linux-amd64.tar.gz
-	sudo tar -C /usr/local -xzf go1.19.2.linux-amd64.tar.gz
+		@ apt-get -y install wget
+		wget https://dl.google.com/go/go1.20.2.linux-amd64.tar.gz
+		sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.2.linux-amd64.tar.gz
+		export PATH=$PATH:/usr/local/go/bin

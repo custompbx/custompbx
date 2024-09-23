@@ -2,9 +2,9 @@
 
 **CustomPBX** (currently in development) is an API server and Web GUI for [FreeSwitch](https://github.com/signalwire/freeswitch), offering a pure FreeSWITCH experience. It can be installed on existing systems, allowing for the import of existing configurations. The system is encapsulated within a single [binary file](https://github.com/custompbx/custompbx/releases).
 
-Please note that this project is still in development, has not undergone extensive testing, and may potentially have security vulnerabilities.
+Please note that this project is still in development, has not undergone extensive testing.
 
-The **Backend** is developed using Golang v.1.19 and is located in the ``src/custompbx`` directory.
+The **Backend** is developed using Golang v.1.20 and is located in the ``src/custompbx`` directory.
 
 The **Frontend**, built with Angular v.17, can be found in the ``src/cweb-app`` directory.
 
@@ -15,7 +15,12 @@ System Requirements:
 * Postgres Database
 ---
 ### Build Process
-To initiate the build process, execute the following command:
+Install **make** first (apt example):
+```
+sodo apt install -y make
+```
+
+To install golang, node, all dependencies and initiate the build process, execute the following command:
 ```
 make install
 ```
@@ -28,6 +33,11 @@ To locally run the frontend, perform the following steps: build and test the pro
 make front-serve
 ```  
 Additional options can be found in the Makefile.
+- install-golang
+- install-node
+- install-dep (install dependencies for back and front)
+- dep-front
+- dep-back
 
 The compiled binary file is located in the ``bin/`` directory and can be used as outlined in the [Documentation](https://github.com/custompbx/custompbx/wiki).
 
