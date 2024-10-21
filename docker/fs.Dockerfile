@@ -118,6 +118,9 @@ RUN sed -i 's|<!-- <param name="rtp-start-port" value="16384"/> -->|<param name=
 RUN sed -i 's/<param name="sip-capture" value="no"\/>/<param name="sip-capture" value="yes"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
 RUN sed -i 's/<param name="rtp-ip" value="\$\${local_ip_v4}"\/>/<param name="rtp-ip" value="freeswitch-host"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
 RUN sed -i 's/<param name="sip-ip" value="\$\${local_ip_v4}"\/>/<param name="sip-ip" value="freeswitch-host"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
+RUN sed -i 's/<param name="local-network-acl" value="localnet.auto"\/>/<param name="local-network-acl" value="loopback.auto"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
+RUN sed -i 's/<param name="apply-nat-acl" value="nat.auto"\/>/<param name="apply-nat-acl" value="rfc1918.auto"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
+RUN sed -i '/<param name="apply-nat-acl" value="rfc1918.auto"\/>/a\ <param name="apply-candidate-acl" value="rfc1918.auto"\/>' /etc/freeswitch/sip_profiles/internal.xml
 
 COPY ./docker/fs_conf/sofia.conf.xml /etc/freeswitch/autoload_configs/
 COPY ./docker/fs_conf/modules.conf.xml /etc/freeswitch/autoload_configs/
