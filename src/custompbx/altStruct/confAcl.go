@@ -18,9 +18,9 @@ type ConfigAclNode struct {
 	Id          int64          `xml:"-" json:"id" customsql:"pkey:id;check(id <> 0)"`
 	Position    int64          `xml:"-" json:"position" customsql:"position;position"`
 	Enabled     bool           `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
-	Type        string         `xml:"type,attr" json:"type,omitempty" customsql:"node_type;check(node_type <> '')"`
-	Cidr        string         `xml:"cidr,attr" json:"cidr" customsql:"cidr"`
-	Domain      string         `xml:"domain,attr" json:"domain" customsql:"domain"`
+	Type        string         `xml:"type,attr" json:"type" customsql:"node_type;check(node_type <> '')"`
+	Cidr        string         `xml:"cidr,attr,omitempty" json:"cidr" customsql:"cidr"`
+	Domain      string         `xml:"domain,attr,omitempty" json:"domain" customsql:"domain"`
 	Description string         `xml:"-" json:"description" customsql:"description"`
 	Parent      *ConfigAclList `xml:"-" json:"parent" customsql:"fkey:parent_id;check(parent_id <> 0)"`
 }
