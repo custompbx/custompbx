@@ -180,7 +180,7 @@ import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from '@angular/material/form-field';
 import {APP_BASE_HREF} from '@angular/common';
 import {MatIconRegistry} from '@angular/material/icon';
 import {ConversationsComponent} from './components/conversations/conversations.component';
-import {ConversationsEffects} from "./store/conversations/conversations.effects";
+import {ConversationsEffects} from './store/conversations/conversations.effects';
 
 @NgModule({
   declarations: [

@@ -25,10 +25,10 @@ export interface Istatuses {
 }
 
 export interface Icommand {
-  callTo: string,
-  hangup: boolean,
-  register: boolean,
-  answer: boolean,
+  callTo: string;
+  hangup: boolean;
+  register: boolean;
+  answer: boolean;
 }
 
 export const initialState: State = {

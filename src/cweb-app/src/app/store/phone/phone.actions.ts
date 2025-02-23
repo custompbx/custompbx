@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 import {CDRActionTypes} from '../cdr/cdr.actions';
-import {createActionHelper} from "../../services/rxjs-helper/actions-helper";
+import {createActionHelper} from '../../services/rxjs-helper/actions-helper';
 
 export enum AuthActionTypes {
   UPDATE_FAILURE = '[Phone] Failure',
@@ -29,8 +29,8 @@ export class StorePhoneStatus implements Action {
   constructor(public payload: any) {}
 }
 
-export const StoreTicker = createActionHelper('StoreTicker')
-export const StoreCommand = createActionHelper('StoreCommand')
+export const StoreTicker = createActionHelper('StoreTicker');
+export const StoreCommand = createActionHelper('StoreCommand');
 
 export type All =
   | Failure

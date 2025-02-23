@@ -156,7 +156,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       this.pieData = {
         'percentage_used_memory':
-          [{data: this.list.dynamic_metrics ? this.getPercentage(this.list.dynamic_metrics.percentage_used_memory) : <ChartDataset><any>[]}],
+          [{data: this.list.dynamic_metrics ? this.getPercentage(this.list.dynamic_metrics.percentage_used_memory) :
+              <ChartDataset><any>[]}],
         'percentage_disk_usage':
           [{data: this.list.dynamic_metrics ? this.getPercentage(this.list.dynamic_metrics.percentage_disk_usage) : <ChartDataset><any>[]}],
       };

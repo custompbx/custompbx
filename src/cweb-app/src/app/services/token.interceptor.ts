@@ -7,7 +7,7 @@ import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 
 import {catchError} from 'rxjs/operators';
-import {CookiesStorageService} from "./cookies-storage.service";
+import {CookiesStorageService} from './cookies-storage.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {

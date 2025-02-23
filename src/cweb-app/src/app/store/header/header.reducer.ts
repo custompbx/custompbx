@@ -28,7 +28,7 @@ export const initialState: State = {
 export function reducer(state: State = initialState, action): State {
   // TODO: fix this
   if (state === null) {
-    state = initialState
+    state = initialState;
   }
   switch (action.type) {
     case StartPhone.type: {

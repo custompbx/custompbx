@@ -17,9 +17,9 @@ import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
 import {StoreCommand} from '../../store/phone/phone.actions';
-import {WsDataService} from "../../services/ws-data.service";
-import {SubscriptionList} from "../../store/dataFlow/dataFlow.actions";
-import {GetWebUsers} from "../../store/settings/settings.actions";
+import {WsDataService} from '../../services/ws-data.service';
+import {SubscriptionList} from '../../store/dataFlow/dataFlow.actions';
+import {GetWebUsers} from '../../store/settings/settings.actions';
 import {
   GetConversationPrivateCalls,
   GetConversationPrivateMessages,
@@ -28,12 +28,12 @@ import {
   SendConversationPrivateMessage,
   StoreCurrentUser,
   StoreGetNewConversationMessage
-} from "../../store/conversations/conversations.actions";
-import {Iuser} from "../../store/auth/auth.reducers";
-import {UserService} from "../../services/user.service";
-import {StartPhone, ToggleShowPhone} from "../../store/header/header.actions";
-import {filter, map, switchMap, tap} from "rxjs/operators";
-import {GetDirectoryUsers} from "../../store/directory/directory.actions";
+} from '../../store/conversations/conversations.actions';
+import {Iuser} from '../../store/auth/auth.reducers';
+import {UserService} from '../../services/user.service';
+import {StartPhone, ToggleShowPhone} from '../../store/header/header.actions';
+import {filter, map, switchMap, tap} from 'rxjs/operators';
+import {GetDirectoryUsers} from '../../store/directory/directory.actions';
 
 const scrollTop = 64;
 
@@ -100,7 +100,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.store.dispatch(GetNewConversationMessage(null))
+    this.store.dispatch(GetNewConversationMessage(null));
     if (this.ws.isConnected) {
       this.store.dispatch(new SubscriptionList({values: [new GetWebUsers(null).type, StoreGetNewConversationMessage.type]}));
       this.store.dispatch(new GetWebUsers(null));
@@ -170,28 +170,35 @@ export class ConversationsComponent implements OnInit, OnDestroy {
           this.scrollToBottom();
         } else {
           setTimeout(() => {
-            this.restoreScrollPosition()
-          }, 0)
+            this.restoreScrollPosition();
+          }, 0);
         }
         this.isUpdatingChat = false;
         if (this.messages[this.currentChat].length === 0) {
           this.showItems[this.currentChat] = mes.calls[this.currentChat] || [];
         } else if (this.messages[this.currentChat].length <= 20) {
-          this.showItems[this.currentChat] = [...this.messages[this.currentChat], ...(mes.calls[this.currentChat] || [])].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+          this.showItems[this.currentChat] = [
+            ...this.messages[this.currentChat],
+            ...(mes.calls[this.currentChat] || [])
+          ].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
         } else if (this.messages[this.currentChat].length > 20) {
-          const firstMes = this.messages[this.currentChat][0]
-          const lastCall = this.calls[this.currentChat].length >= 20 ? this.calls[this.currentChat][this.calls[this.currentChat].length - 1] : null;
+          const firstMes = this.messages[this.currentChat][0];
+          const lastCall = this.calls[this.currentChat].length >= 20 ?
+            this.calls[this.currentChat][this.calls[this.currentChat].length - 1] : null;
           if (lastCall && this.lastCallsAmount !== this.calls[this.currentChat].length && lastCall.created_at < firstMes.created_at) {
             this.lastCallsAmount = this.calls[this.currentChat].length;
             this.store.dispatch(GetConversationPrivateCalls({id: this.currentChat, up_to_time: lastCall.created_at}));
           } else {
-            this.showItems[this.currentChat] = [...this.messages[this.currentChat], ...(mes.calls[this.currentChat] || []).filter((a) => a.created_at >= firstMes.created_at)].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+            this.showItems[this.currentChat] = [
+              ...this.messages[this.currentChat],
+              ...(mes.calls[this.currentChat] || []).filter((a) => a.created_at >= firstMes.created_at)
+            ].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
           }
         }
       }
       if (mes.event.type === 'new-call' && this.user.id === mes.event.data.rid) {
         if (this.currentChat === mes.event.data.sid) {
-          this.voiceCall()
+          this.voiceCall();
           this.isInbound = true;
         }
         if (!this.isRegistered) {
@@ -200,7 +207,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       }
     });
 
-    //directory users
+    // directory users
     this.directory$ = this.directory.subscribe((users) => {
       this.directoryDomains = users.domains;
       this.directoryUsers = users.users;
@@ -273,7 +280,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.inConversationsCall) {
-      this.hangup()
+      this.hangup();
       return;
     }
     if (!this.userList[this.currentVoice]) {
@@ -297,8 +304,8 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     const userArray = Object.values(this.userList || {});
     const filteredUsers = userArray.filter(user => user.login.includes(filterString));
     const sortedUsers = filteredUsers.sort((a, b) => a.id - b.id);
-    //return sortedUsers.map(user => ({ id: user.id, login: user.login }));
-    return sortedUsers
+    // return sortedUsers.map(user => ({ id: user.id, login: user.login }));
+    return sortedUsers;
   }
 
   scrollToBottom() {
@@ -314,7 +321,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
           return
         }*/
     if (!this.newMsg) {
-      return
+      return;
     }
     this.store.dispatch(SendConversationPrivateMessage({id: this.currentChat, text: this.newMsg}));
     this.newMsg = '';
@@ -339,22 +346,22 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     const year = f.getFullYear().toString();
     const month = f.getUTCMonth().toString().padStart(2, '0');
     const day = f.getUTCDay().toString().padStart(2, '0');
-    let date = `${year}-${month}-${day}`;
+    const date = `${year}-${month}-${day}`;
 
     const hours = f.getHours().toString().padStart(2, '0');
     const minutes = f.getMinutes().toString().padStart(2, '0');
     const time = `${hours}:${minutes}`;
-    let res = date + " " + time;
+    let res = date + ' ' + time;
 
-    if (f.toDateString() == new Date().toDateString()) {
-      res = time
+    if (f.toDateString() === new Date().toDateString()) {
+      res = time;
     }
-    return res
+    return res;
   }
 
   voiceCall() {
-    this.store.dispatch(StartPhone(null))
-    this.store.dispatch(ToggleShowPhone({show: false}))
+    this.store.dispatch(StartPhone(null));
+    this.store.dispatch(ToggleShowPhone({show: false}));
     this.currentVoice = this.currentChat;
     this.toChat = true;
   }
@@ -362,9 +369,9 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   backToChat() {
     this.toChat = false;
     if (this.inCall) {
-      this.store.dispatch(ToggleShowPhone({show: true}))
+      this.store.dispatch(ToggleShowPhone({show: true}));
     }
-    setTimeout(() => this.scrollToBottom(), 0)
+    setTimeout(() => this.scrollToBottom(), 0);
   }
 
   hasVerticalScrollbar(element: HTMLElement): boolean {
@@ -377,7 +384,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     }
     const children = this.scrollContainer.nativeElement.children[0].children;
     for (let i = 0; i < children.length; i++) {
-      let child = children[i];
+      const child = children[i];
       if (parseInt(child.getAttribute('data-index'), 10) === this.previousScrollItemIndex) {
         this.scrollContainer.nativeElement.scrollTop = child.offsetTop - child.scrollHeight * 2;
         break;

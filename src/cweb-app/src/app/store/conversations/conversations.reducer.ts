@@ -8,8 +8,8 @@ import {
   GetConversationPrivateCalls,
 } from './conversations.actions';
 
-import {isArray} from "chart.js/helpers";
-import {Iuser} from "../auth/auth.reducers";
+import {isArray} from 'chart.js/helpers';
+import {Iuser} from '../auth/auth.reducers';
 
 export interface State {
   conversations: { [index: number]: Array<Messages> };
@@ -56,7 +56,7 @@ const nullEvent = {type: null, data: null};
 export function reducer(state: State = initialState, action): State {
   // TODO: fix this
   if (state === null) {
-    state = initialState
+    state = initialState;
   }
   switch (action.type) {
     case GetConversationPrivateMessages.type:
@@ -143,7 +143,7 @@ export function reducer(state: State = initialState, action): State {
 
     case StoreGetNewConversationMessage.type: {
       const {response} = action.payload;
-      let {data, error} = response;
+      const {data, error} = response;
       if (error) {
         return {
           ...state,

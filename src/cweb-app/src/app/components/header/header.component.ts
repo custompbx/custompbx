@@ -10,9 +10,9 @@ import {
 import {UserService} from '../../services/user.service';
 import {Iuser} from '../../store/auth/auth.reducers';
 import {Observable, Subscription} from 'rxjs';
-import {select, Store} from "@ngrx/store";
-import {AppState, selectHeader, selectPhoneState} from "../../store/app.states";
-import {StartPhone, ToggleShowPhone} from "../../store/header/header.actions";
+import {select, Store} from '@ngrx/store';
+import {AppState, selectHeader} from '../../store/app.states';
+import {StartPhone, ToggleShowPhone} from '../../store/header/header.actions';
 
 @Component({
   selector: 'app-header',
@@ -67,9 +67,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   showHidePhone() {
     if (!this.startPhone) {
-      this.store.dispatch(StartPhone(null))
+      this.store.dispatch(StartPhone(null));
     }
-    this.store.dispatch(ToggleShowPhone(null))
+    this.store.dispatch(ToggleShowPhone(null));
   }
 
   showHideConversations() {

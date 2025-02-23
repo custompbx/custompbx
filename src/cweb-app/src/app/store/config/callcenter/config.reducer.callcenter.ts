@@ -7,7 +7,7 @@ import {
   initialState,
   State
 } from '../config.state.struct';
-import {getParentId} from "../config.reducers";
+import {getParentId} from '../config.reducers';
 
 export function reducer(state = initialState, action: All): State {
   switch (action.type) {

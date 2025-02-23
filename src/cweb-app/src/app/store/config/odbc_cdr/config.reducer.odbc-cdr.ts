@@ -1,6 +1,6 @@
 import { ConfigActionTypes, All} from './config.actions.odbc-cdr';
 import {Iitem, initialState, IodbcCdr, State} from '../config.state.struct';
-import {getParentId} from "../config.reducers";
+import {getParentId} from '../config.reducers';
 
 export function reducer(state = initialState, action: All): State {
   switch (action.type) {

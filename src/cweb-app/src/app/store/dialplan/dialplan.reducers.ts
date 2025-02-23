@@ -9,7 +9,7 @@ export interface State {
 }
 
 export interface Idebug {
-  log: Array<{log: Array<string>, actions: {application: string, data: string, inline: boolean}}>;
+  log: Array<{ log: Array<string>, actions: { application: string, data: string, inline: boolean } }>;
   enabled: boolean;
 }
 
@@ -27,6 +27,7 @@ export interface Icontext {
 
 export interface Iextensions {
   [index: number]: Iextension;
+
   new: Array<object>;
 }
 
@@ -42,6 +43,7 @@ export interface Iextension {
 
 export interface Iconditions {
   [index: number]: Icondition;
+
   new: Array<object>;
 }
 
@@ -60,6 +62,7 @@ export interface Icondition {
 
 export interface Iactions {
   [index: number]: Iaction;
+
   new: Array<object>;
 }
 
@@ -82,6 +85,7 @@ export interface Iregex {
 
 export interface Iantiactions {
   [index: number]: Iantiaction;
+
   new: Array<object>;
 }
 
@@ -94,10 +98,10 @@ export interface Iantiaction {
 }
 
 export const initialState: State = {
-   contexts: <Icontexts>null,
-   debug: <Idebug>{},
-   staticDialplan: false,
-   loadCounter: 0,
+  contexts: <Icontexts>null,
+  debug: <Idebug>{},
+  staticDialplan: false,
+  loadCounter: 0,
   errorMessage: '',
 };
 
@@ -151,15 +155,17 @@ export function reducer(state = initialState, action: All): State {
     case DialplanActionTypes.MOVE_ACTION:
     case DialplanActionTypes.MOVE_ANTIACTION:
     case DialplanActionTypes.GET_EXTENSIONS: {
-      return {...state,
-        errorMessage: null, loadCounter: state.loadCounter + 1};
+      return {
+        ...state,
+        errorMessage: null, loadCounter: state.loadCounter + 1
+      };
     }
 
     case DialplanActionTypes.STORE_GET_CONTEXTS: {
       const data = action.payload.response['dialplan_contexts'];
       return {
         ...state,
-        contexts: { ...data, },
+        contexts: {...data, },
         errorMessage: action.payload.response.error || null,
         loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
       };
@@ -265,7 +271,8 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         contexts: {
-          ...state.contexts, [id]: {...state.contexts[id], extensions: state.contexts[id].extensions.map(exten => {
+          ...state.contexts, [id]: {
+            ...state.contexts[id], extensions: state.contexts[id].extensions.map(exten => {
               if (exten.id === data[0].id) {
                 exten = {...exten, ...data[0]};
               }
@@ -291,8 +298,9 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         contexts: {
-          ...state.contexts, [id]: {...state.contexts[id], extensions: state.contexts[id].extensions.filter(exten =>
-            exten.id !== extenId
+          ...state.contexts, [id]: {
+            ...state.contexts[id], extensions: state.contexts[id].extensions.filter(exten =>
+              exten.id !== extenId
             )
           },
         },
@@ -425,7 +433,9 @@ export function reducer(state = initialState, action: All): State {
         };
       }
       const id = ids[0];
-      if (!state.contexts[contextId] || !Array.isArray(state.contexts[contextId].extensions) || !Array.isArray(data[id]) || data[id].length === 0) {
+      if (!state.contexts[contextId] ||
+        !Array.isArray(state.contexts[contextId].extensions) ||
+        !Array.isArray(data[id]) || data[id].length === 0) {
         return {
           ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
           errorMessage: action.payload.response.error || null,
@@ -434,10 +444,11 @@ export function reducer(state = initialState, action: All): State {
 
       const extensions = <Array<Iextension>>state.contexts[contextId].extensions.map(exten => {
         if (exten.id === Number(id)) {
-          exten.conditions = exten.conditions.map(cond => {if (cond.id === data[id][0].id) {
-            cond = {...cond, ...data[id][0]};
-          }
-          return cond;
+          exten.conditions = exten.conditions.map(cond => {
+            if (cond.id === data[id][0].id) {
+              cond = {...cond, ...data[id][0]};
+            }
+            return cond;
           });
         }
         return exten;
@@ -517,7 +528,8 @@ export function reducer(state = initialState, action: All): State {
     case DialplanActionTypes.STORE_MOVE_ANTIACTION:
     case DialplanActionTypes.STORE_EXTENSIONS_DETAILS: {
       if (action.payload.response.error) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        return {
+          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
           errorMessage: action.payload.response.error,
         };
       }
@@ -620,7 +632,8 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         contexts: {
-          ...state.contexts, [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
+          ...state.contexts,
+          [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
         },
       };
     }
@@ -645,7 +658,8 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         contexts: {
-          ...state.contexts, [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
+          ...state.contexts,
+          [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
         },
       };
     }
@@ -669,7 +683,8 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         contexts: {
-          ...state.contexts, [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
+          ...state.contexts,
+          [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
         },
       };
     }
@@ -694,7 +709,8 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         contexts: {
-          ...state.contexts, [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
+          ...state.contexts,
+          [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
         },
       };
     }
@@ -718,7 +734,8 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         contexts: {
-          ...state.contexts, [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
+          ...state.contexts,
+          [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
         },
       };
     }
@@ -743,7 +760,8 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         contexts: {
-          ...state.contexts, [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
+          ...state.contexts,
+          [action.payload.contextId]: {...state.contexts[action.payload.contextId], extensions: extensions},
         },
       };
     }

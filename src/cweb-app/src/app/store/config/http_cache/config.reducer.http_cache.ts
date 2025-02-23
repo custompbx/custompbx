@@ -9,7 +9,7 @@ import {
   removeFromObject,
   updateStateItem,
   updateStateWithFieldValue
-} from "../config.reducers";
+} from '../config.reducers';
 
 export function reducer(state = initialState, action: All): State {
   switch (action.type) {
@@ -75,7 +75,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.StoreDelHttpCacheParameter: {
       const id = action.payload.response.data?.id || 0;
       if (!state.http_cache.settings[id]) {
-        return decreaseStateLoadField(state)
+        return decreaseStateLoadField(state);
       }
 
       return updateStateItem(
@@ -84,7 +84,7 @@ export function reducer(state = initialState, action: All): State {
           settings: {...removeFromObject(state.http_cache.settings, id), new: state.http_cache.settings?.new || []},
           errorMessage: action.payload.response.error || null
         },
-        decreaseStateLoadField(state))
+        decreaseStateLoadField(state));
     }
 
     case ConfigActionTypes.StoreSwitchHttpCacheParameter:
@@ -95,7 +95,7 @@ export function reducer(state = initialState, action: All): State {
         'http_cache', {
           settings: {...state.http_cache.settings, [data.id]: data},
           errorMessage: action.payload.response.error || null,
-        }, decreaseStateLoadField(state))
+        }, decreaseStateLoadField(state));
     }
 
     case ConfigActionTypes.StoreNewHttpCacheParameter: {
@@ -109,7 +109,7 @@ export function reducer(state = initialState, action: All): State {
           settings: {...state.http_cache.settings, new: rest},
           errorMessage: null,
         },
-        decreaseStateLoadField(state))
+        decreaseStateLoadField(state));
     }
 
     case ConfigActionTypes.StoreDropNewHttpCacheParameter: {
@@ -127,7 +127,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null
         },
-        decreaseStateLoadField(state))
+        decreaseStateLoadField(state));
     }
 
     case ConfigActionTypes.StoreAddHttpCacheParameter: {
@@ -154,14 +154,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.error || null
         },
-        decreaseStateLoadField(state))
+        decreaseStateLoadField(state));
     }
 
     case ConfigActionTypes.StoreAddHttpCacheProfile:
     case ConfigActionTypes.StoreRenameHttpCacheProfile: {
       const data = action.payload.response.data;
       if (!data.id) {
-        return decreaseStateLoadField(state)
+        return decreaseStateLoadField(state);
       }
 
       if (!state.http_cache) {
@@ -184,7 +184,7 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data;
       const profile = state.http_cache.profiles[data.id];
       if (!profile) {
-        return decreaseStateLoadField(state)
+        return decreaseStateLoadField(state);
       }
 
       return updateStateItem(
@@ -194,7 +194,7 @@ export function reducer(state = initialState, action: All): State {
           profiles: {...removeFromObject(state.http_cache.profiles, data.id)},
           errorMessage: action.payload.response.error || null
         },
-        decreaseStateLoadField(state))
+        decreaseStateLoadField(state));
     }
 
     case ConfigActionTypes.StoreGetHttpCacheProfileParameters: {
@@ -226,7 +226,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error ||  '',
         },
-      decreaseStateLoadField(state))
+      decreaseStateLoadField(state));
 
     }
     case ConfigActionTypes.StoreNewHttpCacheProfileDomain: {

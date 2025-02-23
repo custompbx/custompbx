@@ -31,7 +31,8 @@ export class KeyValuePadPositionComponent implements OnInit {
     }
   }
 
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl, valueObject1: AbstractControl, valueObject2: AbstractControl): boolean {
+  isReadyToSend(nameObject: AbstractControl,
+                valueObject: AbstractControl, valueObject1: AbstractControl, valueObject2: AbstractControl): boolean {
     let obj1 = false;
     let obj2 = false;
     let value = true;
@@ -47,7 +48,8 @@ export class KeyValuePadPositionComponent implements OnInit {
     return nameObject && nameObject.valid && (nameObject.dirty || obj1 || obj2 || value);
   }
 
-  isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl, valueObject1: AbstractControl, valueObject2: AbstractControl): boolean {
+  isNewReadyToSend(nameObject: AbstractControl,
+                   valueObject: AbstractControl, valueObject1: AbstractControl, valueObject2: AbstractControl): boolean {
     let obj1 = true;
     let obj2 = true;
     let value = true;

@@ -40,7 +40,7 @@ import {
 } from './config.actions.http_cache';
 import {catchError, map, switchMap} from 'rxjs/operators';
 import {WsDataService} from '../../../services/ws-data.service';
-import {Failure} from "../config.actions";
+import {Failure} from '../config.actions';
 
 @Injectable()
 export class ConfigEffectsHttpCache {

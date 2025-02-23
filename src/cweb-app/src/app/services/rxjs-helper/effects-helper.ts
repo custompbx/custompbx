@@ -2,7 +2,7 @@ import {createEffect, ofType} from '@ngrx/effects';
 import {Observable, of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
 import {Action} from '@ngrx/store';
-import {WsDataService} from "../ws-data.service";
+import {WsDataService} from '../ws-data.service';
 
 export function createEffectForActions(
   actions,

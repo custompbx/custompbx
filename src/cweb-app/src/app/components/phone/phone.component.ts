@@ -555,7 +555,7 @@ export class PhoneComponent implements OnInit, OnDestroy {
   }
 
   countdown(): void {
-    this.store.dispatch(StoreTicker({date: this.data.startedAt?.toString()}))
+    this.store.dispatch(StoreTicker({date: this.data.startedAt?.toString()}));
   }
 
   removeLastDigit() {

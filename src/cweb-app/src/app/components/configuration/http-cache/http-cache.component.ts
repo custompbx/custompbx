@@ -26,7 +26,7 @@ import {
   RenameHttpCacheProfile, UpdateHttpCacheProfileAws, UpdateHttpCacheProfileAzure
 } from '../../../store/config/http_cache/config.actions.http_cache';
 
-import {ConfirmBottomSheetComponent} from "../../confirm-bottom-sheet/confirm-bottom-sheet.component";
+import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 
 @Component({
   selector: 'app-http-cache',
@@ -202,7 +202,7 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
   }
 
   updateItemAws(item) {
-    item.expires = Number(item.expires)
+    item.expires = Number(item.expires);
     this.store.dispatch(new UpdateHttpCacheProfileAws({aws_s3: item}));
   }
   updateItemAzure(item) {
@@ -219,11 +219,11 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
     if (!obj) {
       return {};
     }
-    const res= Object.values(obj);
+    const res = Object.values(obj);
     if (res.length === 0) {
-      return {}
+      return {};
     }
-    return res[0]
+    return res[0];
   }
 
   onProfileSubmit() {
@@ -255,9 +255,9 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
   }
 
   getFirstElement(obj): any {
-    console.log(obj)
+    console.log(obj);
     if (!obj) {
-      return {}
+      return {};
     }
     const keys = Object.keys(obj);
     if (keys.length === 0) {

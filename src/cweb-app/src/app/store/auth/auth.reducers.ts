@@ -52,9 +52,9 @@ export function reducer(state = initialState, action: (All | SettingsAll)): Stat
         };
       }
 
-      const updatedUser = data[state.user.id]
+      const updatedUser = data[state.user.id];
       if (!updatedUser) {
-        return {...state}
+        return {...state};
       }
 
       if (updatedUser?.avatar_format?.length) {

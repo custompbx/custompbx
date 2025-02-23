@@ -31,7 +31,7 @@ export class SidenavComponent implements OnInit {
 
   isRouteActive(route: string): boolean {
     if (!route) {
-      return false
+      return false;
     }
     return this.router.isActive(route, <IsActiveMatchOptions>{paths: 'subset', queryParams: 'subset', fragment: 'ignored', matrixParams: 'ignored'});
   }

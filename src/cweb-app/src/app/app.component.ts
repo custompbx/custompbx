@@ -41,6 +41,6 @@ export class AppComponent implements OnInit {
   }
 
   toggleRightSideNav($event) {
-    this.showRightNav = !this.showRightNav
+    this.showRightNav = !this.showRightNav;
   }
 }

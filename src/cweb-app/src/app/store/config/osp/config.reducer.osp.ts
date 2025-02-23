@@ -1,6 +1,6 @@
 import {Iitem, Iosp, initialState, State} from '../config.state.struct';
 import {All, ConfigActionTypes} from './config.actions.osp';
-import {getParentId} from "../config.reducers";
+import {getParentId} from '../config.reducers';
 
 export function reducer(state = initialState, action: All): State {
   switch (action.type) {

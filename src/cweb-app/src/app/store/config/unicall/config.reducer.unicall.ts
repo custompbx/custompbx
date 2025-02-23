@@ -1,6 +1,6 @@
 import {Iitem, Iunicall, initialState, State} from '../config.state.struct';
-import {All, ConfigActionTypes} from './config.actions.unicall'
-import {getParentId} from "../config.reducers";
+import {All, ConfigActionTypes} from './config.actions.unicall';
+import {getParentId} from '../config.reducers';
 
 
 export function reducer(state = initialState, action: All): State {

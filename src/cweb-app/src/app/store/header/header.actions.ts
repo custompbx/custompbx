@@ -1,4 +1,4 @@
-import {createActionHelper} from "../../services/rxjs-helper/actions-helper";
+import {createActionHelper} from '../../services/rxjs-helper/actions-helper';
 
-export const StartPhone = createActionHelper('StartPhone')
-export const ToggleShowPhone = createActionHelper('ToggleShowPhone')
+export const StartPhone = createActionHelper('StartPhone');
+export const ToggleShowPhone = createActionHelper('ToggleShowPhone');
