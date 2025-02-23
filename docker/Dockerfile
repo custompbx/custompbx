@@ -20,7 +20,7 @@ RUN npm install
 RUN npm run build --omit=dev
 
 ### STAGE 2: Build Golang backend ###
-FROM golang:1.22 AS backend
+FROM golang:1.24 AS backend
 WORKDIR /app
 
 # Copy go.mod and go.sum
