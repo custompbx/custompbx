@@ -1,10 +1,8 @@
 # Base image
-# docker build --build-arg SIGNALWIRE_TOKEN=pat_S4dEV6fPvGiUwgVxe15zbeGc --build-arg XML_CURL_SERVER_HOST=192.168.0.29 --build-arg XML_CURL_SERVER_PORT=8081 --build-arg XML_CURL_SERVER_ROUTE=/conf/config -t freeswitch-image -f Dockerfile-fs .
-# docker run -d --name freeswitch-container -p 5060:5060/tcp -p 5060:5060/udp -p 5080:5080/tcp -p 5080:5080/udp -p 8021:8021/tcp -p 7443:7443/tcp freeswitch-image
-FROM debian:buster
+FROM debian:bookworm
 
 # Set SIGNALWIRE_TOKEN build argument
-ARG SIGNALWIRE_TOKEN
+ENV SIGNALWIRE_TOKEN=${SIGNALWIRE_TOKEN}
 
 # Set XML_CURL_SERVER_HOST build argument
 ARG XML_CURL_SERVER_HOST
@@ -14,6 +12,12 @@ ARG XML_CURL_SERVER_PORT
 
 # Set XML_CURL_SERVER_ROUTE build argument
 ARG XML_CURL_SERVER_ROUTE
+
+# Set MEDIA_PORT_START build argument
+ARG MEDIA_PORT_START
+
+# Set MEDIA_PORT_END build argument
+ARG MEDIA_PORT_END
 
 # explicitly set user/group IDs
 RUN groupadd -r freeswitch --gid=999 && useradd -r -g freeswitch --uid=999 freeswitch
@@ -32,10 +36,10 @@ RUN wget --no-check-certificate -O /usr/local/share/ca-certificates/mozilla.crt 
 RUN update-ca-certificates
 
 # Download and import the SignalWire FreeSWITCH repository key
-RUN wget --http-user=signalwire --http-password=$SIGNALWIRE_TOKEN -O /usr/share/keyrings/signalwire-freeswitch-repo.gpg https://freeswitch.signalwire.com/repo/deb/debian-release/signalwire-freeswitch-repo.gpg
+RUN wget --http-user=signalwire --http-password=${SIGNALWIRE_TOKEN} -O /usr/share/keyrings/signalwire-freeswitch-repo.gpg https://freeswitch.signalwire.com/repo/deb/debian-release/signalwire-freeswitch-repo.gpg
 
 # Configure authentication
-RUN echo "machine freeswitch.signalwire.com login signalwire password $SIGNALWIRE_TOKEN" > /etc/apt/auth.conf
+RUN echo "machine freeswitch.signalwire.com login signalwire password ${SIGNALWIRE_TOKEN}" > /etc/apt/auth.conf
 RUN chmod 600 /etc/apt/auth.conf
 
 # Add the SignalWire FreeSWITCH repository to the sources.list
@@ -112,8 +116,8 @@ RUN rm /etc/freeswitch/sip_profiles/internal-ipv6.xml
 RUN rm /etc/freeswitch/sip_profiles/external-ipv6.xml
 
 # Left some mediaports for expose
-RUN sed -i 's|<!-- <param name="rtp-start-port" value="16384"/> -->|<param name="rtp-start-port" value="16384"/>|' /etc/freeswitch/autoload_configs/switch.conf.xml && \
-    sed -i 's|<!-- <param name="rtp-end-port" value="32768"\/> -->|<param name="rtp-end-port" value="16399"/>|' /etc/freeswitch/autoload_configs/switch.conf.xml
+RUN sed -i 's|<!-- <param name="rtp-start-port" value="16384"/> -->|<param name="rtp-start-port" value="${MEDIA_PORT_START}"/>|' /etc/freeswitch/autoload_configs/switch.conf.xml && \
+    sed -i 's|<!-- <param name="rtp-end-port" value="32768"\/> -->|<param name="rtp-end-port" value="${MEDIA_PORT_END}"/>|' /etc/freeswitch/autoload_configs/switch.conf.xml
 
 RUN sed -i 's/<param name="sip-capture" value="no"\/>/<param name="sip-capture" value="yes"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
 RUN sed -i 's/<param name="rtp-ip" value="\$\${local_ip_v4}"\/>/<param name="rtp-ip" value="freeswitch-host"\/>/g' /etc/freeswitch/sip_profiles/internal.xml
