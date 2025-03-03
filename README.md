@@ -1,6 +1,7 @@
-# CustomPBX
+![logo2](https://github.com/user-attachments/assets/f45ea5b4-e269-4f5b-a787-d4a3870f17bf)
+<h1 align="center">CustomPBX</h1>
 
-**CustomPBX** (currently in development) is an API server and Web GUI for [FreeSwitch](https://github.com/signalwire/freeswitch), offering a pure FreeSWITCH experience. It can be installed on existing systems, allowing for the import of existing configurations. The system is encapsulated within a single [binary file](https://github.com/custompbx/custompbx/releases).
+**CustomPBX** is an API server and Web GUI for [FreeSwitch](https://github.com/signalwire/freeswitch), offering a pure FreeSWITCH experience. It can be installed on existing systems, allowing for the import of existing configurations. The system is encapsulated within a single [binary file](https://github.com/custompbx/custompbx/releases).
 
 Please note that this project is still in development, has not undergone extensive testing.
 
