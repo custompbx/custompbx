@@ -1,11 +1,18 @@
 ![logo2](https://github.com/user-attachments/assets/f45ea5b4-e269-4f5b-a787-d4a3870f17bf)
+<p align="center">
+    <img src="https://badgen.net//github/stars/custompbx/custompbx?color=ffd700" alt="">
+    <img src="https://badgen.net/badge/license/MIT/cyan" alt="">
+    <img src="https://badgen.net/github/last-commit/custompbx/custompbx?icon=github" alt="">
+    <img alt="GitHub Created At" src="https://img.shields.io/github/created-at/custompbx/custompbx">
+</p>
+
 <h1 align="center">CustomPBX</h1>
 
 **CustomPBX** is an API server and Web GUI for [FreeSwitch](https://github.com/signalwire/freeswitch), offering a pure FreeSWITCH experience. It can be installed on existing systems, allowing for the import of existing configurations. The system is encapsulated within a single [binary file](https://github.com/custompbx/custompbx/releases).
 
 Please note that this project is still in development, has not undergone extensive testing.
 
-The **Backend** is developed using Golang v.1.20 and is located in the ``src/custompbx`` directory.
+The **Backend** is developed using Golang v.1.24 and is located in the ``src/custompbx`` directory.
 
 The **Frontend**, built with Angular v.17, can be found in the ``src/cweb-app`` directory.
 
