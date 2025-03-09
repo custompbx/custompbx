@@ -1,0 +1,65 @@
+name: Build and Publish Docker Images
+
+on:
+  push:
+    tags:
+      - "v*"  # Run only when a new tag (e.g., v1.0.0) is pushed
+
+permissions:
+  contents: read
+  packages: write  # Allow pushing to GitHub Container Registry (GHCR)
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full history is available for diff checks
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Extract tag name (compatible with act)
+        id: tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "TAG=latest" >> $GITHUB_ENV  # Default to "latest" when testing with act
+          fi
+
+      - name: Check if FreeSWITCH needs rebuilding
+        id: fs_changes
+        run: |
+          if git diff --name-only HEAD~1 HEAD | grep -E 'docker/fs.Dockerfile|docker/fs_conf/'; then
+            echo "FS_REBUILD=true" >> $GITHUB_ENV
+          else
+            echo "FS_REBUILD=false" >> $GITHUB_ENV
+          fi
+
+      - name: Build and push CustomPBX image
+        run: |
+          IMAGE_NAME="ghcr.io/custompbx/custompbx"
+
+          echo "Building and pushing ${IMAGE_NAME}:${TAG}..."
+          docker build -t ${IMAGE_NAME}:latest -t ${IMAGE_NAME}:${TAG} -f docker/Dockerfile .
+
+          docker push ${IMAGE_NAME}:latest
+          docker push ${IMAGE_NAME}:${TAG}
+
+      - name: Build and push FreeSWITCH image (if needed)
+        if: env.FS_REBUILD == 'true'
+        env:
+          SIGNALWIRE_TOKEN: ${{ secrets.SIGNALWIRE_TOKEN }}
+        run: |
+          IMAGE_NAME="ghcr.io/custompbx/freeswitch"
+
+          echo "Building and pushing ${IMAGE_NAME}:${TAG}..."
+          docker build --build-arg SIGNALWIRE_TOKEN="${SIGNALWIRE_TOKEN}" \
+            -t ${IMAGE_NAME}:latest -t ${IMAGE_NAME}:${TAG} -f docker/fs.Dockerfile .
+
+          docker push ${IMAGE_NAME}:latest
+          docker push ${IMAGE_NAME}:${TAG}
