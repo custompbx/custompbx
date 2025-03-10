@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   build-and-publish:
+    if: github.repository == 'custompbx/custompbx'
     runs-on: ubuntu-latest
 
     steps:
@@ -52,13 +53,11 @@ jobs:
 
       - name: Build and push FreeSWITCH image (if needed)
         if: env.FS_REBUILD == 'true'
-        env:
-          SIGNALWIRE_TOKEN: ${{ secrets.SIGNALWIRE_TOKEN }}
         run: |
           IMAGE_NAME="ghcr.io/custompbx/freeswitch"
 
           echo "Building and pushing ${IMAGE_NAME}:${TAG}..."
-          docker build --build-arg SIGNALWIRE_TOKEN="${SIGNALWIRE_TOKEN}" \
+          docker build --build-arg SIGNALWIRE_TOKEN="${{ secrets.SIGNALWIRE_TOKEN }}" \
             -t ${IMAGE_NAME}:latest -t ${IMAGE_NAME}:${TAG} -f docker/fs.Dockerfile .
 
           docker push ${IMAGE_NAME}:latest

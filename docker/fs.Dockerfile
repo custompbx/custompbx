@@ -1,8 +1,8 @@
-# Base image
-FROM debian:bookworm
+# ====== BUILD STAGE (temporary container) ======
+FROM debian:bookworm AS builder
 
 # Set SIGNALWIRE_TOKEN build argument
-ENV SIGNALWIRE_TOKEN=${SIGNALWIRE_TOKEN}
+ARG SIGNALWIRE_TOKEN
 
 # Set XML_CURL_SERVER_HOST build argument
 ARG XML_CURL_SERVER_HOST
@@ -92,7 +92,19 @@ RUN apt-get update && apt-get install -y freeswitch \
                                          freeswitch-mod-timerfd \
                                          freeswitch-mod-xml-cdr \
                                          freeswitch-mod-xml-curl \
+                                         freeswitch-mod-fifo \
+                                         freeswitch-mod-voicemail \
+                                         freeswitch-mod-esf \
+                                         freeswitch-mod-valet-parking \
+                                         freeswitch-mod-rtc \
+                                         freeswitch-mod-loopback \
+                                         freeswitch-mod-enum \
+                                         freeswitch-mod-amqp \
+                                         freeswitch-mod-say-en \
                                          freeswitch-mod-cdr-pg-csv
+
+# Clean up sensitive files
+RUN rm -f /etc/apt/auth.conf /usr/share/keyrings/signalwire-freeswitch-repo.gpg
 
 RUN if [ -f /etc/freeswitch/autoload_configs/event_socket.conf.xml ]; then \
     sed -i 's/<param name="listen-ip" value="::"\/>/<param name="listen-ip" value="freeswitch-host"\/>/g' /etc/freeswitch/autoload_configs/event_socket.conf.xml; \
@@ -129,6 +141,17 @@ RUN sed -i '/<param name="apply-nat-acl" value="rfc1918.auto"\/>/a\ <param name=
 COPY ./docker/fs_conf/sofia.conf.xml /etc/freeswitch/autoload_configs/
 COPY ./docker/fs_conf/modules.conf.xml /etc/freeswitch/autoload_configs/
 COPY ./docker/fs_conf/cdr_pg_csv.conf.xml /etc/freeswitch/autoload_configs/
+
+# ====== FINAL STAGE (secure image) ======
+FROM debian:bookworm
+
+# Copy FreeSWITCH binaries from the builder stage
+COPY --from=builder /usr/ /usr/
+COPY --from=builder /etc/freeswitch /etc/freeswitch
+COPY --from=builder /var/lib/freeswitch /var/lib/freeswitch
+
+# Set up a dedicated user
+RUN groupadd -r freeswitch --gid=999 && useradd -r -g freeswitch --uid=999 freeswitch
 
 # Volumes
 VOLUME ["/var/log/freeswitch/log"]

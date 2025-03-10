@@ -54,8 +54,8 @@ Alternatively, you can utilize the precompiled binary available on the **[Releas
 ---
 #### Build with Docker (TEST ONLY)
 A Docker version of the project is also available, currently intended for testing purposes only.
-In the ``.env`` file:
-- Replace the token with yours ``SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``
+In the ``docker-compose.yml`` file:
+- Replace the token with yours at line with ``SIGNALWIRE_TOKEN=<YOUR_TOKEN_HERE>``
 - Start the containers and open ``https://127.0.0.1:8080/cweb`` (or your Docker host), making sure to allow self-signed certificates.
 
 You can start Docker with PostgresDB + Freeswitch + Custompbx by using the command:
