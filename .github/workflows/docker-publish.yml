@@ -52,12 +52,18 @@ jobs:
           docker push ${IMAGE_NAME}:${TAG}
 
       - name: Build and push FreeSWITCH image (if needed)
-        if: env.FS_REBUILD == 'true'
+        if: env.FS_REBUILD == 'true' # || ! steps.docker-images.outputs.freeswitch_exists
         run: |
           IMAGE_NAME="ghcr.io/custompbx/freeswitch"
 
           echo "Building and pushing ${IMAGE_NAME}:${TAG}..."
-          docker build --build-arg SIGNALWIRE_TOKEN="${{ secrets.SIGNALWIRE_TOKEN }}" \
+           docker build \
+            --build-arg SIGNALWIRE_TOKEN="${{ secrets.SIGNALWIRE_TOKEN }}" \
+            --build-arg XML_CURL_SERVER_HOST="custompbx-host" \
+            --build-arg XML_CURL_SERVER_PORT="8081" \
+            --build-arg XML_CURL_SERVER_ROUTE="conf/config" \
+            --build-arg MEDIA_PORT_START="16384" \
+            --build-arg MEDIA_PORT_END="16399" \
             -t ${IMAGE_NAME}:latest -t ${IMAGE_NAME}:${TAG} -f docker/fs.Dockerfile .
 
           docker push ${IMAGE_NAME}:latest
