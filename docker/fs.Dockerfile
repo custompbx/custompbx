@@ -142,7 +142,7 @@ COPY ./docker/fs_conf/sofia.conf.xml /etc/freeswitch/autoload_configs/
 COPY ./docker/fs_conf/modules.conf.xml /etc/freeswitch/autoload_configs/
 COPY ./docker/fs_conf/cdr_pg_csv.conf.xml /etc/freeswitch/autoload_configs/
 
-# ====== FINAL STAGE (secure image) ======
+# ====== FINAL STAGE ======
 FROM debian:bookworm
 
 # Copy FreeSWITCH binaries from the builder stage
