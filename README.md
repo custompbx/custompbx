@@ -63,6 +63,13 @@ docker compose up -d
 After start of the containers open ``https://127.0.0.1:8080/cweb`` (or your Docker host), making sure to allow self-signed certificates.
 
 ---
+
+#### Pull Docker image from **[Packages Page](https://github.com/custompbx/custompbx/pkgs/container/custompbx)**
+For latest:
+```
+docker pull ghcr.io/custompbx/custompbx:latest
+```
+---
 ### Documentation
 For detailed instructions on **Installation** and **Configuration**, please refer to the project's **[Wiki Page](https://github.com/custompbx/custompbx/wiki)**.
 
