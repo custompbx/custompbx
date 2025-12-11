@@ -25,7 +25,9 @@ import {
   UpdateDirectoryProfileParameter
 } from './config.actions.directory';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsDirectory {
 
   constructor(

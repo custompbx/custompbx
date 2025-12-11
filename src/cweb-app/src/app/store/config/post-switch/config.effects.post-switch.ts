@@ -28,7 +28,9 @@ import {
 } from './config.actions.post-switch';
 import {Failure} from '../config.actions';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsPostSwitch {
 
   constructor(

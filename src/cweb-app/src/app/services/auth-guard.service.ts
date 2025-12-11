@@ -6,7 +6,9 @@ import {WsDataService} from './ws-data.service';
 import { RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import {CookiesStorageService} from './cookies-storage.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthGuardService  {
 
   isAuthenticated: false;

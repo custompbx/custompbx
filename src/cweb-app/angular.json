@@ -11,13 +11,16 @@
       "schematics": {},
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "aot": true,
-            "outputPath": "dist/cweb-app",
+            "outputPath": {
+              "base": "dist/cweb-app"
+            },
             "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
@@ -28,7 +31,8 @@
               "src/styles.css"
             ],
             "scripts": [],
-            "baseHref": "/cweb/"
+            "baseHref": "/cweb/",
+            "browser": "src/main.ts"
           },
           "configurations": {
             "production": {
@@ -44,8 +48,6 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "tsConfig": "src/tsconfig.app.json",
               "budgets": [
                 {
@@ -72,8 +74,6 @@
               "namedChunks": false,
               "aot": false,
               "extractLicenses": false,
-              "vendorChunk": false,
-              "buildOptimizer": false,
               "tsConfig": "src/tsconfig.app.json",
               "budgets": [
                 {
@@ -144,5 +144,31 @@
   },
   "cli": {
     "analytics": "da171872-9b80-41f7-8f4f-82750459bb64"
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
+    }
   }
 }

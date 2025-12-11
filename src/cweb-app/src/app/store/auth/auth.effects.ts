@@ -15,7 +15,9 @@ import {
 import {WsDataService} from '../../services/ws-data.service';
 import {CookiesStorageService} from '../../services/cookies-storage.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthEffects {
 
   constructor(

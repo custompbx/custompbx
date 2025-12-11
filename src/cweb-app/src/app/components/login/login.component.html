@@ -11,27 +11,29 @@
           placeholder="Login"
           value=""
           required
-        >
-      </mat-form-field>
+          >
+        </mat-form-field>
 
-      <mat-form-field class="login-full-width" hideRequiredMarker>
-        <input
-          matInput
-          [(ngModel)]="user.password"
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-          autocomplete="off"
-        >
-      </mat-form-field>
+        <mat-form-field class="login-full-width" hideRequiredMarker>
+          <input
+            matInput
+            [(ngModel)]="user.password"
+            name="password"
+            type="password"
+            placeholder="Password"
+            required
+            autocomplete="off"
+            >
+          </mat-form-field>
 
-      <button mat-flat-button type="submit" color="basic">Login</button>
-    </form>
-    <div *ngIf="userService.errorMessage">
-      <div>
-        {{userService.errorMessage}}
+          <button mat-flat-button type="submit" color="basic">Login</button>
+        </form>
+        @if (userService.errorMessage) {
+          <div>
+            <div>
+              {{userService.errorMessage}}
+            </div>
+          </div>
+        }
       </div>
     </div>
-  </div>
-</div>

@@ -1,202 +1,237 @@
-<mat-progress-bar mode="indeterminate" *ngIf="loadCounter > 0"></mat-progress-bar>
-<mat-toolbar>
+@if (loadCounter() > 0) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+<mat-toolbar color="basic">
   <span>User's Gateways</span>
 </mat-toolbar>
-<mat-card *ngIf="loadCounter === 0 && !onlyValues(list)?.length">
-  <mat-card-content>
-    Here no any domains yet. You can create it or try to import from existing config at domains page.
-    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
-            routerLink="/directory/domains">
-      Go to domains
-    </button>
-  </mat-card-content>
-</mat-card>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="onlyValues(list)?.length">
-  <mat-tab label="List">
-    <div *ngFor="let domain of onlyValues(list)">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Domain: <b>{{domain.name}}</b></mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <ng-container *ngFor="let user of onlyValuesByParent(userList, domain.id)">
-            <h4 *ngIf="onlyValuesByParent(gatewayList, user.id).length > 0">User: {{user.name}}</h4>
-            <ng-container *ngFor="let gateway of onlyValuesByParent(gatewayList, user.id)">
-              <mat-expansion-panel (opened)="getDetails(gateway.id)" (closed)="clearDetails(gateway.id)">
-                <mat-expansion-panel-header>
-                  <mat-panel-title class="vert-centered">
-                    <mat-icon class="icon-spacer">swap_horizontal_circle</mat-icon>
-                    <span>{{gateway.name}}</span>
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
-                <form #details="ngForm">
-                  <button mat-raised-button color="basic" (click)="copy(gateway.id)"
-                          *ngIf="listDetails[gateway.id] && (listDetails[gateway.id].parameters || listDetails[gateway.id].variables)">
-                    Copy
-                  </button>
-                  <h3>Parameters:</h3>
-                  <div>
-                    <app-key-value-pad [exist]="listDetails[gateway.id]"
-                                       [items]="listDetails[gateway.id]?.parameters"
-                                       [newItems]="listDetails[gateway.id]?.parameters?.new"
-                                       [id]="gateway.id"
-                                       [toCopy]="toCopy"
-                                       [store]="store"
-                                       [dispatchers]="gatewayParamDispatchers"
-                    >
-                    </app-key-value-pad>
-                  </div>
-                  <h3>Variables:</h3>
-                  <div *ngIf="listDetails[gateway.id] && listDetails[gateway.id].variables">
-                    <div class="spacer" *ngFor="let variable of onlyValues(listDetails[gateway.id].variables)">
-                      <div *ngIf="variable.id && !isArray(variable)">
-                        <mat-form-field hideRequiredMarker>
-                          <mat-label>Name</mat-label>
-                          <input matInput name="name" [(ngModel)]="variable.name" required
-                                 [disabled]="!variable.enabled"
-                                 [name]="'variableName' + variable.id">
-                        </mat-form-field>
-                        <mat-form-field hideRequiredMarker>
-                          <mat-label>Value</mat-label>
-                          <input matInput name="value" [(ngModel)]="variable.value" required
-                                 [disabled]="!variable.enabled"
-                                 [name]="'variableValue' + variable.id">
-                        </mat-form-field>
-                        <mat-form-field hideRequiredMarker>
-                          <mat-label>Direction</mat-label>
-                          <input matInput name="direction" [(ngModel)]="variable.direction"
-                                 [disabled]="!variable.enabled"
-                                 [name]="'variableDirection' + variable.id">
-                        </mat-form-field>
-                        <button mat-button color="accent" class="but-spacer-left"
-                                [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.id], details.controls['variableValue' + variable.id], details.controls['variableDirection' + variable.id])"
-                                (click)="updateVar(variable)">
-                          Update
+@if (loadCounter() === 0 && !onlyValues(list())?.length) {
+  <mat-card>
+    <mat-card-content>
+      Here no any domains yet. You can create it or try to import from existing config at domains page.
+      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+        routerLink="/directory/domains">
+        Go to domains
+      </button>
+    </mat-card-content>
+  </mat-card>
+}
+@if (onlyValues(list())?.length) {
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
+    <mat-tab label="List">
+      @for (domain of onlyValues(list()); track domain) {
+        <div>
+          <mat-card>
+            <mat-card-header>
+              <mat-card-subtitle>Domain: <b>{{domain.name}}</b></mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              @for (user of onlyValuesByParent(userList(), domain.id); track user) {
+                @if (onlyValuesByParent(gatewayList(), user.id).length > 0) {
+                  <h4>User: {{user.name}}</h4>
+                }
+                @for (gateway of onlyValuesByParent(gatewayList(), user.id); track gateway) {
+                  <mat-expansion-panel (opened)="getDetails(gateway.id)" (closed)="clearDetails(gateway.id)">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title class="vert-centered">
+                        <mat-icon class="icon-spacer">swap_horizontal_circle</mat-icon>
+                        <span>{{gateway.name}}</span>
+                      </mat-panel-title>
+                      <mat-panel-description>
+                        Click to get details
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <form #details="ngForm">
+                      @if (listDetails()[gateway.id] && (listDetails()[gateway.id].parameters || listDetails()[gateway.id].variables)) {
+                        <button mat-raised-button color="basic" (click)="copy(gateway.id)"
+                          >
+                          Copy
                         </button>
-                        <button *ngIf="variable.enabled" mat-raised-button color="accent"
-                                class="but-spacer-left switch-button"
-                                (click)="switchVar(variable)">
-                          Disable
-                        </button>
-                        <button *ngIf="!variable.enabled" mat-raised-button color="primary"
-                                class="but-spacer-left switch-button"
-                                (click)="switchVar(variable)">
-                          Enable
-                        </button>
-                        <button mat-raised-button color="warn" class="but-spacer-left"
-                                (click)="deleteVar(variable)">
-                          Delete
-                        </button>
+                      }
+                      <h3>Parameters:</h3>
+                      <div>
+                        <app-key-value-pad [exist]="listDetails()[gateway.id]"
+                          [items]="listDetails()[gateway.id]?.parameters"
+                          [newItems]="listDetails()[gateway.id]?.parameters?.new"
+                          [id]="gateway.id"
+                          [toCopy]="toCopy"
+                          [store]="store"
+                          [dispatchers]="gatewayParamDispatchers"
+                          >
+                        </app-key-value-pad>
                       </div>
+                      <h3>Variables:</h3>
+                      @if (listDetails()[gateway.id] && listDetails()[gateway.id].variables) {
+                        <div>
+                          @for (variable of onlyValues(listDetails()[gateway.id].variables); track variable) {
+                            <div class="spacer">
+                              @if (variable.id && !isArray(variable)) {
+                                <div>
+                                  <mat-form-field hideRequiredMarker>
+                                    <mat-label>Name</mat-label>
+                                    <input matInput name="name" [(ngModel)]="variable.name" required
+                                      [disabled]="!variable.enabled"
+                                      [name]="'variableName' + variable.id">
+                                    </mat-form-field>
+                                    <mat-form-field hideRequiredMarker>
+                                      <mat-label>Value</mat-label>
+                                      <input matInput name="value" [(ngModel)]="variable.value" required
+                                        [disabled]="!variable.enabled"
+                                        [name]="'variableValue' + variable.id">
+                                      </mat-form-field>
+                                      <mat-form-field hideRequiredMarker>
+                                        <mat-label>Direction</mat-label>
+                                        <input matInput name="direction" [(ngModel)]="variable.direction"
+                                          [disabled]="!variable.enabled"
+                                          [name]="'variableDirection' + variable.id">
+                                        </mat-form-field>
+                                        <button mat-button color="accent" class="but-spacer-left"
+                                          [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.id], details.controls['variableValue' + variable.id], details.controls['variableDirection' + variable.id])"
+                                          (click)="updateVar(variable)">
+                                          Update
+                                        </button>
+                                        @if (variable.enabled) {
+                                          <button mat-raised-button color="accent"
+                                            class="but-spacer-left switch-button"
+                                            (click)="switchVar(variable)">
+                                            Disable
+                                          </button>
+                                        }
+                                        @if (!variable.enabled) {
+                                          <button mat-raised-button color="primary"
+                                            class="but-spacer-left switch-button"
+                                            (click)="switchVar(variable)">
+                                            Enable
+                                          </button>
+                                        }
+                                        <button mat-raised-button color="warn" class="but-spacer-left"
+                                          (click)="deleteVar(variable)">
+                                          Delete
+                                        </button>
+                                      </div>
+                                    }
+                                  </div>
+                                }
+                                @if (listDetails()[gateway.id] && listDetails()[gateway.id].variables) {
+                                  <div>
+                                    @for (variable of listDetails()[gateway.id].variables.new; track trackByFn(i, variable); let i = $index) {
+                                      <div class="spacer"
+                                        >
+                                        @if (variable) {
+                                          <div>
+                                            <mat-form-field hideRequiredMarker>
+                                              <mat-label>Name</mat-label>
+                                              <input matInput name="name" [(ngModel)]="variable.name" required
+                                                [name]="'newVarName' + i">
+                                              </mat-form-field>
+                                              <mat-form-field hideRequiredMarker>
+                                                <mat-label>Value</mat-label>
+                                                <input matInput name="value" [(ngModel)]="variable.value" required
+                                                  [name]="'newVarValue' + i">
+                                                </mat-form-field>
+                                                <mat-form-field hideRequiredMarker>
+                                                  <mat-label>Direction</mat-label>
+                                                  <input matInput name="direction" [(ngModel)]="variable.direction"
+                                                    [name]="'newVarDirection' + i">
+                                                  </mat-form-field>
+                                                  <button mat-button color="accent" class="but-spacer-left"
+                                                    [disabled]="!isNewReadyToSend(details.controls['newVarName' + i], details.controls['newVarValue' + i])"
+                                                    (click)="newVar(gateway.id, i, details.controls['newVarName' + i].value, details.controls['newVarValue' + i].value, details.controls['newVarDirection' + i].value)">
+                                                    Update
+                                                  </button>
+                                                  <button mat-button color="warn"
+                                                    class="but-spacer-left"
+                                                    (click)="dropNewVar(gateway.id, i)">
+                                                    Delete
+                                                  </button>
+                                                </div>
+                                              }
+                                            </div>
+                                          }
+                                        </div>
+                                      }
+                                    </div>
+                                  }
+                                  <button mat-raised-button color="accent" class="spacer" (click)="addVarField(gateway.id)">
+                                    Add
+                                  </button>
+                                  @if (toCopy && toCopy != gateway.id) {
+                                    <button mat-raised-button color="primary" class="but-spacer-left" (click)="pasteVars(gateway.id)"
+                                      >
+                                      Paste
+                                    </button>
+                                  }
+                                </form>
+                              </mat-expansion-panel>
+                            }
+                          }
+                        </mat-card-content>
+                      </mat-card>
                     </div>
-                    <div *ngIf="listDetails[gateway.id] && listDetails[gateway.id].variables">
-                      <div class="spacer"
-                           *ngFor="let variable of listDetails[gateway.id].variables.new; trackBy: trackByFn; let i = index;">
-                        <div *ngIf="variable">
+                  }
+                </mat-tab>
+                <mat-tab label="Add">
+                  <form class="spacer spacerb filter-container" (ngSubmit)="onUserSubmit()">
+                    <mat-form-field hideRequiredMarker>
+                      <mat-label>Domain</mat-label>
+                      <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
+                        <mat-option>--</mat-option>
+                        @for (domain of onlyValues(list()); track domain) {
+                          <mat-option [value]="domain.id">{{domain.name}}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field hideRequiredMarker>
+                      <mat-label>User</mat-label>
+                      <mat-select required name="domainId" [(ngModel)]="userId" disableOptionCentering>
+                        <mat-option>--</mat-option>
+                        @for (user of onlyValuesByParent(userList(), domainId); track user) {
+                          <mat-option
+                          [value]="user.id">{{user.name}}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field hideRequiredMarker>
+                      <mat-label>Name</mat-label>
+                      <input matInput placeholder="New gateway name" required name="name" [ngModel]="newGatewayName()" (ngModelChange)="newGatewayName.set($event)">
+                    </mat-form-field>
+                    <button mat-raised-button color="primary" type="submit">Submit</button>
+                  </form>
+                </mat-tab>
+                <mat-tab label="Delete/Rename">
+                  <form class="spacer spacerb filter-container" #deleteForm="ngForm">
+                    <mat-form-field hideRequiredMarker>
+                      <mat-label>Domain</mat-label>
+                      <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
+                        <mat-option>--</mat-option>
+                        @for (domain of onlyValues(list()); track domain) {
+                          <mat-option [value]="domain.id">{{domain.name}}</mat-option>
+                        }
+                      <!--mat-hint>{{selectdomain?.sound}}</mat-hint-->
+                    </mat-select>
+                  </mat-form-field>
+                  @for (user of onlyValuesByParent(userList(), domainId); track user) {
+                    <div>
+                      <h4>User: {{user.name}}</h4>
+                      @for (gateway of onlyValuesByParent(gatewayList(), user.id); track gateway) {
+                        <div>
                           <mat-form-field hideRequiredMarker>
-                            <mat-label>Name</mat-label>
-                            <input matInput name="name" [(ngModel)]="variable.name" required
-                                   [name]="'newVarName' + i">
-                          </mat-form-field>
-                          <mat-form-field hideRequiredMarker>
-                            <mat-label>Value</mat-label>
-                            <input matInput name="value" [(ngModel)]="variable.value" required
-                                   [name]="'newVarValue' + i">
-                          </mat-form-field>
-                          <mat-form-field hideRequiredMarker>
-                            <mat-label>Direction</mat-label>
-                            <input matInput name="direction" [(ngModel)]="variable.direction"
-                                   [name]="'newVarDirection' + i">
-                          </mat-form-field>
-                          <button mat-button color="accent" class="but-spacer-left"
-                                  [disabled]="!isNewReadyToSend(details.controls['newVarName' + i], details.controls['newVarValue' + i])"
-                                  (click)="newVar(gateway.id, i, details.controls['newVarName' + i].value, details.controls['newVarValue' + i].value, details.controls['newVarDirection' + i].value)">
-                            Update
-                          </button>
-                          <button mat-button color="warn"
-                                  class="but-spacer-left"
-                                  (click)="dropNewVar(gateway.id, i)">
-                            Delete
-                          </button>
-                        </div>
+                            <mat-label>Gateway name</mat-label>
+                            <input matInput name="gateway name" required [ngModel]="gateway.name"
+                              [name]="'user::' + gateway.id">
+                            </mat-form-field>
+                            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['user::' + gateway.id])"
+                              (click)="openBottomSheet(gateway.id, deleteForm.controls['user::' + gateway.id].value, gateway.name, 'rename')">
+                              Update
+                            </button>
+                            <button mat-raised-button color="warn"
+                              (click)="openBottomSheet(gateway.id, deleteForm.controls['user::' + gateway.id].value, gateway.name, 'delete')">
+                              Delete
+                            </button>
+                          </div>
+                        }
                       </div>
-                    </div>
-                  </div>
-                  <button mat-raised-button color="accent" class="spacer" (click)="addVarField(gateway.id)">
-                    Add
-                  </button>
-                  <button mat-raised-button color="primary" class="but-spacer-left" (click)="pasteVars(gateway.id)"
-                          *ngIf="toCopy && toCopy != gateway.id">
-                    Paste
-                  </button>
-
-                </form>
-              </mat-expansion-panel>
-            </ng-container>
-          </ng-container>
-
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </mat-tab>
-  <mat-tab label="Add">
-    <form class="spacer spacerb filter-container" (ngSubmit)="onUserSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Domain</mat-label>
-        <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
-          <mat-option>--</mat-option>
-          <mat-option *ngFor="let domain of onlyValues(list)" [value]="domain.id">{{domain.name}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field hideRequiredMarker>
-        <mat-label>User</mat-label>
-        <mat-select required name="domainId" [(ngModel)]="userId" disableOptionCentering>
-          <mat-option>--</mat-option>
-          <mat-option *ngFor="let user of onlyValuesByParent(userList, domainId)"
-                      [value]="user.id">{{user.name}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New gateway name" required name="name" [(ngModel)]="newGatewayName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-  </mat-tab>
-
-  <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb filter-container" #deleteForm="ngForm">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Domain</mat-label>
-        <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
-          <mat-option>--</mat-option>
-          <mat-option *ngFor="let domain of onlyValues(list)" [value]="domain.id">{{domain.name}}</mat-option>
-          <!--mat-hint>{{selectdomain?.sound}}</mat-hint-->
-        </mat-select>
-      </mat-form-field>
-      <div *ngFor="let user of onlyValuesByParent(userList, domainId)">
-        <h4>User: {{user.name}}</h4>
-        <ng-container *ngFor="let gateway of onlyValuesByParent(gatewayList, user.id)">
-          <div>
-            <mat-form-field hideRequiredMarker>
-              <mat-label>Gateway name</mat-label>
-              <input matInput name="gateway name" required [ngModel]="gateway.name"
-                     [name]="'user::' + gateway.id">
-            </mat-form-field>
-            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['user::' + gateway.id])"
-                    (click)="openBottomSheet(gateway.id, deleteForm.controls['user::' + gateway.id].value, gateway.name, 'rename')">
-              Update
-            </button>
-            <button mat-raised-button color="warn"
-                    (click)="openBottomSheet(gateway.id, deleteForm.controls['user::' + gateway.id].value, gateway.name, 'delete')">
-              Delete
-            </button>
-          </div>
-        </ng-container>
-      </div>
-    </form>
-  </mat-tab>
-</mat-tab-group>
+                    }
+                  </form>
+                </mat-tab>
+              </mat-tab-group>
+            }

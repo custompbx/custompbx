@@ -1,6 +1,7 @@
 import {Directive, ElementRef, EventEmitter, HostListener, Input, Output} from '@angular/core';
 
 @Directive({
+  standalone: true,
   selector: '[appResizeInput]'
 })
 export class ResizeInputDirective {

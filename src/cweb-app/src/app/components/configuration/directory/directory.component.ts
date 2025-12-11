@@ -1,9 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
 import {Observable, Subscription} from 'rxjs';
 import {Iitem, Idirectory} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -19,8 +21,12 @@ import {
   SwitchDirectoryParameter, UpdateDirectoryProfileParameter,
   UpdateDirectoryParameter
 } from '../../../store/config/directory/config.actions.directory';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 
 @Component({
+standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent],
   selector: 'app-directory',
   templateUrl: './directory.component.html',
   styleUrls: ['./directory.component.css']

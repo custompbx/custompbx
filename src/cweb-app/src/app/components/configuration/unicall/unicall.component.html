@@ -1,100 +1,108 @@
-<app-inner-header name="Unicall" [loadCounter]="loadCounter"></app-inner-header>
-<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
-               *ngIf="list && list.exists !== false">
-  <mat-tab label="List">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Settings</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Settings
-            </mat-panel-title>
-            <mat-panel-description>
-              Click to get details
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <h3>Params:</h3>
-          <app-key-value-pad-2 [exist]="list.settings"
-                               [items]="list.settings"
-                               [newItems]="list.settings?.new"
-                               [id]="null"
-                               [toCopy]="null"
-                               [dispatchersCallbacks]="globalSettingsDispatchers"
-          >
-          </app-key-value-pad-2>
-        </mat-expansion-panel>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Spans</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div *ngFor="let item of onlyValues(list.spans); trackBy: trackByFn" class="panel-wrapper">
-          <mat-expansion-panel (opened)="getUnicallSpansParams(item.id)"
-                               [expanded]="panelCloser['span' + item.id]">
+<app-inner-header name="Unicall" [loadCounter]="loadCounter()"></app-inner-header>
+<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+@if (list() && list().exists !== false) {
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
+    <mat-tab label="list">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Settings</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title>
-                {{item.span_id}}
+                Settings
               </mat-panel-title>
               <mat-panel-description>
                 Click to get details
               </mat-panel-description>
             </mat-expansion-panel-header>
-            <button mat-raised-button color="basic" (click)="copySpan(item.id)"
-                    *ngIf="list.spans[item.id] && (list.spans[item.id].parameters)">Copy
-            </button>
             <h3>Params:</h3>
-            <div>
-              <app-key-value-pad-2 [exist]="item.parameters"
-                                   [items]="item.parameters"
-                                   [newItems]="item.parameters?.new"
-                                   [id]="item.id"
-                                   [toCopy]="toCopySpan"
-                                   [dispatchersCallbacks]="spanSettingsDispatchers"
-              >
-              </app-key-value-pad-2>
-            </div>
+            <app-key-value-pad-2 [exist]="list().settings"
+                                 [items]="list().settings"
+                                 [newItems]="list().settings?.new"
+                                 [id]="null"
+                                 [toCopy]="null"
+                                 [dispatchersCallbacks]="globalSettingsDispatchers"
+            >
+            </app-key-value-pad-2>
           </mat-expansion-panel>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-tab>
+        </mat-card-content>
+      </mat-card>
 
-  <mat-tab label="Add">
-    <form class="spacer spacerb" (ngSubmit)="onSpanSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New span id" required name="name" [(ngModel)]="newSpanId">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-  </mat-tab>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Spans</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @for (item of onlyValues(list().spans); track item.id) {
+            <div class="panel-wrapper">
+              <mat-expansion-panel (opened)="getUnicallSpansParams(item.id)"
+                                   [expanded]="panelCloser['span' + item.id]">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{item.span_id}}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    Click to get details
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                @if (list().spans[item.id] && (list().spans[item.id].parameters)) {
+                <button mat-raised-button color="basic" (click)="copySpan(item.id)">Copy
+                </button>
+                }
+                <h3>Params:</h3>
+                <div>
+                  <app-key-value-pad-2 [exist]="item.parameters"
+                                       [items]="item.parameters"
+                                       [newItems]="item.parameters?.new"
+                                       [id]="item.id"
+                                       [toCopy]="toCopySpan"
+                                       [dispatchersCallbacks]="spanSettingsDispatchers"
+                  >
+                  </app-key-value-pad-2>
+                </div>
+              </mat-expansion-panel>
+            </div>
+          }
 
-  <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb" #deleteForm="ngForm">
-      <h3>Span:</h3>
-      <div *ngFor="let span of onlyValues(list.spans); trackBy: trackByFn">
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+
+    <mat-tab label="Add">
+      <form class="spacer spacerb" (ngSubmit)="onSpanSubmit()">
         <mat-form-field hideRequiredMarker>
-        <mat-label>Span id</mat-label>
-        <input matInput name="Span id" required [ngModel]="span.span_id"
-                 [name]="'span::' + span.id">
+          <mat-label>Name</mat-label>
+          <input matInput placeholder="New span id" required name="name" [(ngModel)]="newSpanId">
         </mat-form-field>
-        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['span::' + span.id])"
-                (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'rename')">
-          Update
-        </button>
-        <button mat-raised-button color="warn"
-                (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'delete')">
-          Delete
-        </button>
-      </div>
-    </form>
-  </mat-tab>
-</mat-tab-group>
+        <button mat-raised-button color="primary" type="submit">Submit</button>
+      </form>
+    </mat-tab>
+
+    <mat-tab label="Delete/Rename">
+      <form class="spacer spacerb" #deleteForm="ngForm">
+        <h3>Span:</h3>
+        @for (span of onlyValues(list().spans); track span.id) {
+          <div>
+            <mat-form-field hideRequiredMarker>
+              <mat-label>Span id</mat-label>
+              <input matInput name="Span id" required [ngModel]="span.span_id"
+                     [name]="'span::' + span.id">
+            </mat-form-field>
+            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['span::' + span.id])"
+                    (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'rename')">
+              Update
+            </button>
+            <button mat-raised-button color="warn"
+                    (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'delete')">
+              Delete
+            </button>
+          </div>
+        }
+      </form>
+    </mat-tab>
+  </mat-tab-group>
+}
+
 

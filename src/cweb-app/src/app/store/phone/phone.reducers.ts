@@ -1,6 +1,8 @@
 import {All, AuthActionTypes, StoreCommand, StoreTicker} from './phone.actions';
 
 export interface Icreds {
+  verto_ws: string;
+  webrtc_lib: string;
   user_name: string;
   password: string;
   domain: string;

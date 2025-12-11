@@ -1,12 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import {NavigationEnd, Router} from '@angular/router';
+import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {UserService} from './services/user.service';
 import {filter} from 'rxjs/operators';
+import {MaterialModule} from "../material-module";
+
+import {SidenavComponent} from "./components/sidenav/sidenav.component";
+import {ServiceStatusComponent} from "./components/service-status/service-status.component";
+import {HeaderComponent} from "./components/header/header.component";
+import {ConversationsComponent} from "./components/conversations/conversations.component";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  standalone: true,
+  imports: [MaterialModule, RouterOutlet, SidenavComponent, ServiceStatusComponent, HeaderComponent, ConversationsComponent],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
 
@@ -18,19 +26,12 @@ export class AppComponent implements OnInit {
     private router: Router,
     public userService: UserService,
   ) {
-    router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: NavigationEnd) => {
-      if (event.url === 'login' || event.url === '' || event.url === '/login' || event.url === '/') {
-        this.login = true;
-      } else {
-        this.login = false;
-      }
-      /*      if (this.userService.isAuthenticated && event.url === '/login') {
-              this.router.navigateByUrl('dashboard');
-            }*/
-      this.showRightNav = false;
-    });
+    router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+          this.login = event.urlAfterRedirects.startsWith('/login');
+          this.showRightNav = false;
+      });
   }
 
   ngOnInit() {

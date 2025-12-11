@@ -1,109 +1,123 @@
-<app-inner-header name="Groups" [loadCounter]="loadCounter"></app-inner-header>
-<mat-card *ngIf="loadCounter === 0 && !(list | keyvalue)?.length">
-  <mat-card-content>
-    Here no any domains yet. You can create it or try to import from existing config at domains page.
-    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
-            routerLink="/directory/domains">
-      Go to domains
-    </button>
-  </mat-card-content>
-</mat-card>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="(list | keyvalue)?.length">
-  <mat-tab label="List">
-    <div *ngFor="let domain of list | keyvalue">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Domain: <b>{{domain.value.name}}</b></mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-expansion-panel (opened)="getDetails(group.id)" (closed)="clearDetails(group.id)"
-                               *ngFor="let group of onlyValuesByParent(groupList, domain.key)">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                {{group.name}}
-              </mat-panel-title>
-              <mat-panel-description>
-                Click to get details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-
-            <button mat-raised-button class="add-button example-list" color="accent"
+<app-inner-header name="Groups" [loadCounter]="loadCounter()"></app-inner-header>
+@if (loadCounter() === 0 && !(list() | keyvalue)?.length) {
+  <mat-card>
+    <mat-card-content>
+      Here no any domains yet. You can create it or try to import from existing config at domains page.
+      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+        routerLink="/directory/domains">
+        Go to domains
+      </button>
+    </mat-card-content>
+  </mat-card>
+}
+@if ((list() | keyvalue)?.length) {
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
+    <mat-tab label="List">
+      @for (domain of list() | keyvalue; track domain) {
+        <div>
+          <mat-card>
+            <mat-card-header>
+              <mat-card-subtitle>Domain: <b>{{domain.value.name}}</b></mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              @for (group of onlyValuesByParent(groupList(), Number(domain.key)); track group) {
+                <mat-expansion-panel (opened)="getDetails(group.id)" (closed)="clearDetails(group.id)"
+                  >
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{group.name}}
+                    </mat-panel-title>
+                    <mat-panel-description>
+                      Click to get details
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <button mat-raised-button class="add-button example-list" color="accent"
                     (click)="manageGroup[group.id]=!manageGroup[group.id]">Manage
-            </button>
-
-            <div class="example-list users-to-del">
-              <mat-card class="float-card example-box"
-                        *ngFor="let gUser of onlyValuesByParent(listGroupUsers, group.id)">
-                <button mat-flat-button color="warn" class="action" (click)="delUser(gUser.id)" *ngIf="manageGroup[group.id]">Remove</button>
-                <mat-card-actions class="vert-centered">
-                  <mat-icon class="icon-spacer">face</mat-icon>
-                  <span class="user-name">{{listDomainUsers[gUser.user?.id]?.name}}</span>
-                </mat-card-actions>
-              </mat-card>
-            </div>
-
-            <div class="users-to-add example-list">
-              <ng-container *ngFor="let user of onlyValuesByParent(listDomainUsers, domain.key)">
-                <div *ngIf="bound[group.id] && !bound[group.id][user.id] && manageGroup[group.id]">
-                  <mat-card class="float-card example-box">
-                    <button mat-flat-button color="primary" class="action" (click)="addUser(user.id, group.id)">Add</button>
-                    <mat-card-actions class="vert-centered">
-                      <mat-icon class="icon-spacer">face</mat-icon>
-                      <span class="user-name">{{user.name}}</span>
-                    </mat-card-actions>
-                  </mat-card>
-                </div>
-              </ng-container>
-            </div>
-
-          </mat-expansion-panel>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </mat-tab>
-
-  <mat-tab label="Add">
-    <form class="spacer spacerb filter-container" (ngSubmit)="onGroupSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Domain</mat-label>
-        <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
-          <mat-option>--</mat-option>
-          <mat-option *ngFor="let domain of list | keyvalue" [value]="domain.key">{{domain.value.name}}</mat-option>
+                  </button>
+                  <div class="example-list users-to-del">
+                    @for (gUser of onlyValuesByParent(listGroupUsers(), group.id); track gUser) {
+                      <mat-card class="float-card example-box"
+                        >
+                        @if (manageGroup[group.id]) {
+                          <button mat-flat-button color="warn" class="action" (click)="delUser(gUser.id)">Remove</button>
+                        }
+                        <mat-card-actions class="vert-centered">
+                          <mat-icon class="icon-spacer">face</mat-icon>
+                          <span class="user-name">{{listDomainUsers()[gUser.user?.id]?.name}}</span>
+                        </mat-card-actions>
+                      </mat-card>
+                    }
+                  </div>
+                  <div class="users-to-add example-list">
+                    @for (user of onlyValuesByParent(listDomainUsers(), Number(domain.key)); track user) {
+                      @if (bound()[group.id] && !bound()[group.id][user.id] && manageGroup[group.id]) {
+                        <div>
+                          <mat-card class="float-card example-box">
+                            <button mat-flat-button color="primary" class="action" (click)="addUser(user.id, group.id)">Add</button>
+                            <mat-card-actions class="vert-centered">
+                              <mat-icon class="icon-spacer">face</mat-icon>
+                              <span class="user-name">{{user.name}}</span>
+                            </mat-card-actions>
+                          </mat-card>
+                        </div>
+                      }
+                    }
+                  </div>
+                </mat-expansion-panel>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+      }
+    </mat-tab>
+    <mat-tab label="Add">
+      <form class="spacer spacerb filter-container" (ngSubmit)="onGroupSubmit()">
+        <mat-form-field hideRequiredMarker>
+          <mat-label>Domain</mat-label>
+          <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
+            <mat-option>--</mat-option>
+            @for (domain of list() | keyvalue; track domain) {
+              <mat-option [value]="domain.key">{{domain.value.name}}</mat-option>
+            }
           <!--mat-hint>{{selectDomain.value?.sound}}</mat-hint-->
         </mat-select>
       </mat-form-field>
       <mat-form-field hideRequiredMarker>
         <mat-label>Name</mat-label>
-        <input matInput placeholder="New group name" required name="name" [(ngModel)]="newGroupName">
+        <input matInput placeholder="New group name" required name="name" [ngModel]="newGroupName()" (ngModelChange)="newGroupName.set($event)">
       </mat-form-field>
       <button mat-raised-button color="primary" type="submit">Submit</button>
     </form>
   </mat-tab>
-
   <mat-tab label="Delete/Rename">
     <form class="spacer spacerb filter-container" #deleteForm="ngForm">
       <mat-form-field hideRequiredMarker>
         <mat-label>Domain</mat-label>
         <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
           <mat-option>--</mat-option>
-          <mat-option *ngFor="let domain of list | keyvalue" [value]="domain.key">{{domain.value.name}}</mat-option>
-          <!--mat-hint>{{selectDomain.value?.sound}}</mat-hint-->
-        </mat-select>
-      </mat-form-field>
-      <div *ngFor="let group of onlyValuesByParent(groupList, domainId)">
+          @for (domain of list() | keyvalue; track domain) {
+            <mat-option [value]="domain.key">{{domain.value.name}}</mat-option>
+          }
+        <!--mat-hint>{{selectDomain.value?.sound}}</mat-hint-->
+      </mat-select>
+    </mat-form-field>
+    @for (group of onlyValuesByParent(groupList(), domainId); track group) {
+      <div>
         <mat-form-field hideRequiredMarker>
           <mat-label>Group name</mat-label>
           <input matInput name="group name" required [ngModel]="group.name" [name]="'group::' + group.id">
         </mat-form-field>
         <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['group::' + group.id])"
-                (click)="openBottomSheet(group.id, deleteForm.controls['group::' + group.id].value, group, 'rename')">
+          (click)="openBottomSheet(group.id, deleteForm.controls['group::' + group.id].value, group, 'rename')">
           Update
         </button>
         <button mat-raised-button color="warn"
-                (click)="openBottomSheet(group.id, deleteForm.controls['group::' + group.id].value, group, 'delete')">
+          (click)="openBottomSheet(group.id, deleteForm.controls['group::' + group.id].value, group, 'delete')">
           Delete
         </button>
       </div>
-    </form>
-  </mat-tab>
+    }
+  </form>
+</mat-tab>
 </mat-tab-group>
+}

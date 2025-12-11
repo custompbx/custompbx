@@ -1,7 +1,9 @@
-import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, inject, signal, computed, effect} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+import {MaterialModule} from "../../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectDirectoryState} from '../../../store/app.states';
-import {Observable, Subscription} from 'rxjs';
 import {
   GetDirectoryUserGatewayDetails,
   StoreNewDirectoryUserGatewayParameter,
@@ -22,81 +24,90 @@ import {
   StorePasteDirectoryUserGatewayVariables,
   StorePasteDirectoryUserGatewayParameters,
 
-  SwitchDirectoryDomainParameter, SwitchDirectoryUserGatewayParameter,
+  SwitchDirectoryUserGatewayParameter,
 } from '../../../store/directory/directory.actions';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {Idetails, IdirectionItem} from '../../../store/directory/directory.reducers';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {KeyValuePadComponent} from "../../key-value-pad/key-value-pad.component";
 
 @Component({
+  standalone: true,
+  imports: [MaterialModule, FormsModule, RouterLink, KeyValuePadComponent],
   selector: 'app-gateways',
   templateUrl: './gateways.component.html',
   styleUrls: ['./gateways.component.css']
 })
-export class GatewaysComponent implements OnInit, OnDestroy {
-  public users: Observable<any>;
-  public users$: Subscription;
-  public list: any;
-  private userList: any;
-  private gatewayList: any;
-  public listDetails: Idetails;
-  private newGatewayName: string;
-  private domainId: number;
-  private userId: number;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  public loadCounter: number;
-  private toCopy: number;
-  public gatewayParamDispatchers: object;
+export class GatewaysComponent implements OnDestroy {
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.users = this.store.pipe(select(selectDirectoryState));
-  }
+  // --- Dependency Injection using inject() ---
+  protected store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
 
-  ngOnInit() {
-    this.users$ = this.users.subscribe((users) => {
-      this.loadCounter = users.loadCounter;
-      this.list = users.domains;
-      this.userList = users.users;
-      this.gatewayList = users.userGateways;
-      this.listDetails = users.gatewayDetails;
-      this.lastErrorMessage = users.errorMessage;
-      if (!this.lastErrorMessage) {
-        this.newGatewayName = '';
-        // this.domainId = 0;
-        this.selectedIndex = this.selectedIndex === 1 ? 0 : this.selectedIndex;
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
-    this.gatewayParamDispatchers = {
-      addItemField: StoreNewDirectoryUserGatewayParameter,
-      switchItem: SwitchDirectoryUserGatewayParameter,
-      newItem: AddDirectoryUserGatewayParameter,
-      dropNewItem: DropNewDirectoryUserGatewayParameter,
-      deleteItem: DeleteDirectoryUserGatewayParameter,
-      updateItem: UpdateDirectoryUserGatewayParameter,
-      pasteItems: StorePasteDirectoryUserGatewayParameters,
-    };
-  }
+  // --- Reactive State from NgRx using toSignal ---
+  private directoryState = toSignal(
+    this.store.pipe(select(selectDirectoryState)),
+    {
+      initialValue: {
+        domains: {},
+        users: {},
+        userGateways: {},
+        gatewayDetails: {} as Idetails,
+        errorMessage: null,
+        loadCounter: 0
+      } as any // Replace 'any' with the actual DirectoryState interface if available
+    }
+  );
+
+  // --- Computed State for Template Access ---
+  public list = computed(() => this.directoryState().domains || {});
+  protected userList = computed(() => this.directoryState().users || {});
+  protected gatewayList = computed(() => this.directoryState().userGateways || {});
+  public listDetails = computed(() => this.directoryState().gatewayDetails as Idetails || {} as Idetails);
+  public loadCounter = computed(() => this.directoryState().loadCounter || 0);
+
+  // --- Local State as Signals/Properties ---
+  public newGatewayName = signal('');
+  public domainId: number;
+  public userId: number;
+  public selectedIndex: number = 0; // Initialized directly
+  protected toCopy: number;
+  public gatewayParamDispatchers: object = { // Initialized directly
+    addItemField: StoreNewDirectoryUserGatewayParameter,
+    switchItem: SwitchDirectoryUserGatewayParameter,
+    newItem: AddDirectoryUserGatewayParameter,
+    dropNewItem: DropNewDirectoryUserGatewayParameter,
+    deleteItem: DeleteDirectoryUserGatewayParameter,
+    updateItem: UpdateDirectoryUserGatewayParameter,
+    pasteItems: StorePasteDirectoryUserGatewayParameters,
+  };
+
+  private gatewayEffect = effect(() => {
+    const users = this.directoryState();
+    const lastErrorMessage = users.errorMessage;
+
+    if (lastErrorMessage) {
+      this._snackBar.open('Error: ' + lastErrorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    } else {
+      // If the error message clears, reset state
+      this.newGatewayName.set('');
+      // Reset selectedIndex if it was due to a successful action
+      this.selectedIndex = this.selectedIndex === 1 ? 0 : this.selectedIndex;
+    }
+  });
 
   ngOnDestroy() {
-    this.users$.unsubscribe();
     if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
+      this.route.snapshot.data.reconnectUpdater.unsubscribe();
+    }
   }
 
   getDetails(id) {
@@ -151,8 +162,9 @@ export class GatewaysComponent implements OnInit, OnDestroy {
   }
 
   onUserSubmit() {
-    console.log({name: this.newGatewayName, id: this.userId});
-    this.store.dispatch(new AddDirectoryUserGateway({name: this.newGatewayName, id: this.userId}));
+    // Access signal value with ()
+    console.log({name: this.newGatewayName(), id: this.userId});
+    this.store.dispatch(new AddDirectoryUserGateway({name: this.newGatewayName(), id: this.userId}));
   }
 
   checkDirty(condition: AbstractControl): boolean {
@@ -175,11 +187,13 @@ export class GatewaysComponent implements OnInit, OnDestroy {
     if (!obj) {
       return [];
     }
-    return Object.values(obj).filter(u => u.parent?.id === Number(parentId));
+    // Access computed signal userList()
+    return Object.values(obj).filter((u: any) => u.parent?.id === Number(parentId));
   }
 
   copy(key) {
-    if (!this.gatewayList[key]) {
+    // Access computed signal gatewayList()
+    if (!this.gatewayList()[key]) {
       this.toCopy = 0;
       return;
     }
@@ -229,5 +243,4 @@ export class GatewaysComponent implements OnInit, OnDestroy {
   trackByFn(index, item) {
     return index; // or item.id
   }
-
 }

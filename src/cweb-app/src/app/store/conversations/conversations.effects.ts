@@ -17,7 +17,9 @@ import {
 } from './conversations.actions';
 import {catchError, map, switchMap} from 'rxjs/operators';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConversationsEffects {
 
   constructor(

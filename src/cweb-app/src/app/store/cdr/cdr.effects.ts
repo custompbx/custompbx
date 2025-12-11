@@ -10,7 +10,9 @@ import {
 } from './cdr.actions';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class CdrEffects {
 
   constructor(

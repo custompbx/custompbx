@@ -1,9 +1,11 @@
 import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
 import {Observable, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {
   AddDistributorList,
   AddDistributorNode, DelDistributorList,
@@ -17,8 +19,12 @@ import {Idistributor, IdistributorNode, Inode} from '../../../store/config/confi
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 
 @Component({
+standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent],
   selector: 'app-distributor',
   templateUrl: './distributor.component.html',
   styleUrls: ['./distributor.component.css']

@@ -85,7 +85,9 @@ import {
 import {catchError, concatMap, map, mergeMap, switchMap} from 'rxjs/operators';
 import {WsDataService} from '../../services/ws-data.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DialplanEffects {
 
   constructor(

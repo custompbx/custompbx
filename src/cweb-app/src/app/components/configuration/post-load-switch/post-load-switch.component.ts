@@ -1,12 +1,13 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
-import {Iitem, IsimpleModule} from '../../../store/config/config.state.struct';
+import {Component, DestroyRef, inject, computed, effect} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
+import {Iitem, IsimpleModule, State} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {ActivatedRoute} from '@angular/router';
 import {
   DelPostSwitchParameter,
   AddPostSwitchParameter,
@@ -27,48 +28,49 @@ import {
   SwitchPostSwitchCliKeybinding,
   AddPostSwitchCliKeybinding
 } from '../../../store/config/post-switch/config.actions.post-switch';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-post-load-switch',
   templateUrl: './post-load-switch.component.html',
   styleUrls: ['./post-load-switch.component.css']
 })
-export class PostLoadSwitchComponent implements OnInit, OnDestroy {
+export class PostLoadSwitchComponent {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: IsimpleModule;
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+
+  private configsObservable = this.store.pipe(select(selectConfigurationState));
+  private configsSignal = toSignal(this.configsObservable, { initialValue: {} as State });
+
+  public list = computed(() => this.configsSignal().post_load_switch || {} as IsimpleModule);
+  public loadCounter = computed(() => this.configsSignal().loadCounter || 0);
+  private lastErrorMessage = computed(() => this.list().errorMessage || null);
+
   public selectedIndex: number;
-  private lastErrorMessage: string;
-  public loadCounter: number;
   public globalSettingsDispatchers: object;
   public cliKeybindingsDispatchers: object;
   public defaultPtimesDispatchers: object;
   public defaultPtimesMask: object;
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    }
+  });
 
-  ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.post_load_switch;
-      this.lastErrorMessage = configs.post_load_switch && configs.post_load_switch.errorMessage || null;
-      if (!this.lastErrorMessage) {
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
+  constructor() {
+    this.selectedIndex = 0;
+
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewPostSwitchParam.bind(this),
       switchItem: this.switchPostSwitchParam.bind(this),
@@ -100,13 +102,6 @@ export class PostLoadSwitchComponent implements OnInit, OnDestroy {
       name: {name: 'codec_name'},
       value: {name: 'codec_ptime'},
     };
-  }
-
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
   }
 
   updatePostSwitchParam(param: Iitem) {
@@ -171,7 +166,7 @@ export class PostLoadSwitchComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StoreDropNewPostSwitchCliKeybinding({index: index}));
   }
 
-  updatePostSwitchDefaultPtime(param) {
+  updatePostSwitchDefaultPtime(param: { id: number, codec_name: string, codec_ptime: string }) {
     const para = <Iitem>{id: param.id, name: param.codec_name, value: param.codec_ptime};
     this.store.dispatch(new UpdatePostSwitchDefaultPtime({param: para}));
   }
@@ -203,7 +198,7 @@ export class PostLoadSwitchComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StoreDropNewPostSwitchDefaultPtime({index: index}));
   }
 
-  checkDirty(condition: AbstractControl): boolean {
+  checkDirty(condition: AbstractControl | null): boolean {
     if (condition) {
       return !condition.dirty;
     } else {
@@ -211,16 +206,16 @@ export class PostLoadSwitchComponent implements OnInit, OnDestroy {
     }
   }
 
-  isReadyToSendThree(mainObject: AbstractControl, object2: AbstractControl, object3: AbstractControl): boolean {
+  isReadyToSendThree(mainObject: AbstractControl | null, object2: AbstractControl | null, object3: AbstractControl | null): boolean {
     return (mainObject && mainObject.valid && mainObject.dirty)
       || ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty));
   }
 
-  isvalueReadyToSend(valueObject: AbstractControl): boolean {
+  isvalueReadyToSend(valueObject: AbstractControl | null): boolean {
     return valueObject && valueObject.dirty && valueObject.valid;
   }
 
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
+  isReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
     return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
   }
 
@@ -228,13 +223,12 @@ export class PostLoadSwitchComponent implements OnInit, OnDestroy {
     return Array.isArray(obj);
   }
 
-  trackByFn(index, item) {
-    return index; // or item.id
+  trackByFn(index: number, item: any) {
+    return index;
   }
 
-  isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
+  isNewReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
     return nameObject && valueObject && nameObject.valid && valueObject.valid;
   }
 
 }
-

@@ -105,7 +105,9 @@ import {
 } from './config.actions.conference';
 import {createEffectForActions} from '../../../services/rxjs-helper/effects-helper';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsConference {
 
   constructor(

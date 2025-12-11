@@ -1,4 +1,6 @@
-<mat-progress-bar mode="indeterminate" *ngIf="loadCounter > 0"></mat-progress-bar>
-<mat-toolbar>
+@if (loadCounter > 0) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+<mat-toolbar color="basic">
   <span>{{name}}</span>
 </mat-toolbar>

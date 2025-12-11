@@ -1,35 +1,57 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
-import {Ialias, IdirectionItem, Idomain, Idomains, Iitem, Iprofile, Isofia} from '../../../store/config/config.state.struct';
+import {Component, DestroyRef, inject, computed, effect} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
+import {
+  Ialias, IdirectionItem, Idomain, Idomains, Iitem, Iprofile, Isofia, State
+} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {
-  AddSofiaGlobalSettings, AddSofiaProfile, AddSofiaProfileAlias,
-  AddSofiaProfileDomain, AddSofiaProfileGateway,
+  AddSofiaGlobalSettings,
+  AddSofiaProfile,
+  AddSofiaProfileAlias,
+  AddSofiaProfileDomain,
+  AddSofiaProfileGateway,
   AddSofiaProfileGatewayParam,
   AddSofiaProfileGatewayVar,
   AddSofiaProfileParam,
-  DelSofiaGlobalSettings, DelSofiaProfile, DelSofiaProfileAlias,
-  DelSofiaProfileDomain, DelSofiaProfileGateway,
+  DelSofiaGlobalSettings,
+  DelSofiaProfile,
+  DelSofiaProfileAlias,
+  DelSofiaProfileDomain,
+  DelSofiaProfileGateway,
   DelSofiaProfileGatewayParam,
   DelSofiaProfileGatewayVar,
   DelSofiaProfileParam,
-  GetSofiaGlobalSettings, GetSofiaProfileAliases,
-  GetSofiaProfileDomains, GetSofiaProfileGatewayParameters,
-  GetSofiaProfileGateways, GetSofiaProfileGatewayVariables,
-  GetSofiaProfilesParams, RenameSofiaProfile, RenameSofiaProfileGateway, SofiaProfileCommand,
-  StoreDropNewSofiaGlobalSettings, StoreDropNewSofiaProfileAlias,
+  GetSofiaGlobalSettings,
+  GetSofiaProfileAliases,
+  GetSofiaProfileDomains,
+  GetSofiaProfileGatewayParameters,
+  GetSofiaProfileGateways,
+  GetSofiaProfilesParams,
+  RenameSofiaProfile,
+  RenameSofiaProfileGateway,
+  SofiaProfileCommand,
+  StoreDropNewSofiaGlobalSettings,
+  StoreDropNewSofiaProfileAlias,
   StoreDropNewSofiaProfileDomain,
   StoreDropNewSofiaProfileGatewayParam,
   StoreDropNewSofiaProfileGatewayVar,
   StoreDropNewSofiaProfileParam,
-  StoreNewSofiaGlobalSettings, StoreNewSofiaProfileAlias,
+  StoreNewSofiaGlobalSettings,
+  StoreNewSofiaProfileAlias,
   StoreNewSofiaProfileDomain,
   StoreNewSofiaProfileGatewayParam,
   StoreNewSofiaProfileGatewayVar,
-  StoreNewSofiaProfileParam, StorePasteSofiaProfileGatewayParams, StorePasteSofiaProfileGatewayVars, StorePasteSofiaProfileParams,
-  SwitchSofiaGlobalSettings, SwitchSofiaProfile, SwitchSofiaProfileAlias,
+  StoreNewSofiaProfileParam,
+  StorePasteSofiaProfileGatewayParams,
+  StorePasteSofiaProfileGatewayVars,
+  StorePasteSofiaProfileParams,
+  SwitchSofiaGlobalSettings,
+  SwitchSofiaProfile,
+  SwitchSofiaProfileAlias,
   SwitchSofiaProfileDomain,
   SwitchSofiaProfileGatewayParam,
   SwitchSofiaProfileGatewayVar,
@@ -44,61 +66,67 @@ import {
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {ActivatedRoute} from '@angular/router';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-sofia',
   templateUrl: './sofia.component.html',
   styleUrls: ['./sofia.component.css']
 })
-export class SofiaComponent implements OnInit, OnDestroy {
+export class SofiaComponent {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: Isofia;
-  private newProfileName: string;
-  private newGatewayName: string;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  private profileId: number;
-  private panelCloser = [];
-  private choosedGateway = [];
-  public loadCounter: number;
-  private toCopyProfile: number;
-  private toCopyGateway: number;
-  private toCopyProfileGateway: number;
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+
+  private configsObservable = this.store.pipe(select(selectConfigurationState));
+  private configsSignal = toSignal(this.configsObservable, { initialValue: {} as State });
+
+  public list = computed(() => this.configsSignal().sofia || {} as Isofia);
+  public loadCounter = computed(() => this.configsSignal().loadCounter || 0);
+  private lastErrorMessage = computed(() => this.list().errorMessage || null);
+
+  public newProfileName: string = '';
+  public newGatewayName: string = '';
+  public selectedIndex: number = 0;
+  public profileId: number = 0;
+  public panelCloser = {};
+  public choosedGateway = [];
+  public toCopyProfile: number = 0;
+  public toCopyGateway: number = 0;
+  public toCopyProfileGateway: number = 0;
+
   public globalSettingsDispatchers: object;
   public profileParamsDispatchers: object;
   public gatewayParamsDispatchers: object;
   public gatewayVarsDispatchers: object;
   public profileDomainsDispatchers: object;
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
-
-  ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.sofia;
-      this.lastErrorMessage = configs.sofia && configs.sofia.errorMessage || null;
-      if (!this.lastErrorMessage) {
-        this.newProfileName = '';
-        this.newGatewayName = '';
-        this.profileId = (this.list && this.list.profiles && this.list.profiles[this.profileId]) ? this.profileId : 0;
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    } else {
+      // Logic from ngOnInit subscription: Reset names and ensure profileId is valid
+      this.newProfileName = '';
+      this.newGatewayName = '';
+      const profiles = this.list().profiles;
+      if (profiles && profiles[this.profileId]) {
+        // If profileId is still valid, keep it. Otherwise, default to 0.
       } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
+        this.profileId = 0;
       }
-    });
+    }
+  });
+
+  constructor() {
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewGlobalParam.bind(this),
       switchItem: this.switchGlobalParam.bind(this),
@@ -146,18 +174,12 @@ export class SofiaComponent implements OnInit, OnDestroy {
     };
   }
 
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
-  }
-
   getGlobalSettings() {
     this.store.dispatch(new GetSofiaGlobalSettings(null));
   }
 
   clearGlobalSettings() {
+    // This function was empty in the original code, keeping it as a stub.
   }
 
   updateGlobalParam(param: Iitem) {
@@ -191,7 +213,7 @@ export class SofiaComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StoreDropNewSofiaGlobalSettings({index: index}));
   }
 
-  getSofiaProfilesParams(id) {
+  getSofiaProfilesParams(id: number) {
     this.panelCloser['profile' + id] = true;
     this.store.dispatch(new GetSofiaProfilesParams({id: id}));
   }
@@ -227,29 +249,31 @@ export class SofiaComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StoreDropNewSofiaProfileParam({id: parentId, index: index}));
   }
 
-  tabChanged(event) {
-    this.panelCloser = [];
+  tabChanged(event: number) {
+    this.panelCloser = {};
     if (event === 1 || event === 4) {
       this.getSofiaProfilesGateways();
     }
   }
 
-  mainTabChanged(event) {
+  mainTabChanged(event: number) {
     if (event === 2) {
       this.getSofiaProfilesGateways();
     }
   }
 
   getSofiaProfilesGateways() {
-    const ids = Object.keys(this.list.profiles);
-    ids.forEach((id) => this.store.dispatch(new GetSofiaProfileGateways({id: Number(id), keep_subscription: true})));
-
+    const profiles = this.list().profiles;
+    if (profiles) {
+      const ids = Object.keys(profiles).map(Number);
+      ids.forEach((id) => this.store.dispatch(new GetSofiaProfileGateways({id: id, keep_subscription: true})));
+    }
   }
 
   getSofiaProfilesGatewayParams(id: number) {
     this.panelCloser['gateway' + id] = true;
     this.store.dispatch(new GetSofiaProfileGatewayParameters({id: id}));
-    // this.store.dispatch(new GetSofiaProfileGatewayVariables({id: id}));
+    // this.store.dispatch(new GetSofiaProfileGatewayVariables({id: id})); // Original code commented this out, keeping it that way.
   }
 
   updateProfileGatewayParam(param: Iitem) {
@@ -323,6 +347,7 @@ export class SofiaComponent implements OnInit, OnDestroy {
 
   updateProfileDomain(domain: Idomain) {
     const newDomain = {...domain};
+    // Ensure boolean conversion for alias and parse fields
     newDomain.alias = (typeof domain.alias === 'string') ? (<string><any>domain.alias).toLowerCase() === 'true' : domain.alias;
     newDomain.parse = (typeof domain.parse === 'string') ? (<string><any>domain.parse).toLowerCase() === 'true' : domain.parse;
     this.store.dispatch(new UpdateSofiaProfileDomain({sofia_domain: newDomain}));
@@ -334,12 +359,13 @@ export class SofiaComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SwitchSofiaProfileDomain({sofia_domain: newPDomain}));
   }
 
-  newProfileDomain(parentId: number, index: number, name: string, alias: string, parse: string) {
+  newProfileDomain(parentId: number, index: number, name: string, alias: string | boolean, parse: string | boolean) {
     const domain = <Idomain>{};
     domain.enabled = true;
     domain.name = name;
-    domain.alias = alias ? <string>String(alias).toString().toLowerCase() === 'true' : false;
-    domain.parse = parse ? <string>String(parse).toString().toLowerCase() === 'true' : false;
+    // Ensure boolean conversion for new item
+    domain.alias = (typeof alias === 'string') ? <string>String(alias).toLowerCase() === 'true' : !!alias;
+    domain.parse = (typeof parse === 'string') ? <string>String(parse).toLowerCase() === 'true' : !!parse;
 
     this.store.dispatch(new AddSofiaProfileDomain({id: parentId, index: index, sofia_domain: domain}));
   }
@@ -408,7 +434,7 @@ export class SofiaComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SwitchSofiaProfile({id: profile.id, enabled: !profile.enabled}));
   }
 
-  checkDirty(condition: AbstractControl): boolean {
+  checkDirty(condition: AbstractControl | null): boolean {
     if (condition) {
       return !condition.dirty;
     } else {
@@ -416,16 +442,16 @@ export class SofiaComponent implements OnInit, OnDestroy {
     }
   }
 
-  isReadyToSendThree(mainObject: AbstractControl, object2: AbstractControl, object3: AbstractControl): boolean {
+  isReadyToSendThree(mainObject: AbstractControl | null, object2: AbstractControl | null, object3: AbstractControl | null): boolean {
     return (mainObject && mainObject.valid && mainObject.dirty)
       || ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty));
   }
 
-  isvalueReadyToSend(valueObject: AbstractControl): boolean {
+  isvalueReadyToSend(valueObject: AbstractControl | null): boolean {
     return valueObject && valueObject.dirty && valueObject.valid;
   }
 
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
+  isReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
     return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
   }
 
@@ -433,20 +459,9 @@ export class SofiaComponent implements OnInit, OnDestroy {
     return Array.isArray(obj);
   }
 
-  trackByFn(index, item) {
-    return index; // or item.id
-  }
-
-  trackByFnId(index, item) {
-    return item.id;
-  }
-
-  isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && nameObject.valid && valueObject.valid;
-  }
-
-  copyProfile(key) {
-    if (!this.list.profiles[key]) {
+  copyProfile(key: number) {
+    const profiles = this.list().profiles;
+    if (!profiles || !profiles[key]) {
       this.toCopyProfile = 0;
       return;
     }
@@ -460,9 +475,11 @@ export class SofiaComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StorePasteSofiaProfileParams({from_id: this.toCopyProfile, to_id: to}));
   }
 
-  copyGateway(key, id) {
-    if (!this.list.profiles[key].gateways[id]) {
-      this.toCopyProfile = 0;
+  copyGateway(key: number, id: number) {
+    const profile = this.list().profiles?.[key];
+    if (!profile || !profile.gateways || !profile.gateways[id]) {
+      this.toCopyProfileGateway = 0;
+      this.toCopyGateway = 0;
       return;
     }
     this.toCopyProfileGateway = key;
@@ -490,7 +507,7 @@ export class SofiaComponent implements OnInit, OnDestroy {
     }));
   }
 
-  openBottomSheetProfile(id, newName, oldName, action): void {
+  openBottomSheetProfile(id: number, newName: string, oldName: string, action: 'delete' | 'rename'): void {
     const config = {
       data:
         {
@@ -514,7 +531,7 @@ export class SofiaComponent implements OnInit, OnDestroy {
     });
   }
 
-  openBottomSheetGateway(id, newName, oldName, action): void {
+  openBottomSheetGateway(id: number, newName: string, oldName: string, action: 'delete' | 'rename'): void {
     const config = {
       data:
         {
@@ -538,7 +555,7 @@ export class SofiaComponent implements OnInit, OnDestroy {
     });
   }
 
-  onlyValues(obj: object): Array<any> {
+  onlyValues(obj: object | null): Array<any> {
     if (!obj) {
       return [];
     }

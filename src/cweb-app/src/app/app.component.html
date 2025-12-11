@@ -1,6 +1,8 @@
 <app-service-status></app-service-status>
-<app-header *ngIf="userService.isAuthenticated && !login" [currentComponent]="currentComponent"
-            (showRightSideNav)="toggleRightSideNav($event)"></app-header>
+@if (userService.isAuthenticated && !login) {
+  <app-header [currentComponent]="currentComponent"
+  (showRightSideNav)="toggleRightSideNav($event)"></app-header>
+}
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav mode="side" [opened]="userService.isAuthenticated && !login">
     <mat-nav-list>
@@ -12,7 +14,7 @@
   <mat-sidenav-content>
     @if (userService.isAuthenticated && !login) {
       <div [hidden]="!showRightNav">
-        <app-lazy-wrapper type="conversations"></app-lazy-wrapper>
+        <app-conversations></app-conversations>
       </div>
     }
     <div [hidden]="showRightNav">

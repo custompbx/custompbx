@@ -25,7 +25,9 @@ import {
   UpdateFifoFifoMember, UpdateFifoFifoImportance, StoreUpdateFifoFifoImportance
 } from './config.actions.fifo';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsFifo {
 
   constructor(

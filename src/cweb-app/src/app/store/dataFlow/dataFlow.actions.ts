@@ -7,6 +7,7 @@ export enum DataFlowActionTypes {
   STORE_GET_DASHBOARD = '[Dashboard][Store]',
   UnSubscribe = '[UnSubscribe]',
   SubscriptionList = 'SubscriptionList',
+  PersistentSubscription = 'PersistentSubscription',
 }
 
 export class Failure implements Action {
@@ -37,6 +38,11 @@ export class SubscriptionList implements Action {
   constructor(public payload: any) {}
 }
 
+export class PersistentSubscription implements Action {
+  readonly type = DataFlowActionTypes.PersistentSubscription;
+  constructor(public payload: any) {}
+}
+
 export type All =
   | Failure
   | ReduceLoadCounter
@@ -44,4 +50,5 @@ export type All =
   | StoreGetDashboard
   | UnSubscribe
   | SubscriptionList
+  | PersistentSubscription
 ;

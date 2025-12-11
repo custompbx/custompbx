@@ -1,5 +1,5 @@
-import {Action, createAction, FunctionWithParametersType} from '@ngrx/store';
-import {TypedAction} from '@ngrx/store/src/models';
+import { Action, createAction, FunctionWithParametersType } from '@ngrx/store';
+
 
 export interface PayloadAction<T extends string, P> extends Action {
   type: T;
@@ -7,6 +7,6 @@ export interface PayloadAction<T extends string, P> extends Action {
 }
 
 export function createActionHelper(type: string):
-  FunctionWithParametersType<[any], { payload: any } & TypedAction<string>> & TypedAction<string> {
+  FunctionWithParametersType<[any], { payload: any } & Action<string>> & Action<string> {
   return createAction(type, (payload: any) => ({ payload }));
 }

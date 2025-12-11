@@ -1,23 +1,27 @@
-<mat-progress-bar mode="indeterminate" *ngIf="loadCounter > 0"></mat-progress-bar>
-<mat-toolbar>
+@if (loadCounter() > 0) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+<mat-toolbar color="basic">
   <span>FS_CLI</span>
 </mat-toolbar>
 <div>
   <div class="filter-container">
     <mat-form-field hideRequiredMarker>
-        <mat-label>Value</mat-label>
-        <input matInput name="value" [(ngModel)]="command"
-             appResizeInput
-             [resizeOnString]="command" required
-             (keyup.enter)="runCommand()"
-      >
-    </mat-form-field>
-    <button mat-raised-button color="basic" class="but-spacer-left switch-button" [disabled]="!command"
-            (click)="runCommand()">
-      Run Command
-    </button>
+      <mat-label>Value</mat-label>
+      <input matInput name="value" [ngModel]="command()" (ngModelChange)="command.set($event)"
+        appResizeInput
+        [resizeOnString]="command()" required
+        (keyup.enter)="runCommand()"
+        >
+      </mat-form-field>
+      <button mat-raised-button color="basic" class="but-spacer-left switch-button" [disabled]="!command()"
+        (click)="runCommand()">
+        Run Command
+      </button>
+    </div>
+    @if (list().fsCliData) {
+      <div class="term-field">
+        <pre class="term-body">{{list().fsCliData}}</pre>
+      </div>
+    }
   </div>
-  <div class="term-field" *ngIf="list.fscliData">
-    <pre class="term-body">{{list.fscliData}}</pre>
-  </div>
-</div>

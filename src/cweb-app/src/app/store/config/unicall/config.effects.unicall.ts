@@ -25,7 +25,9 @@ import {
   UpdateUnicallSpanParameter
 } from './config.actions.unicall';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsUnicall {
 
   constructor(

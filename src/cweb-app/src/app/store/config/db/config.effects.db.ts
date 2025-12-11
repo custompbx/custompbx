@@ -19,7 +19,9 @@ import {
 import {catchError, map, switchMap} from 'rxjs/operators';
 import {WsDataService} from '../../../services/ws-data.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsDb {
 
   constructor(

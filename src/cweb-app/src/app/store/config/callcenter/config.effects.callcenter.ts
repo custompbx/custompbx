@@ -45,7 +45,9 @@ import {
   UpdateCallcenterSettings, UpdateCallcenterTier
 } from './config.actions.callcenter';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsCallcenter {
 
   constructor(

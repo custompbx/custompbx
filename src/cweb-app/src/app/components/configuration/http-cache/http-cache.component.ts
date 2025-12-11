@@ -1,9 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
+
+import {MaterialModule} from "../../../../material-module";
 import {Observable, Subscription} from 'rxjs';
 import {Iitem, IsimpleModule, IvertoParameterItem} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
@@ -27,11 +29,15 @@ import {
 } from '../../../store/config/http_cache/config.actions.http_cache';
 
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 
 @Component({
-  selector: 'app-http-cache',
-  templateUrl: './http-cache.component.html',
-  styleUrls: ['./http-cache.component.css']
+standalone: true,
+imports:  [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent],
+    selector: 'app-http-cache',
+    templateUrl: './http-cache.component.html',
+    styleUrls: ['./http-cache.component.css']
 })
 export class HttpCacheComponent implements OnInit, OnDestroy {
 

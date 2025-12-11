@@ -1,171 +1,198 @@
-<app-inner-header name="ACL" [loadCounter]="loadCounter"></app-inner-header>
-<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list && list.exists !== false">
-  <mat-tab label="List">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Lists</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div *ngFor="let item of onlyValues(list.lists); trackBy: trackByFn">
-          <mat-expansion-panel (opened)="getDetails(item.id)" (closed)="clearDetails(item.id)">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                {{item.name}}
-              </mat-panel-title>
-              <mat-panel-description>
-                Click to get details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            <form #details="ngForm">
-              <h3>Default:</h3>
-              <div *ngIf="item.id" class="spacer">
-                <mat-form-field hideRequiredMarker>
-        <mat-label>Default</mat-label>
-        <input matInput name="default" [ngModel]="item.default" required
-                         [name]="'default' + item.id">
-                </mat-form-field>
-                <button mat-button color="accent"
-                        [disabled]="!isvalueReadyToSend(details.controls['default' + item.id])"
-                        (click)="updateDefault(item.id, details.controls['default' + item.id])">
-                  Update
-                </button>
-              </div>
-              <h3>Nodes:</h3>
-              <div *ngIf="item && item.nodes" cdkDropList
-                   (cdkDropListDropped)="dropAction($event, onlySortedValues(item.nodes))">
-                <div class="spacer" *ngFor="let node of onlySortedValues(item.nodes); trackBy: trackByIdFn" cdkDrag>
-                  <div *ngIf="node.id && !isArray(node)">
-                    <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
-                    <mat-form-field hideRequiredMarker>
-        <mat-label>Cidr</mat-label>
-        <input matInput name="cidr" [(ngModel)]="node.cidr" required
-                             [disabled]="!node.enabled || node.domain != ''"
-                             [name]="'nodeCidr' + node.id"
-                             appResizeInput
-                             [resizeOnString]="node.cidr"
-                      >
-                    </mat-form-field>
-                    <mat-form-field hideRequiredMarker>
-        <mat-label>Domain</mat-label>
-        <input matInput name="domain" [(ngModel)]="node.domain" required
-                             [disabled]="!node.enabled || node.cidr != ''"
-                             [name]="'nodeDomain' + node.id"
-                             appResizeInput
-                             [resizeOnString]="node.domain"
-                      >
-                    </mat-form-field>
-                    <mat-form-field hideRequiredMarker>
-        <mat-label>Type</mat-label>
-        <input matInput name="type" [(ngModel)]="node.type" required
-                             [disabled]="!node.enabled"
-                             [name]="'nodeType' + node.id"
-                             appResizeInput
-                             [resizeOnString]="node.type"
-                      >
-                    </mat-form-field>
-                    <button mat-button color="accent" class="but-spacer-left"
-                            [disabled]="!isReadyToSendThree(details.controls['nodeType' + node.id], details.controls['nodeCidr' + node.id], details.controls['nodeDomain' + node.id])"
-                            (click)="updateNode(node)">
-                      Update
-                    </button>
-                    <button *ngIf="node.enabled" mat-raised-button color="accent"
-                            class="but-spacer-left switch-button" (click)="switchNode(node)">
-                      Disable
-                    </button>
-                    <button *ngIf="!node.enabled" mat-raised-button color="primary"
-                            class="but-spacer-left switch-button" (click)="switchNode(node)">
-                      Enable
-                    </button>
-                    <button mat-raised-button color="warn" class="but-spacer-left" (click)="deleteNode(node)">
-                      Delete
-                    </button>
-                  </div>
-                </div>
-                <div *ngIf="item && item.nodes">
-                  <div class="spacer" *ngFor="let node of item.nodes.new; let i = index">
-                    <div *ngIf="node" class="spacer">
+<app-inner-header name="ACL" [loadCounter]="loadCounter()"></app-inner-header>
+<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+@if (list() && list().exists !== false) {
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
+    <mat-tab label="List">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Lists</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @for (item of onlyValues(list().lists); track $index) {
+            <div>
+              <mat-expansion-panel (opened)="getDetails(item.id)" (closed)="clearDetails(item.id)">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{item.name}}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    Click to get details
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <form #details="ngForm">
+                  <h3>Default:</h3>
+                  @if (item.id) {
+                    <div class="spacer">
                       <mat-form-field hideRequiredMarker>
-        <mat-label>Cidr</mat-label>
-        <input matInput name="cidr" required
-                               [(ngModel)]="node.cidr"
-                               [name]="'newNodeCidr' + i"
-                               appResizeInput
-                               [resizeOnString]="node.cidr"
-                               [disabled]="node.domain != null && node.domain != ''"
-                        >
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-        <mat-label>Domain</mat-label>
-        <input matInput name="domain" required
-                               [(ngModel)]="node.domain"
-                               [name]="'newNodeDomain' + i"
-                               appResizeInput
-                               [resizeOnString]="node.domain"
-                               [disabled]="node.cidr != null && node.cidr != ''"
-                        >
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-        <mat-label>Type</mat-label>
-        <input matInput name="type" [(ngModel)]="node.type" required [name]="'newNodeType' + i"
-                               appResizeInput
-                               [resizeOnString]="node.type"
-                        >
-                      </mat-form-field>
-                      <button mat-button color="accent" class="but-spacer-left"
-                              [disabled]="!isReadyToSendThree(details.controls['newNodeType' + i], details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])"
-                              (click)="newNode(item.id, i, details.controls['newNodeType' + i].value, details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])">
-                        Update
-                      </button>
-                      <button mat-button color="warn" (click)="dropNewNode(item.id, i)" class="but-spacer-left">
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button mat-raised-button color="accent" class="spacer" (click)="addAclNodeField(item.id)">
-                Add
-              </button>
-            </form>
-          </mat-expansion-panel>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-tab>
-
-  <mat-tab label="Add">
-    <form class="spacer spacerb" (ngSubmit)="onAclListSubmit()" *ngIf="list">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New ACL list name" required name="name" [(ngModel)]="newItemName">
-      </mat-form-field>
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Default</mat-label>
-        <mat-select required name="default" [(ngModel)]="defaultBehavior" disableOptionCentering>
-          <mat-option *ngFor="let val of aclBehavior" [value]="val">{{val}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-  </mat-tab>
-
-  <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb" #deleteForm="ngForm"  *ngIf="list">
-      <div *ngFor="let item of onlyValues(list.lists); trackBy: trackByFn">
-        <mat-form-field hideRequiredMarker>
-        <mat-label>ACL list name</mat-label>
-        <input matInput name="ACL list name" required [ngModel]="item.name" [name]="'list::' + item.id">
-        </mat-form-field>
-        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['list::' + item.id])"
-                (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'rename')">
-          Update
-        </button>
-        <button mat-raised-button color="warn"
-                (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'delete')">
-          Delete
-        </button>
-      </div>
-    </form>
-  </mat-tab>
-</mat-tab-group>
+                        <mat-label>Default</mat-label>
+                        <input matInput name="default" [ngModel]="item.default" required
+                          [name]="'default' + item.id">
+                        </mat-form-field>
+                        <button mat-button color="accent"
+                          [disabled]="!isvalueReadyToSend(details.controls['default' + item.id])"
+                          (click)="updateDefault(item.id, details.controls['default' + item.id])">
+                          Update
+                        </button>
+                      </div>
+                    }
+                    <h3>Nodes:</h3>
+                    @if (item && item.nodes) {
+                      <div cdkDropList
+                        (cdkDropListDropped)="dropAction($event, onlySortedValues(item.nodes))">
+                        @for (node of onlySortedValues(item.nodes); track node.id) {
+                          <div class="spacer" cdkDrag>
+                            @if (node.id && !isArray(node)) {
+                              <div>
+                                <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                                <mat-form-field hideRequiredMarker>
+                                  <mat-label>Cidr</mat-label>
+                                  <input matInput name="cidr" [(ngModel)]="node.cidr" required
+                                    [disabled]="!node.enabled || node.domain != ''"
+                                    [name]="'nodeCidr' + node.id"
+                                    appResizeInput
+                                    [resizeOnString]="node.cidr"
+                                    >
+                                  </mat-form-field>
+                                  <mat-form-field hideRequiredMarker>
+                                    <mat-label>Domain</mat-label>
+                                    <input matInput name="domain" [(ngModel)]="node.domain" required
+                                      [disabled]="!node.enabled || node.cidr != ''"
+                                      [name]="'nodeDomain' + node.id"
+                                      appResizeInput
+                                      [resizeOnString]="node.domain"
+                                      >
+                                    </mat-form-field>
+                                    <mat-form-field hideRequiredMarker>
+                                      <mat-label>Type</mat-label>
+                                      <input matInput name="type" [(ngModel)]="node.type" required
+                                        [disabled]="!node.enabled"
+                                        [name]="'nodeType' + node.id"
+                                        appResizeInput
+                                        [resizeOnString]="node.type"
+                                        >
+                                      </mat-form-field>
+                                      <button mat-button color="accent" class="but-spacer-left"
+                                        [disabled]="!isReadyToSendThree(details.controls['nodeType' + node.id], details.controls['nodeCidr' + node.id], details.controls['nodeDomain' + node.id])"
+                                        (click)="updateNode(node)">
+                                        Update
+                                      </button>
+                                      @if (node.enabled) {
+                                        <button mat-raised-button color="accent"
+                                          class="but-spacer-left switch-button" (click)="switchNode(node)">
+                                          Disable
+                                        </button>
+                                      } @else {
+                                        <button mat-raised-button color="primary"
+                                          class="but-spacer-left switch-button" (click)="switchNode(node)">
+                                          Enable
+                                        </button>
+                                      }
+                                      <button mat-raised-button color="warn" class="but-spacer-left" (click)="deleteNode(node)">
+                                        Delete
+                                      </button>
+                                    </div>
+                                  }
+                                </div>
+                              }
+                              @if (item && item.nodes) {
+                                <div>
+                                  @for (node of item.nodes.new; track node; let i = $index) {
+                                    <div class="spacer">
+                                      @if (node) {
+                                        <div class="spacer">
+                                          <mat-form-field hideRequiredMarker>
+                                            <mat-label>Cidr</mat-label>
+                                            <input matInput name="cidr" required
+                                              [(ngModel)]="node.cidr"
+                                              [name]="'newNodeCidr' + i"
+                                              appResizeInput
+                                              [resizeOnString]="node.cidr"
+                                              [disabled]="node.domain != null && node.domain != ''"
+                                              >
+                                            </mat-form-field>
+                                            <mat-form-field hideRequiredMarker>
+                                              <mat-label>Domain</mat-label>
+                                              <input matInput name="domain" required
+                                                [(ngModel)]="node.domain"
+                                                [name]="'newNodeDomain' + i"
+                                                appResizeInput
+                                                [resizeOnString]="node.domain"
+                                                [disabled]="node.cidr != null && node.cidr != ''"
+                                                >
+                                              </mat-form-field>
+                                              <mat-form-field hideRequiredMarker>
+                                                <mat-label>Type</mat-label>
+                                                <input matInput name="type" [(ngModel)]="node.type" required [name]="'newNodeType' + i"
+                                                  appResizeInput
+                                                  [resizeOnString]="node.type"
+                                                  >
+                                                </mat-form-field>
+                                                <button mat-button color="accent" class="but-spacer-left"
+                                                  [disabled]="!isReadyToSendThree(details.controls['newNodeType' + i], details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])"
+                                                  (click)="newNode(item.id, i, details.controls['newNodeType' + i].value, details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])">
+                                                  Update
+                                                </button>
+                                                <button mat-button color="warn" (click)="dropNewNode(item.id, i)" class="but-spacer-left">
+                                                  Delete
+                                                </button>
+                                              </div>
+                                            }
+                                          </div>
+                                        }
+                                      </div>
+                                    }
+                                  </div>
+                                }
+                                <button mat-raised-button color="accent" class="spacer" (click)="addAclNodeField(item.id)">
+                                  Add
+                                </button>
+                              </form>
+                            </mat-expansion-panel>
+                          </div>
+                        }
+                      </mat-card-content>
+                    </mat-card>
+                  </mat-tab>
+                  <mat-tab label="Add">
+                    @if (list()) {
+                      <form class="spacer spacerb" (ngSubmit)="onAclListSubmit()">
+                        <mat-form-field hideRequiredMarker>
+                          <mat-label>Name</mat-label>
+                          <input matInput placeholder="New ACL list name" required name="name" [(ngModel)]="newItemName">
+                        </mat-form-field>
+                        <mat-form-field hideRequiredMarker>
+                          <mat-label>Default</mat-label>
+                          <mat-select required name="default" [(ngModel)]="defaultBehavior" disableOptionCentering>
+                            @for (val of aclBehavior; track val) {
+                              <mat-option [value]="val">{{val}}</mat-option>
+                            }
+                          </mat-select>
+                        </mat-form-field>
+                        <button mat-raised-button color="primary" type="submit">Submit</button>
+                      </form>
+                    }
+                  </mat-tab>
+                  <mat-tab label="Delete/Rename">
+                    @if (list()) {
+                      <form class="spacer spacerb" #deleteForm="ngForm" >
+                        @for (item of onlyValues(list().lists); track item.id) {
+                          <div>
+                            <mat-form-field hideRequiredMarker>
+                              <mat-label>ACL list name</mat-label>
+                              <input matInput name="ACL list name" required [ngModel]="item.name" [name]="'list::' + item.id">
+                            </mat-form-field>
+                            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['list::' + item.id])"
+                              (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'rename')">
+                              Update
+                            </button>
+                            <button mat-raised-button color="warn"
+                              (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'delete')">
+                              Delete
+                            </button>
+                          </div>
+                        }
+                      </form>
+                    }
+                  </mat-tab>
+                </mat-tab-group>
+              }

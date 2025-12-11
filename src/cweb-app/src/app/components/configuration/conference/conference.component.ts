@@ -1,13 +1,15 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
-import {Iconference, Iitem} from '../../../store/config/config.state.struct';
-import {select, Store} from '@ngrx/store';
-import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {ActivatedRoute} from '@angular/router';
+import { Component, OnDestroy, OnInit, inject, computed, effect } from '@angular/core';
+import { CommonModule } from "@angular/common";
+import { MaterialModule } from "../../../../material-module";
+import { toSignal } from '@angular/core/rxjs-interop'; // Import for signal conversion
+import {Iconference, Iitem, State} from '../../../store/config/config.state.struct';
+import { select, Store } from '@ngrx/store';
+import { AppState, selectConfigurationState } from '../../../store/app.states';
+import { AbstractControl, FormsModule } from '@angular/forms';
+import { ConfirmBottomSheetComponent } from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
 import {
   AddConferenceProfile,
   AddConferenceProfileParameter,
@@ -70,79 +72,88 @@ import {
   DelConferenceLayout,
   UpdateConferenceLayout, DelConferenceLayoutGroup, UpdateConferenceLayoutGroup, UpdateConferenceLayout3D,
 } from '../../../store/config/conference/config.actions.conference';
+import { InnerHeaderComponent } from "../../inner-header/inner-header.component";
+import { ModuleNotExistsBannerComponent } from "../module-not-exists-banner/module-not-exists-banner.component";
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-conference',
   templateUrl: './conference.component.html',
   styleUrls: ['./conference.component.css']
 })
 export class ConferenceComponent implements OnInit, OnDestroy {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: Iconference;
-  public newProfileName: string;
-  public newControlGroupName: string;
-  public newChatPermissionName: string;
-  private newGroupName: string;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  public profileId: number;
-  public controlGroupId: number;
-  public chatPermissionId: number;
-  public loadCounter: number;
-  public toCopyProfile: number;
-  public toCopyUser: number;
-  public toCopyGroup: number;
-  public globalSettingsDispatchers: object;
-  public groupSettingsDispatchers: object;
-  public profileSettingsDispatchers: object;
-  public chatPermissionSettingsDispatchers: object;
-  public advertiseMask: object;
-  public chatPermissionMask: object;
-  public controlMask: object;
-  public layoutImageMask: object;
-  public layoutGroupMask: object;
-  public layoutImageDispatchers: object;
-  public layoutGroupDispatchers: object;
-  public toCopylayoutImage: number;
-  public toCopylayoutGroup: number;
-  public newLayoutName: string;
-  public newLayoutGroupName: string;
+  // --- Dependency Injection using inject() ---
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
+  // --- Reactive State from NgRx using toSignal ---
+  private configState = toSignal(
+    this.store.pipe(select(selectConfigurationState)),
+    {
+      initialValue: {
+        conference: {} as Iconference, // Initial value structure adjusted
+        errorMessage: null,
+        loadCounter: 0,
+      } as State
+    }
+  );
+
+  // --- Computed/Derived State from Signals ---
+  // Replaces: public list: Iconference;
+  public list = computed(() => this.configState().conference);
+
+  // Replaces: public loadCounter: number;
+  public loadCounter = computed(() => this.configState().loadCounter);
+
+  // Replaces: private lastErrorMessage: string;
+  private lastErrorMessage = computed(() => this.configState().conference?.errorMessage || null);
+
+  // --- Local Component State (Variables) ---
+  // These properties are kept as standard class properties as they manage form input or simple indices.
+  public newProfileName: string = '';
+  public newControlGroupName: string = '';
+  public newChatPermissionName: string = '';
+  private newGroupName: string = '';
+  public selectedIndex: number = 0;
+  public profileId: number = 0;
+  public controlGroupId: number = 0;
+  public chatPermissionId: number = 0;
+  public toCopyProfile: number = 0;
+  public toCopyUser: number = 0;
+  public toCopyGroup: number = 0;
+  public globalSettingsDispatchers: object = {};
+  public groupSettingsDispatchers: object = {};
+  public profileSettingsDispatchers: object = {};
+  public chatPermissionSettingsDispatchers: object = {};
+  public advertiseMask: object = {};
+  public chatPermissionMask: object = {};
+  public controlMask: object = {};
+  public layoutImageMask: object = {};
+  public layoutGroupMask: object = {};
+  public layoutImageDispatchers: object = {};
+  public layoutGroupDispatchers: object = {};
+  public toCopylayoutImage: number = 0;
+  public toCopylayoutGroup: number = 0;
+  public newLayoutName: string = '';
+  public newLayoutGroupName: string = '';
+
+  private errorEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    }
+  });
 
   ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.conference;
-      this.lastErrorMessage = configs.conference && configs.conference.errorMessage || null;
-      if (!this.lastErrorMessage) {
-        this.newProfileName = '';
-        this.newControlGroupName = '';
-        this.newChatPermissionName = '';
-        this.newLayoutName = '';
-        this.newLayoutGroupName = '';
-        this.profileId = (this.list && this.list.profiles && this.list.profiles[this.profileId]) ? this.profileId : 0;
-        this.controlGroupId = (this.list && this.list.caller_controls && this.list.caller_controls[this.controlGroupId]) ?
-          this.controlGroupId : 0;
-        this.chatPermissionId = (this.list && this.list.chat_profiles && this.list.chat_profiles[this.chatPermissionId]) ?
-          this.chatPermissionId : 0;
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
+    // Dispatchers setup remains the same
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewConferenceRoom.bind(this),
       switchItem: this.switchConferenceRoom.bind(this),
@@ -213,23 +224,23 @@ export class ConferenceComponent implements OnInit, OnDestroy {
     };
     this.layoutGroupMask = {name: {name: 'body'}};
   }
-/*
-x
-y
-scale
-hscale
+  /*
+  x
+  y
+  scale
+  hscale
 
-zoom
-floor
-floor_only
-overlap
-reservation_id
-*/
+  zoom
+  floor
+  floor_only
+  overlap
+  reservation_id
+  */
   ngOnDestroy() {
-    this.configs$.unsubscribe();
+    // Subscription to the store is automatically handled by toSignal.
     if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
+      this.route.snapshot.data.reconnectUpdater.unsubscribe();
+    }
   }
 
   mainTabChanged(event) {
@@ -238,8 +249,14 @@ reservation_id
     }
   }
 
-  updateConferenceRoom(param: Iitem) {
-    this.store.dispatch(new UpdateConferenceRoom({param: param}));
+  updateConferenceRoom(param) {
+    const newParam = {
+      id: param.id,
+      name: param.name,
+      enabled: param.enabled,
+      value: param.status,
+    };
+    this.store.dispatch(new UpdateConferenceRoom({param: newParam}));
   }
 
   switchConferenceRoom(param: Iitem) {
@@ -385,7 +402,7 @@ reservation_id
   }
 
   copyCallerControlGroup(key) {
-    if (!this.list.caller_controls[key]) {
+    if (!this.list().caller_controls[key]) {
       this.toCopyGroup = 0;
       return;
     }
@@ -424,7 +441,7 @@ reservation_id
   }
 
   copyProfile(key) {
-    if (!this.list.profiles[key]) {
+    if (!this.list().profiles[key]) {
       this.toCopyProfile = 0;
       return;
     }
@@ -466,8 +483,14 @@ reservation_id
     this.store.dispatch(new GetConferenceChatPermissionUsers({id: id}));
   }
 
-  updateChatPermissionUser(param: Iitem) {
-    this.store.dispatch(new UpdateConferenceChatPermissionUser({param: param}));
+  updateChatPermissionUser(param) {
+    const newParam = {
+      id: param.id,
+      name: param.name,
+      enabled: param.enabled,
+      value: param.commands,
+    };
+    this.store.dispatch(new UpdateConferenceChatPermissionUser({param: newParam}));
   }
 
   switchChatPermissionUser(param: Iitem) {
@@ -549,7 +572,7 @@ reservation_id
   }
 
   copyLayoutImage(key) {
-    if (!this.list.layouts.conference_layouts[key]) {
+    if (!this.list().layouts.conference_layouts[key]) {
       this.toCopylayoutImage = 0;
       return;
     }
@@ -560,7 +583,7 @@ reservation_id
   }
 
   copyLayoutGroup(key) {
-    if (!this.list.layouts.conference_layouts_groups[key]) {
+    if (!this.list().layouts.conference_layouts_groups[key]) {
       this.toCopylayoutGroup = 0;
       return;
     }
@@ -591,7 +614,7 @@ reservation_id
     this.store.dispatch(UpdateConferenceLayoutImage({layout_images}));
   }
   storePasteConferenceLayoutImage(to: number) {
-    this.store.dispatch(StorePasteConferenceLayoutImage({from_id: this.toCopyUser, to_id: to}));
+    this.store.dispatch(StorePasteConferenceLayoutImage({from_id: this.toCopylayoutImage, to_id: to}));
   }
 
   storeNewConferenceLayoutGroupLayout(parentId: number) {
@@ -615,7 +638,7 @@ reservation_id
     this.store.dispatch(UpdateConferenceLayoutGroupLayout({param: param}));
   }
   storePasteConferenceLayoutGroupLayout(to: number) {
-    this.store.dispatch(StorePasteConferenceLayoutGroupLayout({from_id: this.toCopyUser, to_id: to}));
+    this.store.dispatch(StorePasteConferenceLayoutGroupLayout({from_id: this.toCopylayoutGroup, to_id: to}));
   }
 
   onLayoutSubmit() {

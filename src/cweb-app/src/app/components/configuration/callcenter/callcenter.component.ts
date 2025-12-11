@@ -1,7 +1,8 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, computed, OnInit, effect, signal} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
 import {ActivatedRoute} from '@angular/router';
-import {Observable, Subscription} from 'rxjs';
-import {Icallcenter, Iitem} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
@@ -39,125 +40,138 @@ import {
   UpdateCallcenterSettings,
   UpdateCallcenterTier,
 } from '../../../store/config/callcenter/config.actions.callcenter';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {IfilterField, IsortField} from '../../cdr/cdr.component';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {AppAutoFocusDirective} from "../../../directives/auto-focus.directive";
+import {Icallcenter, Iitem, State} from '../../../store/config/config.state.struct';
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, AppAutoFocusDirective, KeyValuePad2Component],
   selector: 'app-callcenter',
   templateUrl: './callcenter.component.html',
   styleUrls: ['./callcenter.component.css']
 })
-export class CallcenterComponent implements OnInit, OnDestroy {
+export class CallcenterComponent implements OnInit {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: Icallcenter;
-  private newQueueName: string;
-  private newAgentName: string;
-  private agentName: string;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  private queueId: number;
-  private panelCloser = [];
-  private toEdit = {};
-  private toEditTier = {};
-  private showDel = {};
-  public loadCounter: number;
-  private toCopyqueue: number;
+  // --- Dependency Injection using inject() ---
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+
+  // --- Reactive State from NgRx using toSignal ---
+  private configState = toSignal(
+    this.store.pipe(select(selectConfigurationState)),
+    {
+      initialValue: {
+        callcenter: {} as Icallcenter,
+        errorMessage: null,
+        loadCounter: 0,
+      } as State
+    }
+  );
+
+  // --- Computed/Derived State from NgRx State ---
+  public list = computed(() => this.configState().callcenter);
+  public loadCounter = computed(() => this.configState().loadCounter);
+  private lastErrorMessage = computed(() => this.configState().callcenter?.errorMessage || null);
+
+  // Computed properties for table columns
+  public columns = computed(() => {
+    const agents = this.list().agents;
+    return agents?.table?.length ? Object.keys(agents.table[0]) : [];
+  });
+  public tiersColumns = computed(() => {
+    const tiers = this.list().tiers;
+    return tiers?.table?.length ? Object.keys(tiers.table[0]) : [];
+  });
+  public membersColumns = computed(() => {
+    const members = this.list().members;
+    return members?.table?.length ? Object.keys(members.table[0]) : [];
+  });
+
+  // --- Local Component State (Signals) ---
+  public showDel = signal<{[key: number]: boolean}>({});
+
+  // --- Local Component State (Variables) ---
+  public newQueueName: string = '';
+  public newAgentName: string = '';
+  public agentName: string = '';
+  public selectedIndex: number = 0;
+  protected queueId: number | null = null;
+  protected panelCloser: {[key: string]: boolean} = {};
+  protected toEdit: {[key: number]: any} = {};
+  protected toEditTier: {[key: number]: any} = {};
+  protected toCopyqueue: number = 0;
 
   public operands: Array<string> = ['=', '>', '<', 'CONTAINS'];
-  public sortObject: IsortField = <IsortField>{fields: [], desc: false};
-  public filter: IfilterField = <IfilterField>{};
+  // Agent table filtering/sorting
+  public sortObject: IsortField = {fields: [], desc: false};
+  public filter: IfilterField = {} as IfilterField;
   public filters: Array<IfilterField> = [];
-  private paginationScale = [25, 50, 100, 250];
-  public pageEvent: PageEvent = <PageEvent>{
-    length: 0,
-    pageIndex: 0,
-    pageSize: this.paginationScale[0],
-  };
-  public columns: Array<string>;
-  public sortColumns: string;
-  public tiersSortObject: IsortField = <IsortField>{fields: [], desc: false};
-  public tiersFilter: IfilterField = <IfilterField>{};
+  // Tier table filtering/sorting
+  public tiersSortObject: IsortField = {fields: [], desc: false};
+  public tiersFilter: IfilterField = {} as IfilterField;
   public tiersFilters: Array<IfilterField> = [];
-  public tiersColumns: Array<string>;
-  public tiersSortColumns: string;
-  public tiersPageEvent: PageEvent = <PageEvent>{
-    length: 0,
-    pageIndex: 0,
-    pageSize: this.paginationScale[0],
-  };
-
-  public membersSortObject: IsortField = <IsortField>{fields: [], desc: false};
-  public membersFilter: IfilterField = <IfilterField>{};
+  // Member table filtering/sorting
+  public membersSortObject: IsortField = {fields: [], desc: false};
+  public membersFilter: IfilterField = {} as IfilterField;
   public membersFilters: Array<IfilterField> = [];
-  public membersColumns: Array<string>;
-  public membersSortColumns: string;
-  public membersPageEvent: PageEvent = <PageEvent>{
+
+  public paginationScale = [25, 50, 100, 250];
+  public pageEvent: PageEvent = {
     length: 0,
     pageIndex: 0,
     pageSize: this.paginationScale[0],
-  };
+  } as PageEvent;
+  public tiersPageEvent: PageEvent = {
+    length: 0,
+    pageIndex: 0,
+    pageSize: this.paginationScale[0],
+  } as PageEvent;
+  public membersPageEvent: PageEvent = {
+    length: 0,
+    pageIndex: 0,
+    pageSize: this.paginationScale[0],
+  } as PageEvent;
+
+  public sortColumns: string | null = null;
+  public tiersSortColumns: string | null = null;
+  public membersSortColumns: string | null = null;
 
   public queueParamDispatchers: object;
   public globalSettingsDispatchers: object;
-  public toEditAgentFilter: number = <number>null;
-  public toEditTierFilter: number = <number>null;
-  public toEditMemberFilter: number = <number>null;
+  public toEditAgentFilter: number | null = null;
+  public toEditTierFilter: number | null = null;
+  public toEditMemberFilter: number | null = null;
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
+  // --- Effect for Side Effects (Error handling) ---
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+
+      // Reset new item names on error, as per original logic
+      this.newQueueName = '';
+      this.newAgentName = '';
+      this.agentName = '';
+    }
+  });
+
+  constructor() {
+    // Dependencies are handled by inject()
   }
 
   ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      console.log(configs);
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.callcenter;
-      this.toEdit = {};
-      this.toEditTier = {};
-      if (this.list && this.list.agents && this.list.agents.table && this.list.agents.table.length > 0) {
-        this.columns = [];
-        console.log(this.list.agents.table[0]);
-        Object.keys(this.list.agents.table[0]).forEach( key => {
-          this.columns.push(key);
-        });
-      }
-      if (this.list && this.list.tiers && this.list.tiers.table && this.list.tiers.table.length > 0) {
-        this.tiersColumns = [];
-        console.log(this.list.tiers.table[0]);
-        Object.keys(this.list.tiers.table[0]).forEach( key => {
-          this.tiersColumns.push(key);
-        });
-      }
-      if (this.list && this.list.members && this.list.members.table && this.list.members.table.length > 0) {
-        this.membersColumns = [];
-        console.log(this.list.members.table[0]);
-        Object.keys(this.list.members.table[0]).forEach( key => {
-          this.membersColumns.push(key);
-        });
-      }
-
-      this.lastErrorMessage = configs.callcenter && configs.callcenter.errorMessage || null;
-      if (!this.lastErrorMessage) {
-        this.newQueueName = '';
-        this.newAgentName = '';
-        this.agentName = '';
-        // this.queueId = null;
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
+    // Initialize dispatchers
     this.queueParamDispatchers = {
       addNewItemField: this.StoreNewCallcenterQueueParam.bind(this),
       switchItem: this.SwitchCallcenterQueueParam.bind(this),
@@ -178,14 +192,9 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     };
   }
 
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
-  }
+  // ngOnDestroy is removed as toSignal handles cleanup automatically.
 
-  checkDirty(condition: AbstractControl): boolean {
+  checkDirty(condition: AbstractControl | null): boolean {
     if (condition) {
       return !condition.dirty;
     } else {
@@ -209,47 +218,60 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StoreSetChangedCallcenterTableField({tableName: 'tiers', rowId: id, fieldName: columnName}));
   }
 
-  isReadyToSendThree(mainObject: AbstractControl, object2: AbstractControl, object3: AbstractControl): boolean {
-    return (mainObject && mainObject.valid && mainObject.dirty)
-      || ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty));
+  isReadyToSendThree(mainObject: AbstractControl | null, object2: AbstractControl | null, object3: AbstractControl | null): boolean {
+    return !!((mainObject && mainObject.valid && mainObject.dirty)
+      || ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty)));
   }
 
-  isvalueReadyToSend(valueObject: AbstractControl): boolean {
-    return valueObject && valueObject.dirty && valueObject.valid;
+  isvalueReadyToSend(valueObject: AbstractControl | null): boolean {
+    return !!(valueObject && valueObject.dirty && valueObject.valid);
   }
 
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
+  isReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
+    return !!(nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid);
   }
 
-  isReadyToSendOne(nameObject: AbstractControl): boolean {
-    return nameObject && nameObject.dirty && nameObject.valid;
+  isReadyToSendOne(nameObject: AbstractControl | null): boolean {
+    return !!(nameObject && nameObject.dirty && nameObject.valid);
   }
 
   isArray(obj: any): boolean {
     return Array.isArray(obj);
   }
 
-  trackByFn(index, item) {
+  trackByFn(index: number, item: any): number {
     return index; // or item.id
   }
 
-  trackByFnId(index, item) {
+  trackByFnId(index: number, item: any): number {
     return item.id;
   }
 
-  isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && nameObject.valid && valueObject.valid;
+  isNewReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
+    return !!(nameObject && valueObject && nameObject.valid && valueObject.valid);
   }
 
-  leaveDelIco(id) {
-    setTimeout(function () {
-      this.showDel[id] = false;
-    }.bind(this), 300);
+  showDelIco(id: number) {
+      this.showDel.update(current => {
+        const updated = { ...current };
+        updated[id] = true;
+        return updated;
+      });
   }
 
-  copyQueue(key) {
-    if (!this.list.queues[key]) {
+  leaveDelIco(id: number) {
+    setTimeout(() => {
+      // Update the signal immutably
+      this.showDel.update(current => {
+        const updated = { ...current };
+        updated[id] = false;
+        return updated;
+      });
+    }, 300);
+  }
+
+  copyQueue(key: number) {
+    if (!this.list().queues[key]) {
       this.toCopyqueue = 0;
       return;
     }
@@ -259,8 +281,8 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     });
   }
 
-  tabChanged(event) {
-    this.panelCloser = [];
+  tabChanged(event: number) {
+    this.panelCloser = {};
     if (event === 1/* || event === 4*/) {
       this.GetCallcenterAgents();
     } else if (event === 2) {
@@ -272,7 +294,7 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     }
   }
 
-  mainTabChanged(event) {
+  mainTabChanged(event: number) {
     if (event === 2) {
       // this.GetCallcenterAgents();
     }
@@ -304,11 +326,11 @@ export class CallcenterComponent implements OnInit, OnDestroy {
   }
 
   AddCallcenterSettings(index: number, name: string, value: string) {
-    const param = <Iitem>{};
-    param.enabled = true;
-    param.name = name;
-    param.value = value;
-
+    const param = <Iitem>{
+      enabled: true,
+      name: name,
+      value: value
+    };
     this.store.dispatch(new AddCallcenterSettings({index: index, param: param}));
   }
 
@@ -321,7 +343,7 @@ export class CallcenterComponent implements OnInit, OnDestroy {
   }
 
 
-  GetCallcenterQueuesParams(id) {
+  GetCallcenterQueuesParams(id: number) {
     this.panelCloser['profile' + id] = true;
     this.store.dispatch(new GetCallcenterQueuesParams({id: id}));
   }
@@ -337,10 +359,11 @@ export class CallcenterComponent implements OnInit, OnDestroy {
   }
 
   AddCallcenterQueueParam(parentId: number, index: number, name: string, value: string) {
-    const param = <Iitem>{};
-    param.enabled = true;
-    param.name = name;
-    param.value = value;
+    const param = <Iitem>{
+      enabled: true,
+      name: name,
+      value: value
+    };
 
     this.store.dispatch(new AddCallcenterQueueParam({id: parentId, index: index, param: param}));
   }
@@ -365,10 +388,19 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ImportCallcenterAgentsAndTiers(null));
   }
 
+  handlePageEvent(e: PageEvent) {
+    this.pageEvent = e;
+    this.GetCallcenterAgents();
+  }
+
   GetCallcenterAgents() {
     this.store.dispatch(new GetCallcenterAgents({
-      db_request: {limit: this.pageEvent.pageSize,
-        offset: this.pageEvent.pageIndex, filters: this.filters, order: this.sortObject}
+      db_request: {
+        limit: this.pageEvent.pageSize,
+        offset: this.pageEvent.pageIndex * this.pageEvent.pageSize,
+        filters: this.filters,
+        order: this.sortObject
+      }
     }));
   }
 
@@ -376,7 +408,7 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     this.store.dispatch(new AddCallcenterAgent({name: this.newAgentName}));
   }
 
-  UpdateCallcenterAgent(id, key, value) {
+  UpdateCallcenterAgent(id: number, key: string, value: any) {
     if (id === 0 || key === '') {
       return;
     }
@@ -389,7 +421,7 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateCallcenterAgent({param: param}));
   }
 
-  openBottomSheetQueue(id, newName, oldName, action): void {
+  openBottomSheetQueue(id: number, newName: string, oldName: string, action: string): void {
     const config = {
       data:
         {
@@ -413,7 +445,7 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     });
   }
 
-  DelCallcenterAgent(id, name): void {
+  DelCallcenterAgent(id: number, name: string): void {
     const config = {
       data:
         {
@@ -439,10 +471,12 @@ export class CallcenterComponent implements OnInit, OnDestroy {
   }
 
   addSorter() {
-    const index = this.sortObject.fields.indexOf(this.sortColumns);
+    if (this.sortColumns) {
+      const index = this.sortObject.fields.indexOf(this.sortColumns);
 
-    if (index === -1) {
-      this.sortObject.fields.push(this.sortColumns);
+      if (index === -1) {
+        this.sortObject.fields.push(this.sortColumns);
+      }
     }
   }
 
@@ -450,18 +484,30 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     this.sortObject.fields = [];
   }
 
+  handleTiersPageEvent(e: PageEvent) {
+    this.tiersPageEvent = e;
+    this.GetCallcenterTiers();
+  }
+
   GetCallcenterTiers() {
     this.store.dispatch(new GetCallcenterTiers({
-      db_request: {limit: this.tiersPageEvent.pageSize,
-        offset: this.tiersPageEvent.pageIndex, filters: this.tiersFilters, order: this.tiersSortObject}
+      db_request: {
+        limit: this.tiersPageEvent.pageSize,
+        offset: this.tiersPageEvent.pageIndex * this.tiersPageEvent.pageSize,
+        filters: this.tiersFilters,
+        order: this.tiersSortObject
+      }
     }));
   }
 
   AddCallcenterTier() {
+    if (this.queueId === null) {
+      return; // Cannot add tier without a queue ID
+    }
     this.store.dispatch(new AddCallcenterTier({id: this.queueId, name: this.agentName}));
   }
 
-  UpdateCallcenterTier(id, key, value) {
+  UpdateCallcenterTier(id: number, key: string, value: any) {
     if (id === 0 || key === '') {
       return;
     }
@@ -474,7 +520,7 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateCallcenterTier({param: param}));
   }
 
-  DelCallcenterTier(id, name): void {
+  DelCallcenterTier(id: number, name: string): void {
     const config = {
       data:
         {
@@ -500,10 +546,12 @@ export class CallcenterComponent implements OnInit, OnDestroy {
   }
 
   tiersAddSorter() {
-    const index = this.tiersSortObject.fields.indexOf(this.sortColumns);
+    if (this.tiersSortColumns) {
+      const index = this.tiersSortObject.fields.indexOf(this.tiersSortColumns);
 
-    if (index === -1) {
-      this.tiersSortObject.fields.push(this.sortColumns);
+      if (index === -1) {
+        this.tiersSortObject.fields.push(this.tiersSortColumns);
+      }
     }
   }
 
@@ -524,10 +572,12 @@ export class CallcenterComponent implements OnInit, OnDestroy {
   }
 
   membersAddSorter() {
-    const index = this.membersSortObject.fields.indexOf(this.sortColumns);
+    if (this.membersSortColumns) {
+      const index = this.membersSortObject.fields.indexOf(this.membersSortColumns);
 
-    if (index === -1) {
-      this.membersSortObject.fields.push(this.sortColumns);
+      if (index === -1) {
+        this.membersSortObject.fields.push(this.membersSortColumns);
+      }
     }
   }
 
@@ -535,14 +585,23 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     this.membersSortObject.fields = [];
   }
 
+  handleMembersPageEvent(e: PageEvent) {
+    this.membersPageEvent = e;
+    this.GetCallcenterMembers();
+  }
+
   GetCallcenterMembers() {
     this.store.dispatch(new GetCallcenterMembers({
-      db_request: {limit: this.membersPageEvent.pageSize,
-        offset: this.membersPageEvent.pageIndex, filters: this.membersFilters, order: this.membersSortObject}
+      db_request: {
+        limit: this.membersPageEvent.pageSize,
+        offset: this.membersPageEvent.pageIndex * this.membersPageEvent.pageSize,
+        filters: this.membersFilters,
+        order: this.membersSortObject
+      }
     }));
   }
 
-  DelCallcenterMember(uuid): void {
+  DelCallcenterMember(uuid: string): void {
     const config = {
       data:
         {
@@ -564,8 +623,8 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     if (this.filter.field_value) {
       this.filter.field_value.trim();
     }
-    this.filters.push(<IfilterField>this.filter);
-    this.filter = <IfilterField>{};
+    this.filters.push(<IfilterField>{...this.filter});
+    this.filter = {} as IfilterField;
   }
 
   editFilter(toEdit: number) {
@@ -576,13 +635,11 @@ export class CallcenterComponent implements OnInit, OnDestroy {
   }
 
   saveFilter() {
-    this.filters[this.toEditAgentFilter].field = this.filter.field;
-    this.filters[this.toEditAgentFilter].operand = this.filter.operand ;
-    this.filters[this.toEditAgentFilter].field_value = this.filter.field_value;
+    this.filters[this.toEditAgentFilter!].field = this.filter.field;
+    this.filters[this.toEditAgentFilter!].operand = this.filter.operand ;
+    this.filters[this.toEditAgentFilter!].field_value = this.filter.field_value;
     this.toEditAgentFilter = null;
-    this.filter.field = null;
-    this.filter.operand = null;
-    this.filter.field_value = null;
+    this.filter = {} as IfilterField;
   }
 
   tiersAddFilter() {
@@ -590,8 +647,8 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     if (this.tiersFilter.field_value) {
       this.tiersFilter.field_value.trim();
     }
-    this.tiersFilters.push(<IfilterField>this.tiersFilter);
-    this.tiersFilter = <IfilterField>{};
+    this.tiersFilters.push(<IfilterField>{...this.tiersFilter});
+    this.tiersFilter = {} as IfilterField;
   }
 
   editTierFilter(toEdit: number) {
@@ -602,13 +659,11 @@ export class CallcenterComponent implements OnInit, OnDestroy {
   }
 
   saveTierFilter() {
-    this.tiersFilters[this.toEditTierFilter].field = this.tiersFilter.field;
-    this.tiersFilters[this.toEditTierFilter].operand = this.tiersFilter.operand ;
-    this.tiersFilters[this.toEditTierFilter].field_value = this.tiersFilter.field_value;
+    this.tiersFilters[this.toEditTierFilter!].field = this.tiersFilter.field;
+    this.tiersFilters[this.toEditTierFilter!].operand = this.tiersFilter.operand ;
+    this.tiersFilters[this.toEditTierFilter!].field_value = this.tiersFilter.field_value;
     this.toEditTierFilter = null;
-    this.tiersFilter.field = null;
-    this.tiersFilter.operand = null;
-    this.tiersFilter.field_value = null;
+    this.tiersFilter = {} as IfilterField;
   }
 
   membersAddFilter() {
@@ -616,8 +671,8 @@ export class CallcenterComponent implements OnInit, OnDestroy {
     if (this.membersFilter.field_value) {
       this.membersFilter.field_value.trim();
     }
-    this.membersFilters.push(<IfilterField>this.membersFilter);
-    this.membersFilter = <IfilterField>{};
+    this.membersFilters.push(<IfilterField>{...this.membersFilter});
+    this.membersFilter = {} as IfilterField;
   }
 
   editMemberFilter(toEdit: number) {
@@ -628,13 +683,11 @@ export class CallcenterComponent implements OnInit, OnDestroy {
   }
 
   saveMemberFilter() {
-    this.membersFilters[this.toEditMemberFilter].field = this.membersFilter.field;
-    this.membersFilters[this.toEditMemberFilter].operand = this.membersFilter.operand ;
-    this.membersFilters[this.toEditMemberFilter].field_value = this.membersFilter.field_value;
+    this.membersFilters[this.toEditMemberFilter!].field = this.membersFilter.field;
+    this.membersFilters[this.toEditMemberFilter!].operand = this.membersFilter.operand ;
+    this.membersFilters[this.toEditMemberFilter!].field_value = this.membersFilter.field_value;
     this.toEditMemberFilter = null;
-    this.membersFilter.field = null;
-    this.membersFilter.operand = null;
-    this.membersFilter.field_value = null;
+    this.membersFilter = {} as IfilterField;
   }
 
   onlyValues(obj: object): Array<any> {

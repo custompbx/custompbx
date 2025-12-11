@@ -790,13 +790,13 @@ func DeleteContextConditon(id int64) error {
 	return err
 }
 
-func SetDialplanSettings(dialplan *mainStruct.Dialplans, name, value string) error {
+func SetDialplanSettings(dialplan *mainStruct.Dialplans, name, value string, instanceId int64) error {
 	if name == "" {
 		return errors.New("no param name")
 	}
 	var enabled bool
-	err := db.QueryRow(`INSERT INTO dialplan_settings(name, value) VALUES($1, $2) ON CONFLICT(name) DO UPDATE SET value = $2 RETURNING enabled;`,
-		name, value,
+	err := db.QueryRow(`INSERT INTO dialplan_settings(name, value, instance_id) VALUES($1, $2) ON CONFLICT(name, instance_id) DO UPDATE SET value = $2 RETURNING enabled;`,
+		name, value, instanceId,
 	).Scan(&enabled)
 	if err != nil {
 		log.Printf("%+v", err)

@@ -1,9 +1,9 @@
 <app-inner-header name="Instances" [loadCounter]="loadCounter"></app-inner-header>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
   <mat-tab label="List">
 
     <div class="instances-pad">
-      <ng-container *ngFor="let instance of list | keyvalue; trackBy: trackByFnId;">
+      @for (instance of list | keyvalue; track trackByFnId($index, instance)) {
         <mat-card class="instances-cards">
           <mat-card-header>
             <div mat-card-avatar>
@@ -12,51 +12,57 @@
             <mat-card-title>
               {{instance.value.name}}
               <!--          <mat-icon class="current-instance-check" *ngIf="instance.value.id == currentInstanceId"
-                                  title="Current Instance">check_circle
-                        </mat-icon>-->
-            </mat-card-title>
-            <span class="card-header-spacer"></span>
-            <button *ngIf="instance.value.id !== currentInstanceId" (click)="switchInstance(instance.value.id)" mat-button class="instance-switch-button">Open</button>
-            <div *ngIf="instance.value.id == currentInstanceId" class="current-instance-check" title="Current Instance"><span>Active</span></div>
-            <mat-card-subtitle class="subtitle">{{instance.value.description || 'Description'}}</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content class="instances-content">
-            <div>Host: {{instance.value.host}}</div>
-            <div>Port: {{instance.value.port}}</div>
-          </mat-card-content>
-         <!-- <mat-card-actions class="action-pad">
-            <button mat-button class="connect-button" [matMenuTriggerFor]="menu">
-              Actions
-            </button>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="switchInstance(instance.value.id)">Edit Description</button>
-            </mat-menu>
-          </mat-card-actions>-->
-        </mat-card>
-      </ng-container>
-    </div>
-
-  </mat-tab>
-  <mat-tab label="Edit">
-    <form class="spacer spacerb" #deleteForm="ngForm">
-      <div *ngFor="let instance of list | keyvalue; trackBy: trackByFnId;">
-        <mat-form-field hideRequiredMarker>
-        <mat-label>Instance name</mat-label>
-        <input matInput name="instance name" disabled required [ngModel]="instance.value.name"
-                 [name]="'instance-name::' + instance.value.id">
-        </mat-form-field>
-        <mat-form-field hideRequiredMarker>
-        <mat-label>Instance description</mat-label>
-        <input matInput name="instance description" required [ngModel]="instance.value.description"
-                 [name]="'instance-description::' + instance.value.id">
-        </mat-form-field>
-        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['instance-description::' + instance.value.id])"
-                class="but-spacer-left"
-                (click)="updateDescription(instance.value, deleteForm.controls['instance-description::' + instance.value.id].value)">
-          Update
+              title="Current Instance">check_circle
+            </mat-icon>-->
+          </mat-card-title>
+          <span class="card-header-spacer"></span>
+          @if (instance.value.id !== currentInstanceId) {
+            <button (click)="switchInstance(instance.value.id)" mat-button class="instance-switch-button">Open</button>
+          }
+          @if (instance.value.id == currentInstanceId) {
+            <div class="current-instance-check" title="Current Instance"><span>Active</span></div>
+          }
+          <mat-card-subtitle class="subtitle">{{instance.value.description || 'Description'}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="instances-content">
+          <div>Host: {{instance.value.host}}</div>
+          <div>Port: {{instance.value.port}}</div>
+        </mat-card-content>
+        <!-- <mat-card-actions class="action-pad">
+        <button mat-button class="connect-button" [matMenuTriggerFor]="menu">
+          Actions
         </button>
-      </div>
-    </form>
-  </mat-tab>
-  <mat-tab label="Dump"></mat-tab>
-</mat-tab-group>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="switchInstance(instance.value.id)">Edit Description</button>
+        </mat-menu>
+      </mat-card-actions>-->
+    </mat-card>
+  }
+</div>
+
+</mat-tab>
+<mat-tab label="Edit">
+  <form class="spacer spacerb" #deleteForm="ngForm">
+    @for (instance of list | keyvalue; track trackByFnId($index, instance)) {
+      <div>
+        <mat-form-field hideRequiredMarker>
+          <mat-label>Instance name</mat-label>
+          <input matInput name="instance name" disabled required [ngModel]="instance.value.name"
+            [name]="'instance-name::' + instance.value.id">
+          </mat-form-field>
+          <mat-form-field hideRequiredMarker>
+            <mat-label>Instance description</mat-label>
+            <input matInput name="instance description" required [ngModel]="instance.value.description"
+              [name]="'instance-description::' + instance.value.id">
+            </mat-form-field>
+            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['instance-description::' + instance.value.id])"
+              class="but-spacer-left"
+              (click)="updateDescription(instance.value, deleteForm.controls['instance-description::' + instance.value.id].value)">
+              Update
+            </button>
+          </div>
+        }
+      </form>
+    </mat-tab>
+    <mat-tab label="Dump"></mat-tab>
+  </mat-tab-group>

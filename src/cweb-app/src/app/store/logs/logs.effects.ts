@@ -10,7 +10,9 @@ import {
 } from './logs.actions';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class LogsEffects {
 
   constructor(

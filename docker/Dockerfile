@@ -1,7 +1,7 @@
 #docker build . -t cpbx
 
 ### STAGE 1: Build Angular frontend ###
-FROM node:20 AS frontend
+FROM node:22 AS frontend
 WORKDIR /app
 
 # Copy package.json and package-lock.json
@@ -14,7 +14,7 @@ COPY src/cweb-app/tsconfig.json ./
 COPY src/cweb-app/tslint.json ./
 
 # Install frontend dependencies
-RUN npm install
+RUN npm install --force
 
 # Build frontend
 RUN npm run build --omit=dev

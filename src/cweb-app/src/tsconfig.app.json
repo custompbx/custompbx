@@ -4,7 +4,11 @@
     "outDir": "../out-tsc/app",
     "types": [
       "jasmine",
-      "node"]
+      "node"
+    ],
+    "paths": {
+      "chart.js/dist/types/utils": ["node_modules/chart.js/dist/types/utils.d.ts"]
+    }
   },
   "files": [
     "main.ts",

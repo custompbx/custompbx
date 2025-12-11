@@ -1,17 +1,22 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../material-module";
 import {Observable, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectInstancesState} from '../../store/app.states';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {WsDataService} from '../../services/ws-data.service';
 import {GetInstances, UpdateInstanceDescription} from '../../store/instances/instances.actions';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
+import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 
 
 @Component({
-  selector: 'app-instances',
-  templateUrl: './instances.component.html',
-  styleUrls: ['./instances.component.css']
+standalone: true,
+    imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent],
+    selector: 'app-instances',
+    templateUrl: './instances.component.html',
+    styleUrls: ['./instances.component.css']
 })
 export class InstancesComponent implements OnInit, OnDestroy {
 

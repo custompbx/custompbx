@@ -1,74 +1,44 @@
-<app-inner-header name="Sofia" [loadCounter]="loadCounter"></app-inner-header>
-<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"
-               *ngIf="list && list.exists !== false">
-  <mat-tab label="List">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Global Settings</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-expansion-panel (opened)="getGlobalSettings()" (closed)="clearGlobalSettings()">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Global Settings
-            </mat-panel-title>
-            <mat-panel-description>
-              Click to get details
-            </mat-panel-description>
-          </mat-expansion-panel-header>
+<app-inner-header name="Sofia" [loadCounter]="loadCounter()"></app-inner-header>
+<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+@if (list() && list().exists !== false) {
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"
+    >
+    <mat-tab label="list">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Global Settings</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-expansion-panel (opened)="getGlobalSettings()" (closed)="clearGlobalSettings()">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Global Settings
+              </mat-panel-title>
+              <mat-panel-description>
+                Click to get details
+              </mat-panel-description>
+            </mat-expansion-panel-header>
             <h3>Params:</h3>
-            <app-key-value-pad-2 [exist]="list.global_settings"
-                                 [items]="list.global_settings"
-                                 [newItems]="list.global_settings?.new"
-                                 [id]="null"
-                                 [toCopy]="null"
-                                 [dispatchersCallbacks]="globalSettingsDispatchers"
-            >
+            <app-key-value-pad-2 [exist]="list().global_settings"
+              [items]="list().global_settings"
+              [newItems]="list().global_settings?.new"
+              [id]="null"
+              [toCopy]="null"
+              [dispatchersCallbacks]="globalSettingsDispatchers"
+              >
             </app-key-value-pad-2>
-        </mat-expansion-panel>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-content>
-         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedIndexChange)="tabChanged($event)" *ngIf="list && list.profiles">
-          <mat-tab label="Profiles parameters">
-            <div *ngFor="let item of onlyValues(list.profiles); trackBy: trackByFnId" class="panel-wrapper">
-              <mat-expansion-panel (opened)="getSofiaProfilesParams(item.id)"
-                                   [expanded]="panelCloser['profile' + item.id]">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    {{item.name}}
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
-                <button mat-raised-button color="basic" (click)="copyProfile(item.id)" *ngIf="list.profiles[item.id] && (list.profiles[item.id].parameters)">Copy</button>
-                <h3>Params:</h3>
-                <app-key-value-pad-2 [exist]="item.parameters"
-                                     [items]="item.parameters"
-                                     [newItems]="item.parameters?.new"
-                                     [id]="item.id"
-                                     [toCopy]="toCopyProfile"
-                                     [dispatchersCallbacks]="profileParamsDispatchers"
-                >
-                </app-key-value-pad-2>
-              </mat-expansion-panel>
-            </div>
-          </mat-tab>
-          <mat-tab label="Profiles gateways">
-            <div *ngFor="let profile of onlyValues(list.profiles); trackBy: trackByFnId">
-              <mat-card>
-                <mat-card-header>
-                  <mat-card-subtitle>{{profile.name}}</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-
-                  <div *ngFor="let item of onlyValues(profile.gateways); trackBy: trackByFnId" class="panel-wrapper">
-                    <mat-expansion-panel (opened)="getSofiaProfilesGatewayParams(item.id)"
-                                         [expanded]="panelCloser['gateway' + item.id]">
+          </mat-expansion-panel>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-content>
+          @if (list() && list().profiles) {
+            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedIndexChange)="tabChanged($event)">
+              <mat-tab label="Profiles parameters">
+                @for (item of onlyValues(list().profiles); track item.id) {
+                  <div class="panel-wrapper">
+                    <mat-expansion-panel (opened)="getSofiaProfilesParams(item.id)"
+                      [expanded]="panelCloser['profile' + item.id]">
                       <mat-expansion-panel-header>
                         <mat-panel-title>
                           {{item.name}}
@@ -77,449 +47,539 @@
                           Click to get details
                         </mat-panel-description>
                       </mat-expansion-panel-header>
-                      <form #details="ngForm">
-                        <button mat-raised-button color="basic" (click)="copyGateway(profile.id, item.id)" *ngIf="profile.gateways[item.id] && (profile.gateways[item.id].parameters || profile.gateways[item.id].variables)">Copy</button>
-                        <h3>Params:</h3>
-                        <app-key-value-pad-2 [exist]="item.parameters"
-                                             [items]="item.parameters"
-                                             [newItems]="item.parameters?.new"
-                                             [id]="item.id"
-                                             [toCopy]="toCopyGateway"
-                                             [dispatchersCallbacks]="gatewayParamsDispatchers"
-                                             [grandParentId]="profile.id"
+                      @if (list().profiles[item.id] && (list().profiles[item.id].parameters)) {
+                        <button mat-raised-button color="basic" (click)="copyProfile(item.id)">Copy</button>
+                      }
+                      <h3>Params:</h3>
+                      <app-key-value-pad-2 [exist]="item.parameters"
+                        [items]="item.parameters"
+                        [newItems]="item.parameters?.new"
+                        [id]="item.id"
+                        [toCopy]="toCopyProfile"
+                        [dispatchersCallbacks]="profileParamsDispatchers"
                         >
-                        </app-key-value-pad-2>
-                        <!-- <h3>Variables:</h3>-->
-<!--                        <app-key-value-pad-2 [exist]="item.variables"
-                                             [items]="item.variables"
-                                             [newItems]="item.variables?.new"
-                                             [id]="item.id"
-                                             [toCopy]="toCopyGateway"
-                                             [dispatchersCallbacks]="gatewayParamsDispatchers"
-                                             [grandParentId]="profile.id"
-                        >
-                        </app-key-value-pad-2>-->
-                        <!--<div *ngIf="item.variables">
-                          <div class="spacer" *ngFor="let variable of item.variables | keyvalue; trackBy: trackByFnId">
-                            <div *ngIf="variable.key && !isArray(variable.value)">
-                              <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput name="name" [(ngModel)]="variable.value.name" required
-                                       [disabled]="!variable.value.enabled"
-                                       [name]="'variableName' + variable.key"
-                                       appResizeInput
-                                       [resizeOnString]="variable.value.name"
-                                >
-                              </mat-form-field>
-                              <mat-form-field hideRequiredMarker>
-        <mat-label>Value</mat-label>
-        <input matInput name="value" [(ngModel)]="variable.value.value" required
-                                       [disabled]="!variable.value.enabled"
-                                       [name]="'variableValue' + variable.key"
-                                       appResizeInput
-                                       [resizeOnString]="variable.value.value"
-                                >
-                              </mat-form-field>
-                              <mat-form-field hideRequiredMarker>
-        <mat-label>Direction</mat-label>
-        <input matInput name="direction" [(ngModel)]="variable.value.direction"
-                                       [disabled]="!variable.value.enabled"
-                                       [name]="'variableDirection' + variable.key"
-                                       appResizeInput
-                                       [resizeOnString]="variable.value.direction"
-                                >
-                              </mat-form-field>
-                              <button mat-button color="accent" class="but-spacer-left"
-                                      [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.key], details.controls['variableValue' + variable.key], details.controls['variableDirection' + variable.key])"
-                                      (click)="updateProfileGatewayVar(variable.value); details.controls['variableName' + param.key].markAsPristine(); details.controls['variableValue' + param.key].markAsPristine(); details.controls['variableDirection' + variable.key].markAsPristine()">
-                                Update
-                              </button>
-                              <button *ngIf="variable.value.enabled" mat-raised-button color="accent"
-                                      class="but-spacer-left switch-button"
-                                      (click)="switchProfileGatewayVar(variable.value)">
-                                Disable
-                              </button>
-                              <button *ngIf="!variable.value.enabled" mat-raised-button color="primary"
-                                      class="but-spacer-left switch-button"
-                                      (click)="switchProfileGatewayVar(variable.value)">
-                                Enable
-                              </button>
-                              <button mat-raised-button color="warn" class="but-spacer-left"
-                                      (click)="deleteProfileGatewayVar(variable.value)">
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                          <div *ngIf="item.variables">
-                            <div class="spacer"
-                                 *ngFor="let variable of item.variables.new; trackBy: trackByFn; let i = index;">
-                              <div *ngIf="variable">
-                                <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput name="name" [(ngModel)]="variable.name" required
-                                         [name]="'newVarName' + i"
-                                         appResizeInput
-                                         [resizeOnString]="variable.name"
-                                  >
-                                </mat-form-field>
-                                <mat-form-field hideRequiredMarker>
-        <mat-label>Value</mat-label>
-        <input matInput name="value" [(ngModel)]="variable.value" required
-                                         [name]="'newVarValue' + i"
-                                         appResizeInput
-                                         [resizeOnString]="variable.value"
-                                  >
-                                </mat-form-field>
-                                <mat-form-field hideRequiredMarker>
-        <mat-label>Direction</mat-label>
-        <input matInput name="direction" [(ngModel)]="variable.direction"
-                                         [name]="'newVarDirection' + i"
-                                         appResizeInput
-                                         [resizeOnString]="variable.direction"
-                                  >
-                                </mat-form-field>
-                                <button mat-button color="accent" class="but-spacer-left"
-                                        [disabled]="!isNewReadyToSend(details.controls['newVarName' + i], details.controls['newVarValue' + i])"
-                                        (click)="newProfileGatewayVar(item.id, i, details.controls['newVarName' + i].value, details.controls['newVarValue' + i].value, details.controls['newVarDirection' + i].value)">
-                                  Update
-                                </button>
-                                <button mat-button color="warn"
-                                        (click)="dropNewProfileGatewayVar(profile.id, item.id, i)"
-                                        class="but-spacer-left">
-                                  Delete
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <button mat-raised-button color="accent"
-                                (click)="addNewProfileGatewayVar(profile.id, item.id)">
-                          Add
-                        </button>
-                        <button mat-raised-button color="primary" class="but-spacer-left" (click)="pasteGatewayVars(item.id,profile.id)" *ngIf="toCopyGateway && toCopyGateway != item.id">
-                          Paste
-                        </button>-->
-                      </form>
+                      </app-key-value-pad-2>
                     </mat-expansion-panel>
                   </div>
-
-
-                </mat-card-content>
-              </mat-card>
-            </div>
-          </mat-tab>
-          <mat-tab label="Profiles domains">
-            <div *ngFor="let item of onlyValues(list.profiles); trackBy: trackByFnId" class="panel-wrapper">
-              <mat-expansion-panel (opened)="getSofiaProfileDomain(item.id)"
-                                   [expanded]="panelCloser['domain' + item.id]">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    {{item.name}}
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
-                <form #details="ngForm">
-                  <h3>Domains:</h3><!--
-                  <app-key-value-pad-2 [exist]="item.domains"
-                                       [items]="item.domains"
-                                       [newItems]="item.domains?.new"
-                                       [id]="item.id"
-                                       [toCopy]="null"
-                                       [dispatchersCallbacks]="profileDomainsDispatchers"
-                  >
-                  </app-key-value-pad-2>-->
-                  <div *ngIf="item.domains">
-                    <div class="spacer" *ngFor="let domain of onlyValues(item.domains); trackBy: trackByFnId">
-                      <div *ngIf="domain.id && !isArray(domain)">
-                        <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput name="name" [(ngModel)]="domain.name" required
-                                 [disabled]="!domain.enabled"
-                                 [name]="'domainName' + domain.id">
-                        </mat-form-field>
-                        <mat-form-field hideRequiredMarker>
-        <mat-label>Alias</mat-label>
-        <input matInput name="alias" [(ngModel)]="domain.alias" required
-                                 [disabled]="!domain.enabled"
-                                 [name]="'domainAlias' + domain.id">
-                        </mat-form-field>
-                        <mat-form-field hideRequiredMarker>
-        <mat-label>Parse</mat-label>
-        <input matInput name="parse" [(ngModel)]="domain.parse" required
-                                 [disabled]="!domain.enabled"
-                                 [name]="'domainParse' + domain.id">
-                        </mat-form-field>
-                        <button mat-button color="accent" class="but-spacer-left"
-                                [disabled]="!isReadyToSendThree(details.controls['domainName' + domain.id], details.controls['domainAlias' + domain.id], details.controls['domainParse' + domain.id])"
-                                (click)="updateProfileDomain(domain); details.controls['domainName' + domain.id].markAsPristine(); details.controls['domainAlias' + domain.id].markAsPristine(); details.controls['domainParse' + domain.id].markAsPristine();">
-                          Update
-                        </button>
-                        <button *ngIf="domain.enabled" mat-raised-button color="accent"
-                                class="but-spacer-left switch-button" (click)="switchProfileDomain(domain)">
-                          Disable
-                        </button>
-                        <button *ngIf="!domain.enabled" mat-raised-button color="primary"
-                                class="but-spacer-left switch-button" (click)="switchProfileDomain(domain)">
-                          Enable
-                        </button>
-                        <button mat-raised-button color="warn" class="but-spacer-left"
-                                (click)="deleteProfileDomain(domain)">
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div *ngIf="item.domains">
-                    <div class="spacer" *ngFor="let domain of item.domains.new; let i = index">
-                      <div *ngIf="domain">
-                        <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput name="name" [(ngModel)]="domain.name" required
-                                 [name]="'newDomainName' + i">
-                        </mat-form-field>
-                        <mat-form-field hideRequiredMarker>
-        <mat-label>Alias</mat-label>
-        <input matInput name="alias" [(ngModel)]="domain.alias" required
-                                 [name]="'newDomainAlias' + i">
-                        </mat-form-field>
-                        <mat-form-field hideRequiredMarker>
-        <mat-label>Parse</mat-label>
-        <input matInput name="parse" [(ngModel)]="domain.parse" required
-                                 [name]="'newDomainParse' + i">
-                        </mat-form-field>
-                        <button mat-button color="accent" class="but-spacer-left"
-                                [disabled]="!isReadyToSendThree(details.controls['newDomainName' + i], details.controls['newDomainAlias' + i], details.controls['newDomainParse' + i])"
-                                (click)="newProfileDomain(item.id, i, details.controls['newDomainName' + i].value, details.controls['newDomainAlias' + i].value, details.controls['newDomainParse' + i].value)">
-                          Update
-                        </button>
-                        <button mat-button color="warn" (click)="dropNewProfileDomain(item.id, i)"
-                                class="but-spacer-left">
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <button mat-raised-button color="accent" class="spacer" (click)="addNewProfileDomain(item.id)">
-                    Add
-                  </button>
-                </form>
-              </mat-expansion-panel>
-            </div>
-          </mat-tab>
-          <mat-tab label="Profiles aliases">
-            <div *ngFor="let item of onlyValues(list.profiles); trackBy: trackByFnId" class="panel-wrapper">
-              <mat-expansion-panel (opened)="getSofiaProfileAlias(item.id)"
-                                   [expanded]="panelCloser['alias' + item.id]">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    {{item.name}}
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
-                <form #details="ngForm">
-                  <h3>Aliases:</h3>
-                  <div *ngIf="item.aliases">
-                    <div class="spacer" *ngFor="let alias of onlyValues(item.aliases); trackBy: trackByFnId">
-                      <div *ngIf="alias.id && !isArray(alias)">
-                        <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput name="name" [(ngModel)]="alias.name" required
-                                 [disabled]="!alias.enabled"
-                                 [name]="'aliasName' + alias.id">
-                        </mat-form-field>
-                        <button mat-button color="accent" class="but-spacer-left"
-                                [disabled]="!isvalueReadyToSend(details.controls['aliasName' + alias.id])"
-                                (click)="updateProfileAlias(alias)">
-                          Update
-                        </button>
-                        <button *ngIf="alias.enabled" mat-raised-button color="accent"
-                                class="but-spacer-left switch-button" (click)="switchProfileAlias(alias)">
-                          Disable
-                        </button>
-                        <button *ngIf="!alias.enabled" mat-raised-button color="primary"
-                                class="but-spacer-left switch-button" (click)="switchProfileAlias(alias)">
-                          Enable
-                        </button>
-                        <button mat-raised-button color="warn" class="but-spacer-left"
-                                (click)="deleteProfileAlias(alias)">
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div *ngIf="item.aliases">
-                    <div class="spacer" *ngFor="let alias of item.aliases.new; let i = index">
-                      <div *ngIf="alias">
-                        <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput name="name" [(ngModel)]="alias.name" required
-                                 [name]="'newAliasName' + i">
-                        </mat-form-field>
-                        <button mat-button color="accent" class="but-spacer-left"
-                                [disabled]="!isvalueReadyToSend(details.controls['newAliasName' + i])"
-                                (click)="newProfileAlias(item.id, i, details.controls['newAliasName' + i].value)">
-                          Update
-                        </button>
-                        <button mat-button color="warn" (click)="dropNewProfileAlias(item.id, i)"
-                                class="but-spacer-left">
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <button mat-raised-button color="accent" class="spacer" (click)="addNewProfileAlias(item.id)">
-                    Add
-                  </button>
-                </form>
-              </mat-expansion-panel>
-            </div>
-          </mat-tab>
-          <mat-tab label="Profile commands">
-            <div class="panel-wrapper panel-wrapper-top">
-              <h3>Profiles commands</h3>
-              <article>
-                <div class="section" *ngFor="let item of onlyValues(list.profiles); trackBy: trackByFnId">
-                  <section class="mat-subheading-1">
-                    <span  class=" grid-inner-title">{{item.name}}</span>
-                  </section>
-                  <section>
-                    <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
-                            [disabled]="item.started"
-                            (click)="profileComand(item.id, 0, 'start')">
-                      Start
-                    </button>
-                  </section>
-                  <section>
-                    <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
-                            [disabled]="!item.started"
-                            (click)="profileComand(item.id, 0, 'stop')">
-                      Stop
-                    </button>
-                  </section>
-                  <section *ngIf="item">
-                    <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
-                            [disabled]="!item.started"
-                            (click)="profileComand(item.id, 0, 'restart')">
-                      Restart
-                    </button>
-                  </section>
-                  <section>
-                    <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
-                            [disabled]="!item.started"
-                            (click)="profileComand(item.id, 0, 'rescan')">
-                      Rescan
-                    </button>
-                  </section>
-                  <section>
-                    <mat-form-field hideRequiredMarker>
-                      <mat-label>Gateway</mat-label>
-                      <mat-select required name="gateway" [disabled]="!item.gateways"  [(ngModel)]="choosedGateway[item.id]" disableOptionCentering>
-                        <mat-option *ngFor="let val of onlyValues(item.gateways); trackBy: trackByFnId" [value]="val.id">
-                          {{val.name}}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
-                    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
-                            [disabled]="!item.gateways || !choosedGateway[item.id] || !item.started || !item.gateways[choosedGateway[item.id]].started" (click)="profileComand(item.id, choosedGateway[item.id], 'killgw')">
-                      Killgw
-                    </button>
-                    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
-                            [disabled]="!item.gateways || !choosedGateway[item.id] || !item.started || item.gateways[choosedGateway[item.id]].started" (click)="profileComand(item.id, choosedGateway[item.id], 'startgw')">
-                      Startgw
-                    </button>
-                  </section>
-                  <section>
-                    <button mat-raised-button color="accent" class="but-spacer-left switch-button grid-inner"
-                            *ngIf="item.enabled" (click)="switchProfile(item)">
-                      Disable
-                    </button>
-                    <button mat-raised-button color="primary" class="but-spacer-left switch-button grid-inner"
-                            *ngIf="!item.enabled" (click)="switchProfile(item)">
-                      Enable
-                    </button>
-                  </section>
-                </div>
-              </article>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
-
-      </mat-card-content>
-    </mat-card>
-
-  </mat-tab>
-
-  <mat-tab label="Add">
-    <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-    <form class="spacer spacerb" (ngSubmit)="onGatewaySubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Profile</mat-label>
-        <mat-select required name="profile" [(ngModel)]="profileId" disableOptionCentering>
-          <mat-option *ngFor="let val of onlyValues(list.profiles); trackBy: trackByFnId" [value]="val.id">
-            {{val.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New gateway name" required name="name" [(ngModel)]="newGatewayName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-  </mat-tab>
-
-  <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb" #deleteForm="ngForm">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Profile</mat-label>
-        <mat-select required name="profile" [(ngModel)]="profileId" disableOptionCentering>
-          <mat-option *ngFor="let val of onlyValues(list.profiles); trackBy: trackByFnId" [value]="val.id">
-            {{val.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <div *ngIf="list.profiles && list.profiles[profileId]">
-        <h3>Profile:</h3>
-        <mat-form-field hideRequiredMarker>
-        <mat-label>Profile name</mat-label>
-        <input matInput name="Profile name" required [ngModel]="list.profiles[profileId].name"
-                 [name]="'profile::' + profileId">
-        </mat-form-field>
-        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profileId])"
-                (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list.profiles[profileId].name, 'rename')">
-          Update
-        </button>
-        <button mat-raised-button color="warn"
-                (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list.profiles[profileId].name, 'delete')">
-          Delete
-        </button>
-        <h3>Gateways:</h3>
-        <div *ngFor="let item of onlyValues(list.profiles[profileId].gateways); trackBy: trackByFnId" class="panel-wrapper">
-          <mat-form-field hideRequiredMarker>
-        <mat-label>Gateway name</mat-label>
-        <input matInput name="Gateway name" required [ngModel]="item.name"
-                   [name]="'gateway::' + item.id">
-          </mat-form-field>
-          <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['gateway::' + item.id])"
-                  (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'rename')">
-            Update
-          </button>
-          <button mat-raised-button color="warn"
-                  (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'delete')">
-            Delete
-          </button>
-        </div>
-      </div>
-    </form>
-  </mat-tab>
-</mat-tab-group>
+                }
+              </mat-tab>
+              <mat-tab label="Profiles gateways">
+                @for (profile of onlyValues(list().profiles); track profile.id) {
+                  <div>
+                    <mat-card>
+                      <mat-card-header>
+                        <mat-card-subtitle>{{profile.name}}</mat-card-subtitle>
+                      </mat-card-header>
+                      <mat-card-content>
+                        @for (item of onlyValues(profile.gateways); track item.id) {
+                          <div class="panel-wrapper">
+                            <mat-expansion-panel (opened)="getSofiaProfilesGatewayParams(item.id)"
+                              [expanded]="panelCloser['gateway' + item.id]">
+                              <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                  {{item.name}}
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                  Click to get details
+                                </mat-panel-description>
+                              </mat-expansion-panel-header>
+                              <form #details="ngForm">
+                                @if (profile.gateways[item.id] && (profile.gateways[item.id].parameters || profile.gateways[item.id].variables)) {
+                                  <button mat-raised-button color="basic" (click)="copyGateway(profile.id, item.id)">Copy</button>
+                                }
+                                <h3>Params:</h3>
+                                <app-key-value-pad-2 [exist]="item.parameters"
+                                  [items]="item.parameters"
+                                  [newItems]="item.parameters?.new"
+                                  [id]="item.id"
+                                  [toCopy]="toCopyGateway"
+                                  [dispatchersCallbacks]="gatewayParamsDispatchers"
+                                  [grandParentId]="profile.id"
+                                  >
+                                </app-key-value-pad-2>
+                                <!-- <h3>Variables:</h3>-->
+                                <!--                        <app-key-value-pad-2 [exist]="item.variables"
+                                [items]="item.variables"
+                                [newItems]="item.variables?.new"
+                                [id]="item.id"
+                                [toCopy]="toCopyGateway"
+                                [dispatchersCallbacks]="gatewayParamsDispatchers"
+                                [grandParentId]="profile.id"
+                                >
+                              </app-key-value-pad-2>-->
+                              <!--<div *ngIf="item.variables">
+                              <div class="spacer" *ngFor="let variable of item.variables | keyvalue; trackBy: trackByFnId">
+                                <div *ngIf="variable.key && !isArray(variable.value)">
+                                  <mat-form-field hideRequiredMarker>
+                                    <mat-label>Name</mat-label>
+                                    <input matInput name="name" [(ngModel)]="variable.value.name" required
+                                      [disabled]="!variable.value.enabled"
+                                      [name]="'variableName' + variable.key"
+                                      appResizeInput
+                                      [resizeOnString]="variable.value.name"
+                                      >
+                                    </mat-form-field>
+                                    <mat-form-field hideRequiredMarker>
+                                      <mat-label>Value</mat-label>
+                                      <input matInput name="value" [(ngModel)]="variable.value.value" required
+                                        [disabled]="!variable.value.enabled"
+                                        [name]="'variableValue' + variable.key"
+                                        appResizeInput
+                                        [resizeOnString]="variable.value.value"
+                                        >
+                                      </mat-form-field>
+                                      <mat-form-field hideRequiredMarker>
+                                        <mat-label>Direction</mat-label>
+                                        <input matInput name="direction" [(ngModel)]="variable.value.direction"
+                                          [disabled]="!variable.value.enabled"
+                                          [name]="'variableDirection' + variable.key"
+                                          appResizeInput
+                                          [resizeOnString]="variable.value.direction"
+                                          >
+                                        </mat-form-field>
+                                        <button mat-button color="accent" class="but-spacer-left"
+                                          [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.key], details.controls['variableValue' + variable.key], details.controls['variableDirection' + variable.key])"
+                                          (click)="updateProfileGatewayVar(variable.value); details.controls['variableName' + param.key].markAsPristine(); details.controls['variableValue' + param.key].markAsPristine(); details.controls['variableDirection' + variable.key].markAsPristine()">
+                                          Update
+                                        </button>
+                                        <button *ngIf="variable.value.enabled" mat-raised-button color="accent"
+                                          class="but-spacer-left switch-button"
+                                          (click)="switchProfileGatewayVar(variable.value)">
+                                          Disable
+                                        </button>
+                                        <button *ngIf="!variable.value.enabled" mat-raised-button color="primary"
+                                          class="but-spacer-left switch-button"
+                                          (click)="switchProfileGatewayVar(variable.value)">
+                                          Enable
+                                        </button>
+                                        <button mat-raised-button color="warn" class="but-spacer-left"
+                                          (click)="deleteProfileGatewayVar(variable.value)">
+                                          Delete
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div *ngIf="item.variables">
+                                      <div class="spacer"
+                                        *ngFor="let variable of item.variables.new; trackBy: trackByFn; let i = index;">
+                                        <div *ngIf="variable">
+                                          <mat-form-field hideRequiredMarker>
+                                            <mat-label>Name</mat-label>
+                                            <input matInput name="name" [(ngModel)]="variable.name" required
+                                              [name]="'newVarName' + i"
+                                              appResizeInput
+                                              [resizeOnString]="variable.name"
+                                              >
+                                            </mat-form-field>
+                                            <mat-form-field hideRequiredMarker>
+                                              <mat-label>Value</mat-label>
+                                              <input matInput name="value" [(ngModel)]="variable.value" required
+                                                [name]="'newVarValue' + i"
+                                                appResizeInput
+                                                [resizeOnString]="variable.value"
+                                                >
+                                              </mat-form-field>
+                                              <mat-form-field hideRequiredMarker>
+                                                <mat-label>Direction</mat-label>
+                                                <input matInput name="direction" [(ngModel)]="variable.direction"
+                                                  [name]="'newVarDirection' + i"
+                                                  appResizeInput
+                                                  [resizeOnString]="variable.direction"
+                                                  >
+                                                </mat-form-field>
+                                                <button mat-button color="accent" class="but-spacer-left"
+                                                  [disabled]="!isNewReadyToSend(details.controls['newVarName' + i], details.controls['newVarValue' + i])"
+                                                  (click)="newProfileGatewayVar(item.id, i, details.controls['newVarName' + i].value, details.controls['newVarValue' + i].value, details.controls['newVarDirection' + i].value)">
+                                                  Update
+                                                </button>
+                                                <button mat-button color="warn"
+                                                  (click)="dropNewProfileGatewayVar(profile.id, item.id, i)"
+                                                  class="but-spacer-left">
+                                                  Delete
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <button mat-raised-button color="accent"
+                                          (click)="addNewProfileGatewayVar(profile.id, item.id)">
+                                          Add
+                                        </button>
+                                        <button mat-raised-button color="primary" class="but-spacer-left" (click)="pasteGatewayVars(item.id,profile.id)" *ngIf="toCopyGateway && toCopyGateway != item.id">
+                                          Paste
+                                        </button>-->
+                                      </form>
+                                    </mat-expansion-panel>
+                                  </div>
+                                }
+                              </mat-card-content>
+                            </mat-card>
+                          </div>
+                        }
+                      </mat-tab>
+                      <mat-tab label="Profiles domains">
+                        @for (item of onlyValues(list().profiles); track item.id) {
+                          <div class="panel-wrapper">
+                            <mat-expansion-panel (opened)="getSofiaProfileDomain(item.id)"
+                              [expanded]="panelCloser['domain' + item.id]">
+                              <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                  {{item.name}}
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                  Click to get details
+                                </mat-panel-description>
+                              </mat-expansion-panel-header>
+                              <form #details="ngForm">
+                                <h3>Domains:</h3><!--
+                                <app-key-value-pad-2 [exist]="item.domains"
+                                  [items]="item.domains"
+                                  [newItems]="item.domains?.new"
+                                  [id]="item.id"
+                                  [toCopy]="null"
+                                  [dispatchersCallbacks]="profileDomainsDispatchers"
+                                  >
+                                </app-key-value-pad-2>-->
+                                @if (item.domains) {
+                                  <div>
+                                    @for (domain of onlyValues(item.domains); track domain.id) {
+                                      <div class="spacer">
+                                        @if (domain.id && !isArray(domain)) {
+                                          <div>
+                                            <mat-form-field hideRequiredMarker>
+                                              <mat-label>Name</mat-label>
+                                              <input matInput name="name" [(ngModel)]="domain.name" required
+                                                [disabled]="!domain.enabled"
+                                                [name]="'domainName' + domain.id">
+                                              </mat-form-field>
+                                              <mat-form-field hideRequiredMarker>
+                                                <mat-label>Alias</mat-label>
+                                                <input matInput name="alias" [(ngModel)]="domain.alias" required
+                                                  [disabled]="!domain.enabled"
+                                                  [name]="'domainAlias' + domain.id">
+                                                </mat-form-field>
+                                                <mat-form-field hideRequiredMarker>
+                                                  <mat-label>Parse</mat-label>
+                                                  <input matInput name="parse" [(ngModel)]="domain.parse" required
+                                                    [disabled]="!domain.enabled"
+                                                    [name]="'domainParse' + domain.id">
+                                                  </mat-form-field>
+                                                  <button mat-button color="accent" class="but-spacer-left"
+                                                    [disabled]="!isReadyToSendThree(details.controls['domainName' + domain.id], details.controls['domainAlias' + domain.id], details.controls['domainParse' + domain.id])"
+                                                    (click)="updateProfileDomain(domain); details.controls['domainName' + domain.id].markAsPristine(); details.controls['domainAlias' + domain.id].markAsPristine(); details.controls['domainParse' + domain.id].markAsPristine();">
+                                                    Update
+                                                  </button>
+                                                  @if (domain.enabled) {
+                                                    <button mat-raised-button color="accent"
+                                                      class="but-spacer-left switch-button" (click)="switchProfileDomain(domain)">
+                                                      Disable
+                                                    </button>
+                                                  }
+                                                  @if (!domain.enabled) {
+                                                    <button mat-raised-button color="primary"
+                                                      class="but-spacer-left switch-button" (click)="switchProfileDomain(domain)">
+                                                      Enable
+                                                    </button>
+                                                  }
+                                                  <button mat-raised-button color="warn" class="but-spacer-left"
+                                                    (click)="deleteProfileDomain(domain)">
+                                                    Delete
+                                                  </button>
+                                                </div>
+                                              }
+                                            </div>
+                                          }
+                                        </div>
+                                      }
+                                      @if (item.domains) {
+                                        <div>
+                                          @for (domain of item.domains.new; track $index; let i = $index) {
+                                            <div class="spacer">
+                                              @if (domain) {
+                                                <div>
+                                                  <mat-form-field hideRequiredMarker>
+                                                    <mat-label>Name</mat-label>
+                                                    <input matInput name="name" [(ngModel)]="domain.name" required
+                                                      [name]="'newDomainName' + i">
+                                                    </mat-form-field>
+                                                    <mat-form-field hideRequiredMarker>
+                                                      <mat-label>Alias</mat-label>
+                                                      <input matInput name="alias" [(ngModel)]="domain.alias" required
+                                                        [name]="'newDomainAlias' + i">
+                                                      </mat-form-field>
+                                                      <mat-form-field hideRequiredMarker>
+                                                        <mat-label>Parse</mat-label>
+                                                        <input matInput name="parse" [(ngModel)]="domain.parse" required
+                                                          [name]="'newDomainParse' + i">
+                                                        </mat-form-field>
+                                                        <button mat-button color="accent" class="but-spacer-left"
+                                                          [disabled]="!isReadyToSendThree(details.controls['newDomainName' + i], details.controls['newDomainAlias' + i], details.controls['newDomainParse' + i])"
+                                                          (click)="newProfileDomain(item.id, i, details.controls['newDomainName' + i].value, details.controls['newDomainAlias' + i].value, details.controls['newDomainParse' + i].value)">
+                                                          Update
+                                                        </button>
+                                                        <button mat-button color="warn" (click)="dropNewProfileDomain(item.id, i)"
+                                                          class="but-spacer-left">
+                                                          Delete
+                                                        </button>
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                }
+                                              </div>
+                                            }
+                                            <button mat-raised-button color="accent" class="spacer" (click)="addNewProfileDomain(item.id)">
+                                              Add
+                                            </button>
+                                          </form>
+                                        </mat-expansion-panel>
+                                      </div>
+                                    }
+                                  </mat-tab>
+                                  <mat-tab label="Profiles aliases">
+                                    @for (item of onlyValues(list().profiles); track item.id) {
+                                      <div class="panel-wrapper">
+                                        <mat-expansion-panel (opened)="getSofiaProfileAlias(item.id)"
+                                          [expanded]="panelCloser['alias' + item.id]">
+                                          <mat-expansion-panel-header>
+                                            <mat-panel-title>
+                                              {{item.name}}
+                                            </mat-panel-title>
+                                            <mat-panel-description>
+                                              Click to get details
+                                            </mat-panel-description>
+                                          </mat-expansion-panel-header>
+                                          <form #details="ngForm">
+                                            <h3>Aliases:</h3>
+                                            @if (item.aliases) {
+                                              <div>
+                                                @for (alias of onlyValues(item.aliases); track alias.id) {
+                                                  <div class="spacer">
+                                                    @if (alias.id && !isArray(alias)) {
+                                                      <div>
+                                                        <mat-form-field hideRequiredMarker>
+                                                          <mat-label>Name</mat-label>
+                                                          <input matInput name="name" [(ngModel)]="alias.name" required
+                                                            [disabled]="!alias.enabled"
+                                                            [name]="'aliasName' + alias.id">
+                                                          </mat-form-field>
+                                                          <button mat-button color="accent" class="but-spacer-left"
+                                                            [disabled]="!isvalueReadyToSend(details.controls['aliasName' + alias.id])"
+                                                            (click)="updateProfileAlias(alias)">
+                                                            Update
+                                                          </button>
+                                                          @if (alias.enabled) {
+                                                            <button mat-raised-button color="accent"
+                                                              class="but-spacer-left switch-button" (click)="switchProfileAlias(alias)">
+                                                              Disable
+                                                            </button>
+                                                          }
+                                                          @if (!alias.enabled) {
+                                                            <button mat-raised-button color="primary"
+                                                              class="but-spacer-left switch-button" (click)="switchProfileAlias(alias)">
+                                                              Enable
+                                                            </button>
+                                                          }
+                                                          <button mat-raised-button color="warn" class="but-spacer-left"
+                                                            (click)="deleteProfileAlias(alias)">
+                                                            Delete
+                                                          </button>
+                                                        </div>
+                                                      }
+                                                    </div>
+                                                  }
+                                                </div>
+                                              }
+                                              @if (item.aliases) {
+                                                <div>
+                                                  @for (alias of item.aliases.new; track $index; let i = $index) {
+                                                    <div class="spacer">
+                                                      @if (alias) {
+                                                        <div>
+                                                          <mat-form-field hideRequiredMarker>
+                                                            <mat-label>Name</mat-label>
+                                                            <input matInput name="name" [(ngModel)]="alias.name" required
+                                                              [name]="'newAliasName' + i">
+                                                            </mat-form-field>
+                                                            <button mat-button color="accent" class="but-spacer-left"
+                                                              [disabled]="!isvalueReadyToSend(details.controls['newAliasName' + i])"
+                                                              (click)="newProfileAlias(item.id, i, details.controls['newAliasName' + i].value)">
+                                                              Update
+                                                            </button>
+                                                            <button mat-button color="warn" (click)="dropNewProfileAlias(item.id, i)"
+                                                              class="but-spacer-left">
+                                                              Delete
+                                                            </button>
+                                                          </div>
+                                                        }
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                }
+                                                <button mat-raised-button color="accent" class="spacer" (click)="addNewProfileAlias(item.id)">
+                                                  Add
+                                                </button>
+                                              </form>
+                                            </mat-expansion-panel>
+                                          </div>
+                                        }
+                                      </mat-tab>
+                                      <mat-tab label="Profile commands">
+                                        <div class="panel-wrapper panel-wrapper-top">
+                                          <h3>Profiles commands</h3>
+                                          <article>
+                                            @for (item of onlyValues(list().profiles); track item.id) {
+                                              <div class="section">
+                                                <section class="mat-subheading-1">
+                                                  <span  class=" grid-inner-title">{{item.name}}</span>
+                                                </section>
+                                                <section>
+                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                                    [disabled]="item.started"
+                                                    (click)="profileComand(item.id, 0, 'start')">
+                                                    Start
+                                                  </button>
+                                                </section>
+                                                <section>
+                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                                    [disabled]="!item.started"
+                                                    (click)="profileComand(item.id, 0, 'stop')">
+                                                    Stop
+                                                  </button>
+                                                </section>
+                                                @if (item) {
+                                                  <section>
+                                                    <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                                      [disabled]="!item.started"
+                                                      (click)="profileComand(item.id, 0, 'restart')">
+                                                      Restart
+                                                    </button>
+                                                  </section>
+                                                }
+                                                <section>
+                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                                    [disabled]="!item.started"
+                                                    (click)="profileComand(item.id, 0, 'rescan')">
+                                                    Rescan
+                                                  </button>
+                                                </section>
+                                                <section>
+                                                  <mat-form-field hideRequiredMarker>
+                                                    <mat-label>Gateway</mat-label>
+                                                    <mat-select required name="gateway" [disabled]="!item.gateways"  [(ngModel)]="choosedGateway[item.id]" disableOptionCentering>
+                                                      @for (val of onlyValues(item.gateways); track val.id) {
+                                                        <mat-option [value]="val.id">
+                                                          {{val.name}}
+                                                        </mat-option>
+                                                      }
+                                                    </mat-select>
+                                                  </mat-form-field>
+                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                                                    [disabled]="!item.gateways || !choosedGateway[item.id] || !item.started || !item.gateways[choosedGateway[item.id]].started" (click)="profileComand(item.id, choosedGateway[item.id], 'killgw')">
+                                                    Killgw
+                                                  </button>
+                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                                                    [disabled]="!item.gateways || !choosedGateway[item.id] || !item.started || item.gateways[choosedGateway[item.id]].started" (click)="profileComand(item.id, choosedGateway[item.id], 'startgw')">
+                                                    Startgw
+                                                  </button>
+                                                </section>
+                                                <section>
+                                                  @if (item.enabled) {
+                                                    <button mat-raised-button color="accent" class="but-spacer-left switch-button grid-inner"
+                                                      (click)="switchProfile(item)">
+                                                      Disable
+                                                    </button>
+                                                  }
+                                                  @if (!item.enabled) {
+                                                    <button mat-raised-button color="primary" class="but-spacer-left switch-button grid-inner"
+                                                      (click)="switchProfile(item)">
+                                                      Enable
+                                                    </button>
+                                                  }
+                                                </section>
+                                              </div>
+                                            }
+                                          </article>
+                                        </div>
+                                      </mat-tab>
+                                    </mat-tab-group>
+                                  }
+                                </mat-card-content>
+                              </mat-card>
+                            </mat-tab>
+                            <mat-tab label="Add">
+                              <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
+                                <mat-form-field hideRequiredMarker>
+                                  <mat-label>Name</mat-label>
+                                  <input matInput placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
+                                </mat-form-field>
+                                <button mat-raised-button color="primary" type="submit">Submit</button>
+                              </form>
+                              <form class="spacer spacerb" (ngSubmit)="onGatewaySubmit()">
+                                <mat-form-field hideRequiredMarker>
+                                  <mat-label>Profile</mat-label>
+                                  <mat-select required name="profile" [(ngModel)]="profileId" disableOptionCentering>
+                                    @for (val of onlyValues(list().profiles); track val.id) {
+                                      <mat-option [value]="val.id">
+                                        {{val.name}}
+                                      </mat-option>
+                                    }
+                                  </mat-select>
+                                </mat-form-field>
+                                <mat-form-field hideRequiredMarker>
+                                  <mat-label>Name</mat-label>
+                                  <input matInput placeholder="New gateway name" required name="name" [(ngModel)]="newGatewayName">
+                                </mat-form-field>
+                                <button mat-raised-button color="primary" type="submit">Submit</button>
+                              </form>
+                            </mat-tab>
+                            <mat-tab label="Delete/Rename">
+                              <form class="spacer spacerb" #deleteForm="ngForm">
+                                <mat-form-field hideRequiredMarker>
+                                  <mat-label>Profile</mat-label>
+                                  <mat-select required name="profile" [(ngModel)]="profileId" disableOptionCentering>
+                                    @for (val of onlyValues(list().profiles); track val.id) {
+                                      <mat-option [value]="val.id">
+                                        {{val.name}}
+                                      </mat-option>
+                                    }
+                                  </mat-select>
+                                </mat-form-field>
+                                @if (list().profiles && list().profiles[profileId]) {
+                                  <div>
+                                    <h3>Profile:</h3>
+                                    <mat-form-field hideRequiredMarker>
+                                      <mat-label>Profile name</mat-label>
+                                      <input matInput name="Profile name" required [ngModel]="list().profiles[profileId].name"
+                                        [name]="'profile::' + profileId">
+                                      </mat-form-field>
+                                      <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profileId])"
+                                        (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'rename')">
+                                        Update
+                                      </button>
+                                      <button mat-raised-button color="warn"
+                                        (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'delete')">
+                                        Delete
+                                      </button>
+                                      <h3>Gateways:</h3>
+                                      @for (item of onlyValues(list().profiles[profileId].gateways); track item.id) {
+                                        <div class="panel-wrapper">
+                                          <mat-form-field hideRequiredMarker>
+                                            <mat-label>Gateway name</mat-label>
+                                            <input matInput name="Gateway name" required [ngModel]="item.name"
+                                              [name]="'gateway::' + item.id">
+                                            </mat-form-field>
+                                            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['gateway::' + item.id])"
+                                              (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'rename')">
+                                              Update
+                                            </button>
+                                            <button mat-raised-button color="warn"
+                                              (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'delete')">
+                                              Delete
+                                            </button>
+                                          </div>
+                                        }
+                                      </div>
+                                    }
+                                  </form>
+                                </mat-tab>
+                              </mat-tab-group>
+                            }

@@ -25,7 +25,9 @@ import {
   UpdateOpalListenerParameter
 } from './config.actions.opal';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsOpal {
 
   constructor(

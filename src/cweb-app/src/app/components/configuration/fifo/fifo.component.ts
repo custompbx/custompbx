@@ -1,9 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
 import {Observable, Subscription} from 'rxjs';
 import {Iitem, Ififo, IfifoMember} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -18,8 +20,12 @@ import {
   SwitchFifoParameter, UpdateFifoFifoMember,
   UpdateFifoParameter, UpdateFifoFifoImportance
 } from '../../../store/config/fifo/config.actions.fifo';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 
 @Component({
+standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent],
   selector: 'app-fifo',
   templateUrl: './fifo.component.html',
   styleUrls: ['./fifo.component.css']

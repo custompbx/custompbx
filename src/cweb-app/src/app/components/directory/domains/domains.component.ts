@@ -1,7 +1,9 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {select, Store} from '@ngrx/store';
-import {AppState, selectDirectoryState} from '../../../store/app.states';
-import {Observable, Subscription} from 'rxjs';
+import { Component, OnDestroy, OnInit, ViewChild, inject, signal, computed, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+import { MaterialModule } from "../../../../material-module";
+import { select, Store } from '@ngrx/store';
+import { AppState, selectDirectoryState } from '../../../store/app.states';
 import {
   GetDirectoryDomainDetails,
   StoreAddNewDirectoryDomainParameter,
@@ -23,58 +25,74 @@ import {
   StorePasteDirectoryDomainVariables,
   StorePasteDirectoryDomainParameters, ImportXMLDomain, SwitchDirectoryDomain,
 } from '../../../store/directory/directory.actions';
-import {AbstractControl} from '@angular/forms';
+import { AbstractControl, FormsModule } from '@angular/forms';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import {Idetails} from '../../../store/directory/directory.reducers';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import { ConfirmBottomSheetComponent } from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { InnerHeaderComponent } from "../../inner-header/inner-header.component";
+import {KeyValuePadComponent} from "../../key-value-pad/key-value-pad.component";
+import {CodeEditorComponent} from "../../code-editor/code-editor.component";
+import {JsonPipe} from "@angular/common";
+import {State} from "../../../store/directory/directory.reducers";
 
 @Component({
+  standalone: true,
+  imports: [MaterialModule, FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, JsonPipe],
   selector: 'app-domains',
   templateUrl: './domains.component.html',
   styleUrls: ['./domains.component.css']
 })
-export class DomainsComponent implements OnInit, OnDestroy {
+export class DomainsComponent implements OnInit {
 
-  public domains: Observable<any>;
-  public domains$: Subscription;
-  public list: any;
-  public listDetails: Idetails;
-  public newDomainName: string;
-  public selectedIndex: number;
-  public lastErrorMessage: string;
-  public loadCounter: number;
+  // --- Dependency Injection using inject() ---
+  public store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+
+  private directoryState = toSignal(
+    this.store.pipe(select(selectDirectoryState)),
+    {
+      initialValue: {
+        domains: {},
+        users: {},
+        webUsersTemplates: {},
+        templatesItems: {},
+        errorMessage: null,
+        loadCounter: 0
+      } as State
+    }
+  );
+
+  public domainsList = computed(() => this.directoryState().domains || []);
+  public listDetails = computed(() => this.directoryState().domainDetails || {});
+  public loadCounter = computed(() => this.directoryState().loadCounter || 0);
+
+  // --- Local State as Signals/Properties ---
+  public newDomainName = signal(''); // Local input state now a signal
+  public selectedIndex: number = 0;
   public toCopy: number;
   public domainParamDispatchers: object;
   public domainVarDispatchers: object;
   public XMLBody: string;
   public editorInited: boolean;
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-  ) {
-    this.selectedIndex = 0;
-    this.domains = this.store.pipe(select(selectDirectoryState));
-  }
+  // NOTE: lastErrorMessage is now read directly from directoryState()
+  // --- Effect for Side Effects (Replaces Subscription logic) ---
+  private domainEffect = effect(() => {
+    const errorMessage = this.directoryState().errorMessage;
+
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    } else {
+      // If the error message clears, reset the new domain name input
+      this.newDomainName.set('');
+    }
+  });
 
   ngOnInit() {
-    this.domains$ = this.domains.subscribe((domains) => {
-      this.loadCounter = domains.loadCounter;
-      this.list = domains.domains;
-      this.listDetails = domains.domainDetails;
-      this.lastErrorMessage = domains.errorMessage;
-      if (!this.lastErrorMessage) {
-        this.newDomainName = '';
-        // this.selectedIndex = 0;
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
     this.domainParamDispatchers = {
       addItemField: StoreAddNewDirectoryDomainParameter,
       switchItem: SwitchDirectoryDomainParameter,
@@ -95,16 +113,12 @@ export class DomainsComponent implements OnInit, OnDestroy {
     };
   }
 
-  ngOnDestroy() {
-    this.domains$.unsubscribe();
-  }
-
   importDirectory() {
     this.store.dispatch(new ImportDirectory(null));
   }
 
   getDetails(id) {
-    this.store.dispatch(new GetDirectoryDomainDetails({id: id}));
+    this.store.dispatch(new GetDirectoryDomainDetails({ id: id }));
   }
 
   clearDetails(id) {
@@ -112,18 +126,20 @@ export class DomainsComponent implements OnInit, OnDestroy {
   }
 
   switchDomain(object) {
-    this.store.dispatch(new SwitchDirectoryDomain({id: object.id, enabled: !object.enabled}));
+    this.store.dispatch(new SwitchDirectoryDomain({ id: object.id, enabled: !object.enabled }));
   }
+
   isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
     return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
   }
 
   onDomainSubmit() {
-    this.store.dispatch(new AddDirectoryDomain({name: this.newDomainName}));
+    // Read the signal value using newDomainName()
+    this.store.dispatch(new AddDirectoryDomain({ name: this.newDomainName() }));
   }
 
   ImportXMLDomain() {
-    this.store.dispatch(new ImportXMLDomain({file: this.XMLBody}));
+    this.store.dispatch(new ImportXMLDomain({ file: this.XMLBody }));
   }
 
   checkDirty(condition: AbstractControl): boolean {
@@ -155,7 +171,8 @@ export class DomainsComponent implements OnInit, OnDestroy {
   }
 
   copy(key) {
-    if (!this.listDetails[key]) {
+    // Read computed signal value
+    if (!this.listDetails()[key]) {
       this.toCopy = 0;
       return;
     }
@@ -184,9 +201,9 @@ export class DomainsComponent implements OnInit, OnDestroy {
         return;
       }
       if (action === 'delete') {
-        this.store.dispatch(new DeleteDirectoryDomain({id: id}));
+        this.store.dispatch(new DeleteDirectoryDomain({ id: id }));
       } else if (action === 'rename') {
-        this.store.dispatch(new RenameDirectoryDomain({id: id, name: newName}));
+        this.store.dispatch(new RenameDirectoryDomain({ id: id, name: newName }));
       }
     });
   }

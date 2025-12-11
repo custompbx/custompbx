@@ -11,6 +11,10 @@ volumes:
       o: bind
       device: docker/cdata
 
+networks:
+  local_network:
+    name: local_network
+
 services:
   postgres:
     container_name: postgres-host
@@ -30,7 +34,7 @@ services:
 
   freeswitch:
     container_name: freeswitch-host
-    hostname: docker-fs
+    hostname: freeswitch-host
     image: ghcr.io/custompbx/freeswitch:v0.0.107c
     depends_on:
       custompbx:
@@ -71,7 +75,3 @@ services:
       - freeswitch-recordings:/app/recordings
     networks:
       - local_network
-
-networks:
-  local_network:
-    name: local_network

@@ -1,4 +1,4 @@
-<app-inner-header name="Logs" [loadCounter]="loadCounter"></app-inner-header>
+<app-inner-header name="Logs" [loadCounter]="loadCounter()"></app-inner-header>
 <div>
   <div class="filter-container">
     <button mat-raised-button color="basic" class="but-spacer-left switch-button"
@@ -9,41 +9,46 @@
   <div class="filter-container">
     <mat-form-field hideRequiredMarker>
       <mat-label>Filter Field</mat-label>
-      <mat-select [(ngModel)]="filter.field" [disabled]="!columns" disableOptionCentering>
+      <mat-select [(ngModel)]="filter().field" [disabled]="!columns" disableOptionCentering>
         <mat-option [value]="null">
           ---
         </mat-option>
-        <mat-option *ngFor="let val of columns" [value]="val">
-          {{val}}
-        </mat-option>
+        @for (val of columns; track val) {
+          <mat-option [value]="val">
+            {{ val }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field hideRequiredMarker>
       <mat-label>Operand</mat-label>
-      <mat-select [(ngModel)]="filter.operand" [disabled]="!filter.field">
-        <mat-option *ngFor="let val of operands" [value]="val" disableOptionCentering>
-          {{val}}
-        </mat-option>
+      <mat-select [(ngModel)]="filter().operand" [disabled]="!filter().field">
+        @for (val of operands; track val) {
+          <mat-option [value]="val">
+            {{ val }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field hideRequiredMarker>
-        <mat-label>Value</mat-label>
-        <input matInput name="Value" [(ngModel)]="filter.field_value" [disabled]="!filter.operand" required>
+      <mat-label>Value</mat-label>
+      <input matInput name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required>
     </mat-form-field>
-    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
-            *ngIf="!filters[toEditFilter]"
-            [disabled]="!filter.field_value || !filter.operand || !filter.field"
-            (click)="addFilter()">
-      Add filter
-    </button>
-    <button mat-raised-button color="accent" class="but-spacer-left switch-button"
-            *ngIf="filters[toEditFilter]"
-            [disabled]="!filter.field_value || !filter.operand || !filter.field"
-            (click)="saveFilter()">
-      Edit filter
-    </button>
+    @if (!filters()[toEditFilter()]) {
+      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+              [disabled]="!filter().field_value || !filter().operand || !filter().field"
+              (click)="addFilter()">
+        Add filter
+      </button>
+    } @else {
+      <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+              [disabled]="!filter().field_value || !filter().operand || !filter().field"
+              (click)="saveFilter()">
+        Edit filter
+      </button>
+    }
     <mat-form-field hideRequiredMarker>
       <mat-label>Order Field</mat-label>
       <mat-select [(ngModel)]="sortColumns" [disabled]="!columns" disableOptionCentering>
@@ -51,12 +56,12 @@
           ---
         </mat-option>
         <mat-option *ngFor="let val of columns" [value]="val">
-          {{val}}
+          {{ val }}
         </mat-option>
       </mat-select>
     </mat-form-field>
-    <mat-checkbox [(ngModel)]="sortObject.desc" class="checkbox-spacer-left"
-                  [disabled]="sortObject.fields.length == 0 && !sortColumns">DESC
+    <mat-checkbox [(ngModel)]="sortObject().desc" class="checkbox-spacer-left"
+                  [disabled]="sortObject().fields.length == 0 && !sortColumns">DESC
     </mat-checkbox>
     <button mat-raised-button color="basic" class="but-spacer-left switch-button"
             [disabled]="!sortColumns"
@@ -66,45 +71,63 @@
   </div>
   <div class="chips-pad">
     <mat-chip-listbox aria-label="Filter selection">
-      <mat-chip color="accent"
-                *ngFor="let filterItem of filters; let i = index"
-                (click)="editFilter(i)"
-                [selectable]="true"
-                [removable]="true"
-                (removed)="removeFilter(filterItem)"
-                selected>
-        {{filterItem.field}} {{filterItem.operand}} {{filterItem.field_value}}
-        <mat-icon matChipRemove>cancel</mat-icon>
-      </mat-chip>
-      <mat-chip color="primary"
-                *ngIf="sortObject.fields.length > 0"
-                [selectable]="true"
-                [removable]="true"
-                (removed)="clearSorting()"
-                selected>
-        <span>ORDER BY </span>
-        <span *ngFor="let sort of sortObject.fields; let i = index;">{{sort}}<i
-          *ngIf="i < sortObject.fields.length - 1">,</i> </span>
-        <span *ngIf="sortObject.desc">DESC</span>
-        <span *ngIf="!sortObject.desc">ASC</span>
-        <mat-icon matChipRemove>cancel</mat-icon>
-      </mat-chip>
+      @for (filterItem of filters(); track $index; let i = $index) {
+        <mat-chip color="green"
+                  (click)="editFilter(i)"
+                  [selectable]="true"
+                  [removable]="true"
+                  (removed)="removeFilter(filterItem)"
+                  selected>
+          {{ filterItem.field }} {{ filterItem.operand }} {{ filterItem.field_value }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      }
+      @if (sortObject().fields.length > 0) {
+        <mat-chip color="primary"
+                  [selectable]="true"
+                  [removable]="true"
+                  (removed)="clearSorting()"
+                  selected>
+          <span>ORDER BY </span>
+          @for (sort of sortObject().fields; track $index; let i = $index) {
+            <span>
+              {{ sort }}
+              @if (i < sortObject().fields.length - 1) {
+                <i>,</i>
+              }
+            </span>
+          }
+          @if (sortObject().desc) {
+            <span>DESC</span>
+          } @else {
+            <span>ASC</span>
+          }
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+      }
     </mat-chip-listbox>
   </div>
-  <div *ngIf="list.logsData && list.logsData.length > 0">
-    <div class="log-container">
-      <ng-container *ngFor="let item of list.logsData">
-        <pre [ngClass]="colors[item['log_level']] + ' ' + 'pre-margin'" [title]="item['user_data']">{{item['body']}}</pre>
-      </ng-container>
+  @if (list().logsData && list().logsData.length > 0) {
+    <div>
+      <div class="log-container">
+        @for (item of list().logsData; track $index) {
+          <ng-container>
+          <pre [ngClass]="colors[item['log_level']] + ' ' + 'pre-margin'"
+               [title]="item['user_data']">{{ item['body'] }}</pre>
+          </ng-container>
+        }
+      </div>
     </div>
-  </div>
-  <mat-paginator *ngIf="pageTotal > 0"
-                 [length]="pageTotal"
-                 [pageIndex]="pageEvent.pageIndex"
-                 [pageSize]="pageEvent.pageSize"
-                 [pageSizeOptions]="paginationScale"
-                 (page)="pageEvent = $event"
-                 [showFirstLastButtons] = "true"
-  >
-  </mat-paginator>
+  }
+  @if (pageTotal() > 0) {
+    <mat-paginator
+      [length]="pageTotal()"
+      [pageIndex]="pageEvent().pageIndex"
+      [pageSize]="pageEvent().pageSize"
+      [pageSizeOptions]="paginationScale"
+      (page)="pageEvent.set($event)"
+      [showFirstLastButtons]="true"
+    >
+    </mat-paginator>
+  }
 </div>

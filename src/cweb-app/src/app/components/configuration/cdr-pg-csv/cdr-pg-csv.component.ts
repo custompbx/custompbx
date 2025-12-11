@@ -1,11 +1,12 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
-import {select, Store} from '@ngrx/store';
-import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {AbstractControl} from '@angular/forms';
-import {IcdrPgCsv, Ifield, Iitem} from '../../../store/config/config.state.struct';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import { Component, OnDestroy, OnInit, inject, computed, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MaterialModule } from "../../../../material-module";
+import { select, Store } from '@ngrx/store';
+import { AppState, selectConfigurationState } from '../../../store/app.states';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { AbstractControl, FormsModule } from '@angular/forms';
+import {IcdrPgCsv, Ifield, Iitem, State} from '../../../store/config/config.state.struct';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   AddCdrPgCsvField,
   AddCdrPgCsvParam, DeleteCdrPgCsvField, DeleteCdrPgCsvParameter,
@@ -15,51 +16,64 @@ import {
   StoreNewCdrPgCsvParam, SwitchCdrPgCsvField, SwitchCdrPgCsvParameter,
   UpdateCdrPgCsvField, UpdateCdrPgCsvParameter,
 } from '../../../store/config/cdr_pg_csv/config.actions.cdr-pg-csv';
-import {ActivatedRoute} from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { InnerHeaderComponent } from "../../inner-header/inner-header.component";
+import { ModuleNotExistsBannerComponent } from "../module-not-exists-banner/module-not-exists-banner.component";
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
+  standalone: true,
+  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-cdr-pg-csv',
   templateUrl: './cdr-pg-csv.component.html',
   styleUrls: ['./cdr-pg-csv.component.css']
 })
 export class CdrPgCsvComponent implements OnInit, OnDestroy {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: IcdrPgCsv;
-  private newItemName: string;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  public loadCounter: number;
-  public globalSettingsDispatchers: object;
-  public schemaDispatchers: object;
-  public schemaFieldMask: object;
+  // --- Dependency Injection using inject() ---
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
+  // --- Reactive State from NgRx using toSignal ---
+  private configState = toSignal(
+    this.store.pipe(select(selectConfigurationState)),
+    {
+      initialValue: {
+        cdr_pg_csv: {} as IcdrPgCsv,
+        errorMessage: null,
+        loadCounter: 0,
+      } as State
+    }
+  );
+
+  // --- Computed/Derived State from Signals ---
+  public list = computed(() => this.configState().cdr_pg_csv);
+  public loadCounter = computed(() => this.configState().loadCounter);
+  private lastErrorMessage = computed(() => this.configState().cdr_pg_csv?.errorMessage || null);
+
+  // --- Local Component State (Variables) ---
+  private newItemName: string = '';
+  public selectedIndex: number = 0;
+  public globalSettingsDispatchers: object = {};
+  public schemaDispatchers: object = {};
+  public schemaFieldMask: object = {};
+
+  private errorEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+      this.newItemName = '';
+      this.selectedIndex = 0;
+    }
+  });
 
   ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.cdr_pg_csv;
-      this.lastErrorMessage = configs.cdr_pg_csv && configs.cdr_pg_csv.errorMessage || null;
-      if (!this.lastErrorMessage) {
-        this.newItemName = '';
-        this.selectedIndex = 0;
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
+    // Dispatchers setup remains the same
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewParam.bind(this),
       switchItem: this.switchParam.bind(this),
@@ -82,10 +96,9 @@ export class CdrPgCsvComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.configs$.unsubscribe();
     if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
+      this.route.snapshot.data.reconnectUpdater.unsubscribe();
+    }
   }
 
   addNewParam() {
@@ -149,33 +162,5 @@ export class CdrPgCsvComponent implements OnInit, OnDestroy {
 
   deleteField(field: Ifield) {
     this.store.dispatch(new DeleteCdrPgCsvField({field: field}));
-  }
-
-  checkDirty(condition: AbstractControl): boolean {
-    if (condition) {
-      return !condition.dirty;
-    } else {
-      return true;
-    }
-  }
-
-  isvalueReadyToSend(valueObject: AbstractControl): boolean {
-    return valueObject && valueObject.dirty && valueObject.valid;
-  }
-
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
-  }
-
-  clearDetails(id) {
-    //  this.store.dispatch(new ClearDetails(id));
-  }
-
-  isArray(obj: any): boolean {
-    return Array.isArray(obj);
-  }
-
-  trackByFn(index, item) {
-    return index; // or item.id
   }
 }

@@ -7,7 +7,9 @@ import {
   GetInstances, ConfigActionTypes, StoreGetInstances, StoreGotInstancesError, UpdateInstanceDescription, StoreUpdateInstanceDescription,
 } from './instances.actions';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class EffectsInstances {
 
   constructor(

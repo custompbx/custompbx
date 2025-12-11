@@ -1,102 +1,109 @@
 <app-inner-header name="ODBC CDR" [loadCounter]="loadCounter"></app-inner-header>
 <app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" *ngIf="list && list.exists !== false">
-  <mat-tab label="List">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Settings</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <h3>Params:</h3>
-        <app-key-value-pad-2 [exist]="list.settings"
-                             [items]="list.settings"
-                             [newItems]="list.settings?.new"
-                             [id]="null"
-                             [toCopy]="null"
-                             [dispatchersCallbacks]="globalSettingsDispatchers"
-        >
-        </app-key-value-pad-2>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Tables</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div *ngFor="let table of onlyValues(list.tables); trackBy: trackByFnId;">
-          <mat-expansion-panel (opened)="GetOdbcCdrField(table.id)"
-                               [expanded]="panelCloser['fifo' + table.id]">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                {{table.name}}
-              </mat-panel-title>
-              <mat-panel-description>
-                Click to get details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            <h3>Log Leg</h3>
-            <div *ngIf="table.id" class="spacer">
-              <form #details="ngForm">
-                <mat-form-field hideRequiredMarker>
-        <mat-label>Log-leg</mat-label>
-        <input matInput name="log-leg" [(ngModel)]="table.log_leg"
-                         [disabled]="!table.enabled"
-                         [name]="'tableLogLeg' + table.id">
-                </mat-form-field>
-                <button mat-button color="accent" class="but-spacer-left"
-                        [disabled]="!isReadyToSendOne(details.controls['tableLogLeg' + table.id])"
-                        (click)="updateTable(table)">
-                  Update
-                </button>
-              </form>
-            </div>
-            <h3>Fields:</h3>
-            <app-key-value-pad-2 [exist]="table.fields"
-                                 [items]="table.fields"
-                                 [newItems]="table.fields?.new"
-                                 [id]="table.id"
-                                 [toCopy]="null"
-                                 [dispatchersCallbacks]="fieldsDispatchers"
-                                 [fieldsMask]="tableFieldMask"
+@if (list && list.exists !== false) {
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab label="List">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Settings</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <h3>Params:</h3>
+          <app-key-value-pad-2 [exist]="list.settings"
+            [items]="list.settings"
+            [newItems]="list.settings?.new"
+            [id]="null"
+            [toCopy]="null"
+            [dispatchersCallbacks]="globalSettingsDispatchers"
             >
-            </app-key-value-pad-2>
-          </mat-expansion-panel>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-tab>
-
-  <mat-tab label="Add">
-    <form class="spacer spacerb" (ngSubmit)="onTableSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New table name" required name="name" [(ngModel)]="newTableName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </form>
-  </mat-tab>
-
-  <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb" #deleteForm="ngForm">
-      <div *ngIf="list.tables">
-        <h3>Tables:</h3>
-        <div *ngFor="let table of onlyValues(list.tables)">
+          </app-key-value-pad-2>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-subtitle>Tables</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @for (table of onlyValues(list.tables); track trackByFnId($index, table)) {
+            <div>
+              <mat-expansion-panel (opened)="GetOdbcCdrField(table.id)"
+                [expanded]="panelCloser['fifo' + table.id]">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{table.name}}
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    Click to get details
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <h3>Log Leg</h3>
+                @if (table.id) {
+                  <div class="spacer">
+                    <form #details="ngForm">
+                      <mat-form-field hideRequiredMarker>
+                        <mat-label>Log-leg</mat-label>
+                        <input matInput name="log-leg" [(ngModel)]="table.log_leg"
+                          [disabled]="!table.enabled"
+                          [name]="'tableLogLeg' + table.id">
+                        </mat-form-field>
+                        <button mat-button color="accent" class="but-spacer-left"
+                          [disabled]="!isReadyToSendOne(details.controls['tableLogLeg' + table.id])"
+                          (click)="updateTable(table)">
+                          Update
+                        </button>
+                      </form>
+                    </div>
+                  }
+                  <h3>Fields:</h3>
+                  <app-key-value-pad-2 [exist]="table.fields"
+                    [items]="table.fields"
+                    [newItems]="table.fields?.new"
+                    [id]="table.id"
+                    [toCopy]="null"
+                    [dispatchersCallbacks]="fieldsDispatchers"
+                    [fieldsMask]="tableFieldMask"
+                    >
+                  </app-key-value-pad-2>
+                </mat-expansion-panel>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+      <mat-tab label="Add">
+        <form class="spacer spacerb" (ngSubmit)="onTableSubmit()">
           <mat-form-field hideRequiredMarker>
-        <mat-label>Table name</mat-label>
-        <input matInput name="Table name" required [ngModel]="table.name"
-                   [name]="'Table::' + table.id">
+            <mat-label>Name</mat-label>
+            <input matInput placeholder="New table name" required name="name" [(ngModel)]="newTableName">
           </mat-form-field>
-          <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['Table::' + table.id])"
-                  (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'rename')">
-            Update
-          </button>
-          <button mat-raised-button color="warn"
-                  (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'delete')">
-            Delete
-          </button>
-        </div>
-      </div>
-    </form>
-  </mat-tab>
-</mat-tab-group>
+          <button mat-raised-button color="primary" type="submit">Submit</button>
+        </form>
+      </mat-tab>
+      <mat-tab label="Delete/Rename">
+        <form class="spacer spacerb" #deleteForm="ngForm">
+          @if (list.tables) {
+            <div>
+              <h3>Tables:</h3>
+              @for (table of onlyValues(list.tables); track table) {
+                <div>
+                  <mat-form-field hideRequiredMarker>
+                    <mat-label>Table name</mat-label>
+                    <input matInput name="Table name" required [ngModel]="table.name"
+                      [name]="'Table::' + table.id">
+                    </mat-form-field>
+                    <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['Table::' + table.id])"
+                      (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'rename')">
+                      Update
+                    </button>
+                    <button mat-raised-button color="warn"
+                      (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'delete')">
+                      Delete
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </form>
+        </mat-tab>
+      </mat-tab-group>
+    }

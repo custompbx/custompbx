@@ -6,13 +6,17 @@ import 'ace-builds/src-noconflict/mode-xml';
 import 'ace-builds/src-noconflict/theme-dracula';
 import 'ace-builds/src-noconflict/ext-beautify';
 
+import {MaterialModule} from "../../../material-module";
+
 const THEME = 'ace/theme/dracula';
 const LANG = 'ace/mode/xml';
 
 @Component({
-  selector: 'app-code-editor',
-  templateUrl: './code-editor.component.html',
-  styleUrls: ['./code-editor.component.css']
+standalone: true,
+    imports: [MaterialModule],
+    selector: 'app-code-editor',
+    templateUrl: './code-editor.component.html',
+    styleUrls: ['./code-editor.component.css']
 })
 export class CodeEditorComponent implements OnInit, AfterViewInit {
   private codeEditor: Ace.Editor;
@@ -41,7 +45,7 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
   }
 
 
-  private createCodeEditor(element: Element, options: any): Ace.Editor {
+  private createCodeEditor(element: HTMLElement, options: any): Ace.Editor {
     const editor = edit(element, options);
     editor.setTheme(THEME);
     editor.getSession().setMode(LANG);

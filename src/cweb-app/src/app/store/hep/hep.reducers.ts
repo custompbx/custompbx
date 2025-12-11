@@ -1,8 +1,9 @@
 import {All, HEPActionTypes} from './hep.actions';
+import {IdataItem} from "../../components/svg-seq-diagram/svg-seq-diagram.component";
 
 export interface State {
   hepData: Array<object>;
-  hepDetails: Array<object>;
+  hepDetails: Array<IdataItem>;
   settings: object;
   loadCounter: number;
   errorMessage: string | null;

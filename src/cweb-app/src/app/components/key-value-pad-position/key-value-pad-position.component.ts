@@ -1,11 +1,16 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {AbstractControl} from '@angular/forms';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../material-module";
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
+import {ResizeInputDirective} from "../../directives/resize-input.directive";
 
 @Component({
-  selector: 'app-key-value-pad-position',
-  templateUrl: './key-value-pad-position.component.html',
-  styleUrls: ['./key-value-pad-position.component.css']
+standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, ResizeInputDirective],
+    selector: 'app-key-value-pad-position',
+    templateUrl: './key-value-pad-position.component.html',
+    styleUrls: ['./key-value-pad-position.component.css']
 })
 export class KeyValuePadPositionComponent implements OnInit {
 

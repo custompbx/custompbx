@@ -6,7 +6,9 @@ import {
 
 } from './header.actions';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class HeaderEffects {
 
   constructor(

@@ -1,13 +1,17 @@
-// @ts-ignore
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, signal, computed, effect, OnInit} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectCDRState} from '../../store/app.states';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {PageEvent} from '@angular/material/paginator';
-import {Observable, Subscription} from 'rxjs';
 import {State} from '../../store/cdr/cdr.reducers';
 import {GetCDR} from '../../store/cdr/cdr.actions';
 import {GetWebSettings, SaveWebSettings} from '../../store/settings/settings.actions';
+
+import {MaterialModule} from "../../../material-module";
+import {ResizeInputDirective} from "../../directives/resize-input.directive";
+import {FormsModule} from "@angular/forms";
+import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 
 export interface IfilterField {
   field: string|null;
@@ -21,114 +25,157 @@ export interface IsortField {
 }
 
 @Component({
+  standalone: true,
+  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective],
   selector: 'app-cdr',
   templateUrl: './cdr.component.html',
-  styleUrls: ['./cdr.component.css'],
+  styleUrls: ['./cdr.component.css']
 })
-export class CdrComponent implements OnInit, OnDestroy {
+export class CdrComponent { // Removed OnDestroy
 
-  public filters: Array<IfilterField> = [];
+  // --- Dependency Injection using inject() ---
+  private store = inject(Store<AppState>);
+  private _snackBar = inject(MatSnackBar);
 
-  public pageTotal = 0;
-  private paginationScale = [25, 50, 100, 250];
-  public pageEvent: PageEvent = <PageEvent>{
+  // --- Reactive State from NgRx using toSignal ---
+  private cdrState = toSignal(
+    this.store.pipe(select(selectCDRState)),
+    {
+      initialValue: {
+        cdrData: [],
+        settings: {},
+        errorMessage: null,
+        loadCounter: 0,
+      } as State
+    }
+  );
+
+  // --- Computed/Derived State from NgRx State ---
+  public list = computed(() => this.cdrState());
+  public loadCounter = computed(() => this.cdrState().loadCounter);
+
+  // --- Local Component State as Signals/Properties ---
+  public filters = signal<Array<IfilterField>>([]);
+  public pageTotal = 0; // Kept as property updated by effect
+  protected paginationScale = [25, 50, 100, 250];
+
+  public pageEvent = signal<PageEvent>({
     length: 0,
     pageIndex: 0,
     pageSize: this.paginationScale[0],
-  };
+  } as PageEvent);
 
-  public cdrs: Observable<any>;
-  public cdrs$: Subscription;
-  public list: State;
-  public loadCounter: number;
   public operands: Array<string> = ['=', '>', '<', 'LIKE', '>=', '<=', '!=', 'NOT LIKE'];
-  public sortObject: IsortField = <IsortField>{fields: [], desc: false};
-  public filter: IfilterField = <IfilterField>{};
-  public toEditFilter: number = <number>null;
+  public sortObject = signal<IsortField>({fields: [], desc: false});
+  public filter = signal<IfilterField>({field: null, operand: null, field_value: null});
+  public toEditFilter = signal<number | null>(null);
 
-  public columns: Array<string>;
-  public sortColumns: string;
+  public columns = signal<Array<string>>([]);
+  public sortColumns: string | null = null; // Can remain a property for simple input binding
 
-  public settings = {};
+  // Settings fields
+  public settings = signal<{[key: string]: any}>({});
   public moduleOptions = ['auto', 'cdr_pg_csv', 'odbc_cdr'];
   public fieldModule = 'cdr_module';
   public fieldTable = 'cdr_table';
   public fieldFileServeColumn = 'cdr_file_serve_column';
   public fieldFileServerPath = 'cdr_file_server_path';
 
-  constructor(
-    private store: Store<AppState>,
-    private _snackBar: MatSnackBar,
-  ) {
-    this.cdrs = this.store.pipe(select(selectCDRState));
-  }
+  // --- Effect for Side Effects (Data updates and error handling) ---
+  private stateUpdateEffect = effect(() => {
+    const cdr = this.cdrState();
+    const errorMessage = cdr.errorMessage;
+    const data = cdr.cdrData;
+    const stateSettings = cdr.settings;
 
-  ngOnInit() {
-    this.cdrs$ = this.cdrs.subscribe((cdr) => {
-      this.loadCounter = cdr.loadCounter;
-      this.list = cdr;
-      if (this.list.cdrData.length > 0) {
-        this.columns = [];
-        this.pageTotal = this.list.cdrData[0]['total'];
-        Object.keys(this.list.cdrData[0]).forEach( key => {
-          if (key === 'total' ) {
-            return;
-          }
-          this.columns.push(key);
-        });
-      }
-      this.settings[this.fieldModule] = cdr.settings[this.fieldModule];
-      this.settings[this.fieldTable] = cdr.settings[this.fieldTable];
-      this.settings[this.fieldFileServeColumn] = cdr.settings[this.fieldFileServeColumn];
-      this.settings[this.fieldFileServerPath] = cdr.settings[this.fieldFileServerPath];
-      if (!cdr.errorMessage) {
+    // 1. Handle Snackbar Error
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    }
 
-      } else {
-        this._snackBar.open('Error: ' + cdr.errorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
-  }
+    // 2. Handle data/column setup
+    if (data.length > 0) {
+      const firstRecord = data[0];
 
-  ngOnDestroy() {
-    this.cdrs$.unsubscribe();
+      // Update pageTotal property
+      this.pageTotal = firstRecord['total'] || 0;
+
+      // Update columns signal
+      const newColumns = Object.keys(firstRecord).filter(key => key !== 'total');
+      this.columns.set(newColumns);
+    } else {
+      this.pageTotal = 0;
+      this.columns.set([]);
+    }
+
+    // 3. Update Settings signal
+    if (stateSettings) {
+      this.settings.set({
+        [this.fieldModule]: stateSettings[this.fieldModule],
+        [this.fieldTable]: stateSettings[this.fieldTable],
+        [this.fieldFileServeColumn]: stateSettings[this.fieldFileServeColumn],
+        [this.fieldFileServerPath]: stateSettings[this.fieldFileServerPath],
+      });
+    }
+  });
+
+  handlePageEvent(event: PageEvent) {
+    this.pageEvent.set(event);
+    this.getRecords();
   }
 
   getRecords() {
-    if (!this.settings[this.fieldModule] || !this.settings[this.fieldFileServeColumn]) {
+    // Read current settings and page event
+    const currentSettings = this.settings();
+    const currentPageEvent = this.pageEvent();
+
+    if (!currentSettings[this.fieldModule] || !currentSettings[this.fieldFileServeColumn]) {
       this.getSettings();
     }
+
     this.store.dispatch(new GetCDR({
-      db_request: {limit: this.pageEvent.pageSize, offset: this.pageEvent.pageIndex, filters: this.filters, order: this.sortObject}
+      db_request: {
+        limit: currentPageEvent.pageSize,
+        offset: currentPageEvent.pageIndex,
+        filters: this.filters(), // Read signal value
+        order: this.sortObject() // Read signal value
+      }
     }));
   }
 
-  removeFilter(filter: IfilterField): void {
-    this.pageEvent.pageIndex = 0;
-    const index = this.filters.indexOf(filter);
-
-    if (index >= 0) {
-      this.filters.splice(index, 1);
-    }
+  removeFilter(filterToRemove: IfilterField): void {
+    this.pageEvent.update(e => ({...e, pageIndex: 0}));
+    this.filters.update(currentFilters => {
+      // Find and remove the filter
+      return currentFilters.filter(f => f !== filterToRemove);
+    });
   }
 
   addSorter() {
-    this.pageEvent.pageIndex = 0;
-    const index = this.sortObject.fields.indexOf(this.sortColumns);
+    this.pageEvent.update(e => ({...e, pageIndex: 0}));
+    const sortCol = this.sortColumns;
+    if (!sortCol) return;
 
-    if (index === -1) {
-      this.sortObject.fields.push(this.sortColumns);
-    }
+    this.sortObject.update(currentSort => {
+      if (currentSort.fields.indexOf(sortCol) === -1) {
+        return {
+          ...currentSort,
+          fields: [...currentSort.fields, sortCol]
+        };
+      }
+      return currentSort;
+    });
   }
 
   clearSorting() {
-    this.pageEvent.pageIndex = 0;
-    this.sortObject.fields = [];
+    this.pageEvent.update(e => ({...e, pageIndex: 0}));
+    this.sortObject.set({fields: [], desc: false});
   }
 
-  tabChanged(event) {
+  tabChanged(event: number) {
     if (event === 1) {
       this.getSettings();
     }
@@ -144,11 +191,12 @@ export class CdrComponent implements OnInit, OnDestroy {
   }
 
   saveSettings() {
+    const currentSettings = this.settings();
     const webSettings: object = {};
-    webSettings[this.fieldModule] = this.settings[this.fieldModule];
-    webSettings[this.fieldTable] = this.settings[this.fieldTable];
-    webSettings[this.fieldFileServeColumn] = this.settings[this.fieldFileServeColumn];
-    webSettings[this.fieldFileServerPath] = this.settings[this.fieldFileServerPath];
+    webSettings[this.fieldModule] = currentSettings[this.fieldModule];
+    webSettings[this.fieldTable] = currentSettings[this.fieldTable];
+    webSettings[this.fieldFileServeColumn] = currentSettings[this.fieldFileServeColumn];
+    webSettings[this.fieldFileServerPath] = currentSettings[this.fieldFileServerPath];
     this.store.dispatch(new SaveWebSettings({web_settings: webSettings}));
   }
 
@@ -158,29 +206,41 @@ export class CdrComponent implements OnInit, OnDestroy {
   }
 
   addFilter() {
-    this.toEditFilter = null;
-    this.pageEvent.pageIndex = 0;
-    this.filter.field_value.trim();
-    this.filters.push(<IfilterField>this.filter);
-    this.filter = <IfilterField>{};
+    this.toEditFilter.set(null);
+    this.pageEvent.update(e => ({...e, pageIndex: 0}));
+
+    const currentFilter = this.filter();
+    const trimmedFilterValue = currentFilter.field_value ? currentFilter.field_value.trim() : null;
+
+    if (currentFilter.field && currentFilter.operand && trimmedFilterValue) {
+      this.filters.update(f => [...f, {...currentFilter, field_value: trimmedFilterValue}]);
+    }
+
+    this.filter.set({field: null, operand: null, field_value: null});
   }
 
   editFilter(toEdit: number) {
-    this.toEditFilter = toEdit;
-    this.filter.field = this.filters[toEdit].field;
-    this.filter.operand = this.filters[toEdit].operand;
-    this.filter.field_value = this.filters[toEdit].field_value;
+    this.toEditFilter.set(toEdit);
+    const filterToEdit = this.filters()[toEdit];
+    this.filter.set({...filterToEdit});
   }
 
   saveFilter() {
-    this.filters[this.toEditFilter].field = this.filter.field;
-    this.filters[this.toEditFilter].operand = this.filter.operand ;
-    this.filters[this.toEditFilter].field_value = this.filter.field_value;
-    this.toEditFilter = null;
-    this.filter.field = null;
-    this.filter.operand = null;
-    this.filter.field_value = null;
+    const editIndex = this.toEditFilter();
+    if (editIndex !== null) {
+      const savedFilter = this.filter();
+
+      this.filters.update(currentFilters => {
+        const updatedFilters = [...currentFilters];
+        updatedFilters[editIndex] = {
+          ...savedFilter,
+          field_value: savedFilter.field_value ? savedFilter.field_value.trim() : null
+        };
+        return updatedFilters;
+      });
+
+      this.toEditFilter.set(null);
+      this.filter.set({field: null, operand: null, field_value: null});
+    }
   }
-
-
 }

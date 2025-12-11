@@ -31,10 +31,11 @@ import (
 )
 
 const (
-	eventLogin            = "login"
-	eventSubscriptionList = "SubscriptionList"
-	eventRelogin          = "relogin"
-	eventLogOut           = "[Auth] Logout"
+	eventLogin                  = "login"
+	eventSubscriptionList       = "SubscriptionList"
+	eventPersistentSubscription = "PersistentSubscription"
+	eventRelogin                = "relogin"
+	eventLogOut                 = "[Auth] Logout"
 )
 
 var eventChannel chan interface{}
@@ -230,6 +231,22 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 				} else {
 					for _, name := range msg.Data.ArrVal {
 						wsContext.Subscriptions.Set(name)
+					}
+				}
+				return resp
+			},
+			onlyAdminGroup(),
+		)
+	case eventPersistentSubscription:
+		resp = getUser(
+			msg.Data,
+			func(data *webStruct.MessageData) webStruct.UserResponse {
+				resp.MessageType = eventPersistentSubscription
+				if len(msg.Data.ArrVal) > 10 || len(msg.Data.ArrVal) == 0 {
+					resp.Error = "can't subscribe!"
+				} else {
+					for _, name := range msg.Data.ArrVal {
+						wsContext.Subscriptions.SetPersistent(name)
 					}
 				}
 				return resp
@@ -854,7 +871,15 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Errors:
 	case "AddAclList":
 		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigAclList{Name: msg.Name, Default: msg.Default, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigAclList{}))}, onlyAdminGroup())
-	//Request:{"event":"UpdateAclList","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":4,"name":"dddd2"}}
+	//Request:{"event":"UpdateAclList","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":4,"value":"allow"}}
+	//Response:{"MessageType":"UpdateAclList","data":{"id":4,"position":3,"enabled":true,"name":"dddd2","default":"allow","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
+	//Errors:
+	case "UpdateAclListDefault":
+		resp = getUserForConfig(msg, updateConfig, struct {
+			S interface{}
+			A []string
+		}{&altStruct.ConfigAclList{Id: msg.Id, Default: msg.Default}, []string{"Default"}}, onlyAdminGroup())
+		//Request:{"event":"UpdateAclList","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":4,"name":"dddd2"}}
 	//Response:{"MessageType":"UpdateAclList","data":{"id":4,"position":3,"enabled":true,"name":"dddd2","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:
 	case "UpdateAclList":
@@ -952,25 +977,7 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	case webStruct.GetSofiaProfiles:
 		//yeah getting profiles twice
 		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigSofiaProfile{}, onlyAdminGroup())
-		profiles, ok := resp.Data.(map[int64]interface{})
-		if ok {
-			profilesX := fsesl.GetSofiaProfilesStatuses()
-			for _, profileI := range profiles {
-				profile, ok := profileI.(altStruct.ConfigSofiaProfile)
-				if !ok {
-					continue
-				}
-				profileX := profilesX[profile.Id]
-				if profileX == nil {
-					continue
-				}
-				profile.Started = profileX.Started
-				profile.State = profileX.State
-				profile.Uri = profileX.Uri
-				profiles[profile.Id] = profile
-			}
-			resp.Data = profiles
-		}
+		resp = setProfileStatuses(resp)
 	//Request:{"event":"[Config] Get_sofia_profiles_params","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","id":1}}
 	//Response:{"MessageType":"[Config] Get_sofia_profiles_params","data":{"1":{"id":1,"position":1,"enabled":true,"name":"debug","value":"0","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"10":{"id":10,"position":10,"enabled":true,"name":"outbound-codec-prefs","value":"OPUS,G722,PCMU,PCMA,H264,VP8","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"11":{"id":11,"position":11,"enabled":true,"name":"hold-music","value":"local_stream://moh","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"12":{"id":12,"position":12,"enabled":true,"name":"rtp-timer-name","value":"soft","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"13":{"id":13,"position":13,"enabled":true,"name":"local-network-acl","value":"localnet.auto","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"14":{"id":14,"position":14,"enabled":true,"name":"manage-presence","value":"false","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"15":{"id":15,"position":15,"enabled":true,"name":"inbound-codec-negotiation","value":"generous","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"16":{"id":16,"position":16,"enabled":true,"name":"nonce-ttl","value":"60","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"17":{"id":17,"position":17,"enabled":true,"name":"auth-calls","value":"false","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"18":{"id":18,"position":18,"enabled":true,"name":"inbound-late-negotiation","value":"true","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"19":{"id":19,"position":19,"enabled":true,"name":"inbound-zrtp-passthru","value":"true","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"2":{"id":2,"position":2,"enabled":true,"name":"sip-trace","value":"no","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"20":{"id":20,"position":20,"enabled":true,"name":"rtp-ip","value":"::1","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"21":{"id":21,"position":21,"enabled":true,"name":"sip-ip","value":"::1","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"22":{"id":22,"position":22,"enabled":true,"name":"rtp-timeout-sec","value":"300","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"23":{"id":23,"position":23,"enabled":true,"name":"rtp-hold-timeout-sec","value":"1800","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"24":{"id":24,"position":24,"enabled":true,"name":"tls","value":"false","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"25":{"id":25,"position":25,"enabled":true,"name":"tls-only","value":"false","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"26":{"id":26,"position":26,"enabled":true,"name":"tls-bind-params","value":"transport=tls","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"27":{"id":27,"position":27,"enabled":true,"name":"tls-sip-port","value":"5081","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"28":{"id":28,"position":28,"enabled":true,"name":"tls-passphrase","value":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"29":{"id":29,"position":29,"enabled":true,"name":"tls-verify-date","value":"true","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"3":{"id":3,"position":3,"enabled":true,"name":"sip-capture","value":"no","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"30":{"id":30,"position":30,"enabled":true,"name":"tls-verify-policy","value":"none","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"31":{"id":31,"position":31,"enabled":true,"name":"tls-verify-depth","value":"2","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"32":{"id":32,"position":32,"enabled":true,"name":"tls-verify-in-subjects","value":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"33":{"id":33,"position":33,"enabled":true,"name":"tls-version","value":"tlsv1,tlsv1.1,tlsv1.2","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"4":{"id":4,"position":4,"enabled":true,"name":"rfc2833-pt","value":"101","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"5":{"id":5,"position":5,"enabled":true,"name":"sip-port","value":"5080","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"6":{"id":6,"position":6,"enabled":true,"name":"dialplan","value":"XML","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"7":{"id":7,"position":7,"enabled":true,"name":"context","value":"public","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"8":{"id":8,"position":8,"enabled":true,"name":"dtmf-duration","value":"2000","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"9":{"id":9,"position":9,"enabled":true,"name":"inbound-codec-prefs","value":"OPUS,G722,PCMU,PCMA,H264,VP8","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}}
 	//Errors:
@@ -1200,6 +1207,7 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 			S interface{}
 			A []string
 		}{&altStruct.ConfigSofiaProfile{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
+		resp = setProfileStatuses(resp)
 	//### Cdr_Pg_Csv
 	//Request:{"event":"[Config][Get] Cdr_Pg_Csv","data":{"token":"3c2f3200f73699a28c96783a15dff1d7"}}
 	//Response:{"MessageType":"[Config][Get] Cdr_Pg_Csv","data":{"settings":{"1":{"id":1,"position":1,"enabled":true,"name":"db-info","value":"host=localhost dbname=cdr connect_timeout=10","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"legs","value":"a","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"3":{"id":3,"position":3,"enabled":true,"name":"spool-format","value":"csv","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"4":{"id":4,"position":4,"enabled":true,"name":"rotate-on-hup","value":"true","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}},"schemas":{}}}
@@ -3210,7 +3218,7 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 		resp = getUserForConfig(msg, updateConfig, struct {
 			S interface{}
 			A []string
-		}{&altStruct.ConfigOpalListenerParameter{Id: msg.Param.Id, Name: msg.Param.Name, Value: msg.Param.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
+		}{&altStruct.ConfigOpalSetting{Id: msg.Param.Id, Name: msg.Param.Name, Value: msg.Param.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
 	//Request:{"event":"SwitchOpalParameter","data":{"token":"3c2f3200f73699a28c96783a15dff1d7","param":{"id":4,"enabled":false}}}
 	//Response:{"MessageType":"SwitchOpalParameter","data":{"id":4,"position":4,"enabled":false,"name":"dtmf-type","value":"signal","description":"","parent":{"id":30,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:
@@ -4368,13 +4376,15 @@ func setSettings(data *webStruct.MessageData) webStruct.UserResponse {
 		data.Payload.Db.Host == "" || data.Payload.Db.Port == 0 || data.Payload.Db.Name == "" ||
 		data.Payload.Db.User == "" || data.Payload.Db.Pass == "" ||
 		data.Payload.Web.Host == "" || data.Payload.Web.Port == 0 ||
-		data.Payload.Web.Route == "" || data.Payload.Web.CertPath == "" || data.Payload.Web.KeyPath == "" ||
+		data.Payload.Web.Route == "" ||
 		data.Payload.XMLCurl.Host == "" || data.Payload.XMLCurl.Port == 0 ||
-		data.Payload.XMLCurl.Route == "" || data.Payload.XMLCurl.CertPath == "" || data.Payload.XMLCurl.KeyPath == "" {
+		data.Payload.XMLCurl.Route == "" {
 		return webStruct.UserResponse{Error: "empty data", MessageType: "settings"}
 	}
 	cfg.CustomPbx.Fs.Esl = data.Payload.Fs.Esl
 	cfg.CustomPbx.Db = data.Payload.Db
+	cfg.CustomPbx.Web = data.Payload.Web
+	cfg.CustomPbx.XMLCurl = data.Payload.XMLCurl
 	conf, err := cfg.WD(cfg.CustomPbx)
 	if err != nil {
 		cfg.RD()
@@ -4769,4 +4779,27 @@ func UpdateAutoDialerListMember(msg *webStruct.MessageData) webStruct.UserRespon
 		S interface{}
 		A []string
 	}{item, []string{fieldName}}, onlyAdminGroup())
+}
+
+func setProfileStatuses(resp webStruct.UserResponse) webStruct.UserResponse {
+	profiles, ok := resp.Data.(map[int64]interface{})
+	if ok {
+		profilesX := fsesl.GetSofiaProfilesStatuses()
+		for _, profileI := range profiles {
+			profile, ok := profileI.(altStruct.ConfigSofiaProfile)
+			if !ok {
+				continue
+			}
+			profileX := profilesX[profile.Id]
+			if profileX == nil {
+				continue
+			}
+			profile.Started = profileX.Started
+			profile.State = profileX.State
+			profile.Uri = profileX.Uri
+			profiles[profile.Id] = profile
+		}
+		resp.Data = profiles
+	}
+	return resp
 }

@@ -8,7 +8,9 @@ import {
 } from './fscli.actions';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class FscliEffects {
 
   constructor(

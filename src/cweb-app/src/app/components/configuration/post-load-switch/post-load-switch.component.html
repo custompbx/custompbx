@@ -1,36 +1,39 @@
-<app-inner-header name="Post switch" [loadCounter]="loadCounter"></app-inner-header>
+<app-inner-header name="Post switch" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
-  <mat-card *ngIf="list && list.exists !== false">
-  <mat-card-content>
+@if (list() && list().exists !== false) {
+  <mat-card>
+    <mat-card-content>
       <h3>Settings:</h3>
-      <app-key-value-pad-2 [exist]="list.settings"
-                           [items]="list.settings"
-                           [newItems]="list.settings?.new"
+      <app-key-value-pad-2 [exist]="list().settings"
+                           [items]="list().settings"
+                           [newItems]="list().settings?.new"
                            [id]="null"
                            [toCopy]="null"
                            [dispatchersCallbacks]="globalSettingsDispatchers"
       >
       </app-key-value-pad-2>
       <h3>Cli keybindings:</h3>
-      <app-key-value-pad-2 [exist]="list['cli_keybindings']"
-                           [items]="list['cli_keybindings']"
-                           [newItems]="list['cli_keybindings']?.new"
+      <app-key-value-pad-2 [exist]="list()['cli_keybindings']"
+                           [items]="list()['cli_keybindings']"
+                           [newItems]="list()['cli_keybindings']?.new"
                            [id]="null"
                            [toCopy]="null"
                            [dispatchersCallbacks]="cliKeybindingsDispatchers"
       >
       </app-key-value-pad-2>
       <h3>Default ptimes:</h3>
-      <app-key-value-pad-2 [exist]="list['default_ptimes']"
-                           [items]="list['default_ptimes']"
-                           [newItems]="list['default_ptimes']?.new"
+      <app-key-value-pad-2 [exist]="list()['default_ptimes']"
+                           [items]="list()['default_ptimes']"
+                           [newItems]="list()['default_ptimes']?.new"
                            [id]="null"
                            [toCopy]="null"
                            [dispatchersCallbacks]="defaultPtimesDispatchers"
                            [fieldsMask]="defaultPtimesMask"
       >
       </app-key-value-pad-2>
-  </mat-card-content>
+    </mat-card-content>
   </mat-card>
+}
+
 
 

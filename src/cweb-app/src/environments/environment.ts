@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+// @ts-ignore
   WSServ: "" || "wss://localhost:8080/ws",
   optimization: false,
   sourceMap: false,

@@ -1,9 +1,11 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {Component, inject, signal, computed, effect, OnInit} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+
+import {MaterialModule} from "../../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {
   AddAclList,
   AddAclNode,
@@ -18,70 +20,72 @@ import {
   UpdateAclListDefault,
   UpdateAclNode
 } from '../../../store/config/acl/config.actions.acl';
-import {Iacl, Inode} from '../../../store/config/config.state.struct';
+import {Iacl, Inode, State} from '../../../store/config/config.state.struct';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {ResizeInputDirective} from "../../../directives/resize-input.directive";
+import {JsonPipe} from "@angular/common";
 
 @Component({
+  standalone: true,
+  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, ResizeInputDirective, JsonPipe],
   selector: 'app-acl',
   templateUrl: './acl.component.html',
   styleUrls: ['./acl.component.css']
 })
-export class AclComponent implements OnInit, OnDestroy {
+export class AclComponent { // Removed OnDestroy
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: Iacl;
-  public newItemName: string;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
+  // --- Dependency Injection using inject() ---
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+
+  // --- Reactive State from NgRx using toSignal ---
+  private configState = toSignal(
+    this.store.pipe(select(selectConfigurationState)),
+    {
+      initialValue: {
+        acl: {} as Iacl,
+        errorMessage: null,
+        loadCounter: 0,
+      } as State
+    }
+  );
+
+  // --- Computed/Derived State from NgRx State ---
+  public list = computed(() => this.configState().acl);
+  public loadCounter = computed(() => this.configState().loadCounter);
+  public lastErrorMessage = computed(() => this.configState().errorMessage);
+
+
+  // --- Local Component State as Signals/Properties ---
+  public newItemName: string = ''; // Kept as property for two-way binding
+  public selectedIndex: number = 0; // Kept as property for binding
   public aclBehavior = ['allow', 'deny'];
   public defaultBehavior = 'deny';
-  public loadCounter: number;
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
 
-  ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.acl;
-      this.lastErrorMessage = configs.acl && configs.acl.errorMessage || null;
-      if (!this.lastErrorMessage) {
-        this.newItemName = '';
-        this.selectedIndex = 0;
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
-  }
-
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-      if (this.route.snapshot?.data?.reconnectUpdater) {
-        this.route.snapshot.data.reconnectUpdater.unsubscribe();
-      }
+  // --- Effect for Side Effects (Error handling) ---
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
     }
-  }
+  });
 
-  getDetails(id) {
+  getDetails(id: number) {
     this.store.dispatch(GetAclNodes({id}));
   }
 
-  checkDirty(condition: AbstractControl): boolean {
+  checkDirty(condition: AbstractControl | null): boolean {
     if (condition) {
       return !condition.dirty;
     } else {
@@ -89,17 +93,17 @@ export class AclComponent implements OnInit, OnDestroy {
     }
   }
 
-  isvalueReadyToSend(valueObject: AbstractControl): boolean {
-    return valueObject && valueObject.dirty && valueObject.valid;
+  isvalueReadyToSend(valueObject: AbstractControl | null): boolean {
+    return !!(valueObject && valueObject.dirty && valueObject.valid);
   }
 
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
+  isReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
+    return !!(nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid);
   }
 
-  isReadyToSendThree(mainObject: AbstractControl, object2: AbstractControl, object3: AbstractControl): boolean {
-    return mainObject && mainObject.valid && mainObject.dirty
-      && ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty));
+  isReadyToSendThree(mainObject: AbstractControl | null, object2: AbstractControl | null, object3: AbstractControl | null): boolean {
+    return !!(mainObject && mainObject.valid && mainObject.dirty
+      && ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty)));
   }
 
   updateNode(node: Inode) {
@@ -108,8 +112,8 @@ export class AclComponent implements OnInit, OnDestroy {
 
   updateDefault(id: number, valueObject: AbstractControl) {
     const value = valueObject.value;
-    valueObject.reset();
-    this.store.dispatch(UpdateAclListDefault({value: value, id: id}));
+    valueObject.reset(); // Reset control after dispatching action
+    this.store.dispatch(UpdateAclListDefault({default: value, id: id}));
   }
 
   switchNode(node: Inode) {
@@ -119,14 +123,34 @@ export class AclComponent implements OnInit, OnDestroy {
   }
 
   deleteNode(node: Inode) {
-    this.store.dispatch(DelAclNode({id: node.id}));
+    this.openBottomSheetNode(node.id, 'Are you sure you want to delete this ACL node?', 'delete');
   }
 
-  clearDetails(id) {
+  // Refactored to use a dedicated bottom sheet for nodes
+  openBottomSheetNode(id: number, message: string, action: 'delete'): void {
+    const config = {
+      data: {
+        action: action,
+        case1Text: message,
+      }
+    };
+    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    sheet.afterDismissed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+      if (action === 'delete') {
+        this.store.dispatch(DelAclNode({id: id}));
+      }
+    });
+  }
+
+
+  clearDetails(id: number) {
     //  this.store.dispatch(ClearDetails(id));
   }
 
-  addAclNodeField(id) {
+  addAclNodeField(id: number) {
     this.store.dispatch(StoreNewAclNode({id}));
   }
 
@@ -134,7 +158,7 @@ export class AclComponent implements OnInit, OnDestroy {
     this.store.dispatch(DropNewAclNode({id: id, index: index}));
   }
 
-  newNode(id: number, index: number, type: string, cidr: AbstractControl, domain: AbstractControl) {
+  newNode(id: number, index: number, type: string, cidr: AbstractControl | null, domain: AbstractControl | null) {
     const node = <Inode>{};
     node.enabled = true;
     node.type = type;
@@ -149,34 +173,26 @@ export class AclComponent implements OnInit, OnDestroy {
   }
 
   onAclListSubmit() {
-    this.store.dispatch(AddAclList({name: this.newItemName, default: this.defaultBehavior}));
+    const name = this.newItemName.trim();
+    if (name) {
+      this.store.dispatch(AddAclList({name: name, default: this.defaultBehavior}));
+      this.newItemName = ''; // Clear input field
+    }
   }
 
   isArray(obj: any): boolean {
     return Array.isArray(obj);
   }
 
-  trackByFn(index, item) {
-    return index; // or item.id
-  }
-
-  trackByPositionFn(index, item) {
-    return item.position;
-  }
-
-  trackByIdFn(index, item) {
-    return item.id;
-  }
-
-  openBottomSheet(id, newName, oldName, action): void {
+  openBottomSheet(id: number, newName: string, oldName: string, action: 'delete' | 'rename'): void {
     const config = {
       data:
         {
           newName: newName,
           oldName: oldName,
           action: action,
-          case1Text: 'Are you sure you want to delete list "' + oldName + '"?',
-          case2Text: 'Are you sure you want to rename list "' + oldName + '" to "' + newName + '"?',
+          case1Text: action === 'delete' ? 'Are you sure you want to delete list "' + oldName + '"?' : null,
+          case2Text: action === 'rename' ? 'Are you sure you want to rename list "' + oldName + '" to "' + newName + '"?' : null,
         }
     };
     const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
@@ -192,14 +208,14 @@ export class AclComponent implements OnInit, OnDestroy {
     });
   }
 
-  onlyValues(obj: object): Array<any> {
+  onlyValues(obj: object | null): Array<any> {
     if (!obj) {
       return [];
     }
     return Object.values(obj);
   }
 
-  onlySortedValues(obj: object): Array<any> {
+  onlySortedValues(obj: object | null): Array<any> {
     if (!obj) {
       return [];
     }
@@ -218,13 +234,16 @@ export class AclComponent implements OnInit, OnDestroy {
   }
 
   dropAction(event: CdkDragDrop<string[]>, parent: Array<any>) {
-    if (parent[event.previousIndex].position === parent[event.currentIndex].position) {
+    const previousItem = parent[event.previousIndex];
+    const currentItem = parent[event.currentIndex];
+
+    if (!previousItem || !currentItem || previousItem.position === currentItem.position) {
       return;
     }
     this.store.dispatch(MoveAclListNode({
-      previous_index: parent[event.previousIndex].position,
-      current_index: parent[event.currentIndex].position,
-      id: parent[event.previousIndex].id
+      previous_index: previousItem.position,
+      current_index: currentItem.position,
+      id: previousItem.id
     }));
   }
 

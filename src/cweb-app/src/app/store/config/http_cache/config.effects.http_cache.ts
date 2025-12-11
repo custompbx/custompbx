@@ -42,7 +42,9 @@ import {catchError, map, switchMap} from 'rxjs/operators';
 import {WsDataService} from '../../../services/ws-data.service';
 import {Failure} from '../config.actions';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsHttpCache {
 
   constructor(

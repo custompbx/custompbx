@@ -1,9 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
-import {Iitem, Ilcr, IsimpleModule} from '../../../store/config/config.state.struct';
+import {Component, inject, computed, OnInit, effect} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
@@ -14,46 +15,62 @@ import {
   StoreDropNewFaxParameter,
   SwitchFaxParameter,
   UpdateFaxParameter
-} from '../../../store/config/fax/config.actions.fax';
+} from '../../../store/config/fax/config.actions.fax'; // Changed path
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {Iitem, IsimpleModule, State} from '../../../store/config/config.state.struct';
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
-  selector: 'app-fax',
-  templateUrl: './fax.component.html',
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  selector: 'app-fax', // Changed selector
+  templateUrl: './fax.component.html', // Kept original template reference
   styleUrls: ['./fax.component.css']
 })
-export class FaxComponent implements OnInit, OnDestroy {
+export class FaxComponent implements OnInit { // Removed OnDestroy
+  public moduleName: string = 'Fax';
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: IsimpleModule;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  public loadCounter: number;
+  // --- Dependency Injection using inject() ---
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+
+  // --- Reactive State from NgRx using toSignal ---
+  private configState = toSignal(
+    this.store.pipe(select(selectConfigurationState)),
+    {
+      initialValue: {
+        fax: {} as IsimpleModule, // Initial state set to fax
+        errorMessage: null,
+        loadCounter: 0,
+      } as State
+    }
+  );
+
+  // --- Computed/Derived State from NgRx State ---
+  public list = computed(() => this.configState().fax); // Accessing fax state
+  public loadCounter = computed(() => this.configState().loadCounter);
+  private lastErrorMessage = computed(() => this.configState().fax?.errorMessage || null); // Accessing fax error message
+
+  // --- Local Component State ---
+  public selectedIndex: number = 0;
   public globalSettingsDispatchers: object;
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
+  // --- Effect for Side Effects (Error handling) ---
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    }
+  });
 
   ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.fax;
-      this.lastErrorMessage = configs.fax && configs.fax.errorMessage || null;
-      if (!this.lastErrorMessage) {
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
+    // Initialize dispatchers here, updated for Fax
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewFaxParam.bind(this),
       switchItem: this.switchFaxParam.bind(this),
@@ -63,13 +80,6 @@ export class FaxComponent implements OnInit, OnDestroy {
       updateItem: this.updateFaxParam.bind(this),
       pasteItems: null,
     };
-  }
-
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
   }
 
   updateFaxParam(param: Iitem) {
@@ -83,10 +93,11 @@ export class FaxComponent implements OnInit, OnDestroy {
   }
 
   newFaxParam(index: number, name: string, value: string) {
-    const param = <Iitem>{};
-    param.enabled = true;
-    param.name = name;
-    param.value = value;
+    const param = <Iitem>{
+      enabled: true,
+      name: name,
+      value: value
+    };
 
     this.store.dispatch(new AddFaxParameter({index: index, param: param}));
   }
@@ -103,38 +114,4 @@ export class FaxComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StoreDropNewFaxParameter({index: index}));
   }
 
-  checkDirty(condition: AbstractControl): boolean {
-    if (condition) {
-      return !condition.dirty;
-    } else {
-      return true;
-    }
-  }
-
-  isReadyToSendThree(mainObject: AbstractControl, object2: AbstractControl, object3: AbstractControl): boolean {
-    return (mainObject && mainObject.valid && mainObject.dirty)
-      || ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty));
-  }
-
-  isvalueReadyToSend(valueObject: AbstractControl): boolean {
-    return valueObject && valueObject.dirty && valueObject.valid;
-  }
-
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
-  }
-
-  isArray(obj: any): boolean {
-    return Array.isArray(obj);
-  }
-
-  trackByFn(index, item) {
-    return index; // or item.id
-  }
-
-  isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && nameObject.valid && valueObject.valid;
-  }
-
 }
-

@@ -35,7 +35,9 @@ import {
 } from './config.actions.odbc-cdr';
 import {Failure} from '../config.actions';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsOdbcCdr {
 
   constructor(

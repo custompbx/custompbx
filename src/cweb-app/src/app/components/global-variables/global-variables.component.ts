@@ -1,9 +1,10 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {ChangeDetectionStrategy, Component, inject, signal, computed, effect, OnInit} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+
 import {IglobalVariable, IglobalVariables} from '../../store/global-variables/global-variables.reducer';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectGlobalVariablesState} from '../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
@@ -18,51 +19,73 @@ import {
   MoveGlobalVariable
 } from '../../store/global-variables/global-variables.actions';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../material-module";
+import {InnerHeaderComponent} from "../inner-header/inner-header.component";
+import {ResizeInputDirective} from "../../directives/resize-input.directive";
 
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective],
   selector: 'app-global-variables',
   templateUrl: './global-variables.component.html',
   styleUrls: ['./global-variables.component.css'],
-  // changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GlobalVariablesComponent implements OnInit, OnDestroy {
+export class GlobalVariablesComponent implements OnInit { // Removed OnDestroy
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: IglobalVariables;
-  public newList: Array<IglobalVariable>;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  public loadCounter: number;
+  // --- Dependency Injection using inject() ---
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+
+  // --- Reactive State from NgRx using toSignal ---
+  private globalVarsState = toSignal(
+    this.store.pipe(select(selectGlobalVariablesState)),
+    {
+      initialValue: {
+        globalVariables: {} as IglobalVariables,
+        newGlobalVariables: [],
+        errorMessage: null,
+        loadCounter: 0,
+      }
+    }
+  );
+
+  // --- Computed State from NgRx State ---
+  public list = computed(() => this.globalVarsState().globalVariables);
+  public newList = computed(() => this.globalVarsState().newGlobalVariables);
+  public loadCounter = computed(() => this.globalVarsState().loadCounter);
+  public lastErrorMessage = computed(() => this.globalVarsState().errorMessage);
+
+  // --- Local State as Signal ---
+  public selectedIndex = signal<number>(0);
+
+  // --- Constant Properties ---
   public globalSettingsDispatchers: object;
   public variableTypes = ['set', 'exec-set', 'env-set', 'stun-set'];
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectGlobalVariablesState));
-  }
+  // --- Effect for Side Effects (Replaces subscription error handling) ---
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    }
+  });
 
   ngOnInit() {
-    this.configs$ = this.configs.subscribe((globalVars) => {
-      this.loadCounter = globalVars.loadCounter;
-      this.list = globalVars.globalVariables;
-      this.newList = globalVars.newGlobalVariables;
-      this.lastErrorMessage = globalVars.globalVariables && globalVars.errorMessage || null;
-      if (!this.lastErrorMessage) {
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
-/*    this.globalSettingsDispatchers = {
+    // The subscription logic is handled by toSignal and the effect.
+
+    // The following commented out block is preserved if needed later, but the subscription
+    // cleanup in ngOnDestroy is no longer necessary.
+
+    /*
+    this.globalSettingsDispatchers = {
       addNewItemField: this.addNewGlobalVariable.bind(this),
       switchItem: this.switchGlobalVariable.bind(this),
       addItem: this.newGlobalVariable.bind(this),
@@ -70,14 +93,8 @@ export class GlobalVariablesComponent implements OnInit, OnDestroy {
       deleteItem: this.deleteGlobalVariable.bind(this),
       updateItem: this.updateGlobalVariable.bind(this),
       pasteItems: null,
-    };*/
-  }
-
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
+    };
+    */
   }
 
   updateGlobalVariable(variable: IglobalVariable) {
@@ -141,7 +158,7 @@ export class GlobalVariablesComponent implements OnInit, OnDestroy {
     return Array.isArray(obj);
   }
 
-  trackByFn(index, item) {
+  trackByFn(index: number, item: any): number {
     return index; // or item.id
   }
 
@@ -171,20 +188,25 @@ export class GlobalVariablesComponent implements OnInit, OnDestroy {
     return arr;
   }
 
-  trackByIdFn(index, item) {
+  trackByIdFn(index: number, item: any) {
     return item.id;
   }
 
   dropAction(event: CdkDragDrop<string[]>, parent: Array<any>) {
-    if (parent[event.previousIndex].position === parent[event.currentIndex].position) {
+    // Safely check if indices exist before accessing 'position'
+    if (parent[event.previousIndex] && parent[event.currentIndex] && parent[event.previousIndex].position === parent[event.currentIndex].position) {
       return;
     }
-    this.store.dispatch(new MoveGlobalVariable({
-      previous_index: parent[event.previousIndex].position,
-      current_index: parent[event.currentIndex].position,
-      id: parent[event.previousIndex].id
-    }));
+
+    // Safely access properties for dispatch
+    const previousItem = parent[event.previousIndex];
+    if (previousItem) {
+      this.store.dispatch(new MoveGlobalVariable({
+        previous_index: previousItem.position,
+        current_index: parent[event.currentIndex].position,
+        id: previousItem.id
+      }));
+    }
   }
 
 }
-

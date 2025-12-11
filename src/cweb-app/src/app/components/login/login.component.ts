@@ -4,13 +4,18 @@ import { AppState } from '../../store/app.states';
 import { LogIn } from '../../store/auth/auth.actions';
 import {UserService} from '../../services/user.service';
 import {Iuser} from '../../store/auth/auth.reducers';
+import {MaterialModule} from "../../../material-module";
+
+import {FormsModule} from "@angular/forms";
 
 
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+standalone: true,
+    imports: [MaterialModule, FormsModule],
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
 

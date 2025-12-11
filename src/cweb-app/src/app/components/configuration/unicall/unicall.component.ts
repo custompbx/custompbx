@@ -1,13 +1,14 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
-import {Iitem, Iunicall} from '../../../store/config/config.state.struct';
+import {Component, DestroyRef, inject, computed, effect} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
+import {Iitem, Iunicall, State} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {ActivatedRoute} from '@angular/router';
 import {
   AddUnicallSpan,
   AddUnicallSpanParameter,
@@ -18,52 +19,59 @@ import {
   SwitchUnicallParameter, UpdateUnicallSpanParameter,
   UpdateUnicallParameter
 } from '../../../store/config/unicall/config.actions.unicall';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-unicall',
   templateUrl: './unicall.component.html',
   styleUrls: ['./unicall.component.css']
 })
-export class UnicallComponent implements OnInit, OnDestroy {
+export class UnicallComponent {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: Iunicall;
-  private newSpanId: string;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  private spanId: number;
-  private panelCloser = [];
-  public loadCounter: number;
-  private toCopySpan: number;
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+
+  private configsObservable = this.store.pipe(select(selectConfigurationState));
+  private configsSignal = toSignal(this.configsObservable, { initialValue: {} as State });
+
+  public list = computed(() => this.configsSignal().unicall || {} as Iunicall);
+  public loadCounter = computed(() => this.configsSignal().loadCounter || 0);
+  private lastErrorMessage = computed(() => this.list().errorMessage || null);
+
+  public newSpanId: string = '';
+  public selectedIndex: number = 0;
+  public spanId: number = 0;
+  public panelCloser: any = {};
+  public toCopySpan: number = 0;
+
   public globalSettingsDispatchers: object;
   public spanSettingsDispatchers: object;
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
-
-  ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.unicall;
-      this.lastErrorMessage = configs.unicall && configs.unicall.errorMessage || null;
-      if (!this.lastErrorMessage) {
-        this.newSpanId = '';
-        this.spanId = (this.list && this.list.spans && this.list.spans[this.spanId]) ? this.spanId : 0;
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    } else {
+      // Logic from ngOnInit subscription: Reset newSpanId and ensure spanId is valid
+      this.newSpanId = '';
+      const spans = this.list().spans;
+      if (spans && spans[this.spanId]) {
+        // If spanId is still valid, keep it. Otherwise, default to 0.
       } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
+        this.spanId = 0;
       }
-    });
+    }
+  });
+
+  constructor() {
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewUnicallParam.bind(this),
       switchItem: this.switchUnicallParam.bind(this),
@@ -82,13 +90,6 @@ export class UnicallComponent implements OnInit, OnDestroy {
       updateItem: this.updateSpanParam.bind(this),
       pasteItems: this.pasteSpanParams.bind(this),
     };
-  }
-
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
   }
 
   updateUnicallParam(param: Iitem) {
@@ -122,7 +123,7 @@ export class UnicallComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StoreDropNewUnicallParameter({index: index}));
   }
 
-  getUnicallSpansParams(id) {
+  getUnicallSpansParams(id: number) {
     this.panelCloser['span' + id] = true;
     this.store.dispatch(new GetUnicallSpanParameters({id: id}));
   }
@@ -162,7 +163,7 @@ export class UnicallComponent implements OnInit, OnDestroy {
     this.store.dispatch(new AddUnicallSpan({name: this.newSpanId}));
   }
 
-  checkDirty(condition: AbstractControl): boolean {
+  checkDirty(condition: AbstractControl | null): boolean {
     if (condition) {
       return !condition.dirty;
     } else {
@@ -170,16 +171,16 @@ export class UnicallComponent implements OnInit, OnDestroy {
     }
   }
 
-  isReadyToSendThree(mainObject: AbstractControl, object2: AbstractControl, object3: AbstractControl): boolean {
+  isReadyToSendThree(mainObject: AbstractControl | null, object2: AbstractControl | null, object3: AbstractControl | null): boolean {
     return (mainObject && mainObject.valid && mainObject.dirty)
       || ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty));
   }
 
-  isvalueReadyToSend(valueObject: AbstractControl): boolean {
+  isvalueReadyToSend(valueObject: AbstractControl | null): boolean {
     return valueObject && valueObject.dirty && valueObject.valid;
   }
 
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
+  isReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
     return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
   }
 
@@ -187,16 +188,17 @@ export class UnicallComponent implements OnInit, OnDestroy {
     return Array.isArray(obj);
   }
 
-  trackByFn(index, item) {
+  trackByFn(index: number, item: any) {
     return index; // or item.id
   }
 
-  isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
+  isNewReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
     return nameObject && valueObject && nameObject.valid && valueObject.valid;
   }
 
-  copySpan(key) {
-    if (!this.list.spans[key]) {
+  copySpan(key: number) {
+    const spans = this.list().spans;
+    if (!spans || !spans[key]) {
       this.toCopySpan = 0;
       return;
     }
@@ -210,7 +212,7 @@ export class UnicallComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StorePasteUnicallSpanParameters({from_id: this.toCopySpan, to_id: to}));
   }
 
-  openBottomSheetSpan(id, newName, oldName, action): void {
+  openBottomSheetSpan(id: number, newName: string, oldName: string, action: 'delete' | 'rename'): void {
     const config = {
       data:
         {
@@ -234,7 +236,7 @@ export class UnicallComponent implements OnInit, OnDestroy {
     });
   }
 
-  onlyValues(obj: object): Array<any> {
+  onlyValues(obj: object | null): Array<any> {
     if (!obj) {
       return [];
     }
@@ -242,4 +244,3 @@ export class UnicallComponent implements OnInit, OnDestroy {
   }
 
 }
-

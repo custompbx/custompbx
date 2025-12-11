@@ -34,7 +34,9 @@ import {
   UpdateVoicemailProfileParameter, StoreGetVoicemailProfiles, GetVoicemailProfiles,
 } from './config.actions.voicemail';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsVoicemail {
 
   constructor(

@@ -1,11 +1,16 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {AbstractControl} from '@angular/forms';
+
+import {MaterialModule} from "../../../material-module";
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {Store} from '@ngrx/store';
+import {ResizeInputDirective} from "../../directives/resize-input.directive";
 
 @Component({
-  selector: 'app-key-value-pad',
-  templateUrl: './key-value-pad.component.html',
-  styleUrls: ['./key-value-pad.component.css']
+standalone: true,
+  imports: [MaterialModule, FormsModule, ResizeInputDirective],
+    selector: 'app-key-value-pad',
+    templateUrl: './key-value-pad.component.html',
+    styleUrls: ['./key-value-pad.component.css']
 })
 export class KeyValuePadComponent implements OnInit {
 

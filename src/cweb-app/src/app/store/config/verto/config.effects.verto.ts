@@ -25,7 +25,9 @@ import {
 } from './config.actions.verto';
 import {Failure} from '../config.actions';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsVerto {
 
   constructor(

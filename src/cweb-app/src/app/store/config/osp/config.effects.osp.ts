@@ -25,7 +25,9 @@ import {
   UpdateOspProfileParameter
 } from './config.actions.osp';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsOsp {
 
   constructor(

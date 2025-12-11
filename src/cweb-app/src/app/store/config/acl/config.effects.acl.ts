@@ -25,7 +25,9 @@ import {
   UpdateAclListDefault, UpdateAclNode
 } from './config.actions.acl';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsAcl {
 
   constructor(

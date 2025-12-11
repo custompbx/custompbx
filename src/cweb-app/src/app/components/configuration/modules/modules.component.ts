@@ -1,5 +1,7 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {Component, DestroyRef, inject, signal, computed, effect} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
 import {State} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
@@ -13,68 +15,61 @@ import {
 } from '../../../store/config/config.actions';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {ActivatedRoute} from '@angular/router';
+import {RouterLink} from '@angular/router';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
+import {FormsModule} from "@angular/forms";
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, RouterLink, CodeEditorComponent],
   selector: 'app-modules',
   templateUrl: './modules.component.html',
   styleUrls: ['./modules.component.css']
 })
-export class ModulesComponent implements OnInit, OnDestroy {
+export class ModulesComponent {
 
-  public autoload: object;
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: State;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  public loadCounter: number;
-  public XMLBody: string;
-  public editorInited: boolean;
+  private store = inject(Store<AppState>);
+  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(MatBottomSheet);
 
-  constructor(
-    private store: Store<AppState>,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-    private bottomSheet: MatBottomSheet,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-    this.autoload = {};
-  }
+  private configsObservable = this.store.pipe(select(selectConfigurationState));
+  private configsSignal = toSignal(this.configsObservable, { initialValue: {} as State });
 
-  ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs;
-      this.lastErrorMessage = configs.errorMessage;
+  public list = computed(() => this.configsSignal());
+  public loadCounter = computed(() => this.list().loadCounter || 0);
+  private lastErrorMessage = computed(() => this.list().errorMessage || '');
 
-      if (this.list.post_load_modules && this.list.post_load_modules.modules) {
-        Object.keys(this.list.post_load_modules.modules).forEach(
-          e => {
-            this.autoload[this.list.post_load_modules.modules[e].name] = this.list.post_load_modules.modules[e];
+  public autoload = computed(() => {
+    const list = this.list();
+    const newAutoload: { [key: string]: any } = {};
+    if (list.post_load_modules?.modules) {
+      Object.keys(list.post_load_modules.modules).forEach(
+        e => {
+          const moduleEntry = list.post_load_modules!.modules[e];
+          if (moduleEntry?.name) {
+            newAutoload[moduleEntry.name] = moduleEntry;
           }
-        );
-      }
+        }
+      );
+    }
+    return newAutoload;
+  });
 
-      if (!this.lastErrorMessage) {
+  public selectedIndex: number = 0;
+  public XMLBody = signal<string>('');
+  public editorInited = signal<boolean>(false);
 
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
-  }
-
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
-  }
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    }
+  });
 
   reloadModule(module: number) {
     this.store.dispatch(new ReloadModule({id: module}));
@@ -109,14 +104,10 @@ export class ModulesComponent implements OnInit, OnDestroy {
   }
 
   ImportXMLModuleConfig() {
-    this.store.dispatch(new ImportXMLModuleConfig({file: this.XMLBody}));
+    this.store.dispatch(new ImportXMLModuleConfig({file: this.XMLBody()}));
   }
 
-  trackByFn(index, item) {
-    return index; // or item.id
-  }
-
-  isModuleConf(item): boolean {
+  isModuleConf(item: any): boolean {
     switch (typeof item) {
       case null:
       case 'object':
@@ -130,7 +121,7 @@ export class ModulesComponent implements OnInit, OnDestroy {
     return str.replace(/_/g, '-');
   }
 
-  openBottomSheetModule(id, name, action): void {
+  openBottomSheetModule(id: number, name: string, action: string): void {
     const config = {
       data:
         {
@@ -151,25 +142,6 @@ export class ModulesComponent implements OnInit, OnDestroy {
   }
 
   initEditor() {
-    this.editorInited = true;
+    this.editorInited.set(true);
   }
-
-  onlySortedValues(obj: object): Array<any> {
-    if (!obj) {
-      return [];
-    }
-    const arr = Object.values(obj).sort(
-      function (a, b) {
-        if (a.position > b.position) {
-          return 1;
-        }
-        if (a.position < b.position) {
-          return -1;
-        }
-        return 0;
-      }
-    );
-    return arr;
-  }
-
 }

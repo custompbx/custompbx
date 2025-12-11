@@ -26,7 +26,9 @@ import {
   UpdateCdrPgCsvParameter
 } from './config.actions.cdr-pg-csv';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsCdrPgCsv {
 
   constructor(

@@ -1,9 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
+
+import {MaterialModule} from "../../../../material-module";
 import {Observable, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {IodbcCdr, Iitem, IodbcField, Itable} from '../../../store/config/config.state.struct';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {
@@ -19,11 +21,15 @@ import {
 } from '../../../store/config/odbc_cdr/config.actions.odbc-cdr';
 import {ActivatedRoute} from '@angular/router';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 
 @Component({
-  selector: 'app-odbc-cdr',
-  templateUrl: './odbc-cdr.component.html',
-  styleUrls: ['./odbc-cdr.component.css']
+standalone: true,
+imports:  [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent],
+    selector: 'app-odbc-cdr',
+    templateUrl: './odbc-cdr.component.html',
+    styleUrls: ['./odbc-cdr.component.css']
 })
 export class OdbcCdrComponent implements OnInit, OnDestroy {
 

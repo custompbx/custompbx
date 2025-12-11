@@ -6,7 +6,7 @@
         <input matInput [(ngModel)]="searchUser">
       </mat-form-field>
       @for (webUser of getLogins(searchUser); track webUser.id) {
-        <div [class]="{'chat-contact': true, 'chat-contact-active': currentChat === webUser.id}"
+        <div [class]="{'chat-contact': true, 'chat-contact-active': currentChat() === webUser.id}"
              (click)="enterChat(webUser)">
           <div class="list-avatar">
             @if (!webUser.avatar_format) {
@@ -21,40 +21,42 @@
     </div>
   </mat-sidenav>
   <mat-sidenav-content style="margin-left: 237px"> <!-- sidenav do not pushing content on opened on start-->
-    @if (userList[currentChat]) {
-      <mat-progress-bar mode="indeterminate" *ngIf="loadCounter > 0"></mat-progress-bar>
-      <mat-toolbar>
-        <span>{{ 'Conversation with ' + userList[currentChat].login }}</span>
-        @if (userList[currentChat].sip_id?.Valid) {
+    @if (userList()[currentChat()]) {
+      @if (loadCounter() > 0) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
+      <mat-toolbar color="basic">
+        <span>{{ 'Conversation with ' + userList()[currentChat()].login }}</span>
+        @if (userList()[currentChat()].sip_id?.Valid) {
           <button mat-icon-button color="primary" aria-label="Example icon button with a menu icon"
-                  [disabled]="!user?.sip_id?.Valid" (click)="voiceCall()">
+                  [disabled]="!user()?.sip_id?.Valid" (click)="voiceCall()">
             <mat-icon>keyboard_voice</mat-icon>
           </button>
         }
       </mat-toolbar>
     } @else {
-      <app-inner-header name="Conversations" [loadCounter]="loadCounter"></app-inner-header>
+      <app-inner-header name="Conversations" [loadCounter]="loadCounter()"></app-inner-header>
     }
-    @if (!currentChat) {
+    @if (!currentChat()) {
       <div class="msg-placeholder">
         <mat-icon class="centered-child">question_answer</mat-icon>
       </div>
-    } @else if (currentVoice === currentChat && toChat) {
+    } @else if (currentVoice() === currentChat() && toChat()) {
       <div class="msg-placeholder">
         <div class="centred">
-          @if (!userList[currentVoice].avatar_format) {
+          @if (!userList()[currentVoice()].avatar_format) {
             <mat-icon class="centered-child">account_circle</mat-icon>
           } @else {
             <img class="centered-child awa"
-                 [src]="'./assets/img/avatar/' + userList[currentVoice].id + '.' + user.avatar_format">
+                 [src]="'./assets/img/avatar/' + userList()[currentVoice()].id + '.' + user().avatar_format">
           }
           <div>
-            <h3>{{ totalTime | formatTimer }}</h3>
+            <h3>{{ totalTime() | formatTimer }}</h3>
           </div>
           <div>
             <button class="margin-fab" mat-fab
-                    [color]="inConversationsCall ? 'warn' : inCall ? '' : 'green'"
-                    [disabled]="(inCall && !inConversationsCall) || (isInbound && !isRinging)"
+                    [color]="inConversationsCall ? 'warn' : inCall() ? '' : 'green'"
+                    [disabled]="(inCall() && !inConversationsCall) || (isInbound && !isRinging())"
                     (click)="connectToUser()"
                     aria-label="icon button">
               <mat-icon>phone</mat-icon>
@@ -62,7 +64,7 @@
             @if (isInbound) {
               <button class="margin-fab" mat-fab
                       color="warn"
-                      [disabled]="!isRinging && !inCall"
+                      [disabled]="!isRinging() && !inCall()"
                       (click)="hangup()"
                       aria-label="icon button">
                 <mat-icon>phone_disabled</mat-icon>
@@ -78,13 +80,13 @@
       <div class="msg-chat">
         <div class="msg-view" #scrollContainer>
           <mat-card-content class="chat-content">
-            @for (message of showItems[currentChat]; track message.id) {
+            @for (message of showItems()[currentChat()]; track message.id) {
               <mat-card [attr.data-index]="message.id"
-                        [class]="{'msg-call': message.duration === 0 || message.duration,'msg-in': message.receiver_id.id == user.id,'msg-out': message.receiver_id.id != user.id}">
+                        [class]="{'msg-call': message.duration === 0 || message.duration,'msg-in': message.receiver_id.id == user().id,'msg-out': message.receiver_id.id != user().id}">
                 {{ message.text }}
                 @if (message.duration === 0 || message.duration) {
                   <div style="display: flex;align-items: center;">
-                    @if (message.receiver_id.id == user.id) {
+                    @if (message.receiver_id.id == user().id) {
                       <span>Incoming call</span>
                     } @else {
                       <span>Outgoing call</span>
@@ -93,7 +95,7 @@
                   </div>
                 }
                 <mat-card-footer
-                  [class]="{'footer-msg-in': message.receiver_id.id == user.id,'footer-msg-out': message.receiver_id.id != user.id}">
+                  [class]="{'footer-msg-in': message.receiver_id.id == user().id,'footer-msg-out': message.receiver_id.id != user().id}">
                   {{ convertDate(message.created_at) }}
                 </mat-card-footer>
               </mat-card>

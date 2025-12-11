@@ -37,7 +37,9 @@ import {catchError, concatMap, map, switchMap} from 'rxjs/operators';
 import {WsDataService} from '../../../services/ws-data.service';
 import {AddUserToken, StoreGotWebError} from '../../settings/settings.actions';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AutodialerEffects {
 
   constructor(

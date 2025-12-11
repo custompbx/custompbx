@@ -1,15 +1,14 @@
 import {
-  Component,
-  ElementRef, HostListener,
-  OnDestroy,
-  OnInit,
-  ViewChild
+  Component, effect,
+  ElementRef, HostListener, inject,
+  ViewChild, signal, computed, DestroyRef, Signal
 } from '@angular/core';
-import {debounceTime, Observable, Subject, Subscription, take} from 'rxjs';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import {debounceTime, filter, map, Subject, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {
   AppState,
-  selectConversations, selectDirectoryState, selectHeader,
+  selectConversations, selectDirectoryState,
   selectPhoneState,
   selectSettingsState
 } from '../../store/app.states';
@@ -18,7 +17,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
 import {StoreCommand} from '../../store/phone/phone.actions';
 import {WsDataService} from '../../services/ws-data.service';
-import {SubscriptionList} from '../../store/dataFlow/dataFlow.actions';
+import {PersistentSubscription} from '../../store/dataFlow/dataFlow.actions';
 import {GetWebUsers} from '../../store/settings/settings.actions';
 import {
   GetConversationPrivateCalls,
@@ -29,218 +28,251 @@ import {
   StoreCurrentUser,
   StoreGetNewConversationMessage
 } from '../../store/conversations/conversations.actions';
-import {Iuser} from '../../store/auth/auth.reducers';
 import {UserService} from '../../services/user.service';
 import {StartPhone, ToggleShowPhone} from '../../store/header/header.actions';
-import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {GetDirectoryUsers} from '../../store/directory/directory.actions';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../material-module";
+import {FormsModule} from "@angular/forms";
+import {InnerHeaderComponent} from "../inner-header/inner-header.component";
+import {IwebUser} from "../../store/settings/settings.reducers";
+import {FormatTimerPipe} from "../../pipes/format-timer.pipe";
 
 const scrollTop = 64;
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, FormatTimerPipe],
   selector: 'app-conversations',
   templateUrl: './conversations.component.html',
   styleUrls: ['./conversations.component.css']
 })
-export class ConversationsComponent implements OnInit, OnDestroy {
+export class ConversationsComponent {
 
-  public webUsers: Observable<any>;
-  public pmessages: Observable<any>;
-  public pmessages$: Subscription;
-  public webUsers$: Subscription;
-  public userList: { [key: string]: any };
-  private lastErrorMessage: string;
-  public loadCounter: number;
-  public timersIntervalUpdater: any;
-  public phone: Observable<any>;
-  public phone$: Subscription;
-  public phoneStatus: boolean;
-  public phoneUser: string;
-  public fixedTopGapScrolled: number = scrollTop;
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLElement>;
+
+  // Injectable services
+  private userService = inject(UserService);
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+  private ws = inject(WsDataService);
+  private destroyRef = inject(DestroyRef);
+
+  // NgRx State converted to Signals
+  private webUsersState = toSignal(this.store.pipe(select(selectSettingsState)), {initialValue: {} as any});
+  private phoneState = toSignal(this.store.pipe(select(selectPhoneState)), {initialValue: {} as any});
+  private conversationsState = toSignal(this.store.pipe(select(selectConversations)), {initialValue: {} as any});
+  private directoryState = toSignal(this.store.pipe(select(selectDirectoryState)), {initialValue: {} as any});
+
+  // Derived/Computed Signals
+  public user = this.userService.userSignal; // Already a signal
+  public userList: Signal<{ [id: number]: IwebUser }> = computed(() => this.webUsersState().webUsers || {});
+  public loadCounter = computed(() => this.webUsersState().loadCounter || 0);
+  public webUsersErrorMessage = computed(() => this.webUsersState().errorMessage);
+
+  // Phone State
+  public phoneStatus = computed(() => this.phoneState().phoneStatus?.isRunning || false);
+  public phoneUser = computed(() => this.phoneState().phoneCreds?.user_name || '');
+  public isRegistered = computed(() => this.phoneState().phoneStatus?.registered || false);
+  public totalTime = computed(() => this.phoneState().timer || 0);
+  public inCall = computed(() => this.phoneState().phoneStatus?.inCall || false);
+  public isRinging = computed(() => this.phoneState().phoneStatus?.status === 'ringing');
+
+  // Conversations State
+  public messagesSignal = computed(() => this.conversationsState().conversations || {});
+  public callsSignal = computed(() => this.conversationsState().calls || {});
+  public conversationsErrorMessage = computed(() => this.conversationsState().errorMessage);
+  public scrollDown = computed(() => this.conversationsState().scrollDown || false);
+  private eventData = computed(() => this.conversationsState().event?.data);
+
+  // Directory State
+  public directoryDomains = computed(() => this.directoryState().domains || {});
+  private directoryUsersSignal = computed(() => this.directoryState().users || {});
+  public directoryErrorMessage = computed(() => this.directoryState().errorMessage);
+
+  // Component State (Now converted to Signals)
+  public currentChat = signal<number | null>(null);
+  public currentVoice = signal<number | null>(null);
+  public lastCallsAmount = signal(0);
+  public showItems = signal<{ [key: number]: any[] }>({});
+  public toChat = signal(false);
+
+  // Standard properties (UI/event handling)
   public searchUser = '';
   public newMsg = '';
-  public currentChat = null;
-  public currentVoice = null;
-  public toChat = false;
-  public messages = {};
-  public calls = {};
-  public lastCallsAmount = 0;
-  public showItems = {};
-  public getState$: Subscription;
-  public user: Iuser;
-  public totalTime: 0;
-  public inCall: boolean;
-  public inConversationsCall: boolean;
-  public isMouseOverChat: boolean;
-  private wheelEvent$ = new Subject<WheelEvent>();
-  public isUpdatingChat: boolean;
+  public fixedTopGapScrolled: number = scrollTop;
+  public isInbound: boolean = false;
+  public inConversationsCall: boolean = false;
+  public isMouseOverChat: boolean = false;
+  public isUpdatingChat: boolean = false;
   private previousScrollItemIndex: number | null = null;
-  public directory$: Subscription;
-  public directory: Observable<any>;
-  public directoryDomains: object;
-  private directoryUsers: object;
-  public isInbound: boolean;
-  public isRinging: boolean;
-  public isRegistered: boolean;
+  private wheelEvent$ = new Subject<WheelEvent>();
+  private wheelSubscription: Subscription;
 
-  @ViewChild('scrollContainer') scrollContainer: ElementRef;
+  // Effects for Side Effects and Derived UI Updates
+  private menuUpdateEffect = effect(() => {
+    const currentUser = this.user();
+    this.store.dispatch(StoreCurrentUser({user: currentUser}));
+  });
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-    private ws: WsDataService,
-    private userService: UserService,
-  ) {
-    this.phone = this.store.pipe(select(selectPhoneState));
-    this.webUsers = this.store.pipe(select(selectSettingsState));
-    this.pmessages = this.store.pipe(select(selectConversations));
-    this.directory = this.store.pipe(select(selectDirectoryState));
-  }
+  private errorHandlingEffect = effect(() => {
+    const errors = [
+      this.webUsersErrorMessage(),
+      this.conversationsErrorMessage(),
+      this.directoryErrorMessage()
+    ].filter(e => !!e);
 
-  ngOnInit() {
-    this.store.dispatch(GetNewConversationMessage(null));
-    if (this.ws.isConnected) {
-      this.store.dispatch(new SubscriptionList({values: [new GetWebUsers(null).type, StoreGetNewConversationMessage.type]}));
-      this.store.dispatch(new GetWebUsers(null));
-      if (Object.entries(this.directoryUsers || {}).length === 0) {
-        this.store.dispatch(new GetDirectoryUsers(null));
-      }
+    if (errors.length > 0) {
+      this._snackBar.open('Error: ' + errors[0] + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    }
+  });
+
+  private phoneStatusEffect = effect(() => {
+    // Logic from original phone$ subscription
+    const inCall = this.inCall();
+    const isRinging = this.isRinging();
+    const isRegistered = this.isRegistered();
+
+    // Reset isInbound flag
+    if (this.isInbound && ((!isRinging && !inCall) || (inCall && this.currentChat() !== this.currentVoice()))) {
+      this.isInbound = false;
     }
 
-    this.ws.websocketService.status.subscribe(connected => {
-      if (connected) {
-        this.store.dispatch(new SubscriptionList({values: [new GetWebUsers(null).type, StoreGetNewConversationMessage.type]}));
-        this.store.dispatch(new GetWebUsers(null));
-        if (Object.entries(this.directoryUsers || {}).length === 0) {
-          this.store.dispatch(new GetDirectoryUsers(null));
-        }
-      }
-    });
-    this.getState$ = this.userService.getState.subscribe((state) => {
-      this.user = state.user;
-      this.store.dispatch(StoreCurrentUser({user: this.user}));
-    });
+    // Reset inConversationsCall if main call drops
+    if (!inCall && this.inConversationsCall) {
+      this.inConversationsCall = false;
+    }
+  });
 
-    this.webUsers$ = this.webUsers.subscribe((users) => {
-      this.loadCounter = users.loadCounter;
-      this.userList = users.webUsers;
-      this.lastErrorMessage = users.errorMessage;
-      if (this.lastErrorMessage) {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
-    // PHONE
-    this.phone$ = this.phone.subscribe((phone) => {
-      this.phoneStatus = phone.phoneStatus.isRunning;
-      if (phone.phoneCreds) {
-        this.phoneUser = phone.phoneCreds.user_name || '';
-      }
-      this.isRegistered = phone.phoneStatus.registered;
-      this.totalTime = phone.timer;
-      if (this.isInbound && (
-        (this.isRinging && phone.phoneStatus.status === '') ||
-        (this.inCall && this.inCall !== phone.phoneStatus.inCall))
-      ) {
-        this.isInbound = false;
-      }
-      this.inCall = phone.phoneStatus.inCall;
-      this.isRinging = phone.phoneStatus.status === 'ringing';
-      if (!this.inCall && this.inConversationsCall) {
-        this.inConversationsCall = false;
-      }
-    });
 
-    this.pmessages$ = this.pmessages.subscribe((mes) => {
-      this.messages = mes ? mes.conversations : {};
-      this.calls = mes ? mes.calls : {};
-      this.lastErrorMessage = mes ? mes.errorMessage : null;
-      if (this.lastErrorMessage) {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
+  private conversationUpdateEffect = effect(() => {
+    const messages = this.messagesSignal();
+    const calls = this.callsSignal();
+    const currentScrollDown = this.scrollDown();
+    const eventData = this.eventData();
+    const currentChatId = this.currentChat();
+
+    if (currentChatId !== null && messages[currentChatId]) {
+      const chatMessages = messages[currentChatId];
+      const chatCalls = calls[currentChatId] || [];
+      const currentLastCallsAmount = this.lastCallsAmount();
+
+      if (currentScrollDown) {
+        this.scrollToBottom();
+      } else {
+        setTimeout(() => {
+          this.restoreScrollPosition();
+        }, 0);
       }
-      if (this.messages[this.currentChat]) {
-        if (mes.scrollDown) {
-          this.scrollToBottom();
+      this.isUpdatingChat = false;
+
+      // Logic for merging messages and calls based on count/infinite scroll
+      let newShowItems: any[] = [];
+      if (chatMessages.length === 0) {
+        newShowItems = chatCalls;
+      } else if (chatMessages.length <= 20) {
+        newShowItems = [
+          ...chatMessages,
+          ...chatCalls
+        ].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      } else if (chatMessages.length > 20) {
+        const firstMes = chatMessages[0];
+        const lastCall = chatCalls.length >= 20 ? chatCalls[chatCalls.length - 1] : null;
+
+        if (lastCall && currentLastCallsAmount !== chatCalls.length && lastCall.created_at < firstMes.created_at) {
+          this.lastCallsAmount.set(chatCalls.length);
+          this.store.dispatch(GetConversationPrivateCalls({id: currentChatId, up_to_time: lastCall.created_at}));
         } else {
-          setTimeout(() => {
-            this.restoreScrollPosition();
-          }, 0);
-        }
-        this.isUpdatingChat = false;
-        if (this.messages[this.currentChat].length === 0) {
-          this.showItems[this.currentChat] = mes.calls[this.currentChat] || [];
-        } else if (this.messages[this.currentChat].length <= 20) {
-          this.showItems[this.currentChat] = [
-            ...this.messages[this.currentChat],
-            ...(mes.calls[this.currentChat] || [])
+          newShowItems = [
+            ...chatMessages,
+            ...chatCalls.filter((a: any) => new Date(a.created_at).getTime() >= new Date(firstMes.created_at).getTime())
           ].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-        } else if (this.messages[this.currentChat].length > 20) {
-          const firstMes = this.messages[this.currentChat][0];
-          const lastCall = this.calls[this.currentChat].length >= 20 ?
-            this.calls[this.currentChat][this.calls[this.currentChat].length - 1] : null;
-          if (lastCall && this.lastCallsAmount !== this.calls[this.currentChat].length && lastCall.created_at < firstMes.created_at) {
-            this.lastCallsAmount = this.calls[this.currentChat].length;
-            this.store.dispatch(GetConversationPrivateCalls({id: this.currentChat, up_to_time: lastCall.created_at}));
-          } else {
-            this.showItems[this.currentChat] = [
-              ...this.messages[this.currentChat],
-              ...(mes.calls[this.currentChat] || []).filter((a) => a.created_at >= firstMes.created_at)
-            ].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-          }
         }
       }
-      if (mes.event.type === 'new-call' && this.user.id === mes.event.data.rid) {
-        if (this.currentChat === mes.event.data.sid) {
+
+      // Update showItems signal
+      this.showItems.update(items => ({
+        ...items,
+        [currentChatId]: newShowItems
+      }));
+    }
+
+    // Handle incoming new-call event (from mes.event)
+    if (eventData?.type === 'new-call') {
+      const data = eventData.data;
+      if (this.user().id === data.rid) {
+        if (currentChatId === data.sid) {
           this.voiceCall();
           this.isInbound = true;
         }
-        if (!this.isRegistered) {
+        if (!this.isRegistered()) {
           setTimeout(() => this.store.dispatch(StoreCommand({register: true})), 100);
         }
       }
-    });
+    }
+  });
 
-    // directory users
-    this.directory$ = this.directory.subscribe((users) => {
-      this.directoryDomains = users.domains;
-      this.directoryUsers = users.users;
-      if (users.errorMessage) {
-        this._snackBar.open('Error: ' + users.errorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
+  constructor() {
+    this.store.dispatch(GetNewConversationMessage(null));
+    this.setupWebSocketAndInitialData();
 
-    this.wheelEvent$
+    // Setup wheel event handling subscription and ensure cleanup
+    this.wheelSubscription = this.wheelEvent$
       .pipe(
-        debounceTime(100), // Debounce to avoid too many events in a short time
-        filter(() => !!this.scrollContainer), // Ensure the scroll container is available
-        filter(() => this.isMouseOverChat), // Ensure the mouse is over the chat
+        takeUntilDestroyed(this.destroyRef),
+        debounceTime(100),
+        filter(() => !!this.scrollContainer),
+        filter(() => this.isMouseOverChat),
         filter(() => !this.isUpdatingChat),
+        filter(() => !this.toChat()),
         map(() => {
           const element = this.scrollContainer.nativeElement;
-          if (element && this.hasVerticalScrollbar(element) && element.scrollTop === 0 && this.showItems[this.currentChat]) {
-            const message = this.showItems[this.currentChat][0];
+          const currentChatId = this.currentChat();
+          const items = this.showItems()[currentChatId!];
+
+          if (currentChatId !== null && element && this.hasVerticalScrollbar(element) && element.scrollTop === 0 && items) {
+            const message = items[0];
+            // Capture scroll position before dispatching
             for (let i = 0; i < this.scrollContainer.nativeElement.children[0].children.length; i++) {
-              const child = this.scrollContainer.nativeElement.children[0].children[i];
+              const child = this.scrollContainer.nativeElement.children[0].children[i] as HTMLElement;
               if (child.offsetTop + child.offsetHeight > scrollTop) {
-                this.previousScrollItemIndex = parseInt(child.getAttribute('data-index'), 10);
+                this.previousScrollItemIndex = parseInt(child.getAttribute('data-index') || '0', 10);
                 break;
               }
             }
-            this.store.dispatch(GetConversationPrivateMessages({id: this.currentChat, up_to_time: message.created_at}));
+            this.store.dispatch(GetConversationPrivateMessages({id: currentChatId, up_to_time: message.created_at}));
+            this.isUpdatingChat = true;
           }
         })
       )
       .subscribe();
+  }
+
+  private setupWebSocketAndInitialData() {
+    const persistentActions = [new GetWebUsers(null).type, StoreGetNewConversationMessage.type];
+
+    const initializeData = () => {
+      this.store.dispatch(new PersistentSubscription({values: persistentActions}));
+      this.store.dispatch(new GetWebUsers(null));
+      if (Object.entries(this.directoryUsersSignal() || {}).length === 0) {
+        this.store.dispatch(new GetDirectoryUsers(null));
+      }
+    };
+
+    if (this.ws.isConnected) {
+      initializeData();
+    }
+
+    this.ws.websocketService.status.pipe(
+      filter(connected => connected)
+    ).subscribe(connected => {
+      initializeData();
+    });
   }
 
   @HostListener('wheel', ['$event'])
@@ -250,32 +282,23 @@ export class ConversationsComponent implements OnInit, OnDestroy {
 
   @HostListener('mouseover', ['$event'])
   onMouseOver(event: MouseEvent) {
-    if (this.scrollContainer && this.scrollContainer.nativeElement.contains(event.target)) {
+    if (this.scrollContainer && this.scrollContainer.nativeElement.contains(event.target as Node)) {
       this.isMouseOverChat = true;
     }
   }
 
   @HostListener('mouseout', ['$event'])
   onMouseOut(event: MouseEvent) {
-    if (this.scrollContainer && this.scrollContainer.nativeElement.contains(event.target)) {
+    if (this.scrollContainer && this.scrollContainer.nativeElement.contains(event.target as Node)) {
       this.isMouseOverChat = false;
     }
   }
 
-  ngOnDestroy() {
-    this.timersIntervalUpdater = null;
-    this.webUsers$.unsubscribe();
-    this.phone$.unsubscribe();
-    this.pmessages$.unsubscribe();
-    this.getState$.unsubscribe();
-    this.wheelEvent$.complete();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-      this.route.snapshot.data.reconnectUpdater.unsubscribe();
-    }
-  }
-
   connectToUser() {
-    if (this.isRinging) {
+    const currentChatId = this.currentChat();
+    const currentVoiceId = this.currentVoice();
+
+    if (this.isRinging()) {
       this.store.dispatch(StoreCommand({answer: true}));
       return;
     }
@@ -283,28 +306,31 @@ export class ConversationsComponent implements OnInit, OnDestroy {
       this.hangup();
       return;
     }
-    if (!this.userList[this.currentVoice]) {
+    if (currentVoiceId === null || !this.userList()[currentVoiceId]) {
       return;
     }
-    if (!this.userList[this.currentVoice].sip_id?.Valid) {
+
+    const targetUser = this.userList()[currentVoiceId];
+    if (!targetUser.sip_id?.Valid) {
       return;
     }
-    const sipUser = this.directoryUsers[this.userList[this.currentVoice].sip_id.Int64];
-    const domainName = this.directoryDomains[sipUser.parent.id]?.name;
+
+    const sipUser = this.directoryUsersSignal()[targetUser.sip_id.Int64];
+    if (!sipUser) {
+      return;
+    }
+    const domainName = this.directoryDomains()[sipUser.parent.id]?.name;
     const fullName = sipUser.name + '@' + domainName;
-    if (!this.directoryUsers[this.userList[this.currentVoice].sip_id.Int64]) {
-      return;
-    }
-    this.store.dispatch(SendConversationPrivateCall({id: this.currentChat}));
+
+    this.store.dispatch(SendConversationPrivateCall({id: currentChatId!}));
     this.store.dispatch(StoreCommand({callTo: fullName}));
     this.inConversationsCall = true;
   }
 
   getLogins(filterString: string = ''): any[] {
-    const userArray = Object.values(this.userList || {});
+    const userArray = Object.values(this.userList() || {});
     const filteredUsers = userArray.filter(user => user.login.includes(filterString));
     const sortedUsers = filteredUsers.sort((a, b) => a.id - b.id);
-    // return sortedUsers.map(user => ({ id: user.id, login: user.login }));
     return sortedUsers;
   }
 
@@ -317,35 +343,35 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   }
 
   sendMsg() {
-    /*    if (!this.showItems[this.currentChat]) {
-          return
-        }*/
-    if (!this.newMsg) {
+    const currentChatId = this.currentChat();
+    if (!this.newMsg || currentChatId === null) {
       return;
     }
-    this.store.dispatch(SendConversationPrivateMessage({id: this.currentChat, text: this.newMsg}));
+    this.store.dispatch(SendConversationPrivateMessage({id: currentChatId, text: this.newMsg}));
     this.newMsg = '';
     this.scrollToBottom();
   }
 
-  enterChat(user) {
+  enterChat(user: { id: number }) {
     this.isInbound = false;
     this.previousScrollItemIndex = null;
     this.isUpdatingChat = false;
-    if (this.currentChat !== user.id) {
-      this.currentChat = user.id;
-      this.currentVoice = null;
-      this.store.dispatch(GetConversationPrivateMessages({id: this.currentChat}));
-      this.store.dispatch(GetConversationPrivateCalls({id: this.currentChat}));
+
+    if (this.currentChat() !== user.id) {
+      this.currentChat.set(user.id);
+      this.currentVoice.set(null);
+      this.lastCallsAmount.set(0); // Reset for new chat
+      this.store.dispatch(GetConversationPrivateMessages({id: user.id}));
+      this.store.dispatch(GetConversationPrivateCalls({id: user.id}));
     }
     this.scrollToBottom();
   }
 
-  convertDate(timestamp) {
+  convertDate(timestamp: string): string {
     const f = new Date(timestamp);
     const year = f.getFullYear().toString();
-    const month = f.getUTCMonth().toString().padStart(2, '0');
-    const day = f.getUTCDay().toString().padStart(2, '0');
+    const month = (f.getUTCMonth() + 1).toString().padStart(2, '0'); // month is 0-indexed
+    const day = f.getDate().toString().padStart(2, '0');
     const date = `${year}-${month}-${day}`;
 
     const hours = f.getHours().toString().padStart(2, '0');
@@ -362,13 +388,13 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   voiceCall() {
     this.store.dispatch(StartPhone(null));
     this.store.dispatch(ToggleShowPhone({show: false}));
-    this.currentVoice = this.currentChat;
-    this.toChat = true;
+    this.currentVoice.set(this.currentChat());
+    this.toChat.set(true);
   }
 
   backToChat() {
-    this.toChat = false;
-    if (this.inCall) {
+    this.toChat.set(false);
+    if (this.inCall()) {
       this.store.dispatch(ToggleShowPhone({show: true}));
     }
     setTimeout(() => this.scrollToBottom(), 0);
@@ -379,17 +405,21 @@ export class ConversationsComponent implements OnInit, OnDestroy {
   }
 
   restoreScrollPosition() {
-    if (this.previousScrollItemIndex === null) {
+    if (this.previousScrollItemIndex === null || !this.scrollContainer) {
       return;
     }
-    const children = this.scrollContainer.nativeElement.children[0].children;
+    const children = this.scrollContainer.nativeElement.children[0]?.children;
+    if (!children) return;
+
     for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      if (parseInt(child.getAttribute('data-index'), 10) === this.previousScrollItemIndex) {
-        this.scrollContainer.nativeElement.scrollTop = child.offsetTop - child.scrollHeight * 2;
+      const child = children[i] as HTMLElement;
+      if (parseInt(child.getAttribute('data-index') || '0', 10) === this.previousScrollItemIndex) {
+        // Scroll slightly above the element to restore context
+        this.scrollContainer.nativeElement.scrollTop = child.offsetTop - child.offsetHeight;
         break;
       }
     }
+    this.previousScrollItemIndex = null; // Clear after restoring
   }
 
   hangup() {

@@ -9,11 +9,13 @@ import {
   StoreGetDashboard,
   ReduceLoadCounter,
   Failure,
-  UnSubscribe, SubscriptionList
+  UnSubscribe, SubscriptionList, PersistentSubscription
 } from './dataFlow.actions';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DataFlowEffects {
 
   constructor(
@@ -59,6 +61,21 @@ export class DataFlowEffects {
   SubscriptionList: Observable<any> = createEffect(() => {
     return this.actions.pipe(
       ofType(DataFlowActionTypes.SubscriptionList),
+      map((action: SubscriptionList) => action),
+      switchMap(action => {
+          return this.ws.universalSender(action.type, action.payload).pipe(
+            catchError((error) => {
+              console.log(error);
+              return of(new Failure({error: error}));
+            }),
+          );
+        }
+      ));
+  }, { dispatch: false });
+
+  PersistentSubscription: Observable<any> = createEffect(() => {
+    return this.actions.pipe(
+      ofType(DataFlowActionTypes.PersistentSubscription),
       map((action: SubscriptionList) => action),
       switchMap(action => {
           return this.ws.universalSender(action.type, action.payload).pipe(

@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectApps, selectDirectoryState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
@@ -43,8 +43,14 @@ import {CsvService} from '../../../services/csv-handler';
 import {IfilterField, IsortField} from '../../cdr/cdr.component';
 import {PageEvent} from '@angular/material/paginator';
 import {Iitem} from '../../../store/config/config.state.struct';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ResizeInputDirective} from "../../../directives/resize-input.directive";
 
 @Component({
+standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective],
   selector: 'app-autodialer',
   templateUrl: './autodialer.component.html',
   styleUrls: ['./autodialer.component.css']

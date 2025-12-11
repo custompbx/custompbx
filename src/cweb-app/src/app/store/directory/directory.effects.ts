@@ -132,7 +132,9 @@ import {WsDataService} from '../../services/ws-data.service';
 import {StoreGotAlsaError} from '../config/alsa/config.actions.alsa';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DirectoryEffects {
 
   constructor(

@@ -1,4 +1,4 @@
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "@angular/material/prebuilt-themes/indigo-pink.css";
 
 body {
   margin: 0;
@@ -50,6 +50,10 @@ body {
   color: #ff6b81 !important;
 }
 
+mat-toolbar.mat-basic {
+  background-color: #f1f1f1 !important;
+  color: #000000 !important;
+}
 .mat-green {
   background-color: #56d756 !important;
   color: #fff !important;
@@ -64,6 +68,14 @@ body {
 }
 .mat-purple {
   background-color: #9b3fb5 !important;
+  color: #ffffff !important;
+}
+.mat-accent-new {
+  background-color: #ff4081 !important;
+  color: #ffffff !important;
+}
+.mat-primary-new {
+  background-color: #3f51b5 !important;
   color: #ffffff !important;
 }
 /*

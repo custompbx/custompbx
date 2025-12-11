@@ -1,13 +1,14 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
-import {Iitem, Iopal} from '../../../store/config/config.state.struct';
+import {Component, inject, signal, computed, effect} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
+import {Iitem, Iopal, State} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {ActivatedRoute} from '@angular/router';
 import {
   AddOpalListener,
   AddOpalListenerParameter,
@@ -18,76 +19,64 @@ import {
   SwitchOpalParameter, UpdateOpalListenerParameter,
   UpdateOpalParameter
 } from '../../../store/config/opal/config.actions.opal';
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-opal',
   templateUrl: './opal.component.html',
   styleUrls: ['./opal.component.css']
 })
-export class OpalComponent implements OnInit, OnDestroy {
+export class OpalComponent {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: Iopal;
-  private newListenerName: string;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  private panelCloser = [];
-  public loadCounter: number;
-  private toCopyListener: number;
-  public globalSettingsDispatchers: object;
-  public listenerSettingsDispatchers: object;
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
+  private configsObservable = this.store.pipe(select(selectConfigurationState));
+  private configsSignal = toSignal(this.configsObservable, { initialValue: {} as State });
 
-  ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.opal;
-      this.lastErrorMessage = configs.opal && configs.opal.errorMessage || null;
-      if (!this.lastErrorMessage) {
-        this.newListenerName = '';
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
-    this.globalSettingsDispatchers = {
-      addNewItemField: this.addNewOpalParam.bind(this),
-      switchItem: this.switchOpalParam.bind(this),
-      addItem: this.newOpalParam.bind(this),
-      dropNewItem: this.dropNewOpalParam.bind(this),
-      deleteItem: this.deleteOpalParam.bind(this),
-      updateItem: this.updateOpalParam.bind(this),
-      pasteItems: null,
-    };
-    this.listenerSettingsDispatchers = {
-      addNewItemField: this.addNewListenerParam.bind(this),
-      switchItem: this.switchListenerParam.bind(this),
-      addItem: this.newListenerParam.bind(this),
-      dropNewItem: this.dropNewListenerParam.bind(this),
-      deleteItem: this.deleteListenerParam.bind(this),
-      updateItem: this.updateListenerParam.bind(this),
-      pasteItems: this.pasteListenerParams.bind(this),
-    };
-  }
+  public list = computed(() => this.configsSignal().opal || {} as Iopal);
+  public loadCounter = computed(() => this.configsSignal().loadCounter || 0);
+  private lastErrorMessage = computed(() => this.list().errorMessage || null);
 
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
-  }
+  public newListenerName = signal<string>('');
+  public selectedIndex: number = 0;
+  private panelCloser: {[key: string]: boolean} = {};
+  public toCopyListener: number = 0;
+
+  public globalSettingsDispatchers = {
+    addNewItemField: this.addNewOpalParam.bind(this),
+    switchItem: this.switchOpalParam.bind(this),
+    addItem: this.newOpalParam.bind(this),
+    dropNewItem: this.dropNewOpalParam.bind(this),
+    deleteItem: this.deleteOpalParam.bind(this),
+    updateItem: this.updateOpalParam.bind(this),
+    pasteItems: null,
+  };
+
+  public listenerSettingsDispatchers = {
+    addNewItemField: this.addNewListenerParam.bind(this),
+    switchItem: this.switchListenerParam.bind(this),
+    addItem: this.newListenerParam.bind(this),
+    dropNewItem: this.dropNewListenerParam.bind(this),
+    deleteItem: this.deleteListenerParam.bind(this),
+    updateItem: this.updateListenerParam.bind(this),
+    pasteItems: this.pasteListenerParams.bind(this),
+  };
+
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    }
+  });
 
   updateOpalParam(param: Iitem) {
     this.store.dispatch(new UpdateOpalParameter({param: param}));
@@ -120,7 +109,7 @@ export class OpalComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StoreDropNewOpalParameter({index: index}));
   }
 
-  getOpalListenersParams(id) {
+  getOpalListenersParams(id: number) {
     this.panelCloser['listener' + id] = true;
     this.store.dispatch(new GetOpalListenerParameters({id: id}));
   }
@@ -157,10 +146,10 @@ export class OpalComponent implements OnInit, OnDestroy {
   }
 
   onListenerSubmit() {
-    this.store.dispatch(new AddOpalListener({name: this.newListenerName}));
+    this.store.dispatch(new AddOpalListener({name: this.newListenerName()}));
   }
 
-  checkDirty(condition: AbstractControl): boolean {
+  checkDirty(condition: AbstractControl | null): boolean {
     if (condition) {
       return !condition.dirty;
     } else {
@@ -168,16 +157,16 @@ export class OpalComponent implements OnInit, OnDestroy {
     }
   }
 
-  isReadyToSendThree(mainObject: AbstractControl, object2: AbstractControl, object3: AbstractControl): boolean {
+  isReadyToSendThree(mainObject: AbstractControl | null, object2: AbstractControl | null, object3: AbstractControl | null): boolean {
     return (mainObject && mainObject.valid && mainObject.dirty)
       || ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty));
   }
 
-  isvalueReadyToSend(valueObject: AbstractControl): boolean {
+  isvalueReadyToSend(valueObject: AbstractControl | null): boolean {
     return valueObject && valueObject.dirty && valueObject.valid;
   }
 
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
+  isReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
     return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
   }
 
@@ -185,16 +174,13 @@ export class OpalComponent implements OnInit, OnDestroy {
     return Array.isArray(obj);
   }
 
-  trackByFn(index, item) {
-    return index; // or item.id
-  }
-
-  isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
+  isNewReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
     return nameObject && valueObject && nameObject.valid && valueObject.valid;
   }
 
-  copyListener(key) {
-    if (!this.list.listeners[key]) {
+  copyListener(key: number) {
+    const listeners = this.list().listeners;
+    if (!listeners || !listeners[key]) {
       this.toCopyListener = 0;
       return;
     }
@@ -208,7 +194,7 @@ export class OpalComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StorePasteOpalListenerParameters({from_id: this.toCopyListener, to_id: to}));
   }
 
-  openBottomSheetListener(id, newName, oldName, action): void {
+  openBottomSheetListener(id: number, newName: string, oldName: string, action: string): void {
     const config = {
       data:
         {
@@ -240,4 +226,3 @@ export class OpalComponent implements OnInit, OnDestroy {
   }
 
 }
-

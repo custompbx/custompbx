@@ -1,7 +1,8 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
-  name: 'formatTimer'
+    name: 'formatTimer',
+    standalone: true
 })
 export class FormatTimerPipe implements PipeTransform {
 

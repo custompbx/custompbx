@@ -1,14 +1,14 @@
 import {All, FSCLIActionTypes} from './fscli.actions';
 
 export interface State {
-  fscliData: string;
+  fsCliData: string;
   loadCounter: number;
   errorMessage: string | null;
 }
 
 
 export const initialState: State = {
-  fscliData: '',
+  fsCliData: '',
   loadCounter: 0,
   errorMessage: '',
 };
@@ -35,7 +35,7 @@ export function reducer(state = initialState, action: All): State {
       }
       return {
         ...state,
-        fscliData: action.payload.response.response || '',
+        fsCliData: action.payload.response.response || '',
         errorMessage: null,
         loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
       };

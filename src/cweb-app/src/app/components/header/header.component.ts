@@ -1,6 +1,6 @@
 import {
   Component,
-  ComponentRef, EventEmitter,
+  ComponentRef, effect, EventEmitter, inject,
   Input,
   OnDestroy,
   OnInit, Output,
@@ -13,8 +13,14 @@ import {Observable, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectHeader} from '../../store/app.states';
 import {StartPhone, ToggleShowPhone} from '../../store/header/header.actions';
+import {MaterialModule} from "../../../material-module";
+import {PhoneComponent} from "../phone/phone.component";
+import {RouterLink} from "@angular/router";
+
 
 @Component({
+  standalone: true,
+  imports: [MaterialModule, PhoneComponent, RouterLink],
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
@@ -24,7 +30,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   public user: Iuser;
   public startPhone: boolean;
   public hidePhone = true;
-  public getState$: Subscription;
   public clone = true;
   public phoneState: Observable<any>;
   public phoneState$: Subscription;
@@ -34,19 +39,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild('componentContainer', {read: ViewContainerRef}) container: ViewContainerRef;
   componentRef: ComponentRef<any>;
 
+  private userService = inject(UserService);
+  private resolver = inject(ViewContainerRef);
+  private store = inject(Store<AppState>);
+
+  private menuUpdateEffect = effect(() => {
+    this.user = this.userService.userSignal();
+  });
+
   constructor(
-    private userService: UserService,
-    private resolver: ViewContainerRef,
-    private store: Store<AppState>,
   ) {
-    this.user = this.userService.user;
     this.phoneState = this.store.pipe(select(selectHeader));
   }
 
   ngOnInit() {
-    this.getState$ = this.userService.getState.subscribe((state) => {
-      this.user = state.user;
-    });
     this.phoneState$ = this.phoneState.subscribe((phone) => {
       this.startPhone = phone.phone.started;
       this.hidePhone = !phone.phone.shown;
@@ -54,7 +60,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.getState$.unsubscribe();
     this.phoneState$.unsubscribe();
     if (this.componentRef) {
       this.componentRef.destroy();

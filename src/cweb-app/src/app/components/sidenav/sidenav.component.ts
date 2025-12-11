@@ -1,33 +1,35 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, effect, inject, OnInit} from '@angular/core';
+
+import {MaterialModule} from "../../../material-module";
 import {Iuser} from '../../store/auth/auth.reducers';
 import {UserService} from '../../services/user.service';
 import {Subscription} from 'rxjs';
-import {IsActiveMatchOptions, Router} from '@angular/router';
+import {IsActiveMatchOptions, Router, RouterLink} from '@angular/router';
+import {Store} from "@ngrx/store";
+import {AppState} from "../../store/app.states";
 
 @Component({
-  selector: 'app-sidenav',
-  templateUrl: './sidenav.component.html',
-  styleUrls: ['./sidenav.component.css']
+  standalone: true,
+  imports: [MaterialModule, RouterLink],
+    selector: 'app-sidenav',
+    templateUrl: './sidenav.component.html',
+    styleUrls: ['./sidenav.component.css']
 })
-export class SidenavComponent implements OnInit {
+export class SidenavComponent {
 
   public menuItems = Array<IMenuItemExpand>();
   public user: Iuser;
-  public getState$: Subscription;
 
-  constructor(
-    private userService: UserService,
-    private router: Router,
-  ) {
-    this.user = this.userService.user;
-  }
+  private userService = inject(UserService);
+  private router = inject(Router);
 
-  ngOnInit() {
-    this.getState$ = this.userService.getState.subscribe((state) => {
-      this.user = state.user;
-      this.menuItems = this.getMenuItems(this.user?.group_id);
-    });
-  }
+  private menuUpdateEffect = effect(() => {
+    // a) Read the user signal (userSignal is public in the UserService)
+    const user = this.userService.userSignal();
+    // b) Perform the side effect logic
+    this.user = user;
+    this.menuItems = this.getMenuItems(user?.group_id);
+  });
 
   isRouteActive(route: string): boolean {
     if (!route) {

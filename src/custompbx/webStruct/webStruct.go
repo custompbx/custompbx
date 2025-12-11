@@ -30,10 +30,9 @@ const (
 )
 
 type Message struct {
-	Username    string       `json:"username"`
-	MessageType string       `json:"MessageType"`
-	Event       string       `json:"event"`
-	Data        *MessageData `json:"data"`
+	Username string       `json:"username"`
+	Event    string       `json:"event"`
+	Data     *MessageData `json:"data"`
 }
 
 type MessageData struct {
@@ -104,8 +103,9 @@ type MessageDataVariable struct {
 
 // Subscriptions manages a set of subscriptions with thread-safe operations.
 type Subscriptions struct {
-	mx     sync.RWMutex
-	byName map[string]bool
+	mx         sync.RWMutex
+	byName     map[string]bool
+	persistent map[string]bool
 }
 
 // Get retrieves the subscription status for a given name.
@@ -122,21 +122,27 @@ func (s *Subscriptions) Set(name string) {
 	s.byName[name] = true
 }
 
+// SetPersistent adds a persistent subscription for a given name.
+func (s *Subscriptions) SetPersistent(name string) {
+	s.mx.Lock()
+	defer s.mx.Unlock()
+	s.byName[name] = true
+	s.persistent[name] = true
+}
+
 // Del removes a subscription for a given name.
 func (s *Subscriptions) Del(name string) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
-	if !s.byName[name] {
-		return
-	}
 	s.byName[name] = false
+	s.persistent[name] = false
 }
 
 // Clear removes all subscriptions.
 func (s *Subscriptions) Clear() {
 	s.mx.Lock()
 	defer s.mx.Unlock()
-	s.byName = make(map[string]bool)
+	s.byName = s.persistent
 }
 
 type Param struct {
@@ -434,7 +440,10 @@ func (m *MessageData) Trim() {
 
 // newSubscriptions creates and returns a new Subscriptions instance.
 func newSubscriptions() *Subscriptions {
-	return &Subscriptions{byName: make(map[string]bool)}
+	return &Subscriptions{
+		byName:     make(map[string]bool),
+		persistent: make(map[string]bool),
+	}
 }
 
 // CreateWsContext creates a new WsContext with the provided WebSocket connection.

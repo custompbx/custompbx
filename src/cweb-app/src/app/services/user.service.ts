@@ -1,33 +1,42 @@
-import {Injectable, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
+import {Injectable, inject, computed} from '@angular/core';
 import {Store, select} from '@ngrx/store';
 import {AppState, selectAuthState} from '../store/app.states';
 import {LogOut} from '../store/auth/auth.actions';
+import {toSignal} from "@angular/core/rxjs-interop";
+
+interface AuthState {
+  isAuthenticated: boolean;
+  user: any; // Use a proper user type if available
+  errorMessage: any; // Use a proper error type if available
+  token: any;
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserService implements OnDestroy {
+export class UserService {
 
-  public getState: Observable<any>;
-  public getState$: Subscription;
-  public isAuthenticated: false;
-  public user = null;
-  public errorMessage = null;
+  private store = inject(Store<AppState>);
 
-  constructor(
-    private store: Store<AppState>
-  ) {
-    this.getState = this.store.pipe(select(selectAuthState));
-    this.getState$ = this.getState.subscribe((state) => {
-      this.isAuthenticated = state.isAuthenticated;
-      this.user = state.user;
-      this.errorMessage = state.errorMessage;
-    });
+  private authStateSignal = toSignal(
+    this.store.pipe(select(selectAuthState)),
+    { initialValue: { isAuthenticated: false, user: null, errorMessage: null , token: null} as AuthState }
+  );
+
+  public isAuthenticatedSignal = computed(() => this.authStateSignal().isAuthenticated);
+  public userSignal = computed(() => this.authStateSignal().user);
+  public errorMessageSignal = computed(() => this.authStateSignal().errorMessage);
+
+  public get isAuthenticated(): boolean {
+    return this.isAuthenticatedSignal();
   }
 
-  ngOnDestroy() {
-    this.getState$.unsubscribe();
+  public get user(): any {
+    return this.userSignal();
+  }
+
+  public get errorMessage(): any {
+    return this.errorMessageSignal();
   }
 
   public logOut(): void {

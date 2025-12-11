@@ -1,9 +1,13 @@
 import {Component, Input, OnInit} from '@angular/core';
 
+import {MaterialModule} from "../../../material-module";
+
 @Component({
-  selector: 'app-inner-header',
-  templateUrl: './inner-header.component.html',
-  styleUrls: ['./inner-header.component.css']
+  standalone: true,
+    imports: [MaterialModule],
+    selector: 'app-inner-header',
+    templateUrl: './inner-header.component.html',
+    styleUrls: ['./inner-header.component.css']
 })
 export class InnerHeaderComponent implements OnInit {
 

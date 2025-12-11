@@ -10,7 +10,9 @@ import {
 } from './hep.actions';
 
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class HepEffects {
 
   constructor(

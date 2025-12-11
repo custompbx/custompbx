@@ -38,7 +38,7 @@ func SwitchDialplanNoProceed(switcher bool) bool {
 	if switcher {
 		value = "true"
 	}
-	err := db.SetDialplanSettings(dialplan, mainStruct.NoProceedName, value)
+	err := db.SetDialplanSettings(dialplan, mainStruct.NoProceedName, value, cache.GetCurrentInstanceId())
 	if err != nil {
 		return false
 	}

@@ -3,67 +3,95 @@
   <mat-toolbar [color]="headerColor()" role="heading" class="header" cdkDragHandle>
     Phone
     <span class="example-spacer"></span>
-    <mat-icon *ngIf="!data.UA?.transport.isConnected() && !isVeroLogged()" color="warn">wifi_off</mat-icon>
-    <button *ngIf="data.UA?.transport.isConnected() || isVeroLogged()" class="reg-button" mat-mini-fab [color]="!data.registered && libName === sipjsLib ? 'warn' : 'green'" [title]="!data.registered && libName === sipjsLib ? 'enter calls' : 'leave calls'" aria-label="register" (click)="register()" [disabled]="!data.UA?.transport.isConnected()">
-      <mat-icon *ngIf="!data.registered && libName === sipjsLib">phone_callback</mat-icon>
-      <mat-icon *ngIf="data.registered && libName === sipjsLib">phone_disabled</mat-icon>
-    </button>
+    @if (!isClientConnected()) {
+      <mat-icon color="warn">wifi_off</mat-icon>
+    }
+    @if (isSipJsTransportConnected()) {
+      <button class="reg-button" mat-mini-fab [color]="!registered() && libName === sipjsLib ? 'warn' : 'green'" [title]="!registered() && libName === sipjsLib ? 'enter calls' : 'leave calls'" aria-label="register" (click)="register()" [disabled]="!isSipJsTransportConnected()">
+        @if (!registered() && libName === sipjsLib) {
+          <mat-icon>phone_callback</mat-icon>
+        }
+        @if (registered() && libName === sipjsLib) {
+          <mat-icon>phone_disabled</mat-icon>
+        }
+      </button>
+    }
     <button mat-icon-button (click)="restartUS()" title="restart phone">
       <mat-icon>autorenew</mat-icon>
     </button>
   </mat-toolbar>
-  <section id="main-content" class="animated fadeInUp" *ngIf="data.uaParams.authorizationUsername">
-    <mat-form-field class="number-field">
-      <mat-label>Number</mat-label>
-      <input matInput [(ngModel)]="data.number" name="Number" name="number">
-      <button mat-icon-button matSuffix *ngIf="data.number" aria-label="Delete" (click)="removeLastDigit()" class="dialpad-button-remove">
-        <mat-icon>chevron_left</mat-icon>
-      </button>
-      <button mat-icon-button matSuffix (click)="switchHideButtonsPad()" title="dialpad" aria-label="dialpad">
-        <mat-icon>dialpad</mat-icon>
-      </button>
-    </mat-form-field>
-    <h3 class="timer mat-headline-3">{{data.totalTime | formatTimer}}</h3>
-    <div class="buttons-pad" *ngIf="showButtonsPad">
-      <button (click)="phoneButton(but)" class="phone-digit-button" *ngFor="let but of padButtons">{{ but }}</button>
-    </div>
-    <div class="actions-buttons-pad">
-      <button mat-flat-button (click)="call()" *ngIf="!(data.inCall || data.ringing || data.answered)"
-              color="primary" title="call"
-              class="phone-action-button"
-              [disabled]="(!data.UA?.transport.isConnected() && !isVeroLogged()) || !data.number"
-      >
-        <mat-icon>phone</mat-icon><span>Call</span>
-      </button>
-      <button mat-flat-button (click)="answer()" *ngIf="data.ringing"
-              color="green" title="answer" class="phone-action-button"
-              [disabled]="!data.UA?.transport.isConnected() && !isVeroLogged()"
-      >
-        <span>Answer: </span><span style="font-size: 20px">{{ data.session?.request?.from?.uri?.user }}</span>
-      </button>
-      <button mat-flat-button (click)="hangup()" *ngIf="data.inCall || data.ringing || data.answered"
-              color="warn" class="phone-action-button"
-              [disabled]="!data.UA?.transport.isConnected() && !isVeroLogged()"
-      >
-        <mat-icon>call_end</mat-icon><span>Hangup</span>
-      </button>
-      <button mat-flat-button (click)="hold()" *ngIf="data.answered && !data.onHold"
-              title="hold" class="phone-action-button mat-blue"
-              [disabled]="!data.UA?.transport.isConnected() && !isVeroLogged()"
-      >
-        <mat-icon>phone_paused</mat-icon><span>Hold</span>
-      </button>
-      <button mat-flat-button (click)="unhold()" *ngIf="data.answered && data.onHold"
-              title="unhold" class="phone-action-button mat-blue"
-              [disabled]="!data.UA?.transport.isConnected() && !isVeroLogged()"
-      >
-        <mat-icon>play_arrow</mat-icon><span>Unhold</span>
-      </button>
-    </div>
-  </section>
-  <section *ngIf="!data.uaParams.authorizationUsername">
-    <mat-toolbar color="warn" role="heading" class="header">No creds</mat-toolbar>
-  </section>
+  @if (authorizationUsername()) {
+    <section id="main-content" class="animated fadeInUp">
+      <mat-form-field class="number-field">
+        <mat-label>Number</mat-label>
+        <input matInput [ngModel]="number()" (ngModelChange)="number.set($event)" name="Number" name="number">
+        @if (number()) {
+          <button mat-icon-button matSuffix aria-label="Delete" (click)="removeLastDigit()" class="dialpad-button-remove">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+        }
+        <button mat-icon-button matSuffix (click)="switchHideButtonsPad()" title="dialpad" aria-label="dialpad">
+          <mat-icon>dialpad</mat-icon>
+        </button>
+      </mat-form-field>
+      <h3 class="timer mat-headline-3">{{totalTime() | formatTimer}}</h3>
+      @if (showButtonsPad) {
+        <div class="buttons-pad">
+          @for (but of padButtons; track but) {
+            <button (click)="phoneButton(but)" class="phone-digit-button">{{ but }}</button>
+          }
+        </div>
+      }
+      <div class="actions-buttons-pad">
+        @if (!(inCall() || ringing() || answered())) {
+          <button mat-flat-button (click)="call()"
+            color="primary" title="call"
+            class="phone-action-button"
+            [disabled]="!isClientConnected() || !number()"
+            >
+            <mat-icon>phone</mat-icon><span>Call</span>
+          </button>
+        }
+        @if (ringing()) {
+          <button mat-flat-button (click)="answer()"
+            color="green" title="answer" class="phone-action-button"
+            [disabled]="!isClientConnected()"
+            >
+            <span>Answer: </span><span style="font-size: 20px">{{ data.session?.request?.from?.uri?.user }}</span>
+          </button>
+        }
+        @if (inCall() || ringing() || answered()) {
+          <button mat-flat-button (click)="hangup()"
+            color="warn" class="phone-action-button"
+            [disabled]="!isClientConnected()"
+            >
+            <mat-icon>call_end</mat-icon><span>Hangup</span>
+          </button>
+        }
+        @if (answered() && !onHold()) {
+          <button mat-flat-button (click)="hold()"
+            title="hold" class="phone-action-button mat-blue"
+            [disabled]="!isClientConnected()"
+            >
+            <mat-icon>phone_paused</mat-icon><span>Hold</span>
+          </button>
+        }
+        @if (answered() && onHold()) {
+          <button mat-flat-button (click)="unhold()"
+            title="unhold" class="phone-action-button mat-blue"
+            [disabled]="!isClientConnected()"
+            >
+            <mat-icon>play_arrow</mat-icon><span>Unhold</span>
+          </button>
+        }
+      </div>
+    </section>
+  }
+  @if (!authorizationUsername()) {
+    <section>
+      <mat-toolbar color="warn" role="heading" class="header">No creds</mat-toolbar>
+    </section>
+  }
   <div id="mediaTags" #mediaTags>
     <audio id="remoteTag" autoplay #remoteTag></audio>
     <audio id="localTag" muted="muted" #localTag></audio>

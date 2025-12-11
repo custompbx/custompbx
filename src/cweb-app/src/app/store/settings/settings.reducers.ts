@@ -38,6 +38,8 @@ export interface Isettings {
   database: object;
   webserver: object;
   xml_curl_server: object;
+  cert_path: object;
+  key_path: object;
 }
 
 export interface IwebUser {
@@ -50,7 +52,7 @@ export interface IwebUser {
   webrtc_lib: string;
   ws: string;
   group_id: number;
-  sip_id: object;
+  sip_id: any;
 }
 
 export function reducer(state = initialState, action: All): State {
@@ -258,10 +260,10 @@ export function reducer(state = initialState, action: All): State {
       if (ids.length === 0 || !state.webUsers[id]) {
         return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
       }
-
+      const tokens = state.webUsers[id]?.tokens || [];
       return {
         ...state,
-        webUsers: {...state.webUsers, [id]: {...state.webUsers[id], tokens: [ ...state.webUsers[id]['tokens'], ...data]}},
+        webUsers: {...state.webUsers, [id]: {...state.webUsers[id], tokens: [ ...tokens, ...data]}},
         loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
         errorMessage: action.payload.response.error,
       };
@@ -274,7 +276,8 @@ export function reducer(state = initialState, action: All): State {
         return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
       }
 
-      const rest = state.webUsers[id]['tokens'].filter(i => i.id !== afId);
+      const tokens = state.webUsers[id]?.tokens || [];
+      const rest = tokens.filter(i => i.id !== afId);
 
       return {
         ...state,

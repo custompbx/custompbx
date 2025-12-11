@@ -25,6 +25,7 @@ export interface State {
         variables: Array<{ id: number; name: string; value: string; description: string; disabled: boolean; editable: boolean; }>;
       };
   };
+  userDetails: {[index: number]: object};
 }
 
 export const initialState: State = {
@@ -40,6 +41,7 @@ export const initialState: State = {
   additionalData: {},
   webUsersTemplates: {},
   templatesItems: {},
+  userDetails: {},
 };
 
 export interface Idomains {

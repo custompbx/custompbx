@@ -1,20 +1,22 @@
-<ng-container *ngFor="let item of menuItems">
-  <mat-expansion-panel *ngIf="item.subMenu" class="mat-elevation-z nopadding menu-panel">
-    <mat-expansion-panel-header class="mep-header">
-      <mat-panel-title [routerLink]="item.route ? [item.route] : null" class="menu-title">
-        <mat-icon class="icon-spacer menu-name-1 menu-name-2">{{item.icon}}</mat-icon><span class="menu-name-2">{{item.name}}</span>
-      </mat-panel-title>
-    </mat-expansion-panel-header>
-    <ng-container *ngFor="let subItem of item.subMenu">
-      <a [routerLink]="[subItem.route]" class="menu-sub-item" [class.menu-item-active]="isRouteActive(subItem.route)">
-        <mat-icon class="icon-spacer menu-sub-icon-2">{{subItem.icon}}</mat-icon>
-        <span class="menu-sub-name-2">{{subItem.name}}</span></a>
-    </ng-container>
-  </mat-expansion-panel>
-
-  <a *ngIf="!item.subMenu" [routerLink]="[item.route]" class="menu-item" [class.menu-item-active]="isRouteActive(item.route)">
-    <mat-icon class="icon-spacer">{{item.icon}}</mat-icon>
-    <span class="menu-name-2">{{item.name}}</span>
-  </a>
-
-</ng-container>
+@for (item of menuItems; track item) {
+  @if (item.subMenu) {
+    <mat-expansion-panel class="mat-elevation-z nopadding menu-panel">
+      <mat-expansion-panel-header class="mep-header">
+        <mat-panel-title [routerLink]="item.route ? [item.route] : null" class="menu-title">
+          <mat-icon class="icon-spacer menu-name-1 menu-name-2">{{item.icon}}</mat-icon><span class="menu-name-2">{{item.name}}</span>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      @for (subItem of item.subMenu; track subItem) {
+        <a [routerLink]="[subItem.route]" class="menu-sub-item" [class.menu-item-active]="isRouteActive(subItem.route)">
+          <mat-icon class="icon-spacer menu-sub-icon-2">{{subItem.icon}}</mat-icon>
+          <span class="menu-sub-name-2">{{subItem.name}}</span></a>
+        }
+      </mat-expansion-panel>
+    }
+    @if (!item.subMenu) {
+      <a [routerLink]="[item.route]" class="menu-item" [class.menu-item-active]="isRouteActive(item.route)">
+        <mat-icon class="icon-spacer">{{item.icon}}</mat-icon>
+        <span class="menu-name-2">{{item.name}}</span>
+      </a>
+    }
+  }

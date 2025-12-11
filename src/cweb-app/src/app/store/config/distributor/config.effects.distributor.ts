@@ -25,7 +25,9 @@ import {
   UpdateDistributorNode
 } from './config.actions.distributor';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsDistributor {
 
   constructor(

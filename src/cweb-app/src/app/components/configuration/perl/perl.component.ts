@@ -1,9 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subscription} from 'rxjs';
-import {Iitem, Ilcr, IsimpleModule} from '../../../store/config/config.state.struct';
+import {Component, inject, computed, OnInit, effect} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {CommonModule} from "@angular/common";
+import {MaterialModule} from "../../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl} from '@angular/forms';
+import {AbstractControl, FormsModule} from '@angular/forms';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ActivatedRoute} from '@angular/router';
@@ -14,46 +15,62 @@ import {
   StoreDropNewPerlParameter,
   SwitchPerlParameter,
   UpdatePerlParameter
-} from '../../../store/config/perl/config.actions.perl';
+} from '../../../store/config/perl/config.actions.perl'; // Changed path
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {Iitem, IsimpleModule, State} from '../../../store/config/config.state.struct';
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
-  selector: 'app-perl',
-  templateUrl: './perl.component.html',
+  standalone: true,
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  selector: 'app-perl', // Changed selector
+  templateUrl: './perl.component.html', // Kept original template reference
   styleUrls: ['./perl.component.css']
 })
-export class PerlComponent implements OnInit, OnDestroy {
+export class PerlComponent implements OnInit { // Removed OnDestroy
+  public moduleName: string = 'Perl';
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: IsimpleModule;
-  public selectedIndex: number;
-  private lastErrorMessage: string;
-  public loadCounter: number;
+  // --- Dependency Injection using inject() ---
+  private store = inject(Store<AppState>);
+  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+
+  // --- Reactive State from NgRx using toSignal ---
+  private configState = toSignal(
+    this.store.pipe(select(selectConfigurationState)),
+    {
+      initialValue: {
+        perl: {} as IsimpleModule, // Initial state set to perl
+        errorMessage: null,
+        loadCounter: 0,
+      } as State
+    }
+  );
+
+  // --- Computed/Derived State from NgRx State ---
+  public list = computed(() => this.configState().perl); // Accessing perl state
+  public loadCounter = computed(() => this.configState().loadCounter);
+  private lastErrorMessage = computed(() => this.configState().perl?.errorMessage || null); // Accessing perl error message
+
+  // --- Local Component State ---
+  public selectedIndex: number = 0;
   public globalSettingsDispatchers: object;
 
-  constructor(
-    private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
-    private route: ActivatedRoute,
-  ) {
-    this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
+  // --- Effect for Side Effects (Error handling) ---
+  private snackbarEffect = effect(() => {
+    const errorMessage = this.lastErrorMessage();
+    if (errorMessage) {
+      this._snackBar.open('Error: ' + errorMessage + '!', null, {
+        duration: 3000,
+        panelClass: ['error-snack'],
+      });
+    }
+  });
 
   ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.perl;
-      this.lastErrorMessage = configs.perl && configs.perl.errorMessage || null;
-      if (!this.lastErrorMessage) {
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
-          duration: 3000,
-          panelClass: ['error-snack'],
-        });
-      }
-    });
+    // Initialize dispatchers here, updated for Perl
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewPerlParam.bind(this),
       switchItem: this.switchPerlParam.bind(this),
@@ -63,13 +80,6 @@ export class PerlComponent implements OnInit, OnDestroy {
       updateItem: this.updatePerlParam.bind(this),
       pasteItems: null,
     };
-  }
-
-  ngOnDestroy() {
-    this.configs$.unsubscribe();
-    if (this.route.snapshot?.data?.reconnectUpdater) {
-       this.route.snapshot.data.reconnectUpdater.unsubscribe();
-     }
   }
 
   updatePerlParam(param: Iitem) {
@@ -83,10 +93,11 @@ export class PerlComponent implements OnInit, OnDestroy {
   }
 
   newPerlParam(index: number, name: string, value: string) {
-    const param = <Iitem>{};
-    param.enabled = true;
-    param.name = name;
-    param.value = value;
+    const param = <Iitem>{
+      enabled: true,
+      name: name,
+      value: value
+    };
 
     this.store.dispatch(new AddPerlParameter({index: index, param: param}));
   }
@@ -103,38 +114,4 @@ export class PerlComponent implements OnInit, OnDestroy {
     this.store.dispatch(new StoreDropNewPerlParameter({index: index}));
   }
 
-  checkDirty(condition: AbstractControl): boolean {
-    if (condition) {
-      return !condition.dirty;
-    } else {
-      return true;
-    }
-  }
-
-  isReadyToSendThree(mainObject: AbstractControl, object2: AbstractControl, object3: AbstractControl): boolean {
-    return (mainObject && mainObject.valid && mainObject.dirty)
-      || ((object2 && object2.valid && object2.dirty) || (object3 && object3.valid && object3.dirty));
-  }
-
-  isvalueReadyToSend(valueObject: AbstractControl): boolean {
-    return valueObject && valueObject.dirty && valueObject.valid;
-  }
-
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
-  }
-
-  isArray(obj: any): boolean {
-    return Array.isArray(obj);
-  }
-
-  trackByFn(index, item) {
-    return index; // or item.id
-  }
-
-  isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && nameObject.valid && valueObject.valid;
-  }
-
 }
-

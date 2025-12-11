@@ -10,7 +10,9 @@ import {
 } from './phone.actions';
 import {WsDataService} from '../../services/ws-data.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class PhoneEffects {
 
   constructor(

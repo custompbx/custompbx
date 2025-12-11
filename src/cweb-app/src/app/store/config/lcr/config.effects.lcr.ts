@@ -25,7 +25,9 @@ import {
   UpdateLcrProfileParameter
 } from './config.actions.lcr';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ConfigEffectsLcr {
 
   constructor(

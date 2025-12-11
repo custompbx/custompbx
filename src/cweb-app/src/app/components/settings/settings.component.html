@@ -1,4 +1,4 @@
-<app-inner-header name="Settings" [loadCounter]="loadCounter"></app-inner-header>
+<app-inner-header name="Settings" [loadCounter]="loadCounter()"></app-inner-header>
 <div class="component-inner">
   <mat-expansion-panel (opened)="getConnectionsSettings()">
     <mat-expansion-panel-header>
@@ -14,719 +14,755 @@
           <h3>ESL</h3>
           <div>Event socket settings</div>
         </div>
-        <div *ngIf="settings?.freeswitch?.esl">
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Esl_host</mat-label>
-        <input matInput placeholder="host" required [(ngModel)]="settings.freeswitch.esl.host" name="esl_host">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Esl_port</mat-label>
-        <input matInput placeholder="port" type="number" required [(ngModel)]="settings.freeswitch.esl.port"
-                   name="esl_port">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Esl_pass</mat-label>
-        <input matInput placeholder="password" required [(ngModel)]="settings.freeswitch.esl.pass" name="esl_pass">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Esl_timeout</mat-label>
-        <input matInput placeholder="timeout" type="number" required [(ngModel)]="settings.freeswitch.esl.timeout"
-                   name="esl_timeout">
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="setting">
-        <div class="setting-title">
-          <h3>Database</h3>
-          <div>Database settings</div>
-        </div>
-        <div *ngIf="settings?.database">
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>DataBase_host</mat-label>
-        <input matInput placeholder="host" required [(ngModel)]="settings.database.host" name="dataBase_host">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>DataBase_port</mat-label>
-        <input matInput placeholder="port" type="number" required [(ngModel)]="settings.database.port"
-                   name="dataBase_port">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>DataBase_name</mat-label>
-        <input matInput placeholder="name" required [(ngModel)]="settings.database.name" name="dataBase_name">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>DataBase_user</mat-label>
-        <input matInput placeholder="user" required [(ngModel)]="settings.database.user" name="dataBase_user">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>DataBase-pass</mat-label>
-        <input matInput placeholder="password" required [(ngModel)]="settings.database.pass" name="dataBase-pass">
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="setting">
-        <div class="setting-title">
-          <h3>Webserver</h3>
-          <div>Webserver settings</div>
-        </div>
-        <div *ngIf="settings?.webserver">
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Webserver_host</mat-label>
-        <input matInput placeholder="host" required [(ngModel)]="settings.webserver.host" name="webserver_host">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Webserver_port</mat-label>
-        <input matInput placeholder="port" type="number" required [(ngModel)]="settings.webserver.port"
-                   name="webserver_port">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Webserver_route</mat-label>
-        <input matInput placeholder="route" required [(ngModel)]="settings.webserver.route" name="webserver_route">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Webserver_cert_path</mat-label>
-        <input matInput placeholder="cert_path" required [(ngModel)]="settings.webserver.cert_path"
-                   name="webserver_cert_path">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Webserver-key_path</mat-label>
-        <input matInput placeholder="key_path" required [(ngModel)]="settings.webserver.key_path"
-                   name="webserver-key_path">
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="setting">
-        <div class="setting-title">
-          <h3>Xml curl server</h3>
-          <div>Xml curl server settings</div>
-        </div>
-        <div *ngIf="settings?.xml_curl_server">
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Xml_curl_server_host</mat-label>
-        <input matInput placeholder="host" required [(ngModel)]="settings.xml_curl_server.host"
-                   name="xml_curl_server_host">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Xml_curl_server_port</mat-label>
-        <input matInput placeholder="port" type="number" required [(ngModel)]="settings.xml_curl_server.port"
-                   name="xml_curl_server_port">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Xml_curl_server_route</mat-label>
-        <input matInput placeholder="route" required [(ngModel)]="settings.xml_curl_server.route"
-                   name="xml_curl_server_route">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Xml_curl_server_cert_path</mat-label>
-        <input matInput placeholder="cert_path" required [(ngModel)]="settings.xml_curl_server.cert_path"
-                   name="xml_curl_server_cert_path">
-          </mat-form-field>
-          <mat-form-field class="settings-full-width" hideRequiredMarker>
-        <mat-label>Xml_curl_server-key_path</mat-label>
-        <input matInput placeholder="key_path" required [(ngModel)]="settings.xml_curl_server.key_path"
-                   name="xml_curl_server-key_path">
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="content-center">
-        <button type="submit" [disabled]="sets.invalid || !sets.dirty" mat-flat-button color="primary">Save</button>
-        <button type="reset" (click)="getConnectionsSettings()" [disabled]="sets.invalid || !sets.dirty" mat-flat-button
-                color="accent">
-          Revert
-        </button>
-      </div>
-    </form>
-  </mat-expansion-panel>
-  <mat-expansion-panel (opened)="getWebUsers()">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Web users</mat-panel-title>
-      <mat-panel-description>
-        Click to get details
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-
-     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-      <mat-tab label="List">
-        <div *ngIf="users" class="list-wrap">
-          <mat-expansion-panel *ngFor="let user of users | keyvalue; trackBy: trackByFnId;" class="tabbed-panel">
-            <mat-expansion-panel-header>
-              <mat-panel-title>{{user.value.login}}</mat-panel-title>
-              <mat-panel-description>
-                Click to get details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            <form #userDetails="ngForm">
-              <div *ngIf="user.value">
-                <div class="spacer">
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>User group</mat-label>
-                    <mat-select required name="group" [(ngModel)]="user.value.group_id" disableOptionCentering>
-                      <mat-option *ngFor="let val of onlyValues(usersGroups)" [value]="val.id">
-                        {{val.name}}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                  <button mat-button color="accent" class="but-spacer-left"
-                          [disabled]="!isvalueReadyToSend(userDetails.controls['group'])"
-                          (click)="updateGroup(user.value.id, userDetails.controls['group'].value); userDetails.form.markAsPristine();">
-                    Update
-                  </button>
-                </div>
-                <div class="spacer">
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>New password</mat-label>
-                    <input matInput placeholder="new password for web user" [(ngModel)]="user.value.password"
-                           name="userPassword" type="password" autocomplete="off">
-                  </mat-form-field>
-                  <button mat-button color="accent" class="but-spacer-left"
-                          [disabled]="!isvalueReadyToSend(userDetails.controls['userPassword']) || user.value.password.length < 6"
-                          (click)="updatePassword(user.value.id, userDetails.controls['userPassword'].value); userDetails.form.markAsPristine();">
-                    Update
-                  </button>
-                </div>
-                <div class="spacer">
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>User language</mat-label>
-                    <mat-select required name="lang" [(ngModel)]="user.value.lang" disableOptionCentering>
-                      <mat-option *ngFor="let val of userLangs; let i = index" [value]="i">
-                        {{val}}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                  <button mat-button color="accent" class="but-spacer-left"
-                          [disabled]="!isvalueReadyToSend(userDetails.controls['lang'])"
-                          (click)="updateLang(user.value.id, userDetails.controls['lang'].value); userDetails.form.markAsPristine();">
-                    Update
-                  </button>
-                </div>
-                <div class="spacer">
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>Directory user</mat-label>
-                    <mat-select required name="sipUser" [(ngModel)]="user.value.sip_id.Int64" disableOptionCentering>
-                      <mat-option>-- None --</mat-option>
-                      <mat-optgroup *ngFor="let domain of directoryDomains | keyvalue" [label]="domain.value.name"
-                                    [disabled]="domain.disabled">
-                        <mat-option *ngFor="let directoryUser of onlyValuesByParent(directoryUsers, domain.key)" [value]="directoryUser.id">
-                          {{directoryUser.name}}&#64;{{domain.value.name}}
-                        </mat-option>
-                      </mat-optgroup>
-                    </mat-select>
-                  </mat-form-field>
-                  <button mat-button color="accent" class="but-spacer-left"
-                          [disabled]="!isvalueReadyToSend(userDetails.controls['sipUser'])"
-                          (click)="updateSipUser(user.value.id, userDetails.controls['sipUser'].value); userDetails.form.markAsPristine();">
-                    Update
-                  </button>
-                </div>
-                <div class="spacer extra-space">
-                  <mat-button-toggle-group name="WebRTC" aria-label="WebRTC Lib" [(ngModel)]="user.value.webrtc_lib"
-                                           (change)="updateWebRTCLib(user.value.id, user.value.webrtc_lib)">
-                    <mat-button-toggle value="sipjs">Sip.js</mat-button-toggle>
-                    <mat-button-toggle value="verto">Verto</mat-button-toggle>
-                  </mat-button-toggle-group>
-                </div>
-                <div class="spacer">
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>ws for sipjs</mat-label>
-                    <input matInput placeholder="wss://<HOST>:<PORT>" [(ngModel)]="user.value.ws"
-                           name="userWs" [matAutocomplete]="autoWs"
-                           appResizeInput
-                           [resizeOnString]="user.value.ws"
-                           [disabled]="user.value.webrtc_lib == 'verto'"
-                    >
-                    <mat-autocomplete #autoWs="matAutocomplete">
-                      <mat-option *ngFor="let option of wssUris" [value]="option">
-                        {{option}}
-                      </mat-option>
-                    </mat-autocomplete>
-                  </mat-form-field>
-                  <button mat-button color="accent" class="but-spacer-left"
-                          [disabled]="!isvalueReadyToSend(userDetails.controls['userWs']) || user.value.webrtc_lib == 'verto'"
-                          (click)="updateWs(user.value.id, userDetails.controls['userWs'].value); userDetails.form.markAsPristine();">
-                    Update
-                  </button>
-                </div>
-                <div class="spacer">
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>ws for verto</mat-label>
-                    <input matInput placeholder="wss://<HOST>:<PORT>" [(ngModel)]="user.value.verto_ws"
-                           name="userVertoWs" [matAutocomplete]="autoWsVerto"
-                           appResizeInput
-                           [resizeOnString]="user.value.verto_ws"
-                           [disabled]="user.value.webrtc_lib != 'verto'"
-                    >
-                    <mat-autocomplete #autoWsVerto="matAutocomplete">
-                      <mat-option *ngFor="let option of vertoWsUris" [value]="option"
-                                  [disabled]="user.value.webrtc_lib != 'verto'">
-                        {{option}}
-                      </mat-option>
-                    </mat-autocomplete>
-                  </mat-form-field>
-                  <button mat-button color="accent" class="but-spacer-left"
-                          [disabled]="!isvalueReadyToSend(userDetails.controls['userVertoWs']) || user.value.webrtc_lib != 'verto'"
-                          (click)="updateVertoWs(user.value.id, userDetails.controls['userVertoWs'].value); userDetails.form.markAsPristine();">
-                    Update
-                  </button>
-                </div>
-                <div class="spacer">
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>Stun (replace default)</mat-label>
-                    <input matInput placeholder="stun:<HOST>:<PORT>" [(ngModel)]="user.value.stun"
-                           name="userStun"
-                           appResizeInput
-                           [resizeOnString]="user.value.stun"
-                    >
-                  </mat-form-field>
-                  <button mat-button color="accent" class="but-spacer-left"
-                          [disabled]="!isvalueReadyToSend(userDetails.controls['userStun'])"
-                          (click)="updateStun(user.value.id, userDetails.controls['userStun'].value); userDetails.form.markAsPristine();">
-                    Update
-                  </button>
-                </div>
-                <div class="spacer">
-                  <div *ngIf="!user.value.avatar_format" class="avatar-ico">
-                    <mat-icon>face</mat-icon>
-                  </div>
-                  <img *ngIf="user.value.avatar_format" class="avatar-img"
-                       [src]="'./assets/img/avatar/' + user.value.id + '.' + user.value.avatar_format">
-                  <button mat-raised-button color="accent" class="but-spacer-left upload-image"
-                          (click)="fileInput.click()">
-                    <mat-icon>file_upload</mat-icon>
-                    <span>Upload image</span>
-                    <input #fileInput type="file" name="fileUpload" (change)="chooseAvatar(fileInput, user.value.id)"
-                           style="display:none;" accept="{{acceptFile}}"/>
-                  </button>
-                  <button mat-raised-button color="basic" class="but-spacer-left upload-image"
-                          (click)="clearAvatar(user.value.id)" [disabled]="!user.value.avatar_format">
-                    <span>Clear</span>
-                  </button>
-                </div>
-              </div>
-            </form>
-
-            <mat-expansion-panel (opened)="getUserTokens(user.value.id)">
-              <mat-expansion-panel-header>
-                <mat-panel-title>User Tokens</mat-panel-title>
-                <mat-panel-description>
-                  Click to get details
-                </mat-panel-description>
-              </mat-expansion-panel-header>
-
-              <table mat-table class="token-table" [dataSource]="user.value.tokens">
-                <ng-container *ngFor="let disCol of columns; let colIndex = index" matColumnDef="{{disCol}}">
-                  <th mat-header-cell *matHeaderCellDef>
-                    {{disCol}}
-                    <button mat-raised-button color="primary" class="but-spacer-left" *ngIf="disCol == 'token'"
-                            (click)="AddUserToken(user.value.id)">
-                      Add
-                    </button>
-                  </th>
-                  <td mat-cell *matCellDef="let element">
-                    <span>{{element[disCol]}}</span>
-                    <ng-container *ngIf="disCol === 'purpose'">
-                      <button mat-raised-button color="accent" class="but-spacer-left"
-                              (click)="openBottomSheetRemoveToken(element.id)">
-                        Remove
-                      </button>
-                    </ng-container>
-                  </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="columns"></tr>
-                <tr mat-row *matRowDef="let row; columns: columns;"></tr>
-              </table>
-
-            </mat-expansion-panel>
-          </mat-expansion-panel>
-        </div>
-      </mat-tab>
-      <mat-tab label="Add">
-        <h3>New user data</h3>
-        <form #newUserForm="ngForm" class="spacer spacerb full-form" (ngSubmit)="onNewUserSubmit(newUserForm)"
-              ngNativeValidate>
-          <mat-form-field hideRequiredMarker>
-        <mat-label>Login</mat-label>
-        <input matInput placeholder="New user login" required name="login" (ngModel)="login">
-          </mat-form-field>
-          <mat-form-field hideRequiredMarker>
-        <mat-label>Password</mat-label>
-        <input matInput placeholder="Password" required name="password" (ngModel)="password">
-          </mat-form-field>
-          <mat-form-field hideRequiredMarker>
-            <mat-label>User group</mat-label>
-            <mat-select required name="group_id" (ngModel)="groupId" disableOptionCentering>
-              <mat-option *ngFor="let val of onlyValues(usersGroups)" [value]="val.id">
-                {{val.name}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <button mat-raised-button color="primary" type="submit"
-                  [disabled]="newUserForm.invalid || !newUserForm.dirty || newUserForm.value.password.length < 6">
-            Submit
-          </button>
-        </form>
-
-      </mat-tab>
-      <mat-tab label="Rename/Delete">
-        <h3>User logins</h3>
-        <form class="spacer spacerb" #deleteForm="ngForm" *ngIf="users" ngNativeValidate>
-          <div *ngFor="let user of users | keyvalue;">
-            <mat-form-field hideRequiredMarker>
-        <mat-label>User login</mat-label>
-        <input matInput name="User login" required [ngModel]="user.value.login"
-                     [name]="'list::' + user.key">
+        @if (settings()?.freeswitch?.esl) {
+          <div>
+            <mat-form-field class="settings-full-width" hideRequiredMarker>
+              <mat-label>Esl_host</mat-label>
+              <input matInput placeholder="host" required [(ngModel)]="settings().freeswitch.esl.host" name="esl_host">
             </mat-form-field>
-            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['list::' + user.key])"
-                    (click)="openBottomSheet(user.value.id, deleteForm.controls['list::' + user.key].value, user.value.login, 'rename')">
-              Update
-            </button>
-            <button *ngIf="user.value.enabled" mat-raised-button color="accent"
-                    class="but-spacer-left switch-button"
-                    (click)="switchWebUser(user.value)">
-              Disable
-            </button>
-            <button *ngIf="!user.value.enabled" mat-raised-button color="primary"
-                    class="but-spacer-left switch-button"
-                    (click)="switchWebUser(user.value)">
-              Enable
-            </button>
-            <button mat-raised-button color="warn"
-                    [disabled]="objectLength(users) < 2"
-                    (click)="openBottomSheet(user.value.id, deleteForm.controls['list::' + user.key].value, user.value.login, 'delete')">
-              Delete
-            </button>
+            <mat-form-field class="settings-full-width" hideRequiredMarker>
+              <mat-label>Esl_port</mat-label>
+              <input matInput placeholder="port" type="number" required [(ngModel)]="settings().freeswitch.esl.port"
+                name="esl_port">
+              </mat-form-field>
+              <mat-form-field class="settings-full-width" hideRequiredMarker>
+                <mat-label>Esl_pass</mat-label>
+                <input matInput placeholder="password" required [(ngModel)]="settings().freeswitch.esl.pass" name="esl_pass">
+              </mat-form-field>
+              <mat-form-field class="settings-full-width" hideRequiredMarker>
+                <mat-label>Esl_timeout</mat-label>
+                <input matInput placeholder="timeout" type="number" required [(ngModel)]="settings().freeswitch.esl.timeout"
+                  name="esl_timeout">
+                </mat-form-field>
+              <mat-form-field class="settings-full-width" hideRequiredMarker>
+                <mat-label>Collect_logs</mat-label>
+                <input matInput placeholder="collect_logs" type="number" required [(ngModel)]="settings().freeswitch.esl.collect_logs"
+                  name="collect_logs">
+                </mat-form-field>
+              </div>
+            }
           </div>
-        </form>
-
-      </mat-tab>
-
-    </mat-tab-group>
-  </mat-expansion-panel>
-
-  <mat-expansion-panel (opened)="getWebUsersTemplates()">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Web users Templates</mat-panel-title>
-      <mat-panel-description>
-        Click to get details
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-      <mat-tab label="List">
-        <mat-card>
-          <mat-expansion-panel *ngFor="let template of onlyValues(usersTemplates); trackBy: trackById;" class="tabbed-panel"
-                               (opened)="getWebUsersTemplateDetails(template.id)">
-            <mat-expansion-panel-header>
-              <mat-panel-title>{{template.name}}&#64;{{directoryDomains[template.domain.id].name}}</mat-panel-title>
-              <mat-panel-description>
-                Click to get details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            <!--
-                      number_alias
-                      directory_name-->
-            <form #templateDetails="ngForm">
-              <h3>Template:</h3>
-              <div class="spacer">
-                <mat-form-field hideRequiredMarker>
-                  <mat-label>Name</mat-label>
-                  <input matInput placeholder="Template name" [(ngModel)]="template.name"
-                         name="name" autocomplete="off">
+          <div class="setting">
+            <div class="setting-title">
+              <h3>Database</h3>
+              <div>Database settings</div>
+            </div>
+            @if (settings()?.database) {
+              <div>
+                <mat-form-field class="settings-full-width" hideRequiredMarker>
+                  <mat-label>DataBase_host</mat-label>
+                  <input matInput placeholder="host" required [(ngModel)]="settings().database.host" name="dataBase_host">
                 </mat-form-field>
-                <mat-form-field hideRequiredMarker>
-                  <mat-label>Cache</mat-label>
-                  <input matInput type="number" placeholder="Template cache" [(ngModel)]="template.cache"
-                         name="cache" autocomplete="off">
-                </mat-form-field>
-                <mat-form-field hideRequiredMarker>
-                  <mat-label>Cidr</mat-label>
-                  <input matInput placeholder="Template cidr" [(ngModel)]="template.cidr"
-                         name="cidr" autocomplete="off">
-                </mat-form-field>
-                <button mat-button color="accent" class="but-spacer-left"
-                        [disabled]="!isvalueReadyToSend(templateDetails.controls['name']) && !isvalueReadyToSend(templateDetails.controls['cache']) && !isvalueReadyToSend(templateDetails.controls['cidr'])"
-                        (click)="UpdateWebDirectoryUsersTemplate(template)">
-                  Update
-                </button>
-                <button mat-raised-button color="warn" class="but-spacer-left"
-                        (click)="DelWebDirectoryUsersTemplate(template.name, template.id)">
-                  Delete
-                </button>
+                <mat-form-field class="settings-full-width" hideRequiredMarker>
+                  <mat-label>DataBase_port</mat-label>
+                  <input matInput placeholder="port" type="number" required [(ngModel)]="settings().database.port"
+                    name="dataBase_port">
+                  </mat-form-field>
+                  <mat-form-field class="settings-full-width" hideRequiredMarker>
+                    <mat-label>DataBase_name</mat-label>
+                    <input matInput placeholder="name" required [(ngModel)]="settings().database.name" name="dataBase_name">
+                  </mat-form-field>
+                  <mat-form-field class="settings-full-width" hideRequiredMarker>
+                    <mat-label>DataBase_user</mat-label>
+                    <input matInput placeholder="user" required [(ngModel)]="settings().database.user" name="dataBase_user">
+                  </mat-form-field>
+                  <mat-form-field class="settings-full-width" hideRequiredMarker>
+                    <mat-label>DataBase-pass</mat-label>
+                    <input matInput placeholder="password" required [(ngModel)]="settings().database.pass" name="dataBase-pass">
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+            <div class="setting">
+              <div class="setting-title">
+                <h3>Webserver</h3>
+                <div>Webserver settings</div>
               </div>
-              <div class="spacer">
-                <h3>Parameters:</h3>
-                  <ng-container *ngFor="let param of onlyValues(usersTemplateParameters);">
-                    <div class="spacer" *ngIf="param.parent.id == template.id">
-                      <form #templateParams="ngForm">
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Name</mat-label>
-                        <input matInput placeholder="Name" [(ngModel)]="param.name"
-                               name="name" autocomplete="off">
+              @if (settings()?.webserver) {
+                <div>
+                  <mat-form-field class="settings-full-width" hideRequiredMarker>
+                    <mat-label>Webserver_host</mat-label>
+                    <input matInput placeholder="host" required [(ngModel)]="settings().webserver.host" name="webserver_host">
+                  </mat-form-field>
+                  <mat-form-field class="settings-full-width" hideRequiredMarker>
+                    <mat-label>Webserver_port</mat-label>
+                    <input matInput placeholder="port" type="number" required [(ngModel)]="settings().webserver.port"
+                      name="webserver_port">
+                    </mat-form-field>
+                    <mat-form-field class="settings-full-width" hideRequiredMarker>
+                      <mat-label>Webserver_route</mat-label>
+                      <input matInput placeholder="route" required [(ngModel)]="settings().webserver.route" name="webserver_route">
+                    </mat-form-field>
+                    <mat-form-field class="settings-full-width" hideRequiredMarker>
+                      <mat-label>Webserver_cert_path</mat-label>
+                      <input matInput placeholder="cert_path" [(ngModel)]="settings().webserver.cert_path"
+                        name="webserver_cert_path">
                       </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Value</mat-label>
-                        <input matInput placeholder="Value" [(ngModel)]="param.value"
-                               name="value" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Description</mat-label>
-                        <input matInput placeholder="Description" [(ngModel)]="param.description"
-                               name="description" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Placeholder</mat-label>
-                        <input matInput placeholder="Placeholder" [(ngModel)]="param.placeholder"
-                               name="placeholder" autocomplete="off">
-                      </mat-form-field>
-
-                      <button mat-raised-button [color]="param.show ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="UpdateWebDirectoryUsersTemplateParameter(param, 'show')">
-                        {{param.show ? 'Hide' : 'Show'}}
-                      </button>
-                      <button mat-raised-button [color]="param.editable ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="UpdateWebDirectoryUsersTemplateParameter(param, 'editable')">
-                        {{param.editable ? 'Editable' : 'Uneditable'}}
-                      </button>
-
-                      <button mat-raised-button [color]="param.enabled ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="UpdateWebDirectoryUsersTemplateParameter(param, 'enabled')">
-                        {{param.enabled ? 'Disable' : 'Enable'}}
-                      </button>
-
-                      <button mat-button color="accent" class="but-spacer-left"
-                              [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
-                              (click)="UpdateWebDirectoryUsersTemplateParameter(param, null);">
-                        Update
-                      </button>
-                      <button mat-raised-button color="warn" class="but-spacer-left"
-                              (click)="DelWebDirectoryUsersTemplateParameter(param.id)">
-                        Delete
-                      </button>
-
-                    </form>
-                    </div>
-                  </ng-container>
-                  <ng-container *ngFor="let param of newParameters[template.id]; let i = index;">
-                    <div class="spacer">
-                      <form #templateParams="ngForm">
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Name</mat-label>
-                        <input matInput placeholder="Name" [(ngModel)]="param.name"
-                               name="name" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Value</mat-label>
-                        <input matInput placeholder="Value" [(ngModel)]="param.value"
-                               name="value" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Description</mat-label>
-                        <input matInput placeholder="Description" [(ngModel)]="param.description"
-                               name="description" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Placeholder</mat-label>
-                        <input matInput placeholder="Placeholder" [(ngModel)]="param.placeholder"
-                               name="placeholder" autocomplete="off">
-                      </mat-form-field>
-
-                      <button mat-raised-button [color]="param.show ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="param.show = !param.show">
-                        {{param.show ? 'Hide' : 'Show'}}
-                      </button>
-                      <button mat-raised-button [color]="param.editable ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="param.editable = !param.editable">
-                        {{param.editable ? 'Editable' : 'Uneditable'}}
-                      </button>
-                      <button mat-raised-button [color]="param.enabled ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="param.enabled = !param.enabled">
-                        {{param.enabled ? 'Disable' : 'Enable'}}
-                      </button>
-
-
-                      <button mat-button color="accent" class="but-spacer-left"
-                              [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
-                              (click)="AddWebDirectoryUsersTemplateParameter(param, template.id, i);">
-                        Update
-                      </button>
-
-                      <button mat-button color="warn" class="but-spacer-left"
-                              (click)="StoreDelNewWebDirectoryUsersTemplateParameter(template.id, i)">
-                        Delete
-                      </button>
-                      </form>
-                    </div>
-                  </ng-container>
-                <button mat-raised-button color="accent"
-                        (click)="StoreNewWebDirectoryUsersTemplateParameter(template.id)">
-                  Add
-                </button>
-              </div>
-              <div class="spacer">
-                <h3>Variables:</h3>
-                <ng-container *ngFor="let variable of onlyValues(usersTemplateVariables);">
-                  <div class="spacer" *ngIf="variable.parent.id == template.id">
-                    <form #templateParams="ngForm">
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Name</mat-label>
-                        <input matInput placeholder="Name" [(ngModel)]="variable.name"
-                               name="name" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Value</mat-label>
-                        <input matInput placeholder="Value" [(ngModel)]="variable.value"
-                               name="value" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Description</mat-label>
-                        <input matInput placeholder="Description" [(ngModel)]="variable.description"
-                               name="description" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Placeholder</mat-label>
-                        <input matInput placeholder="Placeholder" [(ngModel)]="variable.placeholder"
-                               name="placeholder" autocomplete="off">
-                      </mat-form-field>
-
-                      <button mat-raised-button [color]="variable.show ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="UpdateWebDirectoryUsersTemplateVariable(variable, 'show')">
-                        {{variable.show ? 'Hide' : 'Show'}}
-                      </button>
-                      <button mat-raised-button [color]="variable.editable ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="UpdateWebDirectoryUsersTemplateVariable(variable, 'editable')">
-                        {{variable.editable ? 'Editable' : 'Uneditable'}}
-                      </button>
-
-                      <button mat-raised-button [color]="variable.enabled ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="UpdateWebDirectoryUsersTemplateVariable(variable, 'enabled')">
-                        {{variable.enabled ? 'Disable' : 'Enable'}}
-                      </button>
-
-                      <button mat-button color="accent" class="but-spacer-left"
-                              [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
-                              (click)="UpdateWebDirectoryUsersTemplateVariable(variable, null);">
-                        Update
-                      </button>
-                      <button mat-raised-button color="warn" class="but-spacer-left"
-                              (click)="DelWebDirectoryUsersTemplateVariable(variable.id)">
-                        Delete
-                      </button>
-
-                    </form>
+                      <mat-form-field class="settings-full-width" hideRequiredMarker>
+                        <mat-label>Webserver-key_path</mat-label>
+                        <input matInput placeholder="key_path" [(ngModel)]="settings().webserver.key_path"
+                          name="webserver-key_path">
+                        </mat-form-field>
+                      </div>
+                    }
                   </div>
-                </ng-container>
-                <ng-container *ngFor="let variable of newVariables[template.id]; let i = index;">
-                  <div class="spacer">
-                    <form #templateParams="ngForm">
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Name</mat-label>
-                        <input matInput placeholder="Name" [(ngModel)]="variable.name"
-                               name="name" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Value</mat-label>
-                        <input matInput placeholder="Value" [(ngModel)]="variable.value"
-                               name="value" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Description</mat-label>
-                        <input matInput placeholder="Description" [(ngModel)]="variable.description"
-                               name="description" autocomplete="off">
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Placeholder</mat-label>
-                        <input matInput placeholder="Placeholder" [(ngModel)]="variable.placeholder"
-                               name="placeholder" autocomplete="off">
-                      </mat-form-field>
+                  <div class="setting">
+                    <div class="setting-title">
+                      <h3>Xml curl server</h3>
+                      <div>Xml curl server settings</div>
+                    </div>
+                    @if (settings()?.xml_curl_server) {
+                      <div>
+                        <mat-form-field class="settings-full-width" hideRequiredMarker>
+                          <mat-label>Xml_curl_server_host</mat-label>
+                          <input matInput placeholder="host" required [(ngModel)]="settings().xml_curl_server.host"
+                            name="xml_curl_server_host">
+                          </mat-form-field>
+                          <mat-form-field class="settings-full-width" hideRequiredMarker>
+                            <mat-label>Xml_curl_server_port</mat-label>
+                            <input matInput placeholder="port" type="number" required [(ngModel)]="settings().xml_curl_server.port"
+                              name="xml_curl_server_port">
+                            </mat-form-field>
+                            <mat-form-field class="settings-full-width" hideRequiredMarker>
+                              <mat-label>Xml_curl_server_route</mat-label>
+                              <input matInput placeholder="route" required [(ngModel)]="settings().xml_curl_server.route"
+                                name="xml_curl_server_route">
+                              </mat-form-field>
+                              <mat-form-field class="settings-full-width" hideRequiredMarker>
+                                <mat-label>Xml_curl_server_cert_path</mat-label>
+                                <input matInput placeholder="cert_path" [(ngModel)]="settings().xml_curl_server.cert_path"
+                                  name="xml_curl_server_cert_path">
+                                </mat-form-field>
+                                <mat-form-field class="settings-full-width" hideRequiredMarker>
+                                  <mat-label>Xml_curl_server-key_path</mat-label>
+                                  <input matInput placeholder="key_path" [(ngModel)]="settings().xml_curl_server.key_path"
+                                    name="xml_curl_server-key_path">
+                                  </mat-form-field>
+                                </div>
+                              }
+                            </div>
+                            <div class="content-center">
+                              <button type="submit" [disabled]="sets.invalid || !sets.dirty" mat-flat-button color="primary">Save</button>
+                              <button type="reset" (click)="getConnectionsSettings()" [disabled]="sets.invalid || !sets.dirty" mat-flat-button
+                                color="accent">
+                                Reset
+                              </button>
+                            </div>
+                          </form>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel (opened)="getWebUsers()">
+                          <mat-expansion-panel-header>
+                            <mat-panel-title>Web users</mat-panel-title>
+                            <mat-panel-description>
+                              Click to get details
+                            </mat-panel-description>
+                          </mat-expansion-panel-header>
 
-                      <button mat-raised-button [color]="variable.show ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="variable.show = !variable.show">
-                        {{variable.show ? 'Hide' : 'Show'}}
-                      </button>
-                      <button mat-raised-button [color]="variable.editable ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="variable.editable = !variable.editable">
-                        {{variable.editable ? 'Editable' : 'Uneditable'}}
-                      </button>
-                      <button mat-raised-button [color]="variable.enabled ? 'primary' : 'accent'"
-                              class="but-spacer-left switch-button"
-                              (click)="variable.enabled = !variable.enabled">
-                        {{variable.enabled ? 'Disable' : 'Enable'}}
-                      </button>
+                          <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+                            <mat-tab label="List">
+                              @if (users()) {
+                                <div class="list-wrap">
+                                  @for (user of users() | keyvalue; track user.value.id) {
+                                    <mat-expansion-panel class="tabbed-panel">
+                                      <mat-expansion-panel-header>
+                                        <mat-panel-title>{{user.value.login}}</mat-panel-title>
+                                        <mat-panel-description>
+                                          Click to get details
+                                        </mat-panel-description>
+                                      </mat-expansion-panel-header>
+                                      <form #userDetails="ngForm">
+                                        @if (user.value) {
+                                          <div>
+                                            <div class="spacer">
+                                              <mat-form-field hideRequiredMarker>
+                                                <mat-label>User group</mat-label>
+                                                <mat-select required name="group" [(ngModel)]="user.value.group_id" disableOptionCentering>
+                                                  @for (val of onlyValues(usersGroups()); track val.id) {
+                                                    <mat-option [value]="val.id">
+                                                      {{val.name}}
+                                                    </mat-option>
+                                                  }
+                                                </mat-select>
+                                              </mat-form-field>
+                                              <button mat-button color="accent" class="but-spacer-left"
+                                                [disabled]="!isvalueReadyToSend(userDetails.controls['group'])"
+                                                (click)="updateGroup(user.value.id, userDetails.controls['group'].value); userDetails.form.markAsPristine();">
+                                                Update
+                                              </button>
+                                            </div>
+                                            <div class="spacer">
+                                              <mat-form-field hideRequiredMarker>
+                                                <mat-label>New password</mat-label>
+                                                <input matInput placeholder="new password for web user" [(ngModel)]="user.value.password"
+                                                  name="userPassword" type="password" autocomplete="off">
+                                                </mat-form-field>
+                                                <button mat-button color="accent" class="but-spacer-left"
+                                                  [disabled]="!isvalueReadyToSend(userDetails.controls['userPassword']) || user.value.password.length < 6"
+                                                  (click)="updatePassword(user.value.id, userDetails.controls['userPassword'].value); userDetails.form.markAsPristine();">
+                                                  Update
+                                                </button>
+                                              </div>
+                                              <div class="spacer">
+                                                <mat-form-field hideRequiredMarker>
+                                                  <mat-label>User language</mat-label>
+                                                  <mat-select required name="lang" [(ngModel)]="user.value.lang" disableOptionCentering>
+                                                    @for (val of userLangs; track val; let i = $index) {
+                                                      <mat-option [value]="i">
+                                                        {{val}}
+                                                      </mat-option>
+                                                    }
+                                                  </mat-select>
+                                                </mat-form-field>
+                                                <button mat-button color="accent" class="but-spacer-left"
+                                                  [disabled]="!isvalueReadyToSend(userDetails.controls['lang'])"
+                                                  (click)="updateLang(user.value.id, userDetails.controls['lang'].value); userDetails.form.markAsPristine();">
+                                                  Update
+                                                </button>
+                                              </div>
+                                              <div class="spacer">
+                                                <mat-form-field hideRequiredMarker>
+                                                  <mat-label>Directory user</mat-label>
+                                                  <mat-select required name="sipUser" [(ngModel)]="user.value.sip_id.Int64" disableOptionCentering>
+                                                    <mat-option>-- None --</mat-option>
+                                                    @for (domain of directoryDomains() | keyvalue; track domain.key) {
+                                                      <mat-optgroup [label]="domain.value.name"
+                                                        [disabled]="domain.disabled">
+                                                        @for (directoryUser of onlyValuesByParent(directoryUsersSignal(), domain.key); track directoryUser) {
+                                                          <mat-option [value]="directoryUser.id">
+                                                            {{directoryUser.name}}&#64;{{domain.value.name}}
+                                                          </mat-option>
+                                                        }
+                                                      </mat-optgroup>
+                                                    }
+                                                  </mat-select>
+                                                </mat-form-field>
+                                                <button mat-button color="accent" class="but-spacer-left"
+                                                  [disabled]="!isvalueReadyToSend(userDetails.controls['sipUser'])"
+                                                  (click)="updateSipUser(user.value.id, userDetails.controls['sipUser'].value); userDetails.form.markAsPristine();">
+                                                  Update
+                                                </button>
+                                              </div>
+                                              <div class="spacer extra-space">
+                                                <mat-button-toggle-group name="WebRTC" aria-label="WebRTC Lib" [(ngModel)]="user.value.webrtc_lib"
+                                                  (change)="updateWebRTCLib(user.value.id, user.value.webrtc_lib)">
+                                                  <mat-button-toggle value="sipjs">Sip.js</mat-button-toggle>
+                                                  <mat-button-toggle value="verto">Verto</mat-button-toggle>
+                                                </mat-button-toggle-group>
+                                              </div>
+                                              <div class="spacer">
+                                                <mat-form-field hideRequiredMarker>
+                                                  <mat-label>ws for sipjs</mat-label>
+                                                  <input matInput placeholder="wss://<HOST>:<PORT>" [(ngModel)]="user.value.ws"
+                                                  name="userWs" [matAutocomplete]="autoWs"
+                                                  appResizeInput
+                                                  [resizeOnString]="user.value.ws"
+                                                  [disabled]="user.value.webrtc_lib == 'verto'"
+                                                  >
+                                                  <mat-autocomplete #autoWs="matAutocomplete">
+                                                    @for (option of wssUris(); track option) {
+                                                      <mat-option [value]="option">
+                                                        {{option}}
+                                                      </mat-option>
+                                                    }
+                                                  </mat-autocomplete>
+                                                </mat-form-field>
+                                                <button mat-button color="accent" class="but-spacer-left"
+                                                  [disabled]="!isvalueReadyToSend(userDetails.controls['userWs']) || user.value.webrtc_lib == 'verto'"
+                                                  (click)="updateWs(user.value.id, userDetails.controls['userWs'].value); userDetails.form.markAsPristine();">
+                                                  Update
+                                                </button>
+                                              </div>
+                                              <div class="spacer">
+                                                <mat-form-field hideRequiredMarker>
+                                                  <mat-label>ws for verto</mat-label>
+                                                  <input matInput placeholder="wss://<HOST>:<PORT>" [(ngModel)]="user.value.verto_ws"
+                                                  name="userVertoWs" [matAutocomplete]="autoWsVerto"
+                                                  appResizeInput
+                                                  [resizeOnString]="user.value.verto_ws"
+                                                  [disabled]="user.value.webrtc_lib != 'verto'"
+                                                  >
+                                                  <mat-autocomplete #autoWsVerto="matAutocomplete">
+                                                    @for (option of vertoWsUris(); track option) {
+                                                      <mat-option [value]="option"
+                                                        [disabled]="user.value.webrtc_lib != 'verto'">
+                                                        {{option}}
+                                                      </mat-option>
+                                                    }
+                                                  </mat-autocomplete>
+                                                </mat-form-field>
+                                                <button mat-button color="accent" class="but-spacer-left"
+                                                  [disabled]="!isvalueReadyToSend(userDetails.controls['userVertoWs']) || user.value.webrtc_lib != 'verto'"
+                                                  (click)="updateVertoWs(user.value.id, userDetails.controls['userVertoWs'].value); userDetails.form.markAsPristine();">
+                                                  Update
+                                                </button>
+                                              </div>
+                                              <div class="spacer">
+                                                <mat-form-field hideRequiredMarker>
+                                                  <mat-label>Stun (replace default)</mat-label>
+                                                  <input matInput placeholder="stun:<HOST>:<PORT>" [(ngModel)]="user.value.stun"
+                                                  name="userStun"
+                                                  appResizeInput
+                                                  [resizeOnString]="user.value.stun"
+                                                  >
+                                                </mat-form-field>
+                                                <button mat-button color="accent" class="but-spacer-left"
+                                                  [disabled]="!isvalueReadyToSend(userDetails.controls['userStun'])"
+                                                  (click)="updateStun(user.value.id, userDetails.controls['userStun'].value); userDetails.form.markAsPristine();">
+                                                  Update
+                                                </button>
+                                              </div>
+                                              <div class="spacer">
+                                                @if (!user.value.avatar_format) {
+                                                  <div class="avatar-ico">
+                                                    <mat-icon>face</mat-icon>
+                                                  </div>
+                                                }
+                                                @if (user.value.avatar_format) {
+                                                  <img class="avatar-img"
+                                                    [src]="'./assets/img/avatar/' + user.value.id + '.' + user.value.avatar_format">
+                                                  }
+                                                  <button mat-raised-button color="accent" class="but-spacer-left upload-image"
+                                                    (click)="fileInput.click()">
+                                                    <mat-icon>file_upload</mat-icon>
+                                                    <span>Upload image</span>
+                                                    <input #fileInput type="file" name="fileUpload" (change)="chooseAvatar(fileInput, user.value.id)"
+                                                      style="display:none;" accept="{{acceptFile}}"/>
+                                                    </button>
+                                                    <button mat-raised-button color="basic" class="but-spacer-left upload-image"
+                                                      (click)="clearAvatar(user.value.id)" [disabled]="!user.value.avatar_format">
+                                                      <span>Clear</span>
+                                                    </button>
+                                                  </div>
+                                                </div>
+                                              }
+                                            </form>
+                                            <mat-expansion-panel (opened)="getUserTokens(user.value.id)">
+                                              <mat-expansion-panel-header>
+                                                <mat-panel-title>User Tokens</mat-panel-title>
+                                                <mat-panel-description>
+                                                  Click to get details
+                                                </mat-panel-description>
+                                              </mat-expansion-panel-header>
+                                              <table mat-table class="token-table" [dataSource]="user.value.tokens">
+                                                @for (disCol of columns; track disCol; let colIndex = $index) {
+                                                  <ng-container matColumnDef="{{disCol}}">
+                                                    <th mat-header-cell *matHeaderCellDef>
+                                                      {{disCol}}
+                                                      @if (disCol == 'token') {
+                                                        <button mat-raised-button color="primary" class="but-spacer-left"
+                                                          (click)="AddUserToken(user.value.id)">
+                                                          Add
+                                                        </button>
+                                                      }
+                                                    </th>
+                                                    <td mat-cell *matCellDef="let element">
+                                                      <span>{{element[disCol]}}</span>
+                                                      @if (disCol === 'purpose') {
+                                                        <button mat-raised-button color="accent" class="but-spacer-left"
+                                                          (click)="openBottomSheetRemoveToken(element.id)">
+                                                          Remove
+                                                        </button>
+                                                      }
+                                                    </td>
+                                                  </ng-container>
+                                                }
+                                                <tr mat-header-row *matHeaderRowDef="columns"></tr>
+                                                <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+                                              </table>
+                                            </mat-expansion-panel>
+                                          </mat-expansion-panel>
+                                        }
+                                      </div>
+                                    }
+                                  </mat-tab>
+                                  <mat-tab label="Add">
+                                    <h3>New user data</h3>
+                                    <form #newUserForm="ngForm" class="spacer spacerb full-form" (ngSubmit)="onNewUserSubmit(newUserForm)"
+                                      ngNativeValidate>
+                                      <mat-form-field hideRequiredMarker>
+                                        <mat-label>Login</mat-label>
+                                        <input matInput placeholder="New user login" required name="login" (ngModel)="login">
+                                      </mat-form-field>
+                                      <mat-form-field hideRequiredMarker>
+                                        <mat-label>Password</mat-label>
+                                        <input matInput placeholder="Password" required name="password" (ngModel)="password">
+                                      </mat-form-field>
+                                      <mat-form-field hideRequiredMarker>
+                                        <mat-label>User group</mat-label>
+                                        <mat-select required name="group_id" (ngModel)="groupId" disableOptionCentering>
+                                          @for (val of onlyValues(usersGroups()); track val.id) {
+                                            <mat-option [value]="val.id">
+                                              {{val.name}}
+                                            </mat-option>
+                                          }
+                                        </mat-select>
+                                      </mat-form-field>
+                                      <button mat-raised-button color="primary" type="submit"
+                                        [disabled]="newUserForm.invalid || !newUserForm.dirty || newUserForm.value.password.length < 6">
+                                        Submit
+                                      </button>
+                                    </form>
 
+                                  </mat-tab>
+                                  <mat-tab label="Rename/Delete">
+                                    <h3>User logins</h3>
+                                    @if (users()) {
+                                      <form class="spacer spacerb" #deleteForm="ngForm" ngNativeValidate>
+                                        @for (user of users() | keyvalue; track user.key) {
+                                          <div>
+                                            <mat-form-field hideRequiredMarker>
+                                              <mat-label>User login</mat-label>
+                                              <input matInput name="User login" required [ngModel]="user.value.login"
+                                                [name]="'list::' + user.key">
+                                              </mat-form-field>
+                                              <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['list::' + user.key])"
+                                                (click)="openBottomSheet(user.value.id, deleteForm.controls['list::' + user.key].value, user.value.login, 'rename')">
+                                                Update
+                                              </button>
+                                              @if (user.value.enabled) {
+                                                <button mat-raised-button color="accent"
+                                                  class="but-spacer-left switch-button"
+                                                  (click)="switchWebUser(user.value)">
+                                                  Disable
+                                                </button>
+                                              }
+                                              @if (!user.value.enabled) {
+                                                <button mat-raised-button color="primary"
+                                                  class="but-spacer-left switch-button"
+                                                  (click)="switchWebUser(user.value)">
+                                                  Enable
+                                                </button>
+                                              }
+                                              <button mat-raised-button color="warn"
+                                                [disabled]="objectLength(users()) < 2"
+                                                (click)="openBottomSheet(user.value.id, deleteForm.controls['list::' + user.key].value, user.value.login, 'delete')">
+                                                Delete
+                                              </button>
+                                            </div>
+                                          }
+                                        </form>
+                                      }
 
-                      <button mat-button color="accent" class="but-spacer-left"
-                              [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
-                              (click)="AddWebDirectoryUsersTemplateVariable(variable, template.id, i);">
-                        Update
-                      </button>
+                                    </mat-tab>
 
-                      <button mat-button color="warn" class="but-spacer-left"
-                              (click)="StoreDelNewWebDirectoryUsersTemplateVariable(template.id, i)">
-                        Delete
-                      </button>
-                    </form>
-                  </div>
-                </ng-container>
-                <button mat-raised-button color="accent"
-                        (click)="StoreNewWebDirectoryUsersTemplateVariable(template.id)">
-                  Add
-                </button>
-              </div>
-            </form>
+                                  </mat-tab-group>
+                                </mat-expansion-panel>
 
-          </mat-expansion-panel>
-        </mat-card>
-      </mat-tab>
-      <mat-tab label="Add">
-        <mat-card>
-          <div class="spacer">
-            <mat-form-field hideRequiredMarker>
-              <mat-label>Domain</mat-label>
-              <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
-                <mat-option>--</mat-option>
-                <mat-option *ngFor="let domain of onlyValues(directoryDomains)"
-                            [value]="domain.id">{{domain.name}}</mat-option>
-                <!--mat-hint>{{selectdomain?.sound}}</mat-hint-->
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field hideRequiredMarker>
-              <mat-label>Template Name</mat-label>
-              <input matInput placeholder="Template name" [(ngModel)]="templateName"
-                     name="cache" autocomplete="off">
-            </mat-form-field>
-            <button mat-button color="primary" class="but-spacer-left"
-                    [disabled]="!templateName"
-                    (click)="AddWebUsersTemplates()">
-              Submit
-            </button>
-          </div>
-        </mat-card>
-      </mat-tab>
-      <mat-tab label="Rename/Delete">
-        <mat-card>
-        </mat-card>
-      </mat-tab>
-    </mat-tab-group>
+                                <mat-expansion-panel (opened)="getWebUsersTemplates()">
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title>Web users Templates</mat-panel-title>
+                                    <mat-panel-description>
+                                      Click to get details
+                                    </mat-panel-description>
+                                  </mat-expansion-panel-header>
+                                  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+                                    <mat-tab label="List">
+                                      <mat-card>
+                                        @for (template of onlyValues(usersTemplates()); track template.id) {
+                                          <mat-expansion-panel class="tabbed-panel"
+                                            (opened)="getWebUsersTemplateDetails(template.id)">
+                                            <mat-expansion-panel-header>
+                                              <mat-panel-title>{{template.name}}&#64;{{directoryDomains()[template.domain.id].name}}</mat-panel-title>
+                                              <mat-panel-description>
+                                                Click to get details
+                                              </mat-panel-description>
+                                            </mat-expansion-panel-header>
+                                            <!--
+                                            number_alias
+                                            directory_name-->
+                                            <form #templateDetails="ngForm">
+                                              <h3>Template:</h3>
+                                              <div class="spacer">
+                                                <mat-form-field hideRequiredMarker>
+                                                  <mat-label>Name</mat-label>
+                                                  <input matInput placeholder="Template name" [(ngModel)]="template.name"
+                                                    name="name" autocomplete="off">
+                                                  </mat-form-field>
+                                                  <mat-form-field hideRequiredMarker>
+                                                    <mat-label>Cache</mat-label>
+                                                    <input matInput type="number" placeholder="Template cache" [(ngModel)]="template.cache"
+                                                      name="cache" autocomplete="off">
+                                                    </mat-form-field>
+                                                    <mat-form-field hideRequiredMarker>
+                                                      <mat-label>Cidr</mat-label>
+                                                      <input matInput placeholder="Template cidr" [(ngModel)]="template.cidr"
+                                                        name="cidr" autocomplete="off">
+                                                      </mat-form-field>
+                                                      <button mat-button color="accent" class="but-spacer-left"
+                                                        [disabled]="!isvalueReadyToSend(templateDetails.controls['name']) && !isvalueReadyToSend(templateDetails.controls['cache']) && !isvalueReadyToSend(templateDetails.controls['cidr'])"
+                                                        (click)="UpdateWebDirectoryUsersTemplate(template)">
+                                                        Update
+                                                      </button>
+                                                      <button mat-raised-button color="warn" class="but-spacer-left"
+                                                        (click)="DelWebDirectoryUsersTemplate(template.name, template.id)">
+                                                        Delete
+                                                      </button>
+                                                    </div>
+                                                    <div class="spacer">
+                                                      <h3>Parameters:</h3>
+                                                      @for (param of onlyValues(usersTemplateParameters()); track param) {
+                                                        @if (param.parent.id == template.id) {
+                                                          <div class="spacer">
+                                                            <form #templateParams="ngForm">
+                                                              <mat-form-field hideRequiredMarker>
+                                                                <mat-label>Name</mat-label>
+                                                                <input matInput placeholder="Name" [(ngModel)]="param.name"
+                                                                  name="name" autocomplete="off">
+                                                                </mat-form-field>
+                                                                <mat-form-field hideRequiredMarker>
+                                                                  <mat-label>Value</mat-label>
+                                                                  <input matInput placeholder="Value" [(ngModel)]="param.value"
+                                                                    name="value" autocomplete="off">
+                                                                  </mat-form-field>
+                                                                  <mat-form-field hideRequiredMarker>
+                                                                    <mat-label>Description</mat-label>
+                                                                    <input matInput placeholder="Description" [(ngModel)]="param.description"
+                                                                      name="description" autocomplete="off">
+                                                                    </mat-form-field>
+                                                                    <mat-form-field hideRequiredMarker>
+                                                                      <mat-label>Placeholder</mat-label>
+                                                                      <input matInput placeholder="Placeholder" [(ngModel)]="param.placeholder"
+                                                                        name="placeholder" autocomplete="off">
+                                                                      </mat-form-field>
+                                                                      <button mat-raised-button [color]="param.show ? 'primary' : 'accent'"
+                                                                        class="but-spacer-left switch-button"
+                                                                        (click)="UpdateWebDirectoryUsersTemplateParameter(param, 'show')">
+                                                                        {{param.show ? 'Hide' : 'Show'}}
+                                                                      </button>
+                                                                      <button mat-raised-button [color]="param.editable ? 'primary' : 'accent'"
+                                                                        class="but-spacer-left switch-button"
+                                                                        (click)="UpdateWebDirectoryUsersTemplateParameter(param, 'editable')">
+                                                                        {{param.editable ? 'Editable' : 'Uneditable'}}
+                                                                      </button>
+                                                                      <button mat-raised-button [color]="param.enabled ? 'primary' : 'accent'"
+                                                                        class="but-spacer-left switch-button"
+                                                                        (click)="UpdateWebDirectoryUsersTemplateParameter(param, 'enabled')">
+                                                                        {{param.enabled ? 'Disable' : 'Enable'}}
+                                                                      </button>
+                                                                      <button mat-button color="accent" class="but-spacer-left"
+                                                                        [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
+                                                                        (click)="UpdateWebDirectoryUsersTemplateParameter(param, null);">
+                                                                        Update
+                                                                      </button>
+                                                                      <button mat-raised-button color="warn" class="but-spacer-left"
+                                                                        (click)="DelWebDirectoryUsersTemplateParameter(param.id)">
+                                                                        Delete
+                                                                      </button>
+                                                                    </form>
+                                                                  </div>
+                                                                }
+                                                              }
+                                                              @for (param of newParameters()[template.id]; track param; let i = $index) {
+                                                                <div class="spacer">
+                                                                  <form #templateParams="ngForm">
+                                                                    <mat-form-field hideRequiredMarker>
+                                                                      <mat-label>Name</mat-label>
+                                                                      <input matInput placeholder="Name" [(ngModel)]="param.name"
+                                                                        name="name" autocomplete="off">
+                                                                      </mat-form-field>
+                                                                      <mat-form-field hideRequiredMarker>
+                                                                        <mat-label>Value</mat-label>
+                                                                        <input matInput placeholder="Value" [(ngModel)]="param.value"
+                                                                          name="value" autocomplete="off">
+                                                                        </mat-form-field>
+                                                                        <mat-form-field hideRequiredMarker>
+                                                                          <mat-label>Description</mat-label>
+                                                                          <input matInput placeholder="Description" [(ngModel)]="param.description"
+                                                                            name="description" autocomplete="off">
+                                                                          </mat-form-field>
+                                                                          <mat-form-field hideRequiredMarker>
+                                                                            <mat-label>Placeholder</mat-label>
+                                                                            <input matInput placeholder="Placeholder" [(ngModel)]="param.placeholder"
+                                                                              name="placeholder" autocomplete="off">
+                                                                            </mat-form-field>
+                                                                            <button mat-raised-button [color]="param.show ? 'primary' : 'accent'"
+                                                                              class="but-spacer-left switch-button"
+                                                                              (click)="param.show = !param.show">
+                                                                              {{param.show ? 'Hide' : 'Show'}}
+                                                                            </button>
+                                                                            <button mat-raised-button [color]="param.editable ? 'primary' : 'accent'"
+                                                                              class="but-spacer-left switch-button"
+                                                                              (click)="param.editable = !param.editable">
+                                                                              {{param.editable ? 'Editable' : 'Uneditable'}}
+                                                                            </button>
+                                                                            <button mat-raised-button [color]="param.enabled ? 'primary' : 'accent'"
+                                                                              class="but-spacer-left switch-button"
+                                                                              (click)="param.enabled = !param.enabled">
+                                                                              {{param.enabled ? 'Disable' : 'Enable'}}
+                                                                            </button>
+                                                                            <button mat-button color="accent" class="but-spacer-left"
+                                                                              [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
+                                                                              (click)="AddWebDirectoryUsersTemplateParameter(param, template.id, i);">
+                                                                              Update
+                                                                            </button>
+                                                                            <button mat-button color="warn" class="but-spacer-left"
+                                                                              (click)="StoreDelNewWebDirectoryUsersTemplateParameter(template.id, i)">
+                                                                              Delete
+                                                                            </button>
+                                                                          </form>
+                                                                        </div>
+                                                                      }
+                                                                      <button mat-raised-button color="accent"
+                                                                        (click)="StoreNewWebDirectoryUsersTemplateParameter(template.id)">
+                                                                        Add
+                                                                      </button>
+                                                                    </div>
+                                                                    <div class="spacer">
+                                                                      <h3>Variables:</h3>
+                                                                      @for (variable of onlyValues(usersTemplateVariables()); track variable) {
+                                                                        @if (variable.parent.id == template.id) {
+                                                                          <div class="spacer">
+                                                                            <form #templateParams="ngForm">
+                                                                              <mat-form-field hideRequiredMarker>
+                                                                                <mat-label>Name</mat-label>
+                                                                                <input matInput placeholder="Name" [(ngModel)]="variable.name"
+                                                                                  name="name" autocomplete="off">
+                                                                                </mat-form-field>
+                                                                                <mat-form-field hideRequiredMarker>
+                                                                                  <mat-label>Value</mat-label>
+                                                                                  <input matInput placeholder="Value" [(ngModel)]="variable.value"
+                                                                                    name="value" autocomplete="off">
+                                                                                  </mat-form-field>
+                                                                                  <mat-form-field hideRequiredMarker>
+                                                                                    <mat-label>Description</mat-label>
+                                                                                    <input matInput placeholder="Description" [(ngModel)]="variable.description"
+                                                                                      name="description" autocomplete="off">
+                                                                                    </mat-form-field>
+                                                                                    <mat-form-field hideRequiredMarker>
+                                                                                      <mat-label>Placeholder</mat-label>
+                                                                                      <input matInput placeholder="Placeholder" [(ngModel)]="variable.placeholder"
+                                                                                        name="placeholder" autocomplete="off">
+                                                                                      </mat-form-field>
+                                                                                      <button mat-raised-button [color]="variable.show ? 'primary' : 'accent'"
+                                                                                        class="but-spacer-left switch-button"
+                                                                                        (click)="UpdateWebDirectoryUsersTemplateVariable(variable, 'show')">
+                                                                                        {{variable.show ? 'Hide' : 'Show'}}
+                                                                                      </button>
+                                                                                      <button mat-raised-button [color]="variable.editable ? 'primary' : 'accent'"
+                                                                                        class="but-spacer-left switch-button"
+                                                                                        (click)="UpdateWebDirectoryUsersTemplateVariable(variable, 'editable')">
+                                                                                        {{variable.editable ? 'Editable' : 'Uneditable'}}
+                                                                                      </button>
+                                                                                      <button mat-raised-button [color]="variable.enabled ? 'primary' : 'accent'"
+                                                                                        class="but-spacer-left switch-button"
+                                                                                        (click)="UpdateWebDirectoryUsersTemplateVariable(variable, 'enabled')">
+                                                                                        {{variable.enabled ? 'Disable' : 'Enable'}}
+                                                                                      </button>
+                                                                                      <button mat-button color="accent" class="but-spacer-left"
+                                                                                        [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
+                                                                                        (click)="UpdateWebDirectoryUsersTemplateVariable(variable, null);">
+                                                                                        Update
+                                                                                      </button>
+                                                                                      <button mat-raised-button color="warn" class="but-spacer-left"
+                                                                                        (click)="DelWebDirectoryUsersTemplateVariable(variable.id)">
+                                                                                        Delete
+                                                                                      </button>
+                                                                                    </form>
+                                                                                  </div>
+                                                                                }
+                                                                              }
+                                                                              @for (variable of newVariables()[template.id]; track variable; let i = $index) {
+                                                                                <div class="spacer">
+                                                                                  <form #templateParams="ngForm">
+                                                                                    <mat-form-field hideRequiredMarker>
+                                                                                      <mat-label>Name</mat-label>
+                                                                                      <input matInput placeholder="Name" [(ngModel)]="variable.name"
+                                                                                        name="name" autocomplete="off">
+                                                                                      </mat-form-field>
+                                                                                      <mat-form-field hideRequiredMarker>
+                                                                                        <mat-label>Value</mat-label>
+                                                                                        <input matInput placeholder="Value" [(ngModel)]="variable.value"
+                                                                                          name="value" autocomplete="off">
+                                                                                        </mat-form-field>
+                                                                                        <mat-form-field hideRequiredMarker>
+                                                                                          <mat-label>Description</mat-label>
+                                                                                          <input matInput placeholder="Description" [(ngModel)]="variable.description"
+                                                                                            name="description" autocomplete="off">
+                                                                                          </mat-form-field>
+                                                                                          <mat-form-field hideRequiredMarker>
+                                                                                            <mat-label>Placeholder</mat-label>
+                                                                                            <input matInput placeholder="Placeholder" [(ngModel)]="variable.placeholder"
+                                                                                              name="placeholder" autocomplete="off">
+                                                                                            </mat-form-field>
+                                                                                            <button mat-raised-button [color]="variable.show ? 'primary' : 'accent'"
+                                                                                              class="but-spacer-left switch-button"
+                                                                                              (click)="variable.show = !variable.show">
+                                                                                              {{variable.show ? 'Hide' : 'Show'}}
+                                                                                            </button>
+                                                                                            <button mat-raised-button [color]="variable.editable ? 'primary' : 'accent'"
+                                                                                              class="but-spacer-left switch-button"
+                                                                                              (click)="variable.editable = !variable.editable">
+                                                                                              {{variable.editable ? 'Editable' : 'Uneditable'}}
+                                                                                            </button>
+                                                                                            <button mat-raised-button [color]="variable.enabled ? 'primary' : 'accent'"
+                                                                                              class="but-spacer-left switch-button"
+                                                                                              (click)="variable.enabled = !variable.enabled">
+                                                                                              {{variable.enabled ? 'Disable' : 'Enable'}}
+                                                                                            </button>
+                                                                                            <button mat-button color="accent" class="but-spacer-left"
+                                                                                              [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
+                                                                                              (click)="AddWebDirectoryUsersTemplateVariable(variable, template.id, i);">
+                                                                                              Update
+                                                                                            </button>
+                                                                                            <button mat-button color="warn" class="but-spacer-left"
+                                                                                              (click)="StoreDelNewWebDirectoryUsersTemplateVariable(template.id, i)">
+                                                                                              Delete
+                                                                                            </button>
+                                                                                          </form>
+                                                                                        </div>
+                                                                                      }
+                                                                                      <button mat-raised-button color="accent"
+                                                                                        (click)="StoreNewWebDirectoryUsersTemplateVariable(template.id)">
+                                                                                        Add
+                                                                                      </button>
+                                                                                    </div>
+                                                                                  </form>
+                                                                                </mat-expansion-panel>
+                                                                              }
+                                                                            </mat-card>
+                                                                          </mat-tab>
+                                                                          <mat-tab label="Add">
+                                                                            <mat-card>
+                                                                              <div class="spacer">
+                                                                                <mat-form-field hideRequiredMarker>
+                                                                                  <mat-label>Domain</mat-label>
+                                                                                  <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
+                                                                                    <mat-option>--</mat-option>
+                                                                                    @for (domain of onlyValues(directoryDomains()); track domain) {
+                                                                                      <mat-option
+                                                                                      [value]="domain.id">{{domain.name}}</mat-option>
+                                                                                    }
+                                                                                  <!--mat-hint>{{selectdomain?.sound}}</mat-hint-->
+                                                                                </mat-select>
+                                                                              </mat-form-field>
+                                                                              <mat-form-field hideRequiredMarker>
+                                                                                <mat-label>Template Name</mat-label>
+                                                                                <input matInput placeholder="Template name" [(ngModel)]="templateName"
+                                                                                  name="cache" autocomplete="off">
+                                                                                </mat-form-field>
+                                                                                <button mat-button color="primary" class="but-spacer-left"
+                                                                                  [disabled]="!templateName"
+                                                                                  (click)="AddWebUsersTemplates()">
+                                                                                  Submit
+                                                                                </button>
+                                                                              </div>
+                                                                            </mat-card>
+                                                                          </mat-tab>
+                                                                          <mat-tab label="Rename/Delete">
+                                                                            <mat-card>
+                                                                            </mat-card>
+                                                                          </mat-tab>
+                                                                        </mat-tab-group>
 
-  </mat-expansion-panel>
-  <!--TODO Web settings list here
-    <mat-expansion-panel (opened)="getWebUsers()">
-      <mat-expansion-panel-header>
-        <mat-panel-title>Web settings</mat-panel-title>
-        <mat-panel-description>
-          Click to get details
-        </mat-panel-description>
-      </mat-expansion-panel-header>
+                                                                      </mat-expansion-panel>
+                                                                      <!--TODO Web settings list here
+                                                                      <mat-expansion-panel (opened)="getWebUsers()">
+                                                                        <mat-expansion-panel-header>
+                                                                          <mat-panel-title>Web settings</mat-panel-title>
+                                                                          <mat-panel-description>
+                                                                            Click to get details
+                                                                          </mat-panel-description>
+                                                                        </mat-expansion-panel-header>
 
-  </mat-expansion-panel>-->
-</div>
+                                                                      </mat-expansion-panel>-->
+                                                                    </div>
