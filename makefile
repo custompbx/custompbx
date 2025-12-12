@@ -37,7 +37,7 @@ build: front back
 
 front:
 		@ cd $(web_path) && npm run build
-		@ cd $(web_path) && go-bindata -pkg cweb -prefix dist/cweb-app -o ../custompbx/cweb/cweb.go dist/cweb-app/...
+		@ cd $(web_path) && go-bindata -pkg cweb -prefix dist/cweb-app/browser -o ../custompbx/cweb/cweb.go dist/cweb-app/browser/...
 
 back:
 		@ cd $(go_path) && export CGO_ENABLED=0 && $(go_app) build -ldflags="-s -w" -o ../../bin/cpbx ./
