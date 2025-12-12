@@ -35,7 +35,7 @@ services:
   freeswitch:
     container_name: freeswitch-host
     hostname: freeswitch-host
-    image: ghcr.io/custompbx/freeswitch:v0.2
+    image: ghcr.io/custompbx/freeswitch:latest
     depends_on:
       custompbx:
         #condition: service_healthy
