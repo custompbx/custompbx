@@ -40,6 +40,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -328,27 +329,11 @@ func Web(rw http.ResponseWriter, r *http.Request) {
 		if route3 != "" {
 			servePath := webcache.GetWebSetting(webcache.CdrFileServerPath)
 			if servePath != "" && servePath != "/" {
-				servePath += "/" + route3
-				if route4 != "" {
-					servePath += "/" + route4
+				servePath, err = resolveFileUnderRoot(servePath, route3, route4, route5, route6, route7, route8, route9)
+				if err != nil {
+					http.Error(rw, "not found", http.StatusNotFound)
+					return
 				}
-				if route5 != "" {
-					servePath += "/" + route5
-				}
-				if route6 != "" {
-					servePath += "/" + route6
-				}
-				if route7 != "" {
-					servePath += "/" + route7
-				}
-				if route8 != "" {
-					servePath += "/" + route8
-				}
-				if route9 != "" {
-					servePath += "/" + route9
-				}
-				log.Println(servePath)
-
 				http.ServeFile(rw, r, servePath)
 
 				return
@@ -390,6 +375,36 @@ func Web(rw http.ResponseWriter, r *http.Request) {
 		// print unknown error
 		log.Println(err)
 	}
+}
+
+func resolveFileUnderRoot(root string, segments ...string) (string, error) {
+	root, err := filepath.Abs(filepath.Clean(root))
+	if err != nil {
+		return "", err
+	}
+	parts := []string{root}
+	for _, segment := range segments {
+		if segment == "" {
+			continue
+		}
+		if filepath.IsAbs(segment) || segment == "." || segment == ".." || strings.ContainsAny(segment, `/\\`) {
+			return "", os.ErrNotExist
+		}
+		parts = append(parts, segment)
+	}
+	candidate, err := filepath.Abs(filepath.Join(parts...))
+	if err != nil {
+		return "", err
+	}
+	rel, err := filepath.Rel(root, candidate)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+		return "", os.ErrNotExist
+	}
+	info, err := os.Stat(candidate)
+	if err != nil || !info.Mode().IsRegular() {
+		return "", os.ErrNotExist
+	}
+	return candidate, nil
 }
 
 func SecurityHeaders(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,7 @@
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+  freeswitch:
+    ports:
+      - "127.0.0.1:8021:8021/tcp"

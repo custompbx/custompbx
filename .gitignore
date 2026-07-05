@@ -2,6 +2,7 @@ bin/*
 /src/custompbx/.idea/
 /src/custompbx/.run/
 /src/cweb-app/node_modules/
+src/cweb-app/node_modules/
 /src/cweb-app/.angular/
 /src/cweb-app/.idea
 /src/cweb-app/.run
@@ -15,3 +16,5 @@ src/custompbx/Gopkg.toml
 /src/pkg/
 /pkg/
 .secrets
+/config.json
+/docker/config.json

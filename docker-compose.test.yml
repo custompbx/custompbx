@@ -1,0 +1,24 @@
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: custompbx_test
+      POSTGRES_PASSWORD: test-only
+      POSTGRES_DB: custompbx_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U custompbx_test -d custompbx_test"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+
+  integration-test:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: integration-test
+    environment:
+      TEST_DATABASE_DSN: postgres://custompbx_test:test-only@postgres-test:5432/custompbx_test?sslmode=disable
+      CUSTOMPBX_CONFIG: /test/config.json
+    depends_on:
+      postgres-test:
+        condition: service_healthy

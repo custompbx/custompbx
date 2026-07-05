@@ -1,0 +1,60 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: src/custompbx/go.mod
+          cache-dependency-path: src/custompbx/go.sum
+      - run: cp config.example.json /tmp/custompbx-test.json
+      - run: test -z "$(gofmt -l .)"
+        working-directory: src/custompbx
+      - run: go vet ./...
+        working-directory: src/custompbx
+        env: { CUSTOMPBX_CONFIG: /tmp/custompbx-test.json }
+      - run: go test ./...
+        working-directory: src/custompbx
+        env: { CUSTOMPBX_CONFIG: /tmp/custompbx-test.json }
+      - run: go test -race ./web ./webStruct ./cfg ./db
+        working-directory: src/custompbx
+        env: { CUSTOMPBX_CONFIG: /tmp/custompbx-test.json }
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/cweb-app/package-lock.json
+      - run: npm ci
+        working-directory: src/cweb-app
+      - run: npm run build
+        working-directory: src/cweb-app
+      - run: npm test -- --watch=false --browsers=ChromeHeadless
+        working-directory: src/cweb-app
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from integration-test
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2

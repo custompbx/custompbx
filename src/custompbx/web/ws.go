@@ -56,7 +56,7 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  2048,
 	WriteBufferSize: 2048,
 	CheckOrigin: func(r *http.Request) bool {
-		return true
+		return CheckWebSocketOrigin(cfg.CustomPbx.Web.OriginPolicy, cfg.CustomPbx.Web.AllowedOrigins, r)
 	},
 }
 
@@ -64,7 +64,7 @@ func SetBroadcastChannel(brChannel chan interface{}) {
 	eventChannel = brChannel
 }
 
-var b = &webStruct.WsHub{}
+var b = webStruct.NewWsHub()
 
 func TimeEvents() {
 	twoSecondsTick := time.Tick(2 * time.Second)
@@ -111,11 +111,11 @@ func StartWS(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("NEW WS CONNECTION")
 	wsContext := webStruct.CreateWsContext(ws)
+	b.Register(wsContext)
 
 	fmt.Println("STARTING GOROUTINES")
 	go wsContext.SendWaiter()
 	go wsContext.ReadWaiter(messageHandler)
-	b.Hub = append(b.Hub, wsContext)
 }
 
 func PostAPIRequest(w http.ResponseWriter, r *http.Request) {
@@ -168,12 +168,13 @@ func tokenGenerator() string {
 func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 	defer func() {
 		if r := recover(); r != nil {
+			wsContext.RecordHandlerFailure()
 			log.Println("Recovered in getUser", r)
 			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
 		}
 	}()
 	if !daemonCache.State.DatabaseConnection {
-		wsContext.SendChannel <- &webStruct.UserResponse{Daemon: daemonCache.State, MessageType: webStruct.BroadcastConnection}
+		wsContext.Enqueue(&webStruct.UserResponse{Daemon: daemonCache.State, MessageType: webStruct.BroadcastConnection})
 		return
 	}
 
@@ -184,13 +185,13 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 	// first check if it login request
 	if msg.Event == eventLogin {
 		resp := checkLogin(msg.Data)
-		wsContext.SendChannel <- &resp
+		wsContext.Enqueue(&resp)
 		return
 	}
 	// allow without token
 	if msg.Event == "get_status" {
 		resp := webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "connection"}
-		wsContext.SendChannel <- &resp
+		wsContext.Enqueue(&resp)
 		return
 	}
 	log.Println("EVENT: ", msg.Event)
@@ -199,17 +200,23 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 	user, response := findUser(msg.Data)
 	if user == nil {
 		log.Println("EVENT: ", msg.Event, "NO USER")
-		wsContext.SendChannel <- &response
+		wsContext.Enqueue(&response)
 		return
 	}
 	subsResp := subscribeUser(msg.Data)
 	if subsResp != nil {
 		log.Println("EVENT: ", msg.Event, "NO SUBS")
-		wsContext.SendChannel <- subsResp
+		wsContext.Enqueue(subsResp)
 		return
 	}
 
 	var resp webStruct.UserResponse
+	if registeredResponse, ok := coreEvents.Dispatch(msg.Data); ok {
+		if !wsContext.Enqueue(&registeredResponse) {
+			_ = wsContext.CloseWithReason("outbound queue full")
+		}
+		return
+	}
 	switch msg.Event {
 	case eventLogOut:
 		wsContext.Subscriptions.Clear()
@@ -270,19 +277,13 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 		)
 	case "[Dialplan][Switch] Debug":
 		resp = getUser(msg.Data, switchDialplanDebug, onlyAdminGroup())
-	case "AddUserToken":
-		resp = getUser(msg.Data, createAPIToken, onlyAdminGroup())
-	case "GetUserTokens":
-		resp = getUser(msg.Data, GetUserTokens, onlyAdminGroup())
-	case "UserGetOwnTokens":
-		resp = getUser(msg.Data, UserGetOwnTokens, onlyAdminGroup())
-	case "RemoveUserToken":
-		resp = getUser(msg.Data, RemoveUserToken, onlyAdminGroup())
 	default:
 		resp = messageMainHandler(msg.Data)
 	}
 
-	wsContext.SendChannel <- &resp
+	if !wsContext.Enqueue(&resp) {
+		_ = wsContext.CloseWithReason("outbound queue full")
+	}
 }
 
 func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
@@ -4511,11 +4512,7 @@ func RealFSCLICommand(data *webStruct.MessageData) webStruct.UserResponse {
 }
 
 func GetLogs(data *webStruct.MessageData) webStruct.UserResponse {
-	limit := data.DBRequest.Limit
-	if limit == 0 || limit > 5000 {
-		limit = 250
-	}
-	offset := data.DBRequest.Offset * limit
+	limit, offset := normalizePagination(data.DBRequest.Limit, data.DBRequest.Offset)
 	logs, err := db.GetList(limit, offset, data.DBRequest.Filters, data.DBRequest.Order, cache.GetCurrentInstanceId())
 	if err != nil {
 		return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}
@@ -4525,11 +4522,7 @@ func GetLogs(data *webStruct.MessageData) webStruct.UserResponse {
 }
 
 func getHEP(data *webStruct.MessageData) webStruct.UserResponse {
-	limit := data.DBRequest.Limit
-	if limit == 0 || limit > 5000 {
-		limit = 250
-	}
-	offset := data.DBRequest.Offset * limit
+	limit, offset := normalizePagination(data.DBRequest.Limit, data.DBRequest.Offset)
 	heps, err := db.GetHEPList(limit, offset, data.DBRequest.Filters, data.DBRequest.Order)
 	if err != nil {
 		return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}

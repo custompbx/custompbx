@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"io"
+	"log"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -134,15 +136,18 @@ func (s *Subscriptions) SetPersistent(name string) {
 func (s *Subscriptions) Del(name string) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
-	s.byName[name] = false
-	s.persistent[name] = false
+	delete(s.byName, name)
+	delete(s.persistent, name)
 }
 
 // Clear removes all subscriptions.
 func (s *Subscriptions) Clear() {
 	s.mx.Lock()
 	defer s.mx.Unlock()
-	s.byName = s.persistent
+	s.byName = make(map[string]bool, len(s.persistent))
+	for name := range s.persistent {
+		s.byName[name] = true
+	}
 }
 
 type Param struct {
@@ -240,57 +245,118 @@ type ErroeResponse struct {
 
 // WsContext represents a WebSocket context with its connection, subscriptions, and send channel.
 type WsContext struct {
-	ws            *websocket.Conn
-	Subscriptions *Subscriptions
-	SendChannel   chan *UserResponse
-	User          *mainStruct.WebUser
+	ws               *websocket.Conn
+	Subscriptions    *Subscriptions
+	ID               uint64
+	User             *mainStruct.WebUser
+	send             chan *UserResponse
+	done             chan struct{}
+	closeOnce        sync.Once
+	onClose          func(*WsContext)
+	onWriteFailure   func()
+	onHandlerFailure func()
+	writeTimeout     time.Duration
+	readTimeout      time.Duration
+	pingInterval     time.Duration
 }
 
 // Close closes the WebSocket connection and clears the send channel.
 func (c *WsContext) Close() error {
-	err := c.ws.Close()
-	if err != nil {
-		return fmt.Errorf("failed to close WebSocket: %w", err)
+	return c.CloseWithReason("closed")
+
+}
+
+func (c *WsContext) CloseWithReason(reason string) (closeErr error) {
+	c.closeOnce.Do(func() {
+		close(c.done)
+		closeErr = c.ws.Close()
+		if c.onClose != nil {
+			c.onClose(c)
+		}
+		log.Printf("component=websocket connection_id=%d operation=close reason=%q", c.ID, reason)
+	})
+	return closeErr
+}
+
+func (c *WsContext) Enqueue(event *UserResponse) bool {
+	select {
+	case <-c.done:
+		return false
+	default:
 	}
-	c.SendChannel = nil
-	return nil
+	select {
+	case c.send <- event:
+		return true
+	default:
+		return false
+	}
+}
+
+func (c *WsContext) RecordHandlerFailure() {
+	if c.onHandlerFailure != nil {
+		c.onHandlerFailure()
+	}
 }
 
 // SendWaiter listens on the SendChannel and sends messages through the WebSocket connection.
 func (c *WsContext) SendWaiter() {
-	for event := range c.SendChannel {
-		// log.Printf("[WEBSOCKET] Send message: %+v\n", v)
-		err := c.ws.SetWriteDeadline(time.Now().Add(2 * time.Second))
-		if err != nil {
-			fmt.Printf("ERROR on SetWriteDeadline: %+v\n", err)
-			c.Close()
+	ping := time.NewTicker(c.pingInterval)
+	defer ping.Stop()
+	for {
+		select {
+		case <-c.done:
 			return
-		}
-		eventMsg, err := json.Marshal(event)
-		if err != nil {
-			fmt.Printf("ERROR on Marshal: %+v\n", err)
-			continue
-		}
+		case <-ping.C:
+			if err := c.ws.WriteControl(websocket.PingMessage, nil, time.Now().Add(c.writeTimeout)); err != nil {
+				if c.onWriteFailure != nil {
+					c.onWriteFailure()
+				}
+				c.CloseWithReason("ping failure")
+				return
+			}
+		case event := <-c.send:
+			// log.Printf("[WEBSOCKET] Send message: %+v\n", v)
+			err := c.ws.SetWriteDeadline(time.Now().Add(c.writeTimeout))
+			if err != nil {
+				if c.onWriteFailure != nil {
+					c.onWriteFailure()
+				}
+				fmt.Printf("ERROR on SetWriteDeadline: %+v\n", err)
+				c.CloseWithReason("write deadline failure")
+				return
+			}
+			eventMsg, err := json.Marshal(event)
+			if err != nil {
+				if c.onWriteFailure != nil {
+					c.onWriteFailure()
+				}
+				fmt.Printf("ERROR on Marshal: %+v\n", err)
+				continue
+			}
 
-		err = c.ws.WriteMessage(websocket.TextMessage, eventMsg)
-		// err = c.ws.WriteJSON(event)
-		if err != nil {
-			// fmt.Printf("ERROR on WriteJSON: %+v\n", err)
-			fmt.Printf("ERROR on WriteMessage: %+v\n", err)
-			c.Close()
-			return
+			err = c.ws.WriteMessage(websocket.TextMessage, eventMsg)
+			// err = c.ws.WriteJSON(event)
+			if err != nil {
+				// fmt.Printf("ERROR on WriteJSON: %+v\n", err)
+				fmt.Printf("ERROR on WriteMessage: %+v\n", err)
+				c.CloseWithReason("write failure")
+				return
+			}
 		}
 	}
 }
 
 // ReadWaiter listens for incoming messages on the WebSocket connection and handles them using the provided handler function.
 func (c *WsContext) ReadWaiter(handler func(*Message, *WsContext)) {
+	c.ws.SetReadLimit(1 << 20)
+	_ = c.ws.SetReadDeadline(time.Now().Add(c.readTimeout))
+	c.ws.SetPongHandler(func(string) error { return c.ws.SetReadDeadline(time.Now().Add(c.readTimeout)) })
 	for {
 		var msg *Message
 		_, r, err := c.ws.NextReader()
 		if err != nil {
 			fmt.Printf("CLOSE WS BY ERROR on NextReader: %+v\n", err)
-			c.Close()
+			c.CloseWithReason("read failure")
 			return
 		}
 
@@ -302,43 +368,87 @@ func (c *WsContext) ReadWaiter(handler func(*Message, *WsContext)) {
 
 		if err != nil {
 			fmt.Printf("ERROR on Decode: %+v\n", err)
-			c.SendChannel <- &UserResponse{Error: "failed to read message", MessageType: "none"}
+			if !c.Enqueue(&UserResponse{Error: "failed to read message", MessageType: "none"}) {
+				c.CloseWithReason("outbound queue full")
+			}
 			continue
 		}
-		//messageHandler
-		go handler(msg, c)
+		handler(msg, c)
 		// log.Printf("[WEBSOCKET] Got message: %+v\n", msg)
 	}
 }
 
 // WsHub manages a collection of WebSocket contexts and provides broadcast capabilities.
 type WsHub struct {
-	Hub []*WsContext
+	mx              sync.RWMutex
+	connections     map[uint64]*WsContext
+	active          atomic.Int64
+	broadcasts      atomic.Uint64
+	queueOverflows  atomic.Uint64
+	failedWrites    atomic.Uint64
+	handlerFailures atomic.Uint64
+}
+
+type HubMetrics struct {
+	Active                                                    int64
+	Broadcasts, QueueOverflows, FailedWrites, HandlerFailures uint64
+}
+
+func NewWsHub() *WsHub { return &WsHub{connections: make(map[uint64]*WsContext)} }
+
+func (h *WsHub) Register(c *WsContext) {
+	h.mx.Lock()
+	if h.connections == nil {
+		h.connections = make(map[uint64]*WsContext)
+	}
+	h.connections[c.ID] = c
+	c.onClose = h.remove
+	c.onWriteFailure = func() { h.failedWrites.Add(1) }
+	c.onHandlerFailure = func() { h.handlerFailures.Add(1) }
+	h.active.Store(int64(len(h.connections)))
+	h.mx.Unlock()
+}
+
+func (h *WsHub) remove(c *WsContext) {
+	h.mx.Lock()
+	delete(h.connections, c.ID)
+	h.active.Store(int64(len(h.connections)))
+	h.mx.Unlock()
+}
+
+func (h *WsHub) snapshot() []*WsContext {
+	h.mx.RLock()
+	defer h.mx.RUnlock()
+	items := make([]*WsContext, 0, len(h.connections))
+	for _, c := range h.connections {
+		items = append(items, c)
+	}
+	return items
+}
+
+func (h *WsHub) Metrics() HubMetrics {
+	return HubMetrics{h.active.Load(), h.broadcasts.Load(), h.queueOverflows.Load(), h.failedWrites.Load(), h.handlerFailures.Load()}
+}
+
+func (h *WsHub) Shutdown() {
+	for _, c := range h.snapshot() {
+		_ = c.CloseWithReason("hub shutdown")
+	}
 }
 
 // Broadcast sends a UserResponse message to all subscribed WebSocket contexts in the hub.
 func (h *WsHub) Broadcast(data UserResponse) {
-	for i := 0; i < len(h.Hub); i++ {
-		if h.Hub[i] == nil || h.Hub[i].SendChannel == nil {
-			h.Drop(i)
-			i--
-			continue
-		}
-
-		subscribed := h.Hub[i].Subscriptions.Get(data.MessageType)
+	h.broadcasts.Add(1)
+	for _, connection := range h.snapshot() {
+		subscribed := connection.Subscriptions.Get(data.MessageType)
 		if !subscribed && data.MessageType != BroadcastConnection {
 			// fmt.Println("NOT Subscribed")
 			continue
 		}
 
-		select {
-		case h.Hub[i].SendChannel <- &data:
-			// fmt.Println("sent message", msg)
-		default:
-			h.Hub[i].Close()
-			fmt.Println("Can't Send")
-			h.Drop(i)
-			i--
+		if !connection.Enqueue(&data) {
+			h.queueOverflows.Add(1)
+			_ = connection.CloseWithReason("outbound queue full")
 		}
 	}
 }
@@ -351,22 +461,13 @@ func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) []int64 
 	}
 
 	var sent []int64
-	for i := 0; i < len(h.Hub); i++ {
-		if h.Hub[i] == nil || h.Hub[i].SendChannel == nil {
-			h.Drop(i)
-			i--
-			continue
-		}
-
-		if h.Hub[i].User != nil && userIDs[h.Hub[i].User.Id] {
-			select {
-			case h.Hub[i].SendChannel <- &data:
-				sent = append(sent, h.Hub[i].User.Id)
-			default:
-				h.Hub[i].Close()
-				fmt.Println("Can't Send")
-				h.Drop(i)
-				i--
+	for _, connection := range h.snapshot() {
+		if connection.User != nil && userIDs[connection.User.Id] {
+			if connection.Enqueue(&data) {
+				sent = append(sent, connection.User.Id)
+			} else {
+				h.queueOverflows.Add(1)
+				_ = connection.CloseWithReason("outbound queue full")
 			}
 		}
 	}
@@ -374,14 +475,6 @@ func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) []int64 
 }
 
 // Drop removes a WebSocket context at the specified index from the hub.
-func (h *WsHub) Drop(index int) {
-	if len(h.Hub) == index+1 {
-		h.Hub = h.Hub[:index]
-		return
-	}
-	h.Hub = append(h.Hub[:index], h.Hub[index+1:]...)
-}
-
 // Trim removes leading and trailing white spaces from various fields in MessageData.
 func (m *MessageData) Trim() {
 	m.Login = strings.TrimSpace(m.Login)
@@ -448,9 +541,17 @@ func newSubscriptions() *Subscriptions {
 
 // CreateWsContext creates a new WsContext with the provided WebSocket connection.
 func CreateWsContext(ws *websocket.Conn) *WsContext {
+	const queueSize = 64
 	return &WsContext{
 		ws:            ws,
+		ID:            nextConnectionID.Add(1),
 		Subscriptions: newSubscriptions(),
-		SendChannel:   make(chan *UserResponse, 42), //capacity - or got disconnect on 2 msg at one time
+		send:          make(chan *UserResponse, queueSize),
+		done:          make(chan struct{}),
+		writeTimeout:  time.Duration(cfg.CustomPbx.Web.WriteTimeoutSeconds) * time.Second,
+		readTimeout:   time.Duration(cfg.CustomPbx.Web.ReadTimeoutSeconds) * time.Second,
+		pingInterval:  time.Duration(cfg.CustomPbx.Web.PingIntervalSeconds) * time.Second,
 	}
 }
+
+var nextConnectionID atomic.Uint64

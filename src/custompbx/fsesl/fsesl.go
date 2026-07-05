@@ -1741,7 +1741,7 @@ func initDirectoryDomain(domains []*xmlStruct.Domain) error {
 		}
 	}
 	if len(errs) > 0 {
-		return fmt.Errorf(strings.Join(errs, "\n"))
+		return errors.New(strings.Join(errs, "\n"))
 	}
 	return nil
 }
@@ -1801,7 +1801,7 @@ func UserList(eslDomainUser *xmlStruct.User, domainId int64) error {
 		}
 	}
 	if len(errs) > 0 {
-		return fmt.Errorf(strings.Join(errs, "\n"))
+		return errors.New(strings.Join(errs, "\n"))
 	}
 	return nil
 }
@@ -1856,7 +1856,7 @@ func ParseDirectoryUsersXML(domainId int64, rawXML string) error {
 		}
 	}
 	if len(errs) > 0 {
-		return fmt.Errorf(strings.Join(errs, "\n"))
+		return errors.New(strings.Join(errs, "\n"))
 	}
 	return nil
 }
@@ -1944,7 +1944,7 @@ func ParseConfigXML(rawXML string) error {
 		}
 	}
 	if len(errs) > 0 {
-		return fmt.Errorf(strings.Join(errs, "\n"))
+		return errors.New(strings.Join(errs, "\n"))
 	}
 	return nil
 }

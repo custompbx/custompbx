@@ -78,11 +78,13 @@ type WebUserGroup struct {
 //type WebUserGroupId uint
 
 type WebUserToken struct {
-	Id      int64  `json:"id"`
-	Login   string `json:"login"`
-	Token   string `json:"token"`
-	Created string `json:"created"`
-	Purpose string `json:"purpose"`
+	Id       int64  `json:"id"`
+	Login    string `json:"login"`
+	Token    string `json:"token,omitempty"`
+	Created  string `json:"created"`
+	Purpose  string `json:"purpose"`
+	Expires  string `json:"expires,omitempty"`
+	LastUsed string `json:"last_used,omitempty"`
 }
 
 type WebUsers struct {
@@ -114,9 +116,15 @@ func (w *WebUserTokens) Set(token string) {
 }
 
 func (w *WebUserTokens) Delete(token string) {
-	w.mx.RLock()
-	defer w.mx.RUnlock()
+	w.mx.Lock()
+	defer w.mx.Unlock()
 	delete(w.tokens, token)
+}
+
+func (w *WebUserTokens) Clear() {
+	w.mx.Lock()
+	defer w.mx.Unlock()
+	clear(w.tokens)
 }
 
 func NewWebUserTokens() WebUserTokens {
@@ -149,6 +157,29 @@ func (w *WebUsers) GetByToken(key string) (*WebUser, bool) {
 	defer w.mx.RUnlock()
 	val, ok := w.byToken[key]
 	return val, ok
+}
+
+func (w *WebUsers) SetToken(token string, user *WebUser) {
+	w.mx.Lock()
+	defer w.mx.Unlock()
+	w.byToken[token] = user
+}
+
+func (w *WebUsers) DeleteToken(token string) {
+	w.mx.Lock()
+	defer w.mx.Unlock()
+	delete(w.byToken, token)
+}
+
+func (w *WebUsers) ClearUserTokens(user *WebUser) {
+	w.mx.Lock()
+	defer w.mx.Unlock()
+	for token, cached := range w.byToken {
+		if cached == user {
+			delete(w.byToken, token)
+		}
+	}
+	user.Tokens.Clear()
 }
 
 func (w *WebUsers) Set(value *WebUser) {

@@ -255,6 +255,7 @@ func SaveWebUserToken(user *mainStruct.WebUser, token, purpose string) (mainStru
 	}
 
 	user.Tokens.Set(token)
+	users.SetToken(token, user)
 
 	return tok, err
 }
@@ -270,6 +271,7 @@ func DelWebUserToken(user *mainStruct.WebUser, token string) error {
 	}
 
 	user.Tokens.Delete(token)
+	users.DeleteToken(token)
 
 	return err
 }
@@ -284,7 +286,7 @@ func DelWebUserTokenById(id int64) (int64, error) {
 	if user == nil {
 		return 0, errors.New("user not found")
 	}
-	user.Tokens.Delete(token)
+	users.ClearUserTokens(user)
 
 	return user.Id, nil
 }
@@ -300,10 +302,12 @@ func GetWebUserByToken(token string) (*mainStruct.WebUser, error) {
 		oldUser := users.GetById(user.Id)
 		if oldUser != nil {
 			oldUser.Tokens.Set(token)
+			users.SetToken(token, oldUser)
 			userRes = oldUser
 		} else {
 			user.Tokens.Set(token)
 			users.Set(user)
+			users.SetToken(token, user)
 			userRes = user
 		}
 	}

@@ -21,6 +21,7 @@ System Requirements:
 * Linux OS (amd64)
 * FreeSWITCH
 * Postgres Database
+* Go 1.24 and Node.js 22 when building from source
 ---
 ### Build Process
 Install **make** first (apt example):
@@ -28,11 +29,11 @@ Install **make** first (apt example):
 sodo apt install -y make
 ```
 
-To install golang, node, all dependencies and initiate the build process, execute the following command:
+After installing the required Go and Node.js versions, install dependencies and build with:
 ```
 make install
 ```
-For rebuilding after resolving dependencies, use:
+For subsequent builds, use:
 ```
 make build
 ``` 
@@ -48,6 +49,8 @@ Additional options can be found in the Makefile.
 - dep-back
 
 The compiled binary file is located in the ``bin/`` directory and can be used as outlined in the [Documentation](https://github.com/custompbx/custompbx/wiki).
+
+Copy `config.example.json` to `config.json` for local runtime configuration. WebSocket origins default to `same_origin`; use `allow_list` with exact `allowed_origins` in production when the UI is hosted separately. The explicit `allow_all` policy is intended only for development.
 
 Alternatively, you can utilize the precompiled binary available on the **[Releases Page](https://github.com/custompbx/custompbx/releases)**.
 

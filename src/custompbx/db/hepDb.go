@@ -8,7 +8,6 @@ import (
 	"github.com/custompbx/hepparser"
 	"log"
 	"strconv"
-	"strings"
 )
 
 func InitHEPDb() {
@@ -364,7 +363,7 @@ func GetHEPDetailsList(callIds []string, instanceId int64) ([]map[string]*interf
 	fieldsArrModified[0] = fmt.Sprintf("to_char(%s, 'YYYY-MM-DD HH24:MI:SS.MS')", fieldsArrModified[0])
 
 	queryBuilder := squirrel.Select(fieldsArrModified...).From(table).PlaceholderFormat(squirrel.Dollar).Where(squirrel.Eq{"instance_id": instanceId})
-	queryBuilder = queryBuilder.Where(fmt.Sprintf("sip_call_id IN ('%s')", strings.Join(callIds[:], "','")))
+	queryBuilder = queryBuilder.Where(squirrel.Eq{"sip_call_id": callIds})
 	queryBuilder = queryBuilder.OrderBy("hep_timestamp ASC")
 
 	query, args, _ := queryBuilder.ToSql()

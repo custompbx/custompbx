@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 const (
@@ -34,13 +37,68 @@ type HEPCollector struct {
 }
 
 type WebServer struct {
-	Route    string `json:"route"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	StunPort int    `json:"stun_port"`
-	CertPath string `json:"cert_path"`
-	KeyPath  string `json:"key_path"`
-	Secure   bool   `json:"secure"`
+	Route               string   `json:"route"`
+	Host                string   `json:"host"`
+	Port                int      `json:"port"`
+	StunPort            int      `json:"stun_port"`
+	CertPath            string   `json:"cert_path"`
+	KeyPath             string   `json:"key_path"`
+	Secure              bool     `json:"secure"`
+	OriginPolicy        string   `json:"origin_policy,omitempty"`
+	AllowedOrigins      []string `json:"allowed_origins,omitempty"`
+	WriteTimeoutSeconds int      `json:"ws_write_timeout_seconds,omitempty"`
+	ReadTimeoutSeconds  int      `json:"ws_read_timeout_seconds,omitempty"`
+	PingIntervalSeconds int      `json:"ws_ping_interval_seconds,omitempty"`
+}
+
+const (
+	OriginPolicySameOrigin = "same_origin"
+	OriginPolicyAllowList  = "allow_list"
+	OriginPolicyAllowAll   = "allow_all"
+)
+
+func (w *WebServer) NormalizeAndValidateOrigins() error {
+	if w.WriteTimeoutSeconds <= 0 {
+		w.WriteTimeoutSeconds = 2
+	}
+	if w.ReadTimeoutSeconds <= 0 {
+		w.ReadTimeoutSeconds = 60
+	}
+	if w.PingIntervalSeconds <= 0 {
+		w.PingIntervalSeconds = 25
+	}
+	if w.PingIntervalSeconds >= w.ReadTimeoutSeconds {
+		return fmt.Errorf("webserver ws_ping_interval_seconds must be lower than ws_read_timeout_seconds")
+	}
+	if w.OriginPolicy == "" {
+		w.OriginPolicy = OriginPolicySameOrigin
+	}
+	if w.OriginPolicy != OriginPolicySameOrigin && w.OriginPolicy != OriginPolicyAllowList && w.OriginPolicy != OriginPolicyAllowAll {
+		return fmt.Errorf("invalid webserver origin_policy %q", w.OriginPolicy)
+	}
+	if w.OriginPolicy == OriginPolicyAllowList && len(w.AllowedOrigins) == 0 {
+		return fmt.Errorf("webserver allowed_origins must not be empty when origin_policy is allow_list")
+	}
+	for i, origin := range w.AllowedOrigins {
+		normalized, err := NormalizeOrigin(origin)
+		if err != nil {
+			return fmt.Errorf("invalid webserver allowed_origins[%d]: %w", i, err)
+		}
+		w.AllowedOrigins[i] = normalized
+	}
+	return nil
+}
+
+func NormalizeOrigin(origin string) (string, error) {
+	origin = strings.TrimSpace(origin)
+	u, err := url.Parse(origin)
+	if err != nil || u.Scheme == "" || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" || (u.Path != "" && u.Path != "/") {
+		return "", fmt.Errorf("origin must contain only http(s) scheme and host")
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return "", fmt.Errorf("origin scheme must be http or https")
+	}
+	return strings.ToLower(u.Scheme) + "://" + strings.ToLower(u.Host), nil
 }
 
 type Database struct {
@@ -59,13 +117,11 @@ type GeneralCfg struct {
 }
 
 func RD() (config GeneralCfg, err error) {
-	workDir, err := os.Getwd()
-	if err != nil || workDir == "" {
-		err = fmt.Errorf("Couldn't not detect pwd directory: " + err.Error())
-		os.Exit(1)
+	path, err := ConfigPath()
+	if err != nil {
+		return config, err
 	}
-
-	file, err := os.ReadFile(workDir + "/" + configFile)
+	file, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Printf("Config file not found. Creating...\n")
 		config = createConfig()
@@ -77,16 +133,14 @@ func RD() (config GeneralCfg, err error) {
 }
 
 func WD(conf GeneralCfg) (config GeneralCfg, err error) {
-	workDir, err := os.Getwd()
-	if err != nil || workDir == "" {
-		err = fmt.Errorf("Couldn't not detect pwd directory: " + err.Error())
-		os.Exit(1)
-	}
-
-	file, _ := json.MarshalIndent(conf, "", "    ")
-	err = os.WriteFile(workDir+"/"+configFile, file, 0644)
+	path, err := ConfigPath()
 	if err != nil {
-		err = fmt.Errorf("Couldn't write to file: " + err.Error())
+		return config, err
+	}
+	file, _ := json.MarshalIndent(conf, "", "    ")
+	err = os.WriteFile(path, file, 0600)
+	if err != nil {
+		err = fmt.Errorf("could not write config file: %w", err)
 		return config, err
 	}
 	return conf, err
@@ -94,16 +148,18 @@ func WD(conf GeneralCfg) (config GeneralCfg, err error) {
 
 func init() {
 	var err error
-	workDir, err := os.Getwd()
-	if err != nil || workDir == "" {
-		err = fmt.Errorf("Couldn't not detect pwd directory: " + err.Error())
-		os.Exit(1)
+	path, err := ConfigPath()
+	if err != nil {
+		log.Fatal(err)
 	}
-	log.Println("Config file at " + workDir + "/" + configFile)
+	log.Println("Config file at " + path)
 	CustomPbx, err = RD()
 	if err != nil {
 		fmt.Printf("ERROR: Could not read configuration file: "+configFile+", cause: %v\n", err.Error())
 		os.Exit(1)
+	}
+	if err = CustomPbx.Web.NormalizeAndValidateOrigins(); err != nil {
+		log.Fatal(err)
 	}
 
 	if CustomPbx.XMLCurl.Route == "" || CustomPbx.XMLCurl.Route[:1] != "/" {
@@ -113,6 +169,17 @@ func init() {
 	if CustomPbx.Web.Route == "" || CustomPbx.Web.Route[:1] != "/" {
 		CustomPbx.Web.Route = "/" + CustomPbx.Web.Route
 	}
+}
+
+func ConfigPath() (string, error) {
+	if configured := strings.TrimSpace(os.Getenv("CUSTOMPBX_CONFIG")); configured != "" {
+		return filepath.Abs(configured)
+	}
+	workDir, err := os.Getwd()
+	if err != nil || workDir == "" {
+		return "", fmt.Errorf("could not detect working directory: %w", err)
+	}
+	return filepath.Join(workDir, configFile), nil
 }
 
 func createConfig() GeneralCfg {
@@ -138,6 +205,10 @@ func createConfig() GeneralCfg {
 	item.Web.CertPath = ""
 	item.Web.KeyPath = ""
 	item.Web.Secure = true
+	item.Web.OriginPolicy = OriginPolicySameOrigin
+	item.Web.WriteTimeoutSeconds = 2
+	item.Web.ReadTimeoutSeconds = 60
+	item.Web.PingIntervalSeconds = 25
 	item.XMLCurl.Route = "/conf/config"
 	item.XMLCurl.Host = "127.0.0.1"
 	item.XMLCurl.Port = 8081

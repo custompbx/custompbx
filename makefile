@@ -9,9 +9,9 @@ ifneq ($(wildcard /usr/local/go/bin),)
     go_app:=/usr/local/go/bin/go
 endif
 
-.PHONY: install show install-dep build dep-front dep-back front back front-serve install-node install-golang
+.PHONY: install show install-dep build dep-front dep-back front back front-serve test
 
-install: install-golang install-node install-dep build
+install: install-dep build
 
 show:
 		@ echo Timestamp: $(shell date)
@@ -25,19 +25,18 @@ install-dep: dep-front dep-back
 		@ echo install-dep started at: $(shell date)
 
 dep-front:
-		@ apt-get -y update
-		@ apt-get -y install go-bindata
-		@ cd $(web_path) && npm install
+		@ cd $(web_path) && npm ci
 
 dep-back:
 		@ cd $(go_path) && $(go_app) mod download
+		@ cd $(go_path) && $(go_app) install github.com/go-bindata/go-bindata/go-bindata@v3.1.2+incompatible
 
 build: front back
 		@ echo build started at: $(shell date)
 
 front:
 		@ cd $(web_path) && npm run build
-		@ cd $(web_path) && go-bindata -pkg cweb -prefix dist/cweb-app/browser -o ../custompbx/cweb/cweb.go dist/cweb-app/browser/...
+		@ cd $(web_path) && $$(go env GOPATH)/bin/go-bindata -pkg cweb -prefix dist/cweb-app/browser -o ../custompbx/cweb/cweb.go dist/cweb-app/browser/...
 
 back:
 		@ cd $(go_path) && export CGO_ENABLED=0 && $(go_app) build -ldflags="-s -w" -o ../../bin/cpbx ./
@@ -47,14 +46,5 @@ front-serve:
 		@ [ "${WS_BACKGROUND_OVERRIDE}" ] || ( echo ">> WS_BACKEND_OVERRIDE is not set (syntax wss://HOST:PORT/ws) " )
 		@ cd $(web_path) && sed -i "s#WSServ: \"[^\"]*\"#WSServ: \"${WS_BACKEND_OVERRIDE}\"#g" src/environments/environment.ts
 		@ cd $(web_path) && npm run start_dev
-
-install-node:
-		@ apt-get -y install curl
-		@ curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
-		@ apt-get -y install nodejs
-
-install-golang:
-		@ apt-get -y install wget
-		wget https://dl.google.com/go/go1.20.2.linux-amd64.tar.gz
-		sudo rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.2.linux-amd64.tar.gz
-		export PATH=$PATH:/usr/local/go/bin
+test:
+		@ cd $(go_path) && CUSTOMPBX_CONFIG=../../config.example.json $(go_app) test ./...

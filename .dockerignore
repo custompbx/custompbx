@@ -1,0 +1,14 @@
+.git
+.github
+.idea
+.vscode
+.secrets
+config.json
+docker/config.json
+**/node_modules
+**/.angular
+**/dist
+bin
+*.tar.gz
+*.key
+*.pem

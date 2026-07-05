@@ -1,15 +1,19 @@
 package db
 
 import (
+	"crypto/sha256"
 	"custompbx/mainStruct"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"log"
+	"time"
 )
 
 func InitWebDB(instanceId int64) {
 	createWebUsersTable(db, instanceId)
 	createWebUsersTokensTable(db)
+	migrateWebUserTokens(db)
 
 	//corm := customOrm.Init(db)
 	//corm.CreateTable(mainStruct.WebDirectoryUsersTemplate{})
@@ -55,13 +59,50 @@ func createWebUsersTokensTable(db *sql.DB) {
 		id serial NOT NULL PRIMARY KEY,
 		user_id BIGINT REFERENCES web_users (id) ON DELETE CASCADE,
 		token VARCHAR,
+		token_hash CHAR(64),
 		created TIMESTAMP DEFAULT now(),
+		expires_at TIMESTAMP,
+		last_used TIMESTAMP,
 		purpose VARCHAR DEFAULT 'gui',
 		UNIQUE (user_id, token)
 	)
 	WITH (OIDS=FALSE);`,
 	)
 	panicErr(err)
+}
+
+func HashToken(token string) string {
+	sum := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(sum[:])
+}
+
+func migrateWebUserTokens(db *sql.DB) {
+	_, err := db.Exec(`ALTER TABLE web_users_tokens ADD COLUMN IF NOT EXISTS token_hash CHAR(64), ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP, ADD COLUMN IF NOT EXISTS last_used TIMESTAMP`)
+	panicErr(err)
+	_, err = db.Exec(`CREATE UNIQUE INDEX IF NOT EXISTS web_users_tokens_hash_idx ON web_users_tokens(token_hash)`)
+	panicErr(err)
+	rows, err := db.Query(`SELECT id, token, purpose, created FROM web_users_tokens WHERE token_hash IS NULL AND token IS NOT NULL`)
+	panicErr(err)
+	type legacyToken struct {
+		id             int64
+		token, purpose string
+		created        time.Time
+	}
+	var legacy []legacyToken
+	for rows.Next() {
+		var item legacyToken
+		panicErr(rows.Scan(&item.id, &item.token, &item.purpose, &item.created))
+		legacy = append(legacy, item)
+	}
+	panicErr(rows.Close())
+	for _, item := range legacy {
+		ttl := 24 * time.Hour
+		if item.purpose == "api" {
+			ttl = 90 * 24 * time.Hour
+		}
+		_, err = db.Exec(`UPDATE web_users_tokens SET token_hash=$1, token=NULL, expires_at=COALESCE(expires_at,$2) WHERE id=$3`, HashToken(item.token), time.Now().Add(ttl), item.id)
+		panicErr(err)
+	}
 }
 
 func GetWebUser(login string, instanceId int64) (*mainStruct.WebUser, error) {
@@ -140,16 +181,21 @@ func SaveWebUserToken(userId int64, tokenValue, purpose string) (mainStruct.WebU
 		purpose = "gui"
 	}
 	var token mainStruct.WebUserToken
-	err := db.QueryRow("INSERT INTO web_users_tokens(user_id, token, purpose) values($1, $2, $3) returning id, token, to_char(created, 'YYYY-MM-DD HH24:MI:SS.MS'), purpose", userId, tokenValue, purpose).Scan(&token.Id, &token.Token, &token.Created, &token.Purpose)
+	ttl := 24 * time.Hour
+	if purpose == "api" {
+		ttl = 90 * 24 * time.Hour
+	}
+	err := db.QueryRow("INSERT INTO web_users_tokens(user_id, token_hash, purpose, expires_at) values($1, $2, $3, $4) returning id, to_char(created, 'YYYY-MM-DD HH24:MI:SS.MS'), purpose, to_char(expires_at, 'YYYY-MM-DD HH24:MI:SS.MS')", userId, HashToken(tokenValue), purpose, time.Now().Add(ttl)).Scan(&token.Id, &token.Created, &token.Purpose, &token.Expires)
 	if err != nil {
 		return mainStruct.WebUserToken{}, err
 	}
 
+	token.Token = tokenValue
 	return token, err
 }
 
 func DelWebUserToken(userId int64, token string) error {
-	_, err := db.Exec("DELETE FROM web_users_tokens WHERE user_id = $1 AND token = $2", userId, token)
+	_, err := db.Exec("DELETE FROM web_users_tokens WHERE user_id = $1 AND token_hash = $2", userId, HashToken(token))
 	if err != nil {
 		return err
 	}
@@ -157,19 +203,22 @@ func DelWebUserToken(userId int64, token string) error {
 }
 
 func DelWebUserTokenById(id int64) (string, int64) {
-	var token string
 	var userId int64
-	err := db.QueryRow("DELETE FROM web_users_tokens WHERE id = $1 returning token, user_id", id).Scan(&token, &userId)
+	err := db.QueryRow("DELETE FROM web_users_tokens WHERE id = $1 returning user_id", id).Scan(&userId)
 	if err != nil {
 		log.Printf("%+v", err)
 		return "", 0
 	}
-	return token, userId
+	return "deleted", userId
 }
 
 func GetWebUserByToken(token string) (*mainStruct.WebUser, error) {
 	user, err := db.Query(
-		`SELECT
+		`WITH valid_token AS (
+			UPDATE web_users_tokens SET last_used=now()
+			WHERE token_hash=$1 AND (expires_at IS NULL OR expires_at > now())
+			RETURNING user_id
+		) SELECT
 					wu.id as id,
 					wu.login as login,
 					wu.group_id as group_id,
@@ -184,11 +233,9 @@ func GetWebUserByToken(token string) (*mainStruct.WebUser, error) {
 					wu.avatar_format as avatar_format,
 					wu.enabled as enabled
 				FROM web_users wu
-				LEFT JOIN web_users_tokens wut ON wu.id = wut.user_id
-				WHERE
-					wut.token = $1
+				JOIN valid_token vt ON wu.id = vt.user_id
 					LIMIT 1`,
-		token,
+		HashToken(token),
 	)
 	if err != nil {
 		log.Printf("%+v", err)
@@ -335,9 +382,10 @@ func GetWebUserTokens(userId int64) ([]mainStruct.WebUserToken, error) {
 	user, err := db.Query(
 		`SELECT
 					id,
-					token,
 					to_char(created, 'YYYY-MM-DD HH24:MI:SS.MS'),
-                    purpose
+					purpose,
+					to_char(expires_at, 'YYYY-MM-DD HH24:MI:SS.MS'),
+					COALESCE(to_char(last_used, 'YYYY-MM-DD HH24:MI:SS.MS'), '')
 				FROM web_users_tokens
 				WHERE
 					user_id = $1
@@ -352,7 +400,7 @@ func GetWebUserTokens(userId int64) ([]mainStruct.WebUserToken, error) {
 	var tokens []mainStruct.WebUserToken
 	for user.Next() {
 		var token mainStruct.WebUserToken
-		err := user.Scan(&token.Id, &token.Token, &token.Created, &token.Purpose)
+		err := user.Scan(&token.Id, &token.Created, &token.Purpose, &token.Expires, &token.LastUsed)
 		if err != nil {
 			log.Printf("%+v", err)
 			return nil, err

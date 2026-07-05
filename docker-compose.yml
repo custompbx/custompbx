@@ -24,8 +24,6 @@ services:
       POSTGRES_USER: custompbx
       POSTGRES_PASSWORD: custompbx
       POSTGRES_DB: custompbx
-    ports:
-      - 5432:5432
     volumes:
       - /var/lib/postgresql/data
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -46,7 +44,6 @@ services:
       - 5060:5060/udp
       - 5080:5080/tcp
       - 7443:7443/tcp
-      - 8021:8021/tcp
       - 16384-16399:16384-16399/udp
     volumes:
       - /var/log/freeswitch/log

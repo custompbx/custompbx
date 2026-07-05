@@ -14,7 +14,7 @@ export class CookiesStorageService {
   }
 
   public setToken(token: string): void {
-    this.setCookie('token', token, null, '/', null, false, null);
+    this.setCookie('token', token, null, '/', null, window.location.protocol === 'https:', 'Lax');
   }
 
   public delToken(): void {
@@ -29,7 +29,7 @@ export class CookiesStorageService {
     path?: string,
     domain?: string,
     secure?: boolean,
-    sameSite: 'Lax' | 'None' | 'Strict' = 'None'
+    sameSite: 'Lax' | 'None' | 'Strict' = 'Lax'
   ): void {
     let cookieValue = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
 

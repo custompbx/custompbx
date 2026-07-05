@@ -14,13 +14,13 @@ COPY src/cweb-app/tsconfig.json ./
 COPY src/cweb-app/tslint.json ./
 
 # Install frontend dependencies
-RUN npm install --force
+RUN npm ci
 
 # Build frontend
-RUN npm run build --omit=dev
+RUN npm run build
 
 ### STAGE 2: Build Golang backend ###
-FROM golang:1.24 AS backend
+FROM golang:1.24 AS backend-base
 WORKDIR /app
 
 # Copy go.mod and go.sum
@@ -33,19 +33,30 @@ COPY src/custompbx/ ./
 #RUN go mod edit -replace github.com/custompbx/customorm=./customorm/
 RUN go mod download
 
-# Copy frontend assets
+FROM backend-base AS backend-test
+COPY config.example.json /test/config.json
+ENV CUSTOMPBX_CONFIG=/test/config.json
+RUN go test ./...
+
+FROM backend-base AS backend-race
+COPY config.example.json /test/config.json
+ENV CUSTOMPBX_CONFIG=/test/config.json
+RUN go test -race ./web ./webStruct ./cfg ./db
+
+FROM backend-base AS integration-test
+COPY docker/test-config.json /test/config.json
+ENV CUSTOMPBX_CONFIG=/test/config.json
+CMD ["go", "test", "-tags=integration", "./db"]
+
+FROM backend-base AS backend
+# Copy frontend assets and compile them into the binary.
 COPY --from=frontend /app/dist/* ./dist/cweb-app
-
-# Build frontend assets into Go file
-RUN go get -u github.com/go-bindata/go-bindata/...
-RUN GOMODULE111=on CGO_ENABLED=0 GOOS=linux go build github.com/go-bindata/go-bindata/go-bindata
-RUN ./go-bindata -pkg cweb -prefix dist/cweb-app/browser -o ./cweb/cweb.go ./dist/cweb-app/browser/...
-
-# Build backend
+RUN go install github.com/go-bindata/go-bindata/go-bindata@v3.1.2+incompatible
+RUN /go/bin/go-bindata -pkg cweb -prefix dist/cweb-app/browser -o ./cweb/cweb.go ./dist/cweb-app/browser/...
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o cpbx .
 
 ### STAGE 3: Final image ###
-FROM alpine:latest
+FROM alpine:latest AS release
 WORKDIR /app
 
 # Copy Golang backend from previous stage
