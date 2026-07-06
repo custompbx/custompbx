@@ -21,7 +21,7 @@ System Requirements:
 * Linux OS (amd64)
 * FreeSWITCH
 * Postgres Database
-* Go 1.24 and Node.js 22 when building from source
+* Go 1.25.11 or newer in the Go 1.25 release line, and Node.js 22 when building from source
 ---
 ### Build Process
 Install **make** first (apt example):

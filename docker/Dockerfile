@@ -6,6 +6,10 @@ WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY src/cweb-app/package*.json ./
+
+# Install frontend dependencies
+RUN npm ci
+
 # Copy frontend files
 COPY src/cweb-app/src ./src
 COPY src/cweb-app/.browserslistrc ./
@@ -13,14 +17,18 @@ COPY src/cweb-app/angular.json ./
 COPY src/cweb-app/tsconfig.json ./
 COPY src/cweb-app/tslint.json ./
 
-# Install frontend dependencies
-RUN npm ci
-
 # Build frontend
 RUN npm run build
 
+FROM frontend AS frontend-test
+RUN apt-get update && apt-get install -y --no-install-recommends chromium && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /app/.angular && chown -R node:node /app/.angular
+ENV CHROME_BIN=/usr/bin/chromium
+USER node
+RUN npm test -- --watch=false --browsers=ChromeHeadlessDocker
+
 ### STAGE 2: Build Golang backend ###
-FROM golang:1.24 AS backend-base
+FROM golang:1.25.11 AS backend-base
 WORKDIR /app
 
 # Copy go.mod and go.sum

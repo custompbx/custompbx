@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 	"log"
 	"net"
 	"strings"

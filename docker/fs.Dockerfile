@@ -2,6 +2,10 @@
 # ====== BUILD STAGE (temporary container) ======
 FROM debian:bookworm AS builder
 
+# Empty installs the newest version exposed by the SignalWire repository.
+# Set this to an exact Debian package version for reproducible/manual builds.
+ARG FREESWITCH_VERSION=""
+
 # explicitly set user/group IDs
 RUN groupadd -r freeswitch --gid=999 && useradd -r -g freeswitch --uid=999 freeswitch
 
@@ -33,8 +37,9 @@ RUN chmod 600 /etc/apt/auth.conf
 RUN echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://freeswitch.signalwire.com/repo/deb/debian-release/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/freeswitch.list
 RUN echo "deb-src [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://freeswitch.signalwire.com/repo/deb/debian-release/ $(lsb_release -sc) main" >> /etc/apt/sources.list.d/freeswitch.list
 
-# Install FreeSWITCH
-RUN apt-get update && apt-get install -y freeswitch \
+# Install FreeSWITCH. Pinning the main package makes apt resolve matching module
+# dependencies from the same repository version.
+RUN apt-get update && apt-get install -y "freeswitch${FREESWITCH_VERSION:+=${FREESWITCH_VERSION}}" \
                                          freeswitch-init \
                                          freeswitch-lang \
                                          freeswitch-timezones \

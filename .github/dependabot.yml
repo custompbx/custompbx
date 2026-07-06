@@ -1,0 +1,48 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /src/cweb-app
+    schedule:
+      interval: weekly
+    groups:
+      angular-21:
+        patterns:
+          - "@angular/*"
+          - "@angular-devkit/*"
+          - "@ngrx/*"
+        update-types:
+          - patch
+          - minor
+      npm-patches:
+        patterns:
+          - "*"
+        update-types:
+          - patch
+    ignore:
+      - dependency-name: "@angular/*"
+        update-types:
+          - version-update:semver-major
+      - dependency-name: "@angular-devkit/*"
+        update-types:
+          - version-update:semver-major
+      - dependency-name: "@ngrx/*"
+        update-types:
+          - version-update:semver-major
+
+  - package-ecosystem: gomod
+    directory: /src/custompbx
+    schedule:
+      interval: weekly
+    groups:
+      go-modules:
+        patterns:
+          - "*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns:
+          - "*"

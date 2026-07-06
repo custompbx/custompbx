@@ -27,7 +27,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
-	"github.com/pion/turn/v2"
+	"github.com/pion/turn/v4"
 	"image"
 	"image/gif"
 	"image/jpeg"

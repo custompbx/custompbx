@@ -29,6 +29,8 @@ jobs:
       - run: go test -race ./web ./webStruct ./cfg ./db
         working-directory: src/custompbx
         env: { CUSTOMPBX_CONFIG: /tmp/custompbx-test.json }
+      - run: go run golang.org/x/vuln/cmd/govulncheck@v1.5.0 ./...
+        working-directory: src/custompbx
 
   frontend:
     runs-on: ubuntu-latest
@@ -40,6 +42,8 @@ jobs:
           cache: npm
           cache-dependency-path: src/cweb-app/package-lock.json
       - run: npm ci
+        working-directory: src/cweb-app
+      - run: npm audit --audit-level=critical
         working-directory: src/cweb-app
       - run: npm run build
         working-directory: src/cweb-app
