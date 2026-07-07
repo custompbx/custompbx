@@ -36,6 +36,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   @Input() currentComponent;
   @Output() showRightSideNav = new EventEmitter<boolean>();
+  @Output() toggleMenu = new EventEmitter<void>();
   @ViewChild('componentContainer', {read: ViewContainerRef}) container: ViewContainerRef;
   componentRef: ComponentRef<any>;
 

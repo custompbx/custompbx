@@ -4,6 +4,7 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {WsDataService} from '../ws-data.service';
 import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
+import {dispatchWhenConnected} from './dispatch-when-connected';
 
 @Injectable({
   providedIn: 'root'
@@ -16,14 +17,8 @@ export class UnsubscribeService  {
     ) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {
-    if (this.ws.isConnected) {
+    return dispatchWhenConnected(this.ws, () => {
       this.store.dispatch(new UnSubscribe(null));
-    }
-
-    return this.ws.websocketService.status.subscribe(connected => {
-      if (connected) {
-        this.store.dispatch(new UnSubscribe(null));
-      }
     });
   }
 }

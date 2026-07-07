@@ -12,6 +12,9 @@ import {MaterialModule} from "../../../material-module";
 export class InnerHeaderComponent implements OnInit {
 
   @Input() name: string;
+  @Input() subtitle: string;
+  @Input() status: string;
+  @Input() statusTone: 'default' | 'success' | 'warning' | 'danger' = 'default';
   @Input() loadCounter: number;
 
   constructor() { }

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ConfirmBottomSheetComponent } from './confirm-bottom-sheet.component';
+import {MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
 describe('ConfirmBottomSheetComponent', () => {
   let component: ConfirmBottomSheetComponent;
@@ -8,7 +9,11 @@ describe('ConfirmBottomSheetComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConfirmBottomSheetComponent ]
+      imports: [ ConfirmBottomSheetComponent ],
+      providers: [
+        {provide: MatBottomSheetRef, useValue: {dismiss: jasmine.createSpy('dismiss')}},
+        {provide: MAT_BOTTOM_SHEET_DATA, useValue: {action: 'delete', case1Text: 'Delete item?'}},
+      ],
     })
     .compileComponents();
   }));

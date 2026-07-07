@@ -51,7 +51,7 @@ func checkLogin(data *webStruct.MessageData) webStruct.UserResponse {
 		return webStruct.UserResponse{Error: "Cant set token", MessageType: data.Event}
 	}
 
-	data.Context.User = user
+	data.Context.SetUser(user)
 	return webStruct.UserResponse{User: user, Token: token, MessageType: data.Event}
 }
 
@@ -112,7 +112,7 @@ func loginOut(data *webStruct.MessageData) webStruct.UserResponse {
 		return webStruct.UserResponse{Error: "Cant delete token", MessageType: data.Event}
 	}
 
-	data.Context.User = nil
+	data.Context.SetUser(nil)
 	return webStruct.UserResponse{MessageType: data.Event}
 }
 
@@ -127,7 +127,7 @@ func findUser(data *webStruct.MessageData) (*mainStruct.WebUser, webStruct.UserR
 		return nil, webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "connection", NoToken: &noToken}
 	}
 	if data.Context.User == nil {
-		data.Context.User = user
+		data.Context.SetUser(user)
 	}
 	if user.Id != data.Context.User.Id {
 		log.Println("EVENT: ", data.Event, "USER: ", user.Login, " ACCESS DENIED! User changed in a single ws connection without logout")

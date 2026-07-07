@@ -128,6 +128,7 @@ func main() {
 	rWeb := chi.NewRouter()
 	configureMiddleware(rWeb)
 	rWeb.Get(cfg.CustomPbx.Web.Route, web.StartWS)
+	rWeb.Get("/api/v1/ws/metrics", web.HubMetrics)
 	rWeb.Post("/api/v1", web.PostAPIRequest)
 	configureStaticRoutes(rWeb)
 

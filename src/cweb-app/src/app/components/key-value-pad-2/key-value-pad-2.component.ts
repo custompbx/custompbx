@@ -51,39 +51,17 @@ export class KeyValuePad2Component implements OnInit {
     valueObject6: AbstractControl,
     valueObject7: AbstractControl,
   ): boolean {
-    let obj1 = false;
-    let obj2 = false;
-    let obj3 = false;
-    let obj4 = false;
-    let obj5 = false;
-    let obj7 = false;
-    let obj6 = false;
-    let value = true;
-    if (valueObject1) {
-      obj1 = valueObject1.dirty && valueObject1.valid;
-    }
-    if (valueObject2) {
-      obj2 = valueObject2.dirty && valueObject2.valid;
-    }
-    if (valueObject3) {
-      obj3 = valueObject3.dirty && valueObject3.valid;
-    }
-    if (valueObject4) {
-      obj4 = valueObject4.dirty && valueObject4.valid;
-    }
-    if (valueObject5) {
-      obj5 = valueObject5.dirty && valueObject5.valid;
-    }
-    if (valueObject6) {
-      obj6 = valueObject6.dirty && valueObject6.valid;
-    }
-    if (valueObject7) {
-      obj7 = valueObject7.dirty && valueObject7.valid;
-    }
-    if (valueObject) {
-      value = valueObject.dirty && valueObject.valid;
-    }
-    return nameObject && nameObject.valid && (nameObject.dirty || obj1 || obj2 || obj3 || obj4 || obj5 || obj6 || obj7 || value);
+    const optionalControls = this.presentControls(
+      valueObject,
+      valueObject1,
+      valueObject2,
+      valueObject3,
+      valueObject4,
+      valueObject5,
+      valueObject6,
+      valueObject7,
+    );
+    return !!nameObject && nameObject.valid && this.hasDirtyValidControl(nameObject, ...optionalControls);
   }
 
   isNewReadyToSend(
@@ -97,39 +75,16 @@ export class KeyValuePad2Component implements OnInit {
     valueObject6: AbstractControl,
     valueObject7: AbstractControl,
   ): boolean {
-    let obj1 = true;
-    let obj2 = true;
-    let obj3 = true;
-    let obj4 = true;
-    let obj5 = true;
-    let obj6 = true;
-    let obj7 = true;
-    let value = true;
-    if (valueObject1 && !valueObject1.disabled) {
-      obj1 = valueObject1.valid;
-    }
-    if (valueObject2 && !valueObject2.disabled) {
-      obj2 = valueObject2.valid;
-    }
-    if (valueObject3 && !valueObject3.disabled) {
-      obj3 = valueObject3.valid;
-    }
-    if (valueObject4 && !valueObject4.disabled) {
-      obj4 = valueObject4.valid;
-    }
-    if (valueObject5 && !valueObject5.disabled) {
-      obj5 = valueObject5.valid;
-    }
-    if (valueObject6 && !valueObject6.disabled) {
-      obj6 = valueObject6.valid;
-    }
-    if (valueObject7 && !valueObject7.disabled) {
-      obj7 = valueObject7.valid;
-    }
-    if (valueObject && !valueObject.disabled) {
-      value = valueObject.valid;
-    }
-    return nameObject && nameObject.valid && value && obj1 && obj2 && obj3 && obj4 && obj5 && obj6 && obj7;
+    return !!nameObject && nameObject.valid && this.presentControls(
+      valueObject,
+      valueObject1,
+      valueObject2,
+      valueObject3,
+      valueObject4,
+      valueObject5,
+      valueObject6,
+      valueObject7,
+    ).every((control) => control.disabled || control.valid);
   }
 
   isArray(obj: any): boolean {
@@ -186,32 +141,11 @@ export class KeyValuePad2Component implements OnInit {
     if (!this.dispatchersCallbacks || !this.dispatchersCallbacks['updateItem']) {
       return;
     }
-    const obj = {id: id, [this.fieldsMask.name.name]: name};
-
-    if (this.fieldsMask.value) {
-      obj[this.fieldsMask.value.name] = value;
-    }
-    if (this.fieldsMask.extraField1) {
-      obj[this.fieldsMask.extraField1.name] = exta1;
-    }
-    if (this.fieldsMask.extraField2) {
-      obj[this.fieldsMask.extraField2.name] = exta2;
-    }
-    if (this.fieldsMask.extraField3) {
-      obj[this.fieldsMask.extraField3.name] = exta3;
-    }
-    if (this.fieldsMask.extraField4) {
-      obj[this.fieldsMask.extraField4.name] = exta4;
-    }
-    if (this.fieldsMask.extraField5) {
-      obj[this.fieldsMask.extraField5.name] = exta5;
-    }
-    if (this.fieldsMask.extraField6) {
-      obj[this.fieldsMask.extraField6.name] = exta6;
-    }
-    if (this.fieldsMask.extraField7) {
-      obj[this.fieldsMask.extraField7.name] = exta7;
-    }
+    const obj = {
+      id: id,
+      [this.fieldsMask.name.name]: name,
+      ...this.maskedValues([value, exta1, exta2, exta3, exta4, exta5, exta6, exta7]),
+    };
     this.dispatchersCallbacks['updateItem'](obj);
   }
 
@@ -255,27 +189,8 @@ export class KeyValuePad2Component implements OnInit {
     if (value !== undefined) {
       args.push(value);
     }
-    if (this.fieldsMask.extraField1) {
-      args.push(extraField1);
-    }
-    if (this.fieldsMask.extraField2) {
-      args.push(extraField2);
-    }
-    if (this.fieldsMask.extraField3) {
-      args.push(extraField3);
-    }
-    if (this.fieldsMask.extraField4) {
-      args.push(extraField4);
-    }
-    if (this.fieldsMask.extraField5) {
-      args.push(extraField5);
-    }
-    if (this.fieldsMask.extraField6) {
-      args.push(extraField6);
-    }
-    if (this.fieldsMask.extraField7) {
-      args.push(extraField7);
-    }
+    this.enabledExtraFieldValues([extraField1, extraField2, extraField3, extraField4, extraField5, extraField6, extraField7])
+      .forEach((extraValue) => args.push(extraValue));
     this.dispatchersCallbacks['addItem'](...args);
   }
 
@@ -303,6 +218,43 @@ export class KeyValuePad2Component implements OnInit {
       return [];
     }
     return Object.values(obj);
+  }
+
+  private presentControls(...controls: AbstractControl[]): AbstractControl[] {
+    return controls.filter(Boolean);
+  }
+
+  private hasDirtyValidControl(...controls: AbstractControl[]): boolean {
+    return controls.some((control) => control.dirty && control.valid);
+  }
+
+  private maskedValues(values: string[]): object {
+    return this.fieldValueEntries(values)
+      .reduce((result, entry) => ({...result, [entry.name]: entry.value}), {});
+  }
+
+  private enabledExtraFieldValues(values: string[]): string[] {
+    return this.extraFieldValueEntries(values)
+      .map((entry) => entry.value);
+  }
+
+  private fieldValueEntries(values: string[]): Array<{name: string, value: string}> {
+    return [
+      {name: this.fieldsMask.value?.name, value: values[0]},
+      ...this.extraFieldValueEntries(values.slice(1)),
+    ].filter((entry): entry is {name: string, value: string} => !!entry.name);
+  }
+
+  private extraFieldValueEntries(values: string[]): Array<{name?: string, value: string}> {
+    return [
+      {name: this.fieldsMask.extraField1?.name, value: values[0]},
+      {name: this.fieldsMask.extraField2?.name, value: values[1]},
+      {name: this.fieldsMask.extraField3?.name, value: values[2]},
+      {name: this.fieldsMask.extraField4?.name, value: values[3]},
+      {name: this.fieldsMask.extraField5?.name, value: values[4]},
+      {name: this.fieldsMask.extraField6?.name, value: values[5]},
+      {name: this.fieldsMask.extraField7?.name, value: values[6]},
+    ].filter((entry) => !!entry.name);
   }
 
 }

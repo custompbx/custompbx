@@ -5,7 +5,7 @@ import (
 	"custompbx/cfg"
 	"custompbx/mainStruct"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"github.com/gorilla/websocket"
 	"io"
 	"log"
@@ -35,6 +35,15 @@ type Message struct {
 	Username string       `json:"username"`
 	Event    string       `json:"event"`
 	Data     *MessageData `json:"data"`
+}
+
+var ErrInvalidMessage = errors.New("invalid websocket message")
+
+func (m *Message) Validate() error {
+	if m == nil || m.Data == nil || strings.TrimSpace(m.Event) == "" {
+		return ErrInvalidMessage
+	}
+	return nil
 }
 
 type MessageData struct {
@@ -249,6 +258,7 @@ type WsContext struct {
 	Subscriptions    *Subscriptions
 	ID               uint64
 	User             *mainStruct.WebUser
+	userID           atomic.Int64
 	send             chan *UserResponse
 	done             chan struct{}
 	closeOnce        sync.Once
@@ -273,9 +283,22 @@ func (c *WsContext) CloseWithReason(reason string) (closeErr error) {
 		if c.onClose != nil {
 			c.onClose(c)
 		}
-		log.Printf("component=websocket connection_id=%d operation=close reason=%q", c.ID, reason)
+		log.Printf("component=websocket connection_id=%d user_id=%d operation=close reason=%q", c.ID, c.UserID(), reason)
 	})
 	return closeErr
+}
+
+func (c *WsContext) SetUser(user *mainStruct.WebUser) {
+	c.User = user
+	if user == nil {
+		c.userID.Store(0)
+		return
+	}
+	c.userID.Store(user.Id)
+}
+
+func (c *WsContext) UserID() int64 {
+	return c.userID.Load()
 }
 
 func (c *WsContext) Enqueue(event *UserResponse) bool {
@@ -321,7 +344,7 @@ func (c *WsContext) SendWaiter() {
 				if c.onWriteFailure != nil {
 					c.onWriteFailure()
 				}
-				fmt.Printf("ERROR on SetWriteDeadline: %+v\n", err)
+				log.Printf("component=websocket connection_id=%d user_id=%d operation=set_write_deadline error=%q", c.ID, c.UserID(), err)
 				c.CloseWithReason("write deadline failure")
 				return
 			}
@@ -330,7 +353,7 @@ func (c *WsContext) SendWaiter() {
 				if c.onWriteFailure != nil {
 					c.onWriteFailure()
 				}
-				fmt.Printf("ERROR on Marshal: %+v\n", err)
+				log.Printf("component=websocket connection_id=%d user_id=%d operation=marshal_response error=%q", c.ID, c.UserID(), err)
 				continue
 			}
 
@@ -338,7 +361,7 @@ func (c *WsContext) SendWaiter() {
 			// err = c.ws.WriteJSON(event)
 			if err != nil {
 				// fmt.Printf("ERROR on WriteJSON: %+v\n", err)
-				fmt.Printf("ERROR on WriteMessage: %+v\n", err)
+				log.Printf("component=websocket connection_id=%d user_id=%d operation=write_message error=%q", c.ID, c.UserID(), err)
 				c.CloseWithReason("write failure")
 				return
 			}
@@ -355,20 +378,28 @@ func (c *WsContext) ReadWaiter(handler func(*Message, *WsContext)) {
 		var msg *Message
 		_, r, err := c.ws.NextReader()
 		if err != nil {
-			fmt.Printf("CLOSE WS BY ERROR on NextReader: %+v\n", err)
+			log.Printf("component=websocket connection_id=%d user_id=%d operation=next_reader error=%q", c.ID, c.UserID(), err)
 			c.CloseWithReason("read failure")
 			return
 		}
 
 		err = json.NewDecoder(r).Decode(&msg)
 		if err == io.EOF {
-			fmt.Printf("EOF reader\n")
 			err = io.ErrUnexpectedEOF
 		}
 
 		if err != nil {
-			fmt.Printf("ERROR on Decode: %+v\n", err)
+			log.Printf("component=websocket connection_id=%d user_id=%d operation=decode_message error=%q", c.ID, c.UserID(), err)
 			if !c.Enqueue(&UserResponse{Error: "failed to read message", MessageType: "none"}) {
+				c.RecordHandlerFailure()
+				c.CloseWithReason("outbound queue full")
+			}
+			continue
+		}
+		if err := msg.Validate(); err != nil {
+			log.Printf("component=websocket connection_id=%d user_id=%d operation=validate_message error=%q", c.ID, c.UserID(), err)
+			if !c.Enqueue(&UserResponse{Error: "invalid message", MessageType: "none"}) {
+				c.RecordHandlerFailure()
 				c.CloseWithReason("outbound queue full")
 			}
 			continue
@@ -387,17 +418,32 @@ type WsHub struct {
 	queueOverflows  atomic.Uint64
 	failedWrites    atomic.Uint64
 	handlerFailures atomic.Uint64
+	shuttingDown    atomic.Bool
+	shutdownOnce    sync.Once
 }
 
 type HubMetrics struct {
-	Active                                                    int64
-	Broadcasts, QueueOverflows, FailedWrites, HandlerFailures uint64
+	Active          int64  `json:"active"`
+	Broadcasts      uint64 `json:"broadcasts"`
+	QueueOverflows  uint64 `json:"queue_overflows"`
+	FailedWrites    uint64 `json:"failed_writes"`
+	HandlerFailures uint64 `json:"handler_failures"`
+	ShuttingDown    bool   `json:"shutting_down"`
 }
 
 func NewWsHub() *WsHub { return &WsHub{connections: make(map[uint64]*WsContext)} }
 
 func (h *WsHub) Register(c *WsContext) {
+	if h.shuttingDown.Load() {
+		_ = c.CloseWithReason("hub shutdown")
+		return
+	}
 	h.mx.Lock()
+	if h.shuttingDown.Load() {
+		h.mx.Unlock()
+		_ = c.CloseWithReason("hub shutdown")
+		return
+	}
 	if h.connections == nil {
 		h.connections = make(map[uint64]*WsContext)
 	}
@@ -427,17 +473,30 @@ func (h *WsHub) snapshot() []*WsContext {
 }
 
 func (h *WsHub) Metrics() HubMetrics {
-	return HubMetrics{h.active.Load(), h.broadcasts.Load(), h.queueOverflows.Load(), h.failedWrites.Load(), h.handlerFailures.Load()}
+	return HubMetrics{
+		Active:          h.active.Load(),
+		Broadcasts:      h.broadcasts.Load(),
+		QueueOverflows:  h.queueOverflows.Load(),
+		FailedWrites:    h.failedWrites.Load(),
+		HandlerFailures: h.handlerFailures.Load(),
+		ShuttingDown:    h.shuttingDown.Load(),
+	}
 }
 
 func (h *WsHub) Shutdown() {
-	for _, c := range h.snapshot() {
-		_ = c.CloseWithReason("hub shutdown")
-	}
+	h.shutdownOnce.Do(func() {
+		h.shuttingDown.Store(true)
+		for _, c := range h.snapshot() {
+			_ = c.CloseWithReason("hub shutdown")
+		}
+	})
 }
 
 // Broadcast sends a UserResponse message to all subscribed WebSocket contexts in the hub.
 func (h *WsHub) Broadcast(data UserResponse) {
+	if h.shuttingDown.Load() {
+		return
+	}
 	h.broadcasts.Add(1)
 	for _, connection := range h.snapshot() {
 		subscribed := connection.Subscriptions.Get(data.MessageType)
@@ -462,9 +521,10 @@ func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) []int64 
 
 	var sent []int64
 	for _, connection := range h.snapshot() {
-		if connection.User != nil && userIDs[connection.User.Id] {
+		connectionUserID := connection.UserID()
+		if connectionUserID != 0 && userIDs[connectionUserID] {
 			if connection.Enqueue(&data) {
-				sent = append(sent, connection.User.Id)
+				sent = append(sent, connectionUserID)
 			} else {
 				h.queueOverflows.Add(1)
 				_ = connection.CloseWithReason("outbound queue full")
@@ -539,6 +599,13 @@ func newSubscriptions() *Subscriptions {
 	}
 }
 
+func durationFromConfig(seconds int, fallback time.Duration) time.Duration {
+	if seconds <= 0 {
+		return fallback
+	}
+	return time.Duration(seconds) * time.Second
+}
+
 // CreateWsContext creates a new WsContext with the provided WebSocket connection.
 func CreateWsContext(ws *websocket.Conn) *WsContext {
 	const queueSize = 64
@@ -548,9 +615,9 @@ func CreateWsContext(ws *websocket.Conn) *WsContext {
 		Subscriptions: newSubscriptions(),
 		send:          make(chan *UserResponse, queueSize),
 		done:          make(chan struct{}),
-		writeTimeout:  time.Duration(cfg.CustomPbx.Web.WriteTimeoutSeconds) * time.Second,
-		readTimeout:   time.Duration(cfg.CustomPbx.Web.ReadTimeoutSeconds) * time.Second,
-		pingInterval:  time.Duration(cfg.CustomPbx.Web.PingIntervalSeconds) * time.Second,
+		writeTimeout:  durationFromConfig(cfg.CustomPbx.Web.WriteTimeoutSeconds, 10*time.Second),
+		readTimeout:   durationFromConfig(cfg.CustomPbx.Web.ReadTimeoutSeconds, 60*time.Second),
+		pingInterval:  durationFromConfig(cfg.CustomPbx.Web.PingIntervalSeconds, 30*time.Second),
 	}
 }
 

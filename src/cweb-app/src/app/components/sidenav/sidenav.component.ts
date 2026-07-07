@@ -35,7 +35,15 @@ export class SidenavComponent {
     if (!route) {
       return false;
     }
-    return this.router.isActive(route, <IsActiveMatchOptions>{paths: 'subset', queryParams: 'subset', fragment: 'ignored', matrixParams: 'ignored'});
+    return this.router.isActive(this.normalizeRoute(route), <IsActiveMatchOptions>{paths: 'subset', queryParams: 'subset', fragment: 'ignored', matrixParams: 'ignored'});
+  }
+
+  isMenuSectionActive(item: IMenuItemExpand): boolean {
+    return item?.subMenu?.some((subItem) => this.isRouteActive(subItem.route)) ?? false;
+  }
+
+  private normalizeRoute(route: string): string {
+    return route.startsWith('/') ? route : `/${route}`;
   }
   getMenuItems(id): Array<IMenuItemExpand> {
     if (!id) {

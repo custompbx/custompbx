@@ -7,6 +7,7 @@ import (
 	"custompbx/cfg"
 	"custompbx/daemonCache"
 	"custompbx/intermediateDB"
+	"custompbx/logsafe"
 	"custompbx/mainStruct"
 	"custompbx/pbxcache"
 	"custompbx/webcache"
@@ -281,7 +282,7 @@ func SetGlobalVariables() {
 
 func SaveToFile(body, path, fileName string, withEsl bool) {
 	if body == "" || path == "" || fileName == "" {
-		log.Println("Cant DropToFileWithEsl: body, path, fileName: ", body, path, fileName)
+		log.Printf("Cant DropToFileWithEsl: empty body/path/fileName path=%q fileName=%q", path, fileName)
 		return
 	}
 	if withEsl {
@@ -2116,8 +2117,7 @@ func setConfigAcl(conf *xmlStruct.Configuration) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("%v", mod)
-	log.Printf("%v", conf)
+	log.Printf("import acl config module=%s config=%s", logsafe.Redact(mod), logsafe.Redact(conf))
 	if conf.NetworkLists == nil || conf.NetworkLists.List == nil {
 		return errors.New("empty config object")
 	}
@@ -3770,9 +3770,7 @@ func setConfigFifo(conf *xmlStruct.Configuration) error {
 			}
 		}
 	}
-	log.Println(conf)
-	log.Println(conf.Fifos)
-	log.Println(conf.Fifos.Fifo)
+	log.Printf("import fifo config=%s", logsafe.Redact(conf))
 	if conf.Fifos == nil {
 		return nil
 	}
@@ -3813,9 +3811,7 @@ func setConfigOpal(conf *xmlStruct.Configuration) error {
 			}
 		}
 	}
-	log.Println(conf)
-	log.Println(conf.Listeners)
-	log.Println(conf.Listeners.Listener)
+	log.Printf("import event_socket config=%s", logsafe.Redact(conf))
 	if conf.Listeners == nil {
 		return nil
 	}
@@ -3856,9 +3852,7 @@ func setConfigOsp(conf *xmlStruct.Configuration) error {
 			}
 		}
 	}
-	log.Println(conf)
-	log.Println(conf.Profiles)
-	log.Println(conf.Profiles.Profile)
+	log.Printf("import sofia config=%s", logsafe.Redact(conf))
 	if conf.Profiles == nil {
 		return nil
 	}
@@ -3899,9 +3893,7 @@ func setConfigUnicall(conf *xmlStruct.Configuration) error {
 			}
 		}
 	}
-	log.Println(conf)
-	log.Println(conf.Spans)
-	log.Println(conf.Spans.Span)
+	log.Printf("import freetdm config=%s", logsafe.Redact(conf))
 	if conf.Spans == nil {
 		return nil
 	}

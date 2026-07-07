@@ -1,10 +1,12 @@
 <app-service-status></app-service-status>
 @if (userService.isAuthenticated && !login) {
   <app-header [currentComponent]="currentComponent"
-  (showRightSideNav)="toggleRightSideNav($event)"></app-header>
+  (showRightSideNav)="toggleRightSideNav($event)"
+  (toggleMenu)="toggleNavigation()"></app-header>
 }
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav mode="side" [opened]="userService.isAuthenticated && !login">
+  <mat-sidenav [mode]="compact() ? 'over' : 'side'" [opened]="userService.isAuthenticated && !login && menuOpen"
+    (closedStart)="menuOpen = false">
     <mat-nav-list>
       <div class="menu-sidenav">
         <app-sidenav></app-sidenav>
@@ -17,8 +19,8 @@
         <app-conversations></app-conversations>
       </div>
     }
-    <div [hidden]="showRightNav">
+    <main class="app-main" [hidden]="showRightNav">
       <router-outlet (activate)="onRouterOutletActivate($event)"></router-outlet>
-    </div>
+    </main>
   </mat-sidenav-content>
 </mat-sidenav-container>

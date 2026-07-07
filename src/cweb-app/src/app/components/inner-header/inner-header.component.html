@@ -1,6 +1,18 @@
 @if (loadCounter > 0) {
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
-<mat-toolbar color="basic">
-  <span>{{name}}</span>
-</mat-toolbar>
+<header class="page-header">
+  <div class="page-heading">
+    <div class="title-row">
+      <h1>{{name}}</h1>
+      @if (status) {
+        <span class="status-badge"
+          [class.success]="statusTone === 'success'"
+          [class.warning]="statusTone === 'warning'"
+          [class.danger]="statusTone === 'danger'">{{status}}</span>
+      }
+    </div>
+    @if (subtitle) { <p>{{subtitle}}</p> }
+  </div>
+  <div class="page-actions" aria-label="Page actions"><ng-content></ng-content></div>
+</header>

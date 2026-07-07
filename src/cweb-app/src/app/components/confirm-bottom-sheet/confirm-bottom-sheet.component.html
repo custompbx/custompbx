@@ -1,1 +1,14 @@
-<p>confirm-bottom-sheet works!</p>
+<section class="confirm-sheet" [ngSwitch]="data?.action" aria-live="polite">
+  <mat-icon class="confirm-icon" color="warn" aria-hidden="true">warning</mat-icon>
+  <div class="confirm-copy">
+    <h3 *ngSwitchCase="'delete'">{{data?.case1Text || 'Confirm deletion'}}</h3>
+    <h3 *ngSwitchCase="'rename'">{{data?.case2Text || 'Confirm rename'}}</h3>
+    <h3 *ngSwitchDefault>{{data?.title || 'Confirm action'}}</h3>
+    <p>{{data?.message || 'This action may change the current configuration.'}}</p>
+  </div>
+</section>
+
+<div class="confirm-actions">
+  <button mat-stroked-button type="button" (click)="confirmAction(false)">Cancel</button>
+  <button mat-raised-button color="warn" type="button" (click)="confirmAction(true)">Confirm</button>
+</div>

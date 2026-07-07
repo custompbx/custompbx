@@ -9,3 +9,10 @@
   width: 100%;
   z-index: 1000;
 }
+.page-header { min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 24px; background: var(--cpbx-surface); border-bottom: 1px solid var(--cpbx-border); }
+.page-heading { min-width: 0; }
+.title-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+h1 { margin: 0; font-size: 24px; line-height: 1.2; font-weight: 650; letter-spacing: -.02em; }
+p { margin: 6px 0 0; color: var(--cpbx-text-muted); font-size: 14px; }
+.page-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+@media (max-width: 767px) { .page-header { align-items: flex-start; flex-direction: column; padding: 16px; } .page-actions { width: 100%; justify-content: flex-start; } }

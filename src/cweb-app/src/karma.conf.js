@@ -33,7 +33,14 @@ module.exports = function (config) {
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
-          '--disable-gpu'
+          '--disable-gpu',
+          '--disable-software-rasterizer',
+          '--disable-background-networking',
+          '--disable-breakpad',
+          '--disable-crash-reporter',
+          '--disable-features=UseDBus,Crashpad',
+          '--no-zygote',
+          '--remote-debugging-port=9222'
         ]
       }
     },

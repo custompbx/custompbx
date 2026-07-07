@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {BreakpointObserver} from '@angular/cdk/layout';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {map} from 'rxjs/operators';
 import {UserService} from './services/user.service';
 import {filter} from 'rxjs/operators';
 import {MaterialModule} from "../material-module";
@@ -21,16 +24,20 @@ export class AppComponent implements OnInit {
   login = true;
   public currentComponent;
   public showRightNav = false;
+  public menuOpen = true;
+  public compact = toSignal(this.breakpointObserver.observe('(max-width: 1023px)').pipe(map(result => result.matches)), {initialValue: false});
 
   constructor(
     private router: Router,
     public userService: UserService,
+    private breakpointObserver: BreakpointObserver,
   ) {
     router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
           this.login = event.urlAfterRedirects.startsWith('/login');
           this.showRightNav = false;
+          if (this.compact()) this.menuOpen = false;
       });
   }
 
@@ -43,5 +50,9 @@ export class AppComponent implements OnInit {
 
   toggleRightSideNav($event) {
     this.showRightNav = !this.showRightNav;
+  }
+
+  toggleNavigation() {
+    this.menuOpen = !this.menuOpen;
   }
 }

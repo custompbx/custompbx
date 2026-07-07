@@ -2,7 +2,7 @@
   width: 100%;
   min-height: calc(100vh - 64px);
   position: absolute;
-  background: #ffffff;
+  background: var(--cpbx-surface-muted);
 }
 
 .mat-drawer-content {
@@ -14,11 +14,14 @@
 }
 
 mat-sidenav {
-  width: 240px;
+  width: 264px;
+  border-right: 1px solid var(--cpbx-border);
+  background: var(--cpbx-surface);
 }
 .menu-sidenav {
-  margin: 0 12px;
+  padding: 12px 10px 24px;
 }
+.app-main { min-width: 0; min-height: calc(100vh - 64px); }
 /*
 .cdk-overlay-container {
   position: unset;

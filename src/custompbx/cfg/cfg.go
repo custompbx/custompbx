@@ -194,7 +194,7 @@ func createConfig() GeneralCfg {
 	item.Fs.HEPCollector.Host = "127.0.0.1"
 	item.Fs.HEPCollector.Port = 9060
 	item.Fs.Esl.Port = 8021
-	item.Fs.Esl.Pass = "ClueCon"
+	item.Fs.Esl.Pass = "change-me"
 	item.Fs.Esl.Host = "127.0.0.1"
 	item.Fs.Esl.Timeout = 10
 	item.Fs.Esl.CollectLogs = 7

@@ -1,22 +1,19 @@
-<app-inner-header name="Dashboard" [loadCounter]="loadCounter()"></app-inner-header>
-<div class="grid-container">
-  <h1 class="mat-h1">System</h1>
+<app-inner-header name="Dashboard" subtitle="Live system capacity and service health" [loadCounter]="loadCounter()"
+  [status]="loadCounter() > 0 ? 'Refreshing' : 'Live'" [statusTone]="loadCounter() > 0 ? 'warning' : 'success'"></app-inner-header>
+<div class="grid-container page-content">
+  <div class="section-heading">
+    <div>
+      <h2>System overview</h2>
+      <p>Current FreeSWITCH host and workload metrics</p>
+    </div>
+  </div>
   <div class="main-panel">
     @for (card of cards | async; track trackByFn(i, card); let i = $index) {
       @if (showCard(card?.moduleName)) {
         <div [class]="card?.class">
-          <mat-card class="dashboard-card">
+          <mat-card class="dashboard-card page-section">
             <mat-card-header>
-              <mat-card-title>
-                {{card.title}}
-                <!--            <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-              <mat-menu #menu="matMenu" xPosition="before">
-                <button mat-menu-item>Expand</button>
-                <button mat-menu-item>Remove</button>
-              </mat-menu>-->
-            </mat-card-title>
+              <mat-card-title>{{card.title}}</mat-card-title>
           </mat-card-header>
           <mat-card-content class="dashboard-card-content">
             @if (list() && list().dynamic_metrics && (list().dynamic_metrics[card.field] || list()[card.field] || list()[card.field] == 0 || card.type == 'table')) {
@@ -30,13 +27,11 @@
                       [type]="card.type"
                       [legend]="pieChartLegend"
                       [options]="card.chartOption">
-                      <!--[colors]="pieChartColors"
-                      -->
                     </canvas>
                   </div>
                 }
                 @case ('bar') {
-                  <div style="display: block">
+                  <div class="chart">
                     <canvas baseChart
                       height="300%"
                       [datasets]="barData()[card.field]"
@@ -50,56 +45,56 @@
                   </div>
                 }
                 @case ('number') {
-                  <div class="calls-block">
-                    <h1 class="numberAnswered">Answered: {{list()[card.field].answered}}</h1>
-                    <h1 class="numberCircle">Total: {{list()[card.field].total}}</h1>
+                  <div class="metric-grid" aria-label="Channel counters">
+                    <div class="metric-card metric-card-success">
+                      <span class="metric-label">Answered</span>
+                      <strong>{{list()[card.field].answered}}</strong>
+                    </div>
+                    <div class="metric-card">
+                      <span class="metric-label">Total</span>
+                      <strong>{{list()[card.field].total}}</strong>
+                    </div>
                   </div>
                 }
                 @case ('items') {
-                  <div class="calls-block mat-headline">
-                    <div>Host: {{list().hostname}}</div>
-                    <div>OS: {{list().os}}</div>
-                    <div>Platform: {{list().platform}}</div>
-                    <div>CPU: {{list().cpu_model}}</div>
-                    <div>CPU Frequency: {{list().cpu_frequency}}</div>
+                  <div class="host-details">
+                    <div><span>Host</span><strong>{{list().hostname}}</strong></div>
+                    <div><span>OS</span><strong>{{list().os}}</strong></div>
+                    <div><span>Platform</span><strong>{{list().platform}}</strong></div>
+                    <div><span>CPU</span><strong>{{list().cpu_model}}</strong></div>
+                    <div><span>CPU Frequency</span><strong>{{list().cpu_frequency}}</strong></div>
                   </div>
                 }
                 @case ('table') {
-                  <div style="display: block">
-                    <table mat-table [dataSource]="list()[card.field]" class="mat-elevation-z8">
-                      <!-- Id Column -->
+                  <div class="responsive-table dashboard-table">
+                    <table mat-table [dataSource]="list()[card.field]">
                       <ng-container matColumnDef="id">
                         <th mat-header-cell *matHeaderCellDef> ID</th>
                         <td mat-cell *matCellDef="let element"> {{element.id}}</td>
                       </ng-container>
-                      <!-- Name Column -->
                       <ng-container matColumnDef="name">
                         <th mat-header-cell *matHeaderCellDef> Name</th>
                         <td mat-cell *matCellDef="let element"> {{element.name}}</td>
                       </ng-container>
-                      <!-- Enabled Column -->
                       <ng-container matColumnDef="enabled">
                         <th mat-header-cell *matHeaderCellDef> Enabled</th>
                         <td mat-cell *matCellDef="let element">
                           @if (!element.enabled) {
-                            <span color="warn" selected>{{element.enabled}}</span>
+                            <span class="status-badge danger">{{element.enabled}}</span>
                           }
                           @if (element.enabled) {
-                            <span color="primary" selected>{{element.enabled}}</span>
+                            <span class="status-badge success">{{element.enabled}}</span>
                           }
                         </td>
                       </ng-container>
-                      <!-- Uri Column -->
                       <ng-container matColumnDef="uri">
                         <th mat-header-cell *matHeaderCellDef> URI</th>
                         <td mat-cell *matCellDef="let element"> {{element.uri}}</td>
                       </ng-container>
-                      <!-- State Column -->
                       <ng-container matColumnDef="state">
                         <th mat-header-cell *matHeaderCellDef> State</th>
                         <td mat-cell *matCellDef="let element"> {{element.state}}</td>
                       </ng-container>
-                      <!-- Started Column -->
                       <ng-container matColumnDef="started">
                         <th mat-header-cell *matHeaderCellDef> Started</th>
                         <td mat-cell *matCellDef="let element"> {{element.started}}</td>

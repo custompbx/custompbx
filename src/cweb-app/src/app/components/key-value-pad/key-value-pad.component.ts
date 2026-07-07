@@ -28,11 +28,11 @@ export class KeyValuePadComponent implements OnInit {
   }
 
   isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid;
+    return this.controlsAreValid(nameObject, valueObject) && (nameObject.dirty || valueObject.dirty);
   }
 
   isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return nameObject && valueObject && nameObject.valid && valueObject.valid;
+    return this.controlsAreValid(nameObject, valueObject);
   }
 
   isArray(obj: any): boolean {
@@ -99,6 +99,10 @@ export class KeyValuePadComponent implements OnInit {
       return [];
     }
     return Object.values(obj);
+  }
+
+  private controlsAreValid(...controls: AbstractControl[]): boolean {
+    return controls.every((control) => !!control && control.valid);
   }
 
 }
