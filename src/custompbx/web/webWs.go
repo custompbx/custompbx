@@ -119,7 +119,7 @@ func loginOut(data *webStruct.MessageData) webStruct.UserResponse {
 func findUser(data *webStruct.MessageData) (*mainStruct.WebUser, webStruct.UserResponse) {
 	user, err := webcache.GetWebUserByToken(data.Token)
 	if err != nil || user == nil || user.Login == "" {
-		log.Println("EVENT: ", data.Event, "NO SUER BY TOKEN")
+		log.Println("EVENT: ", data.Event, "NO USER BY TOKEN")
 		if data.Context != nil {
 			data.Context.Subscriptions.Clear()
 		}

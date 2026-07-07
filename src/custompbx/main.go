@@ -257,15 +257,9 @@ func Web(rw http.ResponseWriter, r *http.Request) {
 
 	var file []byte
 	if route1 == "assets" && route2 == "img" && route3 == "avatar" {
-		c, err := r.Cookie("token")
-		if err != nil {
-			log.Println(err.Error())
-			_, _ = rw.Write([]byte("access denied"))
-			return
-		}
-		requester, err := webcache.GetWebUserByToken(c.Value)
-		if err != nil || requester == nil || requester.Login == "" {
-			_, _ = rw.Write([]byte("access denied"))
+		requester, status := web.UserFromCookie(r, "token")
+		if status != http.StatusOK || requester.Login == "" {
+			http.Error(rw, "access denied", status)
 			return
 		}
 
@@ -315,15 +309,9 @@ func Web(rw http.ResponseWriter, r *http.Request) {
 			file = buf.Bytes()
 		}
 	} else if route1 == "cdr" && route2 == "records" {
-		c, err := r.Cookie("token")
-		if err != nil {
-			log.Println(err.Error())
-			_, _ = rw.Write([]byte("access denied"))
-			return
-		}
-		requester, err := webcache.GetWebUserByToken(c.Value)
-		if err != nil || requester == nil || requester.Login == "" {
-			_, _ = rw.Write([]byte("access denied"))
+		requester, status := web.UserFromCookie(r, "token")
+		if status != http.StatusOK || requester.Login == "" {
+			http.Error(rw, "access denied", status)
 			return
 		}
 

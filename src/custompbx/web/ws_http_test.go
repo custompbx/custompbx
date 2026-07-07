@@ -10,36 +10,10 @@ import (
 	"testing"
 )
 
-func TestRequestBearerToken(t *testing.T) {
-	tests := []struct {
-		name string
-		auth string
-		want string
-	}{
-		{name: "missing"},
-		{name: "basic rejected", auth: "Basic abc"},
-		{name: "bearer", auth: "Bearer abc", want: "abc"},
-		{name: "lowercase bearer", auth: "bearer abc", want: "abc"},
-		{name: "trim token", auth: "Bearer   abc  ", want: "abc"},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodGet, "/api/v1/ws/metrics", nil)
-			if tt.auth != "" {
-				req.Header.Set("Authorization", tt.auth)
-			}
-			if got := requestBearerToken(req); got != tt.want {
-				t.Fatalf("token = %q, want %q", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestHubMetricsRequiresAdminBearerToken(t *testing.T) {
-	oldLookup := metricsTokenLookup
-	defer func() { metricsTokenLookup = oldLookup }()
-	metricsTokenLookup = func(token string) (*mainStruct.WebUser, error) {
+	oldLookup := HTTPTokenLookup
+	defer func() { HTTPTokenLookup = oldLookup }()
+	HTTPTokenLookup = func(token string) (*mainStruct.WebUser, error) {
 		switch token {
 		case "admin":
 			return &mainStruct.WebUser{Id: 1, GroupId: mainStruct.GetAdminId()}, nil
