@@ -54,7 +54,7 @@ jobs:
           cache-dependency-path: src/cweb-app/package-lock.json
       - run: npm ci
         working-directory: src/cweb-app
-      - run: npm audit --audit-level=critical
+      - run: npm audit --audit-level=high
         working-directory: src/cweb-app
       - run: npm test -- --watch=false --browsers=ChromeHeadless
         working-directory: src/cweb-app

@@ -15,7 +15,6 @@ COPY src/cweb-app/src ./src
 COPY src/cweb-app/.browserslistrc ./
 COPY src/cweb-app/angular.json ./
 COPY src/cweb-app/tsconfig.json ./
-COPY src/cweb-app/tslint.json ./
 
 RUN npm run build
 

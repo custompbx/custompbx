@@ -7,8 +7,7 @@
     "start_dev": "ng serve --configuration=dev",
     "build_dev": "ng build --configuration=dev",
     "build": "ng build --configuration=production",
-    "test": "ng test",
-    "lint": "ng lint"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
@@ -56,5 +55,8 @@
     "karma-jasmine-html-reporter": "^1.7.0",
     "ts-node": "~10.9.1",
     "typescript": "5.9.3"
+  },
+  "overrides": {
+    "http-proxy-middleware": "3.0.7"
   }
 }
