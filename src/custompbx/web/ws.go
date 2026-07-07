@@ -4656,35 +4656,20 @@ func getCallcenterTiers(msg *webStruct.MessageData) webStruct.UserResponse {
 // like getConfig
 func getByStruct(data *webStruct.MessageData, item interface{}) webStruct.UserResponse {
 	if data.Id == 0 {
-		return webStruct.UserResponse{Error: "no parent id", MessageType: data.Event}
+		return errorResponse(data.Event, "no parent id")
 	}
 	filter := map[string]customorm.FilterFields{"Parent": {Flag: true, UseValue: true, Value: data.Id}}
 
 	var res interface{}
 	var err error
-	if data.DBRequest.Limit != 0 || data.DBRequest.Filters != nil {
-		limit := data.DBRequest.Limit
-		if limit < 25 || limit > 250 {
-			limit = 25
-		}
-		offset := 0
-		if data.DBRequest.Offset > 0 {
-			offset = data.DBRequest.Offset * limit
-		}
-		for _, v := range data.DBRequest.Filters {
-			filter[v.Field] = customorm.FilterFields{Flag: true, UseValue: true, Value: v.FieldValue, Operand: v.Operand}
-		}
-		filterStr := customorm.Filters{
-			Fields: filter,
-			Limit:  limit,
-			Offset: offset,
-			Order:  customorm.Order{Desc: data.DBRequest.Order.Desc, Fields: data.DBRequest.Order.Fields}}
+	if hasPagedRequest(data.DBRequest) {
+		filterStr := buildFilteredConfigRequest(filter, data.DBRequest)
 		res, err = intermediateDB.GetByFilteredValues(
 			item,
 			filterStr,
 		)
 		if err != nil {
-			return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}
+			return errorResponse(data.Event, err.Error())
 		}
 		//TODO: with total all the time
 		filterStr.Count = true
@@ -4693,19 +4678,16 @@ func getByStruct(data *webStruct.MessageData, item interface{}) webStruct.UserRe
 			filterStr,
 		)
 		if err != nil {
-			return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}
+			return errorResponse(data.Event, err.Error())
 		}
 		if len(resCount) == 0 {
-			return webStruct.UserResponse{Error: "can't count total", MessageType: data.Event}
+			return errorResponse(data.Event, "can't count total")
 		}
 		total, ok := resCount[0].(int64)
 		if !ok {
-			return webStruct.UserResponse{Error: "can't get total", MessageType: data.Event}
+			return errorResponse(data.Event, "can't get total")
 		}
-		res = struct {
-			Items interface{} `json:"items"`
-			Total int64       `json:"total"`
-		}{Items: res, Total: total}
+		res = paginatedResult{Items: res, Total: total}
 	} else {
 		res, err = intermediateDB.GetByValuesAsMap(
 			item,
@@ -4714,10 +4696,10 @@ func getByStruct(data *webStruct.MessageData, item interface{}) webStruct.UserRe
 	}
 
 	if err != nil {
-		return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}
+		return errorResponse(data.Event, err.Error())
 	}
 
-	return webStruct.UserResponse{Data: res, MessageType: data.Event}
+	return dataResponse(data.Event, res)
 }
 
 func AddAutoDialerListMembers(data *webStruct.MessageData) webStruct.UserResponse {

@@ -59,13 +59,3 @@ var coreEvents = func() *handlerRegistry {
 	mustRegister(r, "RemoveUserToken", RemoveUserToken, onlyAdminGroup)
 	return r
 }()
-
-func normalizePagination(limit, page int) (int, int) {
-	if limit <= 0 || limit > 5000 {
-		limit = 250
-	}
-	if page < 0 {
-		page = 0
-	}
-	return limit, page * limit
-}

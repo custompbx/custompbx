@@ -1,6 +1,7 @@
 package db
 
 import (
+	"custompbx/sqlutil"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -362,8 +363,12 @@ func GetHEPDetailsList(callIds []string, instanceId int64) ([]map[string]*interf
 	copy(fieldsArrModified, fieldsArr)
 	fieldsArrModified[0] = fmt.Sprintf("to_char(%s, 'YYYY-MM-DD HH24:MI:SS.MS')", fieldsArrModified[0])
 
+	callIDPredicate, err := sqlutil.StringListEqual("sip_call_id", callIds)
+	if err != nil {
+		return nil, errors.New("error on select")
+	}
 	queryBuilder := squirrel.Select(fieldsArrModified...).From(table).PlaceholderFormat(squirrel.Dollar).Where(squirrel.Eq{"instance_id": instanceId})
-	queryBuilder = queryBuilder.Where(squirrel.Eq{"sip_call_id": callIds})
+	queryBuilder = queryBuilder.Where(callIDPredicate)
 	queryBuilder = queryBuilder.OrderBy("hep_timestamp ASC")
 
 	query, args, _ := queryBuilder.ToSql()

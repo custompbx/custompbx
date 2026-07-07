@@ -43,29 +43,14 @@ func getConfig(data *webStruct.MessageData, item interface{}) webStruct.UserResp
 	}
 	var res interface{}
 	var err error
-	if data.DBRequest.Limit != 0 || data.DBRequest.Filters != nil {
-		limit := data.DBRequest.Limit
-		if limit < 25 || limit > 250 {
-			limit = 25
-		}
-		offset := 0
-		if data.DBRequest.Offset > 0 {
-			offset = data.DBRequest.Offset * limit
-		}
-		for _, v := range data.DBRequest.Filters {
-			filter[v.Field] = customorm.FilterFields{Flag: true, UseValue: true, Value: v.FieldValue, Operand: v.Operand}
-		}
-		filterStr := customorm.Filters{
-			Fields: filter,
-			Limit:  limit,
-			Offset: offset,
-			Order:  customorm.Order{Desc: data.DBRequest.Order.Desc, Fields: data.DBRequest.Order.Fields}}
+	if hasPagedRequest(data.DBRequest) {
+		filterStr := buildFilteredConfigRequest(filter, data.DBRequest)
 		res, err = intermediateDB.GetByFilteredValues(
 			module,
 			filterStr,
 		)
 		if err != nil {
-			return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}
+			return errorResponse(data.Event, err.Error())
 		}
 		//TODO: with total all the time
 		filterStr.Count = true
@@ -74,19 +59,16 @@ func getConfig(data *webStruct.MessageData, item interface{}) webStruct.UserResp
 			filterStr,
 		)
 		if err != nil {
-			return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}
+			return errorResponse(data.Event, err.Error())
 		}
 		if len(resCount) == 0 {
-			return webStruct.UserResponse{Error: "can't count total", MessageType: data.Event}
+			return errorResponse(data.Event, "can't count total")
 		}
 		total, ok := resCount[0].(int64)
 		if !ok {
-			return webStruct.UserResponse{Error: "can't get total", MessageType: data.Event}
+			return errorResponse(data.Event, "can't get total")
 		}
-		res = struct {
-			Items interface{} `json:"items"`
-			Total int64       `json:"total"`
-		}{Items: res, Total: total}
+		res = paginatedResult{Items: res, Total: total}
 	} else {
 		res, err = intermediateDB.GetByValuesAsMap(
 			module,
@@ -95,10 +77,10 @@ func getConfig(data *webStruct.MessageData, item interface{}) webStruct.UserResp
 	}
 
 	if err != nil {
-		return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}
+		return errorResponse(data.Event, err.Error())
 	}
 
-	return webStruct.UserResponse{Data: res, MessageType: data.Event}
+	return dataResponse(data.Event, res)
 }
 
 func getConferenceLayoutConfig() *altStruct.ConfigurationsList {
