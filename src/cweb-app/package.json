@@ -32,7 +32,6 @@
     "chart.js": "^4.4.1",
     "chartjs-plugin-datalabels": "^2.2.0",
     "core-js": "^3.32.2",
-    "ng-country-flags": "^1.0.6",
     "ng2-charts": "^6.0.1",
     "rxjs": "~7.8.0",
     "save-svg-as-png": "^1.4.17",

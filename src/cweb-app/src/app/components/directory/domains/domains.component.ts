@@ -32,12 +32,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { InnerHeaderComponent } from "../../inner-header/inner-header.component";
 import {KeyValuePadComponent} from "../../key-value-pad/key-value-pad.component";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
-import {JsonPipe} from "@angular/common";
 import {State} from "../../../store/directory/directory.reducers";
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, JsonPipe],
+  imports: [MaterialModule, FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent],
   selector: 'app-domains',
   templateUrl: './domains.component.html',
   styleUrls: ['./domains.component.css']
