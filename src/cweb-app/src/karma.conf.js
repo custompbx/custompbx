@@ -24,33 +24,8 @@ module.exports = function (config) {
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    browserNoActivityTimeout: 60000,
-    browserDisconnectTimeout: 10000,
-    browserDisconnectTolerance: 1,
-    captureTimeout: 60000,
     autoWatch: true,
     browsers: ['Chrome'],
-    customLaunchers: {
-      ChromeHeadlessDocker: {
-        base: 'Chrome',
-        flags: [
-          '--headless=new',
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-          '--disable-software-rasterizer',
-          '--disable-background-networking',
-          '--disable-breakpad',
-          '--disable-crashpad',
-          '--disable-crash-reporter',
-          '--disable-features=UseDBus,Crashpad',
-          '--user-data-dir=/tmp/chrome-user-data',
-          '--data-path=/tmp/chrome-data',
-          '--disk-cache-dir=/tmp/chrome-cache'
-        ]
-      }
-    },
     singleRun: false
   });
 };

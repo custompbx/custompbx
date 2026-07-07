@@ -17,14 +17,7 @@ COPY src/cweb-app/angular.json ./
 COPY src/cweb-app/tsconfig.json ./
 COPY src/cweb-app/tslint.json ./
 
-# Build frontend
 RUN npm run build
-
-FROM frontend AS frontend-test
-RUN apt-get update && apt-get install -y --no-install-recommends chromium-headless-shell && rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /app/.angular && chown -R node:node /app/.angular
-ENV CHROME_BIN=/usr/bin/chromium-headless-shell
-RUN npm test -- --watch=false --browsers=ChromeHeadlessDocker
 
 ### STAGE 2: Build Golang backend ###
 FROM golang:1.25.11 AS backend-base

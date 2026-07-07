@@ -66,6 +66,7 @@ func SetBroadcastChannel(brChannel chan interface{}) {
 }
 
 var b = webStruct.NewWsHub()
+var metricsTokenLookup = webcache.GetWebUserByToken
 
 func TimeEvents() {
 	twoSecondsTick := time.Tick(2 * time.Second)
@@ -165,10 +166,41 @@ func PostAPIRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HubMetrics(w http.ResponseWriter, _ *http.Request) {
+func HubMetrics(w http.ResponseWriter, r *http.Request) {
+	user, status := metricsRequestUser(r)
+	if status != http.StatusOK {
+		http.Error(w, http.StatusText(status), status)
+		return
+	}
+	if user.GroupId != mainStruct.GetAdminId() {
+		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(b.Metrics()); err != nil {
 		log.Printf("component=websocket operation=write_metrics error=%q", err)
 	}
+}
+
+func metricsRequestUser(r *http.Request) (*mainStruct.WebUser, int) {
+	token := requestBearerToken(r)
+	if token == "" {
+		return nil, http.StatusUnauthorized
+	}
+	user, err := metricsTokenLookup(token)
+	if err != nil || user == nil || user.Id == 0 {
+		return nil, http.StatusUnauthorized
+	}
+	return user, http.StatusOK
+}
+
+func requestBearerToken(r *http.Request) string {
+	const prefix = "bearer "
+	auth := strings.TrimSpace(r.Header.Get("Authorization"))
+	if len(auth) <= len(prefix) || !strings.EqualFold(auth[:len(prefix)], prefix) {
+		return ""
+	}
+	return strings.TrimSpace(auth[len(prefix):])
 }
 
 func tokenGenerator() string {

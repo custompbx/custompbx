@@ -14,7 +14,7 @@ Please note that this project is still in development, has not undergone extensi
 
 The **Backend** is developed using Go 1.25 and is located in the ``src/custompbx`` directory.
 
-The **Frontend**, built with Angular v.21, can be found in the ``src/cweb-app`` directory.
+The **Frontend**, built with Angular v21, can be found in the ``src/cweb-app`` directory.
 
 ---
 System Requirements:
@@ -50,7 +50,6 @@ Additional options can be found in the Makefile.
 - docker-test
 - docker-race
 - docker-frontend-build
-- docker-frontend-test
 - docker-integration-test
 - docker-release
 
@@ -62,7 +61,7 @@ Alternatively, you can utilize the precompiled binary available on the **[Releas
 
 ---
 #### Build with Docker (TEST ONLY)
-A Docker version of the project is also available. Frontend builds should be run through Docker or WSL, not through Windows-mounted `node_modules`.
+A Docker version of the project is also available. Production frontend builds should be run through Docker or WSL, not through Windows-mounted `node_modules`.
 
 Useful Docker build and test targets:
 
@@ -72,13 +71,12 @@ make docker-vet
 make docker-test
 make docker-race
 make docker-frontend-build
-make docker-frontend-test
 make docker-integration-test
 make docker-release
 ```
 
 The Docker build uses `npm ci` and builds embedded frontend assets from container-generated static output. Runtime secrets and local `config.json` are excluded from the Docker build context.
-If Chromium cannot start under Docker Desktop, use the `docker-frontend-build` result as the production compile check and run Angular unit tests in WSL or CI Linux.
+Run Angular unit tests in WSL or CI Linux with `npm ci` followed by `npm test -- --watch=false --browsers=ChromeHeadless`. Docker Desktop is kept for production frontend compilation, not browser-based unit tests.
 
 You can start Docker with PostgresDB + Freeswitch + Custompbx by using the command:
 ```

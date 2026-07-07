@@ -9,7 +9,7 @@ ifneq ($(wildcard /usr/local/go/bin),)
     go_app:=/usr/local/go/bin/go
 endif
 
-.PHONY: install show install-dep build dep-front dep-back front back front-serve test docker-fmt docker-vet docker-test docker-race docker-frontend-build docker-frontend-test docker-integration-test docker-release
+.PHONY: install show install-dep build dep-front dep-back front back front-serve test docker-fmt docker-vet docker-test docker-race docker-frontend-build docker-integration-test docker-release
 
 install: install-dep build
 
@@ -63,9 +63,6 @@ docker-race:
 
 docker-frontend-build:
 		@ docker build --target frontend -f docker/Dockerfile .
-
-docker-frontend-test:
-		@ docker build --target frontend-test -f docker/Dockerfile .
 
 docker-integration-test:
 		@ docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from integration-test

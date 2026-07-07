@@ -18,7 +18,9 @@ jobs:
           go-version-file: src/custompbx/go.mod
           cache-dependency-path: src/custompbx/go.sum
       - run: cp config.example.json /tmp/custompbx-test.json
-      - run: test -z "$(gofmt -l .)"
+      - run: |
+          files="$(find . -name '*.go' ! -path './cweb/cweb.go' -print0 | xargs -0 gofmt -l)"
+          test -z "$files" || (echo "$files" && exit 1)
         working-directory: src/custompbx
       - run: go vet ./...
         working-directory: src/custompbx
