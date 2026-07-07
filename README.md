@@ -12,7 +12,7 @@
 
 Please note that this project is still in development, has not undergone extensive testing.
 
-The **Backend** is developed using Golang v.1.24 and is located in the ``src/custompbx`` directory.
+The **Backend** is developed using Go 1.25 and is located in the ``src/custompbx`` directory.
 
 The **Frontend**, built with Angular v.21, can be found in the ``src/cweb-app`` directory.
 
@@ -42,11 +42,17 @@ To locally run the frontend, perform the following steps: build and test the pro
 make front-serve
 ```  
 Additional options can be found in the Makefile.
-- install-golang
-- install-node
 - install-dep (install dependencies for back and front)
 - dep-front
 - dep-back
+- docker-fmt
+- docker-vet
+- docker-test
+- docker-race
+- docker-frontend-build
+- docker-frontend-test
+- docker-integration-test
+- docker-release
 
 The compiled binary file is located in the ``bin/`` directory and can be used as outlined in the [Documentation](https://github.com/custompbx/custompbx/wiki).
 
@@ -56,7 +62,23 @@ Alternatively, you can utilize the precompiled binary available on the **[Releas
 
 ---
 #### Build with Docker (TEST ONLY)
-A Docker version of the project is also available, currently intended for testing purposes only.
+A Docker version of the project is also available. Frontend builds should be run through Docker or WSL, not through Windows-mounted `node_modules`.
+
+Useful Docker build and test targets:
+
+```
+make docker-fmt
+make docker-vet
+make docker-test
+make docker-race
+make docker-frontend-build
+make docker-frontend-test
+make docker-integration-test
+make docker-release
+```
+
+The Docker build uses `npm ci` and builds embedded frontend assets from container-generated static output. Runtime secrets and local `config.json` are excluded from the Docker build context.
+If Chromium cannot start under Docker Desktop, use the `docker-frontend-build` result as the production compile check and run Angular unit tests in WSL or CI Linux.
 
 You can start Docker with PostgresDB + Freeswitch + Custompbx by using the command:
 ```
@@ -64,6 +86,13 @@ docker compose up -d
 ```
 
 After start of the containers open ``https://127.0.0.1:8080/cweb`` (or your Docker host), making sure to allow self-signed certificates.
+
+When rebuilding only the CustomPBX application container locally, remove the existing `custompbx-host` container before starting the rebuilt one if Docker Desktop does not pick up the new image:
+
+```
+docker rm -f custompbx-host
+docker compose up -d --no-deps custompbx
+```
 
 ---
 

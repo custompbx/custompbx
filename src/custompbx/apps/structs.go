@@ -87,7 +87,7 @@ type AutoDialerReducer struct {
 	Name        string                     `json:"name" customsql:"name;unique_1;check(name <> '')"`
 	Enabled     bool                       `json:"enabled" customsql:"enabled;default=TRUE"`
 	Description string                     `json:"description,omitempty" customsql:"description"`
-	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique_1;check(domain_id <> 0)""`
+	Domain      *altStruct.DirectoryDomain `json:"domain,omitempty" customsql:"fkey:domain_id;unique_1;check(domain_id <> 0)"`
 }
 
 func (w *AutoDialerReducer) GetTableName() string {
@@ -110,7 +110,7 @@ func (w *AutoDialerReducerMember) GetTableName() string {
 
 type AutoDialerProceed struct {
 	Id      int64 `json:"id" customsql:"pkey:id;check(id <> 0)"`
-	Started bool  `json:"running" customsql:"running"`
+	Started bool  `json:"started" customsql:"running"`
 	Running bool  `json:"running" customsql:"running"`
 
 	Parent *AutoDialerCompany    `json:"parent,omitempty" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`

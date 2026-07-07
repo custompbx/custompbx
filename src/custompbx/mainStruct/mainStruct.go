@@ -192,7 +192,10 @@ func (w *WebUsers) Set(value *WebUser) {
 	}
 }
 
-func (w *WebUsers) ClearCache(key WebUser) {
+func (w *WebUsers) ClearCache(key *WebUser) {
+	if key == nil {
+		return
+	}
 	w.mx.RLock()
 	defer w.mx.RUnlock()
 	delete(w.byLogin, key.Login)

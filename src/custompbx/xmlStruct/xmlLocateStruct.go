@@ -17,14 +17,14 @@ type Action struct {
 	Attrphrase      string   `xml:"phrase,attr,omitempty"  json:",omitempty"`
 	Attrtype        string   `xml:"type,attr,omitempty"  json:",omitempty"`
 	Attrinline      string   `xml:"inline,attr,omitempty"  json:",omitempty"`
-	string          string   `xml:",chardata" json:",omitempty"`
+	string          string
 }
 
 type Regex struct {
 	XMLName        xml.Name `xml:"regex,omitempty" json:"action,omitempty"`
 	Attrexpression string   `xml:"expression,attr"  json:",omitempty"`
 	Attrfield      string   `xml:"field,attr"  json:",omitempty"`
-	string         string   `xml:",chardata" json:",omitempty"`
+	string         string
 }
 
 type Advertise struct {
@@ -171,7 +171,7 @@ type Condition struct {
 	Minday    string   `xml:"minday,attr,omitempty" json:"minday"`
 	TzOffset  string   `xml:"tz-offset,attr,omitempty" json:"tz-offset"`
 	Dst       string   `xml:"dst,attr,omitempty" json:"dst"`
-	Attrregex string   `xml:"regex,attr,omitempty" json:"regex,omitempty"`
+	Attrregex string   `xml:"regex,attr,omitempty" json:"regex_attr,omitempty"`
 	Regex     []*Regex `xml:"regex,omitempty" json:"regex,omitempty"`
 }
 
@@ -361,7 +361,7 @@ type EventFilter struct {
 
 type Expression struct {
 	XMLName xml.Name `xml:"expression,omitempty" json:"expression,omitempty"`
-	string  string   `xml:",chardata" json:",omitempty"`
+	string  string
 }
 
 type Exten struct {
@@ -880,7 +880,7 @@ type Synthparams struct {
 type Template struct {
 	XMLName  xml.Name `xml:"template,omitempty" json:"template,omitempty"`
 	Attrname string   `xml:"name,attr"  json:",omitempty"`
-	string   string   `xml:",chardata" json:",omitempty"`
+	string   string
 }
 
 type Templates struct {

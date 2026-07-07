@@ -21,10 +21,9 @@ COPY src/cweb-app/tslint.json ./
 RUN npm run build
 
 FROM frontend AS frontend-test
-RUN apt-get update && apt-get install -y --no-install-recommends chromium && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends chromium-headless-shell && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /app/.angular && chown -R node:node /app/.angular
-ENV CHROME_BIN=/usr/bin/chromium
-USER node
+ENV CHROME_BIN=/usr/bin/chromium-headless-shell
 RUN npm test -- --watch=false --browsers=ChromeHeadlessDocker
 
 ### STAGE 2: Build Golang backend ###
@@ -40,6 +39,15 @@ COPY src/custompbx/ ./
 # Download backend dependencies
 #RUN go mod edit -replace github.com/custompbx/customorm=./customorm/
 RUN go mod download
+
+FROM backend-base AS backend-fmt
+RUN files="$(find . -name '*.go' ! -path './cweb/cweb.go' -print0 | xargs -0 gofmt -l)" && \
+    test -z "$files" || (echo "$files" && exit 1)
+
+FROM backend-base AS backend-vet
+COPY config.example.json /test/config.json
+ENV CUSTOMPBX_CONFIG=/test/config.json
+RUN go vet ./...
 
 FROM backend-base AS backend-test
 COPY config.example.json /test/config.json

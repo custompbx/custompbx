@@ -3,6 +3,7 @@
 package db
 
 import (
+	"custompbx/mainStruct"
 	"database/sql"
 	"os"
 	"testing"
@@ -89,5 +90,84 @@ func TestLegacyTokensAreHashedAndRemainValid(t *testing.T) {
 	}
 	if raw != nil || hash != HashToken("legacy-secret") {
 		t.Fatal("legacy token was not safely migrated")
+	}
+}
+
+func TestLogFilteringAndPagination(t *testing.T) {
+	dsn := os.Getenv("TEST_DATABASE_DSN")
+	if dsn == "" {
+		t.Skip("TEST_DATABASE_DSN is not configured")
+	}
+	conn, err := sql.Open("postgres", dsn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	if err = conn.Ping(); err != nil {
+		t.Fatal(err)
+	}
+	db = conn
+	_, err = db.Exec(`DROP TABLE IF EXISTS freeswitch_logs; CREATE TABLE freeswitch_logs(
+		created timestamp DEFAULT now(),
+		log_file text,
+		log_func text,
+		log_line integer,
+		log_level integer,
+		text_channel integer,
+		user_data text,
+		body text,
+		instance_id bigint NOT NULL
+	);
+	INSERT INTO freeswitch_logs(created,log_file,log_func,log_line,log_level,text_channel,user_data,body,instance_id) VALUES
+		('2026-01-01 00:00:01','a.go','a',10,3,1,'u1','alpha message',11),
+		('2026-01-01 00:00:02','b.go','b',20,4,1,'u2','beta message',11),
+		('2026-01-01 00:00:03','c.go','c',30,4,1,'u3','beta second',11),
+		('2026-01-01 00:00:04','d.go','d',40,4,1,'u4','other instance',12);`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rows, err := GetList(
+		1,
+		1,
+		[]mainStruct.Filter{{Field: "body", Operand: ConstLike, FieldValue: "beta%"}},
+		mainStruct.Order{Fields: []string{"created"}},
+		11,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("got %d rows, want 1", len(rows))
+	}
+	if body := valueAsString(rows[0]["body"]); body != "beta second" {
+		t.Fatalf("unexpected paged body %q", body)
+	}
+	if total := valueAsInt64(rows[0][ConstTotal]); total != 2 {
+		t.Fatalf("unexpected total %d", total)
+	}
+}
+
+func valueAsString(value *interface{}) string {
+	if value == nil || *value == nil {
+		return ""
+	}
+	if s, ok := (*value).(string); ok {
+		return s
+	}
+	return ""
+}
+
+func valueAsInt64(value *interface{}) int64 {
+	if value == nil || *value == nil {
+		return 0
+	}
+	switch v := (*value).(type) {
+	case int64:
+		return v
+	case int:
+		return int64(v)
+	default:
+		return 0
 	}
 }

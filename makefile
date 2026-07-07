@@ -9,7 +9,7 @@ ifneq ($(wildcard /usr/local/go/bin),)
     go_app:=/usr/local/go/bin/go
 endif
 
-.PHONY: install show install-dep build dep-front dep-back front back front-serve test
+.PHONY: install show install-dep build dep-front dep-back front back front-serve test docker-fmt docker-vet docker-test docker-race docker-frontend-build docker-frontend-test docker-integration-test docker-release
 
 install: install-dep build
 
@@ -48,3 +48,27 @@ front-serve:
 		@ cd $(web_path) && npm run start_dev
 test:
 		@ cd $(go_path) && CUSTOMPBX_CONFIG=../../config.example.json $(go_app) test ./...
+
+docker-fmt:
+		@ docker build --target backend-fmt -f docker/Dockerfile .
+
+docker-vet:
+		@ docker build --target backend-vet -f docker/Dockerfile .
+
+docker-test:
+		@ docker build --target backend-test -f docker/Dockerfile .
+
+docker-race:
+		@ docker build --target backend-race -f docker/Dockerfile .
+
+docker-frontend-build:
+		@ docker build --target frontend -f docker/Dockerfile .
+
+docker-frontend-test:
+		@ docker build --target frontend-test -f docker/Dockerfile .
+
+docker-integration-test:
+		@ docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from integration-test
+
+docker-release:
+		@ docker build -f docker/Dockerfile .
