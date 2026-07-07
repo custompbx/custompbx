@@ -9,7 +9,6 @@ import {PageEvent} from '@angular/material/paginator';
 import {State} from '../../store/hep/hep.reducers';
 import {GetHEP, GetHEPDetails} from '../../store/hep/hep.actions';
 import {MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef} from '@angular/material/bottom-sheet';
-import * as svg from 'save-svg-as-png';
 import {FormsModule} from "@angular/forms";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {SvgSeqDiagramComponent} from "../svg-seq-diagram/svg-seq-diagram.component";
@@ -24,6 +23,75 @@ export interface IfilterField {
 export interface IsortField {
   fields: Array<string>;
   desc: boolean;
+}
+
+function svgSize(svgElement: SVGSVGElement): { width: number; height: number } {
+  const rect = svgElement.getBoundingClientRect();
+  const viewBox = svgElement.viewBox?.baseVal;
+  const width = Number(svgElement.getAttribute('width')) || viewBox?.width || rect.width;
+  const height = Number(svgElement.getAttribute('height')) || viewBox?.height || rect.height;
+
+  if (!width || !height) {
+    throw new Error('SVG has no drawable size.');
+  }
+
+  return {width, height};
+}
+
+function triggerDownload(url: string, filename: string): void {
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function downloadSvgAsPng(svgElement: SVGSVGElement, filename: string, scale = 1): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const {width, height} = svgSize(svgElement);
+    const clonedSvg = svgElement.cloneNode(true) as SVGSVGElement;
+    clonedSvg.setAttribute('width', String(width));
+    clonedSvg.setAttribute('height', String(height));
+    clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    const svgSource = new XMLSerializer().serializeToString(clonedSvg);
+    const svgUrl = URL.createObjectURL(new Blob([svgSource], {type: 'image/svg+xml;charset=utf-8'}));
+    const image = new Image();
+
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.ceil(width * scale);
+      canvas.height = Math.ceil(height * scale);
+
+      const context = canvas.getContext('2d');
+      if (!context) {
+        URL.revokeObjectURL(svgUrl);
+        reject(new Error('Canvas 2D context is not available.'));
+        return;
+      }
+
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => {
+        URL.revokeObjectURL(svgUrl);
+        if (!blob) {
+          reject(new Error('Unable to render SVG as PNG.'));
+          return;
+        }
+        const pngUrl = URL.createObjectURL(blob);
+        triggerDownload(pngUrl, filename);
+        URL.revokeObjectURL(pngUrl);
+        resolve();
+      }, 'image/png');
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(svgUrl);
+      reject(new Error('Unable to load SVG for PNG export.'));
+    };
+
+    image.src = svgUrl;
+  });
 }
 
 // Defining the BottomSheetExportComponent here to ensure it's defined before it's used
@@ -67,27 +135,23 @@ export class BottomSheetExportComponent {
       filename = 'empty.txt';
     }
 
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(
+    const url = URL.createObjectURL(
       new Blob([txt], {
         type: type
       })
     );
-    a.setAttribute('download', filename);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    triggerDownload(url, filename);
+    URL.revokeObjectURL(url);
   }
 
   saveTextAsPng() {
     this._bottomSheetRef.dismiss();
-    // Assuming svg.saveSvgAsPng is available
-    if (typeof svg !== 'undefined' && svg.saveSvgAsPng) {
-      // 'idOfMySvgGraphic' must be the ID of the SVG element in the parent HepComponent template
-      svg.saveSvgAsPng(document.getElementById('idOfMySvgGraphic'), 'callflow.png', {scale: 1, modifyCss: 0});
-    } else {
-      console.error('save-svg-as-png library not loaded or function missing.');
+    const svgElement = document.getElementById('idOfMySvgGraphic');
+    if (!(svgElement instanceof SVGSVGElement)) {
+      console.error('HEP callflow SVG was not found.');
+      return;
     }
+    downloadSvgAsPng(svgElement, 'callflow.png').catch(error => console.error(error));
   }
 }
 

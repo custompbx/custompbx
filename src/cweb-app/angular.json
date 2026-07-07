@@ -31,6 +31,12 @@
               "src/styles.css"
             ],
             "scripts": [],
+            "allowedCommonJsDependencies": [
+              "ace-builds",
+              "ace-builds/src-noconflict/mode-xml",
+              "ace-builds/src-noconflict/theme-dracula",
+              "ace-builds/src-noconflict/ext-beautify"
+            ],
             "baseHref": "/cweb/",
             "browser": "src/main.ts"
           },
