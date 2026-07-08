@@ -49,27 +49,38 @@ type WebServer struct {
 	WriteTimeoutSeconds int      `json:"ws_write_timeout_seconds,omitempty"`
 	ReadTimeoutSeconds  int      `json:"ws_read_timeout_seconds,omitempty"`
 	PingIntervalSeconds int      `json:"ws_ping_interval_seconds,omitempty"`
+	WebSocketQueueSize  int      `json:"websocket_queue_size,omitempty"`
 }
 
 const (
 	OriginPolicySameOrigin = "same_origin"
 	OriginPolicyAllowList  = "allow_list"
 	OriginPolicyAllowAll   = "allow_all"
+
+	DefaultWSWriteTimeoutSeconds = 10
+	DefaultWSReadTimeoutSeconds  = 60
+	DefaultWSPingIntervalSeconds = 30
+	DefaultWebSocketQueueSize    = 64
+	MaxWebSocketQueueSize        = 1024
 )
 
 func (w *WebServer) NormalizeAndValidateOrigins() error {
 	if w.WriteTimeoutSeconds <= 0 {
-		w.WriteTimeoutSeconds = 2
+		w.WriteTimeoutSeconds = DefaultWSWriteTimeoutSeconds
 	}
-	if w.ReadTimeoutSeconds <= 0 {
-		w.ReadTimeoutSeconds = 60
+	if w.ReadTimeoutSeconds <= 1 {
+		w.ReadTimeoutSeconds = DefaultWSReadTimeoutSeconds
 	}
 	if w.PingIntervalSeconds <= 0 {
-		w.PingIntervalSeconds = 25
+		w.PingIntervalSeconds = DefaultWSPingIntervalSeconds
 	}
 	if w.PingIntervalSeconds >= w.ReadTimeoutSeconds {
-		return fmt.Errorf("webserver ws_ping_interval_seconds must be lower than ws_read_timeout_seconds")
+		w.PingIntervalSeconds = w.ReadTimeoutSeconds / 2
+		if w.PingIntervalSeconds < 1 {
+			w.PingIntervalSeconds = 1
+		}
 	}
+	w.WebSocketQueueSize = NormalizeWebSocketQueueSize(w.WebSocketQueueSize)
 	if w.OriginPolicy == "" {
 		w.OriginPolicy = OriginPolicySameOrigin
 	}
@@ -87,6 +98,16 @@ func (w *WebServer) NormalizeAndValidateOrigins() error {
 		w.AllowedOrigins[i] = normalized
 	}
 	return nil
+}
+
+func NormalizeWebSocketQueueSize(size int) int {
+	if size <= 0 {
+		return DefaultWebSocketQueueSize
+	}
+	if size > MaxWebSocketQueueSize {
+		return MaxWebSocketQueueSize
+	}
+	return size
 }
 
 func NormalizeOrigin(origin string) (string, error) {
@@ -206,9 +227,10 @@ func createConfig() GeneralCfg {
 	item.Web.KeyPath = ""
 	item.Web.Secure = true
 	item.Web.OriginPolicy = OriginPolicySameOrigin
-	item.Web.WriteTimeoutSeconds = 2
-	item.Web.ReadTimeoutSeconds = 60
-	item.Web.PingIntervalSeconds = 25
+	item.Web.WriteTimeoutSeconds = DefaultWSWriteTimeoutSeconds
+	item.Web.ReadTimeoutSeconds = DefaultWSReadTimeoutSeconds
+	item.Web.PingIntervalSeconds = DefaultWSPingIntervalSeconds
+	item.Web.WebSocketQueueSize = DefaultWebSocketQueueSize
 	item.XMLCurl.Route = "/conf/config"
 	item.XMLCurl.Host = "127.0.0.1"
 	item.XMLCurl.Port = 8081

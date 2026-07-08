@@ -112,8 +112,22 @@ func unsubscribe(data *webStruct.MessageData, wsContext *webStruct.WsContext) we
 	return webStruct.UserResponse{MessageType: eventSubscriptionList}
 }
 
+func updateSettings(data *webStruct.MessageData) webStruct.UserResponse {
+	if err := data.Payload.Web.NormalizeAndValidateOrigins(); err != nil {
+		return webStruct.UserResponse{Error: err.Error(), MessageType: "settings"}
+	}
+	data.Payload.Web.Route = normalizeRoute(data.Payload.Web.Route)
+	data.Payload.XMLCurl.Route = normalizeRoute(data.Payload.XMLCurl.Route)
+	return setSettings(data)
+}
+
 var coreEvents = func() *handlerRegistry {
 	r := newHandlerRegistry()
+	mustRegister(r, eventGetSettings, checkSettings, onlyAdminGroup)
+	mustRegister(r, eventSetSettings, updateSettings, onlyAdminGroup)
+	mustRegister(r, webStruct.GetDashboard, getDashboardData, onlyAdminGroup)
+	mustRegister(r, eventGetInstances, GetInstances, onlyAdminGroup)
+	mustRegister(r, eventUpdateInstanceDescription, UpdateInstanceDescription, onlyAdminGroup)
 	mustRegister(r, eventRelogin, checkRelogin, onlyAdminGroup)
 	mustRegister(r, eventLogOut, logoutAndClearSubscriptions, onlyAdminGroup)
 	mustRegister(r, "AddUserToken", createAPIToken, onlyAdminGroup)
@@ -133,4 +147,11 @@ func mustRegisterContext(r *handlerRegistry, name string, handler contextEventHa
 	if err := r.RegisterWithContext(name, handler, groups); err != nil {
 		panic(err)
 	}
+}
+
+func normalizeRoute(route string) string {
+	if route == "" || route[0] == '/' {
+		return route
+	}
+	return "/" + route
 }

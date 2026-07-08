@@ -8,7 +8,8 @@
     "route": "/ws", "host": "127.0.0.1", "port": 8080, "stun_port": 3478,
     "cert_path": "", "key_path": "", "secure": true,
     "origin_policy": "same_origin", "allowed_origins": [],
-    "ws_write_timeout_seconds": 2, "ws_read_timeout_seconds": 60, "ws_ping_interval_seconds": 25
+    "ws_write_timeout_seconds": 10, "ws_read_timeout_seconds": 60, "ws_ping_interval_seconds": 30,
+    "websocket_queue_size": 64
   },
   "xml_curl_server": {
     "route": "/conf/config", "host": "127.0.0.1", "port": 8081,

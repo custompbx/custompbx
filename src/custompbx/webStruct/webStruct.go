@@ -436,6 +436,9 @@ type HubMetrics struct {
 func NewWsHub() *WsHub { return &WsHub{connections: make(map[uint64]*WsContext)} }
 
 func (h *WsHub) Register(c *WsContext) {
+	if c == nil {
+		return
+	}
 	if h.shuttingDown.Load() {
 		_ = c.CloseWithReason("hub shutdown")
 		return
@@ -449,17 +452,30 @@ func (h *WsHub) Register(c *WsContext) {
 	if h.connections == nil {
 		h.connections = make(map[uint64]*WsContext)
 	}
+	if existing := h.connections[c.ID]; existing != nil {
+		h.active.Store(int64(len(h.connections)))
+		h.mx.Unlock()
+		if existing != c {
+			_ = c.CloseWithReason("duplicate connection id")
+		}
+		return
+	}
 	h.connections[c.ID] = c
-	c.onClose = h.remove
+	c.onClose = h.unregister
 	c.onWriteFailure = func() { h.failedWrites.Add(1) }
 	c.onHandlerFailure = func() { h.handlerFailures.Add(1) }
 	h.active.Store(int64(len(h.connections)))
 	h.mx.Unlock()
 }
 
-func (h *WsHub) remove(c *WsContext) {
+func (h *WsHub) unregister(c *WsContext) {
+	if c == nil {
+		return
+	}
 	h.mx.Lock()
-	delete(h.connections, c.ID)
+	if h.connections[c.ID] == c {
+		delete(h.connections, c.ID)
+	}
 	h.active.Store(int64(len(h.connections)))
 	h.mx.Unlock()
 }
@@ -507,10 +523,7 @@ func (h *WsHub) Broadcast(data UserResponse) {
 			continue
 		}
 
-		if !connection.Enqueue(&data) {
-			h.queueOverflows.Add(1)
-			_ = connection.CloseWithReason("outbound queue full")
-		}
+		h.enqueueOrDrop(connection, &data)
 	}
 }
 
@@ -528,15 +541,21 @@ func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) []int64 
 	for _, connection := range h.snapshot() {
 		connectionUserID := connection.UserID()
 		if connectionUserID != 0 && userIDs[connectionUserID] {
-			if connection.Enqueue(&data) {
+			if h.enqueueOrDrop(connection, &data) {
 				sent = append(sent, connectionUserID)
-			} else {
-				h.queueOverflows.Add(1)
-				_ = connection.CloseWithReason("outbound queue full")
 			}
 		}
 	}
 	return sent
+}
+
+func (h *WsHub) enqueueOrDrop(connection *WsContext, data *UserResponse) bool {
+	if connection.Enqueue(data) {
+		return true
+	}
+	h.queueOverflows.Add(1)
+	_ = connection.CloseWithReason("outbound queue full")
+	return false
 }
 
 // Drop removes a WebSocket context at the specified index from the hub.
@@ -613,7 +632,7 @@ func durationFromConfig(seconds int, fallback time.Duration) time.Duration {
 
 // CreateWsContext creates a new WsContext with the provided WebSocket connection.
 func CreateWsContext(ws *websocket.Conn) *WsContext {
-	const queueSize = 64
+	queueSize := cfg.NormalizeWebSocketQueueSize(cfg.CustomPbx.Web.WebSocketQueueSize)
 	return &WsContext{
 		ws:            ws,
 		ID:            nextConnectionID.Add(1),

@@ -1,6 +1,7 @@
 package web
 
 import (
+	"custompbx/cfg"
 	"custompbx/mainStruct"
 	"custompbx/webStruct"
 	"testing"
@@ -78,6 +79,11 @@ func TestHandlerRegistryUnknownEventFallsBack(t *testing.T) {
 
 func TestCoreRegistryIncludesMigratedEvents(t *testing.T) {
 	events := []string{
+		eventGetSettings,
+		eventSetSettings,
+		webStruct.GetDashboard,
+		eventGetInstances,
+		eventUpdateInstanceDescription,
 		eventRelogin,
 		eventLogOut,
 		eventSubscriptionList,
@@ -200,6 +206,39 @@ func TestSubscriptionRegistryHandlers(t *testing.T) {
 	})
 }
 
+func TestUpdateSettingsNormalizesWebSocketConfig(t *testing.T) {
+	oldConfig := cfg.CustomPbx
+	t.Cleanup(func() { cfg.CustomPbx = oldConfig })
+	t.Setenv("CUSTOMPBX_CONFIG", t.TempDir()+"/config.json")
+
+	payload := validSettingsPayload()
+	payload.Web.Route = "ws"
+	payload.XMLCurl.Route = "conf/config"
+	payload.Web.WriteTimeoutSeconds = -1
+	payload.Web.ReadTimeoutSeconds = 1
+	payload.Web.PingIntervalSeconds = 100
+	payload.Web.WebSocketQueueSize = cfg.MaxWebSocketQueueSize + 1
+	payload.Web.OriginPolicy = cfg.OriginPolicySameOrigin
+
+	resp := updateSettings(&webStruct.MessageData{Event: eventSetSettings, Payload: payload})
+
+	if resp.Error != "" {
+		t.Fatalf("unexpected error: %s", resp.Error)
+	}
+	if resp.Settings == nil {
+		t.Fatal("settings response is nil")
+	}
+	if resp.Settings.Web.Route != "/ws" || resp.Settings.XMLCurl.Route != "/conf/config" {
+		t.Fatalf("routes were not normalized: web=%q xml=%q", resp.Settings.Web.Route, resp.Settings.XMLCurl.Route)
+	}
+	if resp.Settings.Web.WriteTimeoutSeconds != cfg.DefaultWSWriteTimeoutSeconds ||
+		resp.Settings.Web.ReadTimeoutSeconds != cfg.DefaultWSReadTimeoutSeconds ||
+		resp.Settings.Web.PingIntervalSeconds != cfg.DefaultWSPingIntervalSeconds ||
+		resp.Settings.Web.WebSocketQueueSize != cfg.MaxWebSocketQueueSize {
+		t.Fatalf("websocket settings were not normalized: %+v", resp.Settings.Web)
+	}
+}
+
 func adminContext() *webStruct.WsContext {
 	ctx := webStruct.CreateWsContext(nil)
 	ctx.SetUser(&mainStruct.WebUser{Id: 1, Login: "admin", GroupId: mainStruct.GetAdminId()})
@@ -214,6 +253,31 @@ func userContext() *webStruct.WsContext {
 
 func messageData(ctx *webStruct.WsContext, event string) *webStruct.MessageData {
 	return &webStruct.MessageData{Event: event, Context: ctx}
+}
+
+func validSettingsPayload() cfg.GeneralCfg {
+	return cfg.GeneralCfg{
+		Fs: cfg.FreeSWITCH{
+			Esl: cfg.Esl{Host: "127.0.0.1", Port: 8021, Pass: "change-me"},
+		},
+		Db: cfg.Database{
+			Host: "127.0.0.1",
+			Port: 5432,
+			Name: "custompbx",
+			User: "custompbx",
+			Pass: "change-me",
+		},
+		Web: cfg.WebServer{
+			Host:  "127.0.0.1",
+			Port:  8080,
+			Route: "/ws",
+		},
+		XMLCurl: cfg.WebServer{
+			Host:  "127.0.0.1",
+			Port:  8081,
+			Route: "/conf/config",
+		},
+	}
 }
 
 func TestNormalizePagination(t *testing.T) {

@@ -1,6 +1,7 @@
 package webStruct
 
 import (
+	"custompbx/cfg"
 	"custompbx/mainStruct"
 	"encoding/json"
 	"net/http"
@@ -103,6 +104,19 @@ func TestHubBroadcastDropsSlowClientAndContinues(t *testing.T) {
 	_ = unsubscribed.Close()
 }
 
+func TestHubBroadcastConnectionBypassesSubscriptionFilter(t *testing.T) {
+	hub := NewWsHub()
+	context, _ := testWebSocketContext(t)
+	hub.Register(context)
+
+	hub.Broadcast(UserResponse{MessageType: BroadcastConnection})
+
+	if len(context.send) != 1 {
+		t.Fatalf("queue length = %d, want 1", len(context.send))
+	}
+	_ = context.Close()
+}
+
 func TestWsContextCloseWithNilWebSocketIsSafeAndIdempotent(t *testing.T) {
 	context := CreateWsContext(nil)
 	closed := 0
@@ -119,6 +133,78 @@ func TestWsContextCloseWithNilWebSocketIsSafeAndIdempotent(t *testing.T) {
 	}
 	if context.Enqueue(&UserResponse{MessageType: "after-close"}) {
 		t.Fatal("enqueue succeeded after close")
+	}
+}
+
+func TestHubRegisterDuplicateConnectionIsIdempotent(t *testing.T) {
+	hub := NewWsHub()
+	context, _ := testWebSocketContext(t)
+
+	hub.Register(context)
+	hub.Register(context)
+
+	if got := hub.Metrics(); got.Active != 1 {
+		t.Fatalf("active connections = %d, want 1", got.Active)
+	}
+	_ = context.Close()
+	if got := hub.Metrics(); got.Active != 0 {
+		t.Fatalf("active connections after close = %d, want 0", got.Active)
+	}
+}
+
+func TestHubRegisterDuplicateIDDoesNotReplaceExistingConnection(t *testing.T) {
+	hub := NewWsHub()
+	original, _ := testWebSocketContext(t)
+	duplicate, _ := testWebSocketContext(t)
+	duplicate.ID = original.ID
+
+	hub.Register(original)
+	hub.Register(duplicate)
+
+	if got := hub.Metrics(); got.Active != 1 {
+		t.Fatalf("active connections = %d, want 1", got.Active)
+	}
+	if duplicate.Enqueue(&UserResponse{MessageType: "closed"}) {
+		t.Fatal("duplicate connection was not closed")
+	}
+	original.Subscriptions.Set("event")
+	hub.Broadcast(UserResponse{MessageType: "event"})
+	if len(original.send) != 1 {
+		t.Fatalf("original queue length = %d, want 1", len(original.send))
+	}
+	_ = original.Close()
+}
+
+func TestHubUnregisterIgnoresUnregisteredConnection(t *testing.T) {
+	hub := NewWsHub()
+	registered, _ := testWebSocketContext(t)
+	unregistered, _ := testWebSocketContext(t)
+	registered.Subscriptions.Set("event")
+	hub.Register(registered)
+
+	hub.unregister(unregistered)
+	hub.Broadcast(UserResponse{MessageType: "event"})
+
+	if got := hub.Metrics(); got.Active != 1 {
+		t.Fatalf("active connections = %d, want 1", got.Active)
+	}
+	if len(registered.send) != 1 {
+		t.Fatalf("registered queue length = %d, want 1", len(registered.send))
+	}
+	_ = registered.Close()
+	_ = unregistered.Close()
+}
+
+func TestCreateWsContextUsesConfiguredQueueSize(t *testing.T) {
+	oldWeb := cfg.CustomPbx.Web
+	t.Cleanup(func() { cfg.CustomPbx.Web = oldWeb })
+	cfg.CustomPbx.Web.WebSocketQueueSize = 3
+
+	context := CreateWsContext(nil)
+	defer context.Close()
+
+	if got := cap(context.send); got != 3 {
+		t.Fatalf("queue capacity = %d, want 3", got)
 	}
 }
 

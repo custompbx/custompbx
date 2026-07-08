@@ -28,3 +28,75 @@ func TestNormalizeAndValidateOrigins(t *testing.T) {
 		})
 	}
 }
+
+func TestNormalizeAndValidateWebSocketSettings(t *testing.T) {
+	tests := []struct {
+		name      string
+		cfg       WebServer
+		wantWrite int
+		wantRead  int
+		wantPing  int
+		wantQueue int
+	}{
+		{
+			name:      "legacy defaults",
+			cfg:       WebServer{},
+			wantWrite: DefaultWSWriteTimeoutSeconds,
+			wantRead:  DefaultWSReadTimeoutSeconds,
+			wantPing:  DefaultWSPingIntervalSeconds,
+			wantQueue: DefaultWebSocketQueueSize,
+		},
+		{
+			name:      "configured values",
+			cfg:       WebServer{WriteTimeoutSeconds: 5, ReadTimeoutSeconds: 20, PingIntervalSeconds: 10, WebSocketQueueSize: 128},
+			wantWrite: 5,
+			wantRead:  20,
+			wantPing:  10,
+			wantQueue: 128,
+		},
+		{
+			name:      "invalid values normalize safely",
+			cfg:       WebServer{WriteTimeoutSeconds: -1, ReadTimeoutSeconds: 1, PingIntervalSeconds: -1, WebSocketQueueSize: -1},
+			wantWrite: DefaultWSWriteTimeoutSeconds,
+			wantRead:  DefaultWSReadTimeoutSeconds,
+			wantPing:  DefaultWSPingIntervalSeconds,
+			wantQueue: DefaultWebSocketQueueSize,
+		},
+		{
+			name:      "ping not lower than read is adjusted",
+			cfg:       WebServer{WriteTimeoutSeconds: 1, ReadTimeoutSeconds: 10, PingIntervalSeconds: 10, WebSocketQueueSize: 1},
+			wantWrite: 1,
+			wantRead:  10,
+			wantPing:  5,
+			wantQueue: 1,
+		},
+		{
+			name:      "queue clamps to maximum",
+			cfg:       WebServer{WebSocketQueueSize: MaxWebSocketQueueSize + 1},
+			wantWrite: DefaultWSWriteTimeoutSeconds,
+			wantRead:  DefaultWSReadTimeoutSeconds,
+			wantPing:  DefaultWSPingIntervalSeconds,
+			wantQueue: MaxWebSocketQueueSize,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.cfg.NormalizeAndValidateOrigins(); err != nil {
+				t.Fatal(err)
+			}
+			if tt.cfg.WriteTimeoutSeconds != tt.wantWrite || tt.cfg.ReadTimeoutSeconds != tt.wantRead || tt.cfg.PingIntervalSeconds != tt.wantPing || tt.cfg.WebSocketQueueSize != tt.wantQueue {
+				t.Fatalf("got write=%d read=%d ping=%d queue=%d", tt.cfg.WriteTimeoutSeconds, tt.cfg.ReadTimeoutSeconds, tt.cfg.PingIntervalSeconds, tt.cfg.WebSocketQueueSize)
+			}
+		})
+	}
+}
+
+func TestCreateConfigIncludesWebSocketDefaults(t *testing.T) {
+	conf := createConfig()
+	if conf.Web.WriteTimeoutSeconds != DefaultWSWriteTimeoutSeconds ||
+		conf.Web.ReadTimeoutSeconds != DefaultWSReadTimeoutSeconds ||
+		conf.Web.PingIntervalSeconds != DefaultWSPingIntervalSeconds ||
+		conf.Web.WebSocketQueueSize != DefaultWebSocketQueueSize {
+		t.Fatalf("unexpected websocket defaults: %+v", conf.Web)
+	}
+}

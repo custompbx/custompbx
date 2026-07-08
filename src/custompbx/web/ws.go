@@ -32,12 +32,16 @@ import (
 )
 
 const (
-	eventLogin                  = "login"
-	eventSubscriptionList       = "SubscriptionList"
-	eventPersistentSubscription = "PersistentSubscription"
-	eventRelogin                = "relogin"
-	eventLogOut                 = "[Auth] Logout"
-	eventSwitchDialplanDebug    = "[Dialplan][Switch] Debug"
+	eventLogin                     = "login"
+	eventSubscriptionList          = "SubscriptionList"
+	eventPersistentSubscription    = "PersistentSubscription"
+	eventRelogin                   = "relogin"
+	eventLogOut                    = "[Auth] Logout"
+	eventSwitchDialplanDebug       = "[Dialplan][Switch] Debug"
+	eventGetSettings               = "get_settings"
+	eventSetSettings               = "set_settings"
+	eventGetInstances              = "GetInstances"
+	eventUpdateInstanceDescription = "UpdateInstanceDescription"
 )
 
 var eventChannel chan interface{}
@@ -262,16 +266,6 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	var resp webStruct.UserResponse
 
 	switch msg.Event {
-	case "get_settings":
-		resp = getUser(msg, checkSettings, onlyAdminGroup())
-	case "set_settings":
-		resp = getUser(msg, setSettings, onlyAdminGroup())
-	case webStruct.GetDashboard:
-		resp = getUser(msg, getDashboardData, onlyAdminGroup())
-	case "GetInstances":
-		resp = getUser(msg, GetInstances, onlyAdminGroup())
-	case "UpdateInstanceDescription":
-		resp = getUser(msg, UpdateInstanceDescription, onlyAdminGroup())
 	//Doc started ---- (//Request:.*parent":\{.*id":\d+)[^\}]+ //(Request:.*),"description":""(.+) //(Request:(?!.*Switch)+)(.+)(,|\{)"enabled":(?:false|true)(?:,|\{) //(Request:(.*Switch)+.+),"parent":\{"id":\d+\} //(Request:(?!.*Move)+.*),"position":\d+
 	//## Directory
 	//### Domains

@@ -55,7 +55,7 @@ Additional options can be found in the Makefile.
 
 The compiled binary file is located in the ``bin/`` directory and can be used as outlined in the [Documentation](https://github.com/custompbx/custompbx/wiki).
 
-Copy `config.example.json` to `config.json` for local runtime configuration. WebSocket origins default to `same_origin`; use `allow_list` with exact `allowed_origins` in production when the UI is hosted separately. The explicit `allow_all` policy is intended only for development.
+Copy `config.example.json` to `config.json` for local runtime configuration. WebSocket origins default to `same_origin`; use `allow_list` with exact `allowed_origins` in production when the UI is hosted separately. The explicit `allow_all` policy is intended only for development. WebSocket write/read/ping timings use `ws_write_timeout_seconds`, `ws_read_timeout_seconds`, and `ws_ping_interval_seconds`; outbound queue capacity uses `websocket_queue_size` and defaults to 64.
 
 Alternatively, you can utilize the precompiled binary available on the **[Releases Page](https://github.com/custompbx/custompbx/releases)**.
 
