@@ -518,6 +518,9 @@ func (h *WsHub) Broadcast(data UserResponse) {
 func (h *WsHub) Unicast(data UserResponse, users []*mainStruct.WebUser) []int64 {
 	userIDs := make(map[int64]bool)
 	for _, user := range users {
+		if user == nil {
+			continue
+		}
 		userIDs[user.Id] = true
 	}
 

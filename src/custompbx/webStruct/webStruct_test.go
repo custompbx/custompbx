@@ -56,11 +56,7 @@ func TestHubDisconnectsQueueOverflowAndClosesOnce(t *testing.T) {
 	hub := NewWsHub()
 	hub.Register(context)
 	context.Subscriptions.Set("event")
-	for i := 0; i < cap(context.send); i++ {
-		if !context.Enqueue(&UserResponse{MessageType: "queued"}) {
-			t.Fatal("queue filled early")
-		}
-	}
+	fillOutboundQueue(t, context)
 	hub.Broadcast(UserResponse{MessageType: "event"})
 	if got := hub.Metrics(); got.Active != 0 || got.QueueOverflows != 1 {
 		t.Fatalf("unexpected metrics: %+v", got)
@@ -68,6 +64,43 @@ func TestHubDisconnectsQueueOverflowAndClosesOnce(t *testing.T) {
 	if err := context.Close(); err != nil {
 		t.Fatalf("second close failed: %v", err)
 	}
+}
+
+func TestHubBroadcastDropsSlowClientAndContinues(t *testing.T) {
+	hub := NewWsHub()
+	slow, _ := testWebSocketContext(t)
+	fast, _ := testWebSocketContext(t)
+	unsubscribed, _ := testWebSocketContext(t)
+	slow.Subscriptions.Set("event")
+	fast.Subscriptions.Set("event")
+	hub.Register(slow)
+	hub.Register(fast)
+	hub.Register(unsubscribed)
+	fillOutboundQueue(t, slow)
+
+	done := make(chan struct{})
+	go func() {
+		hub.Broadcast(UserResponse{MessageType: "event"})
+		close(done)
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("broadcast blocked on slow client")
+	}
+
+	if got := hub.Metrics(); got.Active != 2 || got.QueueOverflows != 1 || got.Broadcasts != 1 {
+		t.Fatalf("unexpected metrics: %+v", got)
+	}
+	if len(fast.send) != 1 {
+		t.Fatalf("fast client queue length = %d, want 1", len(fast.send))
+	}
+	if len(unsubscribed.send) != 0 {
+		t.Fatalf("unsubscribed client queue length = %d, want 0", len(unsubscribed.send))
+	}
+	_ = fast.Close()
+	_ = unsubscribed.Close()
 }
 
 func TestWsContextCloseWithNilWebSocketIsSafeAndIdempotent(t *testing.T) {
@@ -122,11 +155,18 @@ func TestHubShutdownClosesConnectionsAndStopsBroadcasts(t *testing.T) {
 	if after := hub.Metrics(); after.Broadcasts != got.Broadcasts {
 		t.Fatalf("broadcast counted after shutdown: before=%+v after=%+v", got, after)
 	}
+	hub.Shutdown()
+	if after := hub.Metrics(); after.Active != 0 || !after.ShuttingDown || after.Broadcasts != got.Broadcasts {
+		t.Fatalf("shutdown was not idempotent: before=%+v after=%+v", got, after)
+	}
 
 	late, _ := testWebSocketContext(t)
 	hub.Register(late)
 	if after := hub.Metrics(); after.Active != 0 {
 		t.Fatalf("late register survived shutdown: %+v", after)
+	}
+	if late.Enqueue(&UserResponse{MessageType: "after-shutdown"}) {
+		t.Fatal("late connection accepted outbound message after shutdown")
 	}
 }
 
@@ -148,6 +188,37 @@ func TestHubUnicastUsesStableUserID(t *testing.T) {
 	}
 	_ = first.Close()
 	_ = second.Close()
+}
+
+func TestHubUnicastDropsFullMatchingConnectionAndContinues(t *testing.T) {
+	hub := NewWsHub()
+	full, _ := testWebSocketContext(t)
+	ready, _ := testWebSocketContext(t)
+	other, _ := testWebSocketContext(t)
+	full.SetUser(&mainStruct.WebUser{Id: 303})
+	ready.SetUser(&mainStruct.WebUser{Id: 303})
+	other.SetUser(&mainStruct.WebUser{Id: 404})
+	hub.Register(full)
+	hub.Register(ready)
+	hub.Register(other)
+	fillOutboundQueue(t, full)
+
+	sent := hub.Unicast(UserResponse{MessageType: "event"}, []*mainStruct.WebUser{nil, {Id: 303}})
+
+	if len(sent) != 1 || sent[0] != 303 {
+		t.Fatalf("sent users = %v, want [303]", sent)
+	}
+	if got := hub.Metrics(); got.Active != 2 || got.QueueOverflows != 1 {
+		t.Fatalf("unexpected metrics: %+v", got)
+	}
+	if len(ready.send) != 1 {
+		t.Fatalf("ready client queue length = %d, want 1", len(ready.send))
+	}
+	if len(other.send) != 0 {
+		t.Fatalf("other client queue length = %d, want 0", len(other.send))
+	}
+	_ = ready.Close()
+	_ = other.Close()
 }
 
 func TestReadWaiterProcessesMessagesInOrder(t *testing.T) {
@@ -220,4 +291,13 @@ func TestSubscriptionsConcurrentAccess(t *testing.T) {
 		go func() { defer wg.Done(); s.Set("event"); _ = s.Get("event"); s.Clear() }()
 	}
 	wg.Wait()
+}
+
+func fillOutboundQueue(t *testing.T, context *WsContext) {
+	t.Helper()
+	for i := 0; i < cap(context.send); i++ {
+		if !context.Enqueue(&UserResponse{MessageType: "queued"}) {
+			t.Fatal("queue filled early")
+		}
+	}
 }
