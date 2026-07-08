@@ -37,6 +37,7 @@ const (
 	eventPersistentSubscription = "PersistentSubscription"
 	eventRelogin                = "relogin"
 	eventLogOut                 = "[Auth] Logout"
+	eventSwitchDialplanDebug    = "[Dialplan][Switch] Debug"
 )
 
 var eventChannel chan interface{}
@@ -197,11 +198,11 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 	}()
 	if err := msg.Validate(); err != nil {
 		wsContext.RecordHandlerFailure()
-		wsContext.Enqueue(&webStruct.UserResponse{Error: "invalid message", MessageType: "none"})
+		sendWSResponse(wsContext, &webStruct.UserResponse{Error: "invalid message", MessageType: "none"})
 		return
 	}
 	if !daemonCache.State.DatabaseConnection {
-		wsContext.Enqueue(&webStruct.UserResponse{Daemon: daemonCache.State, MessageType: webStruct.BroadcastConnection})
+		sendWSResponse(wsContext, &webStruct.UserResponse{Daemon: daemonCache.State, MessageType: webStruct.BroadcastConnection})
 		return
 	}
 
@@ -212,13 +213,13 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 	// first check if it login request
 	if msg.Event == eventLogin {
 		resp := checkLogin(msg.Data)
-		wsContext.Enqueue(&resp)
+		sendWSResponse(wsContext, &resp)
 		return
 	}
 	// allow without token
 	if msg.Event == "get_status" {
 		resp := webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "connection"}
-		wsContext.Enqueue(&resp)
+		sendWSResponse(wsContext, &resp)
 		return
 	}
 	log.Println("EVENT: ", msg.Event)
@@ -227,88 +228,27 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 	user, response := findUser(msg.Data)
 	if user == nil {
 		log.Println("EVENT: ", msg.Event, "NO USER")
-		wsContext.Enqueue(&response)
+		sendWSResponse(wsContext, &response)
 		return
 	}
 	subsResp := subscribeUser(msg.Data)
 	if subsResp != nil {
 		log.Println("EVENT: ", msg.Event, "NO SUBS")
-		wsContext.Enqueue(subsResp)
+		sendWSResponse(wsContext, subsResp)
 		return
 	}
 
-	var resp webStruct.UserResponse
-	if registeredResponse, ok := coreEvents.Dispatch(msg.Data); ok {
-		if !wsContext.Enqueue(&registeredResponse) {
-			_ = wsContext.CloseWithReason("outbound queue full")
-		}
+	if registeredResponse, ok := coreEvents.Dispatch(msg.Data, wsContext); ok {
+		sendWSResponse(wsContext, &registeredResponse)
 		return
 	}
-	switch msg.Event {
-	case eventLogOut:
-		wsContext.Subscriptions.Clear()
-		resp = getUser(msg.Data, loginOut, onlyAdminGroup())
-	case eventRelogin:
-		resp = getUser(msg.Data, checkRelogin, onlyAdminGroup())
-	case webStruct.DialplanDebug:
-		resp = getUser(msg.Data, getDialplanDebug, onlyAdminGroup())
-	case webStruct.SubscribeHepPackages:
-		resp = getUser(msg.Data, getDialplanDebug, onlyAdminGroup())
-	case eventSubscriptionList:
-		resp = getUser(
-			msg.Data,
-			func(data *webStruct.MessageData) webStruct.UserResponse {
-				resp.MessageType = eventSubscriptionList
-				wsContext.Subscriptions.Clear()
-				if len(msg.Data.ArrVal) > 10 || len(msg.Data.ArrVal) == 0 {
-					resp.Error = "can't subscribe!"
-				} else {
-					for _, name := range msg.Data.ArrVal {
-						wsContext.Subscriptions.Set(name)
-					}
-				}
-				return resp
-			},
-			onlyAdminGroup(),
-		)
-	case eventPersistentSubscription:
-		resp = getUser(
-			msg.Data,
-			func(data *webStruct.MessageData) webStruct.UserResponse {
-				resp.MessageType = eventPersistentSubscription
-				if len(msg.Data.ArrVal) > 10 || len(msg.Data.ArrVal) == 0 {
-					resp.Error = "can't subscribe!"
-				} else {
-					for _, name := range msg.Data.ArrVal {
-						wsContext.Subscriptions.SetPersistent(name)
-					}
-				}
-				return resp
-			},
-			onlyAdminGroup(),
-		)
-	case webStruct.Unsubscribe:
-		resp = getUser(
-			msg.Data,
-			func(data *webStruct.MessageData) webStruct.UserResponse {
-				if msg.Data.Name != "" {
-					wsContext.Subscriptions.Del(msg.Data.Name)
-				} else {
-					wsContext.Subscriptions.Clear()
-				}
-				resp.MessageType = "OK"
-				resp.MessageType = eventSubscriptionList
-				return resp
-			},
-			onlyAdminGroup(),
-		)
-	case "[Dialplan][Switch] Debug":
-		resp = getUser(msg.Data, switchDialplanDebug, onlyAdminGroup())
-	default:
-		resp = messageMainHandler(msg.Data)
-	}
 
-	if !wsContext.Enqueue(&resp) {
+	resp := messageMainHandler(msg.Data)
+	sendWSResponse(wsContext, &resp)
+}
+
+func sendWSResponse(wsContext *webStruct.WsContext, resp *webStruct.UserResponse) {
+	if !wsContext.Enqueue(resp) {
 		_ = wsContext.CloseWithReason("outbound queue full")
 	}
 }
