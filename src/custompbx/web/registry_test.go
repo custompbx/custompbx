@@ -84,6 +84,56 @@ func TestCoreRegistryIncludesMigratedEvents(t *testing.T) {
 		webStruct.GetDashboard,
 		eventGetInstances,
 		eventUpdateInstanceDescription,
+		eventGetWebSettings,
+		eventSaveWebSettings,
+		eventGetCDR,
+		eventGetHEP,
+		eventGetHEPDetails,
+		eventGetLogs,
+		eventGetPhoneCreds,
+		eventSendFSCLICommand,
+		eventRealFSCLIConnect,
+		eventRealFSCLICommand,
+		eventSettingsUsersGet,
+		eventGetWebUsersByDirectory,
+		eventSettingsUsersAdd,
+		eventSettingsUsersRename,
+		eventSettingsUsersDelete,
+		eventSettingsUsersSwitch,
+		eventSettingsUsersUpdatePass,
+		eventSettingsUsersUpdateLang,
+		eventSettingsUsersUpdateSip,
+		eventSettingsUsersUpdateWS,
+		eventSettingsUsersUpdateVerto,
+		eventSettingsUsersUpdateRTC,
+		eventSettingsUsersUpdateStun,
+		eventSettingsUsersUpdateAvatar,
+		eventSettingsUsersClearAvatar,
+		eventUpdateWebUserGroup,
+		eventGetWebDirUserTemplates,
+		eventAddWebDirUserTemplate,
+		eventDelWebDirUserTemplate,
+		eventUpdateWebDirUserTemplate,
+		eventSwitchWebDirUserTemplate,
+		eventGetWebDirUserTplParams,
+		eventAddWebDirUserTplParam,
+		eventDelWebDirUserTplParam,
+		eventSwitchWebDirUserTplParam,
+		eventUpdateWebDirUserTplParam,
+		eventGetWebDirUserTplVars,
+		eventAddWebDirUserTplVar,
+		eventDelWebDirUserTplVar,
+		eventSwitchWebDirUserTplVar,
+		eventUpdateWebDirUserTplVar,
+		eventGetWebDirUserTplList,
+		eventGetWebDirUserTplForm,
+		eventCreateWebDirUserByTpl,
+		eventGetConvPrivateMessages,
+		eventGetConvPrivateCalls,
+		eventGetConvRoomMessages,
+		eventSendConvPrivateMessage,
+		eventSendConvPrivateCall,
+		eventSendConvRoomMessage,
 		eventRelogin,
 		eventLogOut,
 		eventSubscriptionList,
@@ -96,6 +146,206 @@ func TestCoreRegistryIncludesMigratedEvents(t *testing.T) {
 	for _, event := range events {
 		if !coreEvents.Has(event) {
 			t.Fatalf("%s event is not registered", event)
+		}
+	}
+}
+
+func TestCoreRegistryIncludesWebUserSettingsFamily(t *testing.T) {
+	events := []string{
+		eventSettingsUsersGet,
+		eventGetWebUsersByDirectory,
+		eventSettingsUsersAdd,
+		eventSettingsUsersRename,
+		eventSettingsUsersDelete,
+		eventSettingsUsersSwitch,
+		eventSettingsUsersUpdatePass,
+		eventSettingsUsersUpdateLang,
+		eventSettingsUsersUpdateSip,
+		eventSettingsUsersUpdateWS,
+		eventSettingsUsersUpdateVerto,
+		eventSettingsUsersUpdateRTC,
+		eventSettingsUsersUpdateStun,
+		eventSettingsUsersUpdateAvatar,
+		eventSettingsUsersClearAvatar,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryHandlerOverrides(t *testing.T) {
+	calls := 0
+	r := buildCoreEvents(map[string]eventHandler{
+		eventUpdateWebUserGroup: func(data *webStruct.MessageData) webStruct.UserResponse {
+			calls++
+			return webStruct.UserResponse{MessageType: data.Event}
+		},
+	})
+	ctx := adminContext()
+	data := messageData(ctx, eventUpdateWebUserGroup)
+
+	resp, ok := r.Dispatch(data, ctx)
+
+	if !ok {
+		t.Fatal("event was not dispatched")
+	}
+	if calls != 1 {
+		t.Fatalf("handler calls = %d, want 1", calls)
+	}
+	if resp.MessageType != eventUpdateWebUserGroup {
+		t.Fatalf("message type = %q, want %q", resp.MessageType, eventUpdateWebUserGroup)
+	}
+}
+
+func TestCoreRegistryOverrideKeepsAccessCheck(t *testing.T) {
+	r := buildCoreEvents(map[string]eventHandler{
+		eventGetWebDirUserTemplates: func(data *webStruct.MessageData) webStruct.UserResponse {
+			t.Fatal("handler should not run for unauthorized group")
+			return webStruct.UserResponse{}
+		},
+	})
+	ctx := userContext()
+	data := messageData(ctx, eventGetWebDirUserTemplates)
+
+	resp, ok := r.Dispatch(data, ctx)
+
+	if !ok {
+		t.Fatal("event was not dispatched")
+	}
+	if resp.MessageType != "no_access" {
+		t.Fatalf("message type = %q, want no_access", resp.MessageType)
+	}
+}
+
+func TestCoreRegistryIncludesWebDirectoryTemplateFamily(t *testing.T) {
+	events := []string{
+		eventGetWebDirUserTemplates,
+		eventAddWebDirUserTemplate,
+		eventDelWebDirUserTemplate,
+		eventUpdateWebDirUserTemplate,
+		eventSwitchWebDirUserTemplate,
+		eventGetWebDirUserTplParams,
+		eventAddWebDirUserTplParam,
+		eventDelWebDirUserTplParam,
+		eventSwitchWebDirUserTplParam,
+		eventUpdateWebDirUserTplParam,
+		eventGetWebDirUserTplVars,
+		eventAddWebDirUserTplVar,
+		eventDelWebDirUserTplVar,
+		eventSwitchWebDirUserTplVar,
+		eventUpdateWebDirUserTplVar,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryManagerDirectoryTemplateEvents(t *testing.T) {
+	events := []string{
+		eventGetWebDirUserTplList,
+		eventGetWebDirUserTplForm,
+		eventCreateWebDirUserByTpl,
+	}
+	for _, event := range events {
+		event := event
+		calls := 0
+		r := buildCoreEvents(map[string]eventHandler{
+			event: func(data *webStruct.MessageData) webStruct.UserResponse {
+				calls++
+				return webStruct.UserResponse{MessageType: data.Event}
+			},
+		})
+		ctx := managerContext()
+		data := messageData(ctx, event)
+
+		resp, ok := r.Dispatch(data, ctx)
+
+		if !ok {
+			t.Fatalf("%s event was not dispatched", event)
+		}
+		if calls != 1 {
+			t.Fatalf("%s handler calls = %d, want 1", event, calls)
+		}
+		if resp.MessageType != event {
+			t.Fatalf("%s response message type = %q", event, resp.MessageType)
+		}
+	}
+}
+
+func TestCoreRegistryManagerDirectoryTemplateEventsRejectUsers(t *testing.T) {
+	events := []string{
+		eventGetWebDirUserTplList,
+		eventGetWebDirUserTplForm,
+		eventCreateWebDirUserByTpl,
+	}
+	for _, event := range events {
+		event := event
+		r := buildCoreEvents(map[string]eventHandler{
+			event: func(data *webStruct.MessageData) webStruct.UserResponse {
+				t.Fatalf("%s handler should not run for unauthorized group", event)
+				return webStruct.UserResponse{}
+			},
+		})
+		ctx := userContext()
+		data := messageData(ctx, event)
+
+		resp, ok := r.Dispatch(data, ctx)
+
+		if !ok {
+			t.Fatalf("%s event was not dispatched", event)
+		}
+		if resp.MessageType != "no_access" {
+			t.Fatalf("%s message type = %q, want no_access", event, resp.MessageType)
+		}
+	}
+}
+
+func TestCoreRegistryIncludesConversationFamily(t *testing.T) {
+	events := []string{
+		eventGetConvPrivateMessages,
+		eventGetConvPrivateCalls,
+		eventGetConvRoomMessages,
+		eventSendConvPrivateMessage,
+		eventSendConvPrivateCall,
+		eventSendConvRoomMessage,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func assertAdminOnlyEventsDispatch(t *testing.T, events []string) {
+	t.Helper()
+	for _, event := range events {
+		event := event
+		calls := 0
+		r := buildCoreEvents(map[string]eventHandler{
+			event: func(data *webStruct.MessageData) webStruct.UserResponse {
+				calls++
+				return webStruct.UserResponse{MessageType: data.Event}
+			},
+		})
+		ctx := adminContext()
+		data := messageData(ctx, event)
+
+		resp, ok := r.Dispatch(data, ctx)
+
+		if !ok {
+			t.Fatalf("%s event was not dispatched", event)
+		}
+		if calls != 1 {
+			t.Fatalf("%s handler calls = %d, want 1", event, calls)
+		}
+		if resp.MessageType != event {
+			t.Fatalf("%s response message type = %q", event, resp.MessageType)
+		}
+
+		userCtx := userContext()
+		userData := messageData(userCtx, event)
+		userResp, userOK := r.Dispatch(userData, userCtx)
+
+		if !userOK {
+			t.Fatalf("%s event was not dispatched for access check", event)
+		}
+		if userResp.MessageType != "no_access" {
+			t.Fatalf("%s user message type = %q, want no_access", event, userResp.MessageType)
+		}
+		if calls != 1 {
+			t.Fatalf("%s unauthorized handler call changed calls to %d", event, calls)
 		}
 	}
 }
@@ -206,6 +456,20 @@ func TestSubscriptionRegistryHandlers(t *testing.T) {
 	})
 }
 
+func TestHEPDetailsRegistryPreservesEmptyPayloadBehavior(t *testing.T) {
+	ctx := adminContext()
+	data := messageData(ctx, eventGetHEPDetails)
+
+	resp, ok := coreEvents.Dispatch(data, ctx)
+
+	if !ok {
+		t.Fatal("GetHEPDetails was not dispatched by registry")
+	}
+	if resp.MessageType != eventGetHEPDetails || resp.Error != "empty data" {
+		t.Fatalf("unexpected response: %+v", resp)
+	}
+}
+
 func TestUpdateSettingsNormalizesWebSocketConfig(t *testing.T) {
 	oldConfig := cfg.CustomPbx
 	t.Cleanup(func() { cfg.CustomPbx = oldConfig })
@@ -248,6 +512,12 @@ func adminContext() *webStruct.WsContext {
 func userContext() *webStruct.WsContext {
 	ctx := webStruct.CreateWsContext(nil)
 	ctx.SetUser(&mainStruct.WebUser{Id: 2, Login: "user", GroupId: mainStruct.GetUserId()})
+	return ctx
+}
+
+func managerContext() *webStruct.WsContext {
+	ctx := webStruct.CreateWsContext(nil)
+	ctx.SetUser(&mainStruct.WebUser{Id: 3, Login: "manager", GroupId: mainStruct.GetManagerId()})
 	return ctx
 }
 

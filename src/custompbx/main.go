@@ -6,7 +6,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"custompbx/apps"
 	"custompbx/cache"
 	"custompbx/cfg"
 	"custompbx/cweb"
@@ -97,7 +96,6 @@ func main() {
 			log.Println("Database schema updated for version " + mainStruct.Version)
 		}
 		nocache.InitDB()
-		apps.InitApps()
 		db.InitLogDB()
 		db.InitWebDB(cache.GetCurrentInstanceId())
 		db.InitGlobalVariablesDB()

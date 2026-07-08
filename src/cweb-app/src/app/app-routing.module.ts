@@ -71,7 +71,6 @@ import { GetInstancesDataService } from './services/resolve-route/get-instances-
 import { GetGlobalVariablesDataService } from './services/resolve-route/get-global-variables-data.service';
 import { GetPostLoadModulesDataService } from './services/resolve-route/get-post-load-modules-data.service';
 import { GetVoicemailDataService } from './services/resolve-route/get-voicemail-data.service';
-import { GetAutodialerDataService } from './services/resolve-route/get-autodialer-data.service';
 
 export const routes: Routes = [
   // --- Static Routes ---
@@ -548,14 +547,6 @@ export const routes: Routes = [
     loadComponent: () => import('./components/hep/hep.component').then(m => m.HepComponent),
     resolve: {reconnectUpdater: UnsubscribeService}
   },
-  {
-    path: 'apps/autodialer',
-    title: 'apps/autodialer',
-    canActivate: [AuthGuard],
-    loadComponent: () => import('./components/apps/autodialer/autodialer.component').then(m => m.AutodialerComponent),
-    resolve: {reconnectUpdater: GetAutodialerDataService}
-  },
-
   // --- Catch-All Route ---
   {
     path: '**',

@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"custompbx/altData"
 	"custompbx/altStruct"
-	"custompbx/apps"
 	"custompbx/cache"
 	"custompbx/cdrDb"
 	"custompbx/cfg"
@@ -42,6 +41,56 @@ const (
 	eventSetSettings               = "set_settings"
 	eventGetInstances              = "GetInstances"
 	eventUpdateInstanceDescription = "UpdateInstanceDescription"
+	eventGetWebSettings            = "GetWebSettings"
+	eventSaveWebSettings           = "SaveWebSettings"
+	eventGetCDR                    = "[CDR] Get"
+	eventGetHEP                    = "GetHEP"
+	eventGetHEPDetails             = "GetHEPDetails"
+	eventGetLogs                   = "GetLogs"
+	eventGetPhoneCreds             = "[Phone][Get] Creds"
+	eventSendFSCLICommand          = "SendFSCLICommand"
+	eventRealFSCLIConnect          = "RealFSCLIConnect"
+	eventRealFSCLICommand          = "RealFSCLICommand"
+	eventUpdateWebUserGroup        = "UpdateWebUserGroup"
+	eventGetWebDirUserTemplates    = "GetWebDirectoryUsersTemplates"
+	eventAddWebDirUserTemplate     = "AddWebDirectoryUsersTemplate"
+	eventDelWebDirUserTemplate     = "DelWebDirectoryUsersTemplate"
+	eventUpdateWebDirUserTemplate  = "UpdateWebDirectoryUsersTemplate"
+	eventSwitchWebDirUserTemplate  = "SwitchWebDirectoryUsersTemplate"
+	eventGetWebDirUserTplParams    = "GetWebDirectoryUsersTemplateParameters"
+	eventAddWebDirUserTplParam     = "AddWebDirectoryUsersTemplateParameter"
+	eventDelWebDirUserTplParam     = "DelWebDirectoryUsersTemplateParameter"
+	eventSwitchWebDirUserTplParam  = "SwitchWebDirectoryUsersTemplateParameter"
+	eventUpdateWebDirUserTplParam  = "UpdateWebDirectoryUsersTemplateParameter"
+	eventGetWebDirUserTplVars      = "GetWebDirectoryUsersTemplateVariables"
+	eventAddWebDirUserTplVar       = "AddWebDirectoryUsersTemplateVariable"
+	eventDelWebDirUserTplVar       = "DelWebDirectoryUsersTemplateVariable"
+	eventSwitchWebDirUserTplVar    = "SwitchWebDirectoryUsersTemplateVariable"
+	eventUpdateWebDirUserTplVar    = "UpdateWebDirectoryUsersTemplateVariable"
+	eventGetWebDirUserTplList      = "GetWebDirectoryUsersTemplatesList"
+	eventGetWebDirUserTplForm      = "GetWebDirectoryUsersTemplateForm"
+	eventCreateWebDirUserByTpl     = "CreateWebDirectoryUsersByTemplate"
+	eventSettingsUsersGet          = "[Settings][Users] Get"
+	eventGetWebUsersByDirectory    = "GetWebUsersByDirectory"
+	eventSettingsUsersAdd          = "[Settings][Users] Add"
+	eventSettingsUsersRename       = "[Settings][Users] Rename"
+	eventSettingsUsersDelete       = "[Settings][Users] Delete"
+	eventSettingsUsersSwitch       = "[Settings][Users][Switch] Web user"
+	eventSettingsUsersUpdatePass   = "[Settings][Users][Update] Password"
+	eventSettingsUsersUpdateLang   = "[Settings][Users][Update] Lang"
+	eventSettingsUsersUpdateSip    = "[Settings][Users][Update] Sip user"
+	eventSettingsUsersUpdateWS     = "[Settings][Users][Update] Ws"
+	eventSettingsUsersUpdateVerto  = "[Settings][Users][Update] Verto Ws"
+	eventSettingsUsersUpdateRTC    = "[Settings][Users][Update] WebRTC Lib"
+	eventSettingsUsersUpdateStun   = "[Settings][Users][Update] Stun"
+	eventSettingsUsersUpdateAvatar = "[Settings][Users][Update] Avatar"
+	eventSettingsUsersClearAvatar  = "[Settings][Users][Clear] Avatar"
+	eventGetConvPrivateMessages    = "GetConversationPrivateMessages"
+	eventGetConvPrivateCalls       = "GetConversationPrivateCalls"
+	eventGetConvRoomMessages       = "GetConversationRoomMessages"
+	eventSendConvPrivateMessage    = "SendConversationPrivateMessage"
+	eventSendConvPrivateCall       = "SendConversationPrivateCall"
+	eventSendConvRoomMessage       = "SendConversationRoomMessage"
 )
 
 var eventChannel chan interface{}
@@ -4050,274 +4099,7 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Request:
 	//Response:
 	//Errors:
-	case "[Settings][Users] Get":
-		resp = getUser(msg, getWebUsers, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "GetWebUsersByDirectory":
-		resp = getUser(msg, GetWebUsersByDirectory, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users] Add":
-		resp = getUser(msg, addWebUsers, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users] Rename":
-		resp = getUser(msg, renameWebUsers, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users] Delete":
-		resp = getUser(msg, deleteWebUsers, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Switch] Web user":
-		resp = getUser(msg, switchWebUser, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Update] Password":
-		resp = getUser(msg, updateWebUsersPassword, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Update] Lang":
-		resp = getUser(msg, updateWebUsersLang, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Update] Sip user":
-		resp = getUser(msg, updateWebUsersSipUser, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Update] Ws":
-		resp = getUser(msg, updateWebUsersWs, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Update] Verto Ws":
-		resp = getUser(msg, updateWebUsersVertoWs, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Update] WebRTC Lib":
-		resp = getUser(msg, UpdateWebUserWebRTCLib, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Update] Stun":
-		resp = getUser(msg, updateWebUsersStun, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Update] Avatar":
-		resp = getUser(msg, updateWebUsersAvatar, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Settings][Users][Clear] Avatar":
-		resp = getUser(msg, clearWebUsersAvatar, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[CDR] Get":
-		resp = getUser(msg, getCDR, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "GetHEP":
-		resp = getUser(msg, getHEP, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "GetHEPDetails":
-		resp = getUser(msg, GetHEPDetails, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "GetLogs":
-		resp = getUser(msg, GetLogs, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "GetWebSettings":
-		resp = getUser(msg, GetWebSettings, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "SaveWebSettings":
-		resp = getUser(msg, SaveWebSettings, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Phone][Get] Creds":
-		resp = getUser(msg, getPhoneCreds, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "SendFSCLICommand":
-		resp = getUser(msg, runCLICommand, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "RealFSCLIConnect":
-		resp = getUser(msg, RealFSCLIConnect, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "RealFSCLICommand":
-		resp = getUser(msg, RealFSCLICommand, onlyAdminGroup())
-
-	//Request:
-	//Response:
-	//Errors:
-	case "UpdateWebUserGroup":
-		resp = getUser(msg, UpdateWebUserGroup, onlyAdminGroup())
-
-	//Request:
-	//Response:
-	//Errors:
-	case "GetWebDirectoryUsersTemplates":
-		resp = getUser(msg, GetWebDirectoryUsersTemplates, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "AddWebDirectoryUsersTemplate":
-		resp = getUser(msg, AddWebDirectoryUsersTemplate, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "DelWebDirectoryUsersTemplate":
-		resp = getUser(msg, DelWebDirectoryUsersTemplate, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "SwitchWebDirectoryUsersTemplate":
-		resp = getUser(msg, SwitchWebDirectoryUsersTemplate, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "UpdateWebDirectoryUsersTemplate":
-		resp = getUser(msg, UpdateWebDirectoryUsersTemplate, onlyAdminGroup())
-
-	//Request:
-	//Response:
-	//Errors:
-	case "GetWebDirectoryUsersTemplateParameters":
-		resp = getUser(msg, GetWebDirectoryUsersTemplateParameters, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "AddWebDirectoryUsersTemplateParameter":
-		resp = getUser(msg, AddWebDirectoryUsersTemplateParameter, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "DelWebDirectoryUsersTemplateParameter":
-		resp = getUser(msg, DelWebDirectoryUsersTemplateParameter, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "SwitchWebDirectoryUsersTemplateParameter":
-		resp = getUser(msg, SwitchWebDirectoryUsersTemplateParameter, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "UpdateWebDirectoryUsersTemplateParameter":
-		resp = getUser(msg, UpdateWebDirectoryUsersTemplateParameter, onlyAdminGroup())
-
-	//Request:
-	//Response:
-	//Errors:
-	case "GetWebDirectoryUsersTemplateVariables":
-		resp = getUser(msg, GetWebDirectoryUsersTemplateVariables, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "AddWebDirectoryUsersTemplateVariable":
-		resp = getUser(msg, AddWebDirectoryUsersTemplateVariable, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "DelWebDirectoryUsersTemplateVariable":
-		resp = getUser(msg, DelWebDirectoryUsersTemplateVariable, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "SwitchWebDirectoryUsersTemplateVariable":
-		resp = getUser(msg, SwitchWebDirectoryUsersTemplateVariable, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "UpdateWebDirectoryUsersTemplateVariable":
-		resp = getUser(msg, UpdateWebDirectoryUsersTemplateVariable, onlyAdminGroup())
-
-	//Request:
-	//Response:
-	//Errors:
-	case "GetWebDirectoryUsersTemplatesList":
-		resp = getUser(msg, GetWebDirectoryUsersTemplatesList, onlyAdminAndManagerGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "GetWebDirectoryUsersTemplateForm":
-		resp = getUser(msg, GetWebDirectoryUsersTemplateForm, onlyAdminAndManagerGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "CreateWebDirectoryUsersByTemplate":
-		resp = getUser(msg, CreateWebDirectoryUsersByTemplate, onlyAdminAndManagerGroup())
-
-	//Request:
-	//Response:
-	//Errors:
-	case "GetConversationPrivateMessages":
-		resp = getUser(msg, GetConversationPrivateMessages, onlyAdminGroup())
-	case "GetConversationPrivateCalls":
-		resp = getUser(msg, GetConversationPrivateCalls, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "GetConversationRoomMessages":
-		resp = getUser(msg, GetConversationRoomMessages, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "SendConversationPrivateMessage":
-		resp = getUser(msg, SendConversationPrivateMessage, onlyAdminGroup())
-	case "SendConversationPrivateCall":
-		resp = getUser(msg, SendConversationPrivateCall, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "SendConversationRoomMessage":
-		resp = getUser(msg, SendConversationRoomMessage, onlyAdminGroup())
-
-	//Request:
-	//Response:
-	//Errors:
-	case "UpdateAutoDialerListMember":
-		resp = UpdateAutoDialerListMember(msg)
-	//Request:
-	//Response:
-	//Errors:
-	case "AddAutoDialerListMembers":
-		resp = getUser(msg, AddAutoDialerListMembers, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "GetAutoDialerListMembers":
-		resp = getUserForConfig(msg, getByStruct, &apps.AutoDialerListMember{}, onlyAdminGroup())
 	default:
-		foo, exists := apps.WebCases[msg.Event]
-		if exists {
-			return getUser(msg, foo, onlyAdminAndManagerGroup())
-		}
 		resp = webStruct.UserResponse{Error: "Wrong event", MessageType: "none"}
 	}
 
@@ -4644,77 +4426,6 @@ func getByStruct(data *webStruct.MessageData, item interface{}) webStruct.UserRe
 	}
 
 	return dataResponse(data.Event, res)
-}
-
-func AddAutoDialerListMembers(data *webStruct.MessageData) webStruct.UserResponse {
-	if data.Id == 0 {
-		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
-	}
-	var items []struct {
-		Name       string `json:"name"`
-		ToNumber   string `json:"to_number"`
-		FromNumber string `json:"from_number"`
-		Retries    string `json:"retries"`
-		CustomVars string `json:"custom_vars"`
-	}
-	err := json.Unmarshal(data.Data, &items)
-	if err != nil {
-		return webStruct.UserResponse{Error: "wrong data", MessageType: data.Event}
-	}
-	counter := 0
-	for _, sub := range items {
-		retry, _ := strconv.ParseInt(sub.Retries, 10, 64)
-		item := &apps.AutoDialerListMember{
-			Name:       sub.Name,
-			ToNumber:   sub.ToNumber,
-			FromNumber: sub.FromNumber,
-			Retries:    retry,
-			CustomVars: sub.CustomVars,
-			Enabled:    true,
-			Parent:     &apps.AutoDialerList{Id: data.Id},
-		}
-		_, err := intermediateDB.InsertItem(item)
-		if err != nil {
-			log.Println(err.Error())
-			continue
-		}
-
-		counter++
-	}
-	return webStruct.UserResponse{MessageType: data.Event, Total: &counter}
-}
-
-func UpdateAutoDialerListMember(msg *webStruct.MessageData) webStruct.UserResponse {
-	if msg.Param.Name == "" || msg.Param.Value == "" {
-		return webStruct.UserResponse{Error: "wrong params", MessageType: msg.Event}
-	}
-	item := &apps.AutoDialerListMember{Id: msg.Param.Id}
-	fieldName := mainStruct.GetItemNameByTag(item, msg.Param.Name)
-	if fieldName == "id" {
-		return webStruct.UserResponse{Error: "please dont", MessageType: msg.Event}
-	}
-	f := reflect.ValueOf(item).Elem().FieldByName(fieldName)
-	switch f.Type().Name() {
-	case "string":
-		f.SetString(msg.Param.Value)
-	case "int":
-		fallthrough
-	case "int64":
-		res, err := strconv.ParseInt(msg.Param.Value, 10, 64)
-		if err == nil {
-			f.SetInt(res)
-		}
-	case "bool":
-		res, err := strconv.ParseBool(msg.Param.Value)
-		if err == nil {
-			f.SetBool(res)
-		}
-	}
-
-	return getUserForConfig(msg, updateConfig, struct {
-		S interface{}
-		A []string
-	}{item, []string{fieldName}}, onlyAdminGroup())
 }
 
 func setProfileStatuses(resp webStruct.UserResponse) webStruct.UserResponse {

@@ -180,19 +180,7 @@ export class SidenavComponent {
             icon: 'playlist_add_check',
             name: 'Global Variables',
             subMenu: null,
-          }/*,
-          {
-            route: '',
-            icon: 'apps',
-            name: 'Apps',
-            subMenu: [
-              {
-                route: '/apps/autodialer',
-                icon: 'navigate_next',
-                name: 'Autodialer',
-              },
-            ],
-          }*/
+          }
         ];
       case 2:
         return [

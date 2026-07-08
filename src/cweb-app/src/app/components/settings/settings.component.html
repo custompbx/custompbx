@@ -94,6 +94,30 @@
                       <input matInput placeholder="route" required [(ngModel)]="settings().webserver.route" name="webserver_route">
                     </mat-form-field>
                     <mat-form-field class="settings-full-width" hideRequiredMarker>
+                      <mat-label>WebSocket write timeout seconds</mat-label>
+                      <input matInput placeholder="10" type="number" min="1"
+                        [(ngModel)]="settings().webserver.ws_write_timeout_seconds"
+                        name="webserver_ws_write_timeout_seconds">
+                    </mat-form-field>
+                    <mat-form-field class="settings-full-width" hideRequiredMarker>
+                      <mat-label>WebSocket read timeout seconds</mat-label>
+                      <input matInput placeholder="60" type="number" min="2"
+                        [(ngModel)]="settings().webserver.ws_read_timeout_seconds"
+                        name="webserver_ws_read_timeout_seconds">
+                    </mat-form-field>
+                    <mat-form-field class="settings-full-width" hideRequiredMarker>
+                      <mat-label>WebSocket ping interval seconds</mat-label>
+                      <input matInput placeholder="30" type="number" min="1"
+                        [(ngModel)]="settings().webserver.ws_ping_interval_seconds"
+                        name="webserver_ws_ping_interval_seconds">
+                    </mat-form-field>
+                    <mat-form-field class="settings-full-width" hideRequiredMarker>
+                      <mat-label>WebSocket queue size</mat-label>
+                      <input matInput placeholder="64" type="number" min="1" max="1024"
+                        [(ngModel)]="settings().webserver.websocket_queue_size"
+                        name="webserver_websocket_queue_size">
+                    </mat-form-field>
+                    <mat-form-field class="settings-full-width" hideRequiredMarker>
                       <mat-label>Webserver_cert_path</mat-label>
                       <input matInput placeholder="cert_path" [(ngModel)]="settings().webserver.cert_path"
                         name="webserver_cert_path">

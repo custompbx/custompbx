@@ -79,7 +79,6 @@ import {ConfigEffectsConference} from "./store/config/conference/config.effects.
 import {GlobalVariablesEffects} from "./store/global-variables/global-variables.effects";
 import {ConfigEffectsPostLoadModules} from "./store/config/post_load_modules/config.effects.PostLoadModules";
 import {ConfigEffectsVoicemail} from "./store/config/voicemail/config.effects.voicemail";
-import {AutodialerEffects} from "./store/apps/autodialer/autodialer.effects";
 import {ConversationsEffects} from "./store/conversations/conversations.effects";
 import {provideCharts, withDefaultRegisterables} from "ng2-charts";
 import {MatIconRegistry} from "@angular/material/icon";
@@ -171,7 +170,6 @@ export const appConfig: ApplicationConfig = {
         GlobalVariablesEffects,
         ConfigEffectsPostLoadModules,
         ConfigEffectsVoicemail,
-        AutodialerEffects,
         ConversationsEffects,
       ]),
     ),
