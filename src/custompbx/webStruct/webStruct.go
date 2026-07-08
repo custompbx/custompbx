@@ -279,7 +279,9 @@ func (c *WsContext) Close() error {
 func (c *WsContext) CloseWithReason(reason string) (closeErr error) {
 	c.closeOnce.Do(func() {
 		close(c.done)
-		closeErr = c.ws.Close()
+		if c.ws != nil {
+			closeErr = c.ws.Close()
+		}
 		if c.onClose != nil {
 			c.onClose(c)
 		}

@@ -75,10 +75,25 @@ func TestHTTPUserAuthentication(t *testing.T) {
 		}
 	})
 
+	t.Run("missing cookie", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		if _, status := UserFromCookie(req, "token"); status != http.StatusUnauthorized {
+			t.Fatalf("status=%d, want %d", status, http.StatusUnauthorized)
+		}
+	})
+
 	t.Run("lookup error", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Set("Authorization", "Bearer error")
 		if _, status := UserFromBearer(req); status != http.StatusUnauthorized {
+			t.Fatalf("status=%d, want %d", status, http.StatusUnauthorized)
+		}
+	})
+
+	t.Run("cookie lookup error", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.AddCookie(&http.Cookie{Name: "token", Value: "error"})
+		if _, status := UserFromCookie(req, "token"); status != http.StatusUnauthorized {
 			t.Fatalf("status=%d, want %d", status, http.StatusUnauthorized)
 		}
 	})

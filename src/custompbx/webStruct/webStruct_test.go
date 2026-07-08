@@ -70,6 +70,25 @@ func TestHubDisconnectsQueueOverflowAndClosesOnce(t *testing.T) {
 	}
 }
 
+func TestWsContextCloseWithNilWebSocketIsSafeAndIdempotent(t *testing.T) {
+	context := CreateWsContext(nil)
+	closed := 0
+	context.onClose = func(*WsContext) { closed++ }
+
+	if err := context.CloseWithReason("unit test"); err != nil {
+		t.Fatalf("close returned error: %v", err)
+	}
+	if err := context.CloseWithReason("second close"); err != nil {
+		t.Fatalf("second close returned error: %v", err)
+	}
+	if closed != 1 {
+		t.Fatalf("onClose called %d times, want 1", closed)
+	}
+	if context.Enqueue(&UserResponse{MessageType: "after-close"}) {
+		t.Fatal("enqueue succeeded after close")
+	}
+}
+
 func TestHubRegisterRemoveConcurrent(t *testing.T) {
 	hub := NewWsHub()
 	var wg sync.WaitGroup
