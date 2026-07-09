@@ -61,7 +61,7 @@ func getDirectoryById(data *webStruct.MessageData, item interface{}) webStruct.U
 
 func importDirectory(data *webStruct.MessageData) webStruct.UserResponse {
 	fsesl.GetXMLDirectory()
-	return webStruct.UserResponse{MessageType: data.Event}
+	return successResponse(data.Event)
 }
 
 func ImportXMLDomain(data *webStruct.MessageData) webStruct.UserResponse {
@@ -75,7 +75,7 @@ func ImportXMLDomain(data *webStruct.MessageData) webStruct.UserResponse {
 	}
 	//items := pbxcache.GetDomains()
 
-	return webStruct.UserResponse{MessageType: data.Event}
+	return successResponse(data.Event)
 }
 
 func addNewUser(data *webStruct.MessageData) webStruct.UserResponse {
@@ -184,5 +184,5 @@ func ImportXMLDomainUser(data *webStruct.MessageData) webStruct.UserResponse {
 		return webStruct.UserResponse{Error: err.Error(), MessageType: data.Event}
 	}
 
-	return webStruct.UserResponse{MessageType: data.Event}
+	return successResponse(data.Event)
 }

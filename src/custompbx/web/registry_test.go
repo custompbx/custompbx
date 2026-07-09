@@ -4,6 +4,12 @@ import (
 	"custompbx/cfg"
 	"custompbx/mainStruct"
 	"custompbx/webStruct"
+	"os"
+	"path/filepath"
+	"regexp"
+	"runtime"
+	"sort"
+	"strings"
 	"testing"
 )
 
@@ -77,6 +83,36 @@ func TestHandlerRegistryUnknownEventFallsBack(t *testing.T) {
 	}
 }
 
+func TestCoreRegistryEventInventoryHasNoDuplicates(t *testing.T) {
+	names := coreEvents.EventNames()
+	seen := map[string]bool{}
+	for _, name := range names {
+		if seen[name] {
+			t.Fatalf("duplicate registered event %q", name)
+		}
+		seen[name] = true
+	}
+	if len(names) == 0 {
+		t.Fatal("core registry is empty")
+	}
+}
+
+func TestMessageMainHandlerInventoryHasNoRegistryOverlap(t *testing.T) {
+	registered := stringSet(coreEvents.EventNames())
+	remainingSwitchEvents := messageMainHandlerEventInventory(t)
+	var overlap []string
+	for _, event := range remainingSwitchEvents {
+		if registered[event] {
+			overlap = append(overlap, event)
+		}
+	}
+	sort.Strings(overlap)
+	if len(overlap) != 0 {
+		t.Fatalf("events are both registered and still present in messageMainHandler fallback: %s", strings.Join(overlap, ", "))
+	}
+	t.Logf("event inventory: registered=%d remaining_switch=%d", len(registered), len(remainingSwitchEvents))
+}
+
 func TestCoreRegistryIncludesMigratedEvents(t *testing.T) {
 	events := []string{
 		eventGetSettings,
@@ -128,12 +164,111 @@ func TestCoreRegistryIncludesMigratedEvents(t *testing.T) {
 		eventGetWebDirUserTplList,
 		eventGetWebDirUserTplForm,
 		eventCreateWebDirUserByTpl,
+		eventDirDomainsGet,
+		eventDirImport,
+		eventDirDomainImportXML,
+		eventDirDomainAdd,
+		eventDirDomainRename,
+		eventDirDomainSwitch,
+		eventDirDomainDelete,
+		eventDirDomainDetails,
+		eventDirDomainAddParam,
+		eventDirDomainUpdateParam,
+		eventDirDomainSwitchParam,
+		eventDirDomainDeleteParam,
+		eventDirDomainAddVar,
+		eventDirDomainUpdateVar,
+		eventDirDomainSwitchVar,
+		eventDirDomainDeleteVar,
+		webStruct.GetDirectoryUser,
+		eventDirUserDetails,
+		eventDirUserAddParam,
+		eventDirUserAddVar,
+		eventDirUserDeleteParam,
+		eventDirUserDeleteVar,
+		eventDirUserUpdateParam,
+		eventDirUserUpdateVar,
+		eventDirUserUpdateCache,
+		eventDirUserUpdateCidr,
+		eventDirUserUpdateNumberAlias,
+		eventDirUserAdd,
+		eventDirUserImportXML,
+		eventDirUserDelete,
+		eventDirUserUpdateName,
+		eventDirUserSwitch,
+		eventDirUserSwitchParam,
+		eventDirUserSwitchVar,
+		eventDirGroupsGet,
+		eventDirGroupUsersGet,
+		eventDirGroupAdd,
+		eventDirGroupDelete,
+		eventDirGroupUpdateName,
+		eventDirGroupUserAdd,
+		eventDirGroupUserDelete,
+		eventDirUserGatewaysGet,
+		eventDirUserGatewayDetails,
+		eventDirUserGatewayAddParam,
+		eventDirUserGatewayDeleteParam,
+		eventDirUserGatewayUpdateParam,
+		eventDirUserGatewaySwitchParam,
+		eventDirUserGatewayAddVar,
+		eventDirUserGatewayUpdateVar,
+		eventDirUserGatewaySwitchVar,
+		eventDirUserGatewayDeleteVar,
+		eventDirUserGatewayAdd,
+		eventDirUserGatewayDelete,
+		eventDirUserGatewayUpdateName,
+		webStruct.GetModules,
+		eventConfigModuleReload,
+		eventConfigModuleUnload,
+		eventConfigModuleLoad,
+		eventConfigModuleSwitch,
+		eventConfigModuleFromScratch,
+		eventConfigModuleImport,
+		eventConfigModulesImportAll,
+		eventConfigModuleTruncate,
+		eventConfigModuleImportXML,
+		eventConfigModuleAutoload,
 		eventGetConvPrivateMessages,
 		eventGetConvPrivateCalls,
 		eventGetConvRoomMessages,
 		eventSendConvPrivateMessage,
 		eventSendConvPrivateCall,
 		eventSendConvRoomMessage,
+		eventSwitchDialplanNoProceed,
+		eventDialplanGetSettings,
+		eventDialplanGetContexts,
+		eventDialplanImport,
+		eventDialplanGetExtensions,
+		eventDialplanGetConditions,
+		eventDialplanGetExtDetails,
+		eventDialplanMoveExtension,
+		eventDialplanMoveCondition,
+		eventDialplanMoveAction,
+		eventDialplanMoveAntiaction,
+		eventDialplanAddRegex,
+		eventDialplanAddAction,
+		eventDialplanAddAntiaction,
+		eventDialplanDeleteRegex,
+		eventDialplanDeleteAction,
+		eventDialplanDeleteAntiaction,
+		eventDialplanUpdateRegex,
+		eventDialplanUpdateAction,
+		eventDialplanUpdateAntiaction,
+		eventDialplanSwitchRegex,
+		eventDialplanSwitchAction,
+		eventDialplanSwitchAntiaction,
+		eventDialplanAddContext,
+		eventDialplanAddExtension,
+		eventDialplanAddCondition,
+		eventDialplanRenameContext,
+		eventDialplanRenameExtension,
+		eventDialplanDeleteContext,
+		eventDialplanDeleteExtension,
+		eventDialplanSwitchExtContinue,
+		eventDialplanUpdateCondition,
+		eventDialplanSwitchCondition,
+		eventDialplanDeleteCondition,
 		eventRelogin,
 		eventLogOut,
 		eventSubscriptionList,
@@ -296,6 +431,206 @@ func TestCoreRegistryManagerDirectoryTemplateEventsRejectUsers(t *testing.T) {
 	}
 }
 
+func TestCoreRegistryIncludesDirectoryDomainConfigFamily(t *testing.T) {
+	events := []string{
+		eventDirDomainsGet,
+		eventDirImport,
+		eventDirDomainImportXML,
+		eventDirDomainAdd,
+		eventDirDomainRename,
+		eventDirDomainSwitch,
+		eventDirDomainDelete,
+		eventDirDomainDetails,
+		eventDirDomainAddParam,
+		eventDirDomainUpdateParam,
+		eventDirDomainSwitchParam,
+		eventDirDomainDeleteParam,
+		eventDirDomainAddVar,
+		eventDirDomainUpdateVar,
+		eventDirDomainSwitchVar,
+		eventDirDomainDeleteVar,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesDirectoryUserFamily(t *testing.T) {
+	events := []string{
+		webStruct.GetDirectoryUser,
+		eventDirUserDetails,
+		eventDirUserAddParam,
+		eventDirUserAddVar,
+		eventDirUserDeleteParam,
+		eventDirUserDeleteVar,
+		eventDirUserUpdateParam,
+		eventDirUserUpdateVar,
+		eventDirUserUpdateCache,
+		eventDirUserUpdateCidr,
+		eventDirUserUpdateNumberAlias,
+		eventDirUserAdd,
+		eventDirUserImportXML,
+		eventDirUserDelete,
+		eventDirUserUpdateName,
+		eventDirUserSwitch,
+		eventDirUserSwitchParam,
+		eventDirUserSwitchVar,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesDirectoryGroupFamily(t *testing.T) {
+	events := []string{
+		eventDirGroupsGet,
+		eventDirGroupUsersGet,
+		eventDirGroupAdd,
+		eventDirGroupDelete,
+		eventDirGroupUpdateName,
+		eventDirGroupUserAdd,
+		eventDirGroupUserDelete,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesDirectoryUserGatewayFamily(t *testing.T) {
+	events := []string{
+		eventDirUserGatewaysGet,
+		eventDirUserGatewayDetails,
+		eventDirUserGatewayAddParam,
+		eventDirUserGatewayDeleteParam,
+		eventDirUserGatewayUpdateParam,
+		eventDirUserGatewaySwitchParam,
+		eventDirUserGatewayAddVar,
+		eventDirUserGatewayUpdateVar,
+		eventDirUserGatewaySwitchVar,
+		eventDirUserGatewayDeleteVar,
+		eventDirUserGatewayAdd,
+		eventDirUserGatewayDelete,
+		eventDirUserGatewayUpdateName,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesModuleFamily(t *testing.T) {
+	events := []string{
+		webStruct.GetModules,
+		eventConfigModuleReload,
+		eventConfigModuleUnload,
+		eventConfigModuleLoad,
+		eventConfigModuleSwitch,
+		eventConfigModuleFromScratch,
+		eventConfigModuleImport,
+		eventConfigModulesImportAll,
+		eventConfigModuleTruncate,
+		eventConfigModuleImportXML,
+		eventConfigModuleAutoload,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesACLFamily(t *testing.T) {
+	events := []string{
+		eventACLListsGet,
+		eventACLListAdd,
+		eventACLListUpdateDefault,
+		eventACLListUpdate,
+		eventACLListDelete,
+		eventACLListConfigUpdateDefault,
+		eventACLNodesGet,
+		eventACLNodeAdd,
+		eventACLNodeDelete,
+		eventACLNodeUpdate,
+		eventACLNodeSwitch,
+		eventACLNodeMove,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesSofiaGlobalFamily(t *testing.T) {
+	events := []string{
+		eventSofiaGlobalSettingsGet,
+		eventSofiaGlobalSettingUpdate,
+		eventSofiaGlobalSettingSwitch,
+		eventSofiaGlobalSettingAdd,
+		eventSofiaGlobalSettingDelete,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesSofiaProfileFamily(t *testing.T) {
+	events := []string{
+		webStruct.GetSofiaProfiles,
+		eventSofiaProfileParamsGet,
+		eventSofiaProfileParamAdd,
+		eventSofiaProfileParamDelete,
+		eventSofiaProfileParamSwitch,
+		eventSofiaProfileParamUpdate,
+		eventSofiaProfileDomainsGet,
+		eventSofiaProfileDomainAdd,
+		eventSofiaProfileDomainDelete,
+		eventSofiaProfileDomainSwitch,
+		eventSofiaProfileDomainUpdate,
+		eventSofiaProfileAliasesGet,
+		eventSofiaProfileAliasAdd,
+		eventSofiaProfileAliasDelete,
+		eventSofiaProfileAliasSwitch,
+		eventSofiaProfileAliasUpdate,
+		eventSofiaProfileAdd,
+		eventSofiaProfileRename,
+		eventSofiaProfileDelete,
+		eventSofiaProfileCommand,
+		eventSofiaProfileSwitch,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesSofiaGatewayFamily(t *testing.T) {
+	events := []string{
+		eventSofiaProfileGatewaysGet,
+		eventSofiaGatewayVarsGet,
+		eventSofiaGatewayParamsGet,
+		eventSofiaGatewayParamAdd,
+		eventSofiaGatewayParamUpdate,
+		eventSofiaGatewayParamSwitch,
+		eventSofiaGatewayParamDelete,
+		eventSofiaGatewayVarAdd,
+		eventSofiaGatewayVarUpdate,
+		eventSofiaGatewayVarSwitch,
+		eventSofiaGatewayVarDelete,
+		eventSofiaGatewayAdd,
+		eventSofiaGatewayDelete,
+		eventSofiaGatewayRename,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesCDRConfigFamily(t *testing.T) {
+	events := []string{
+		eventCdrPgCsvGet,
+		eventCdrPgCsvParamAdd,
+		eventCdrPgCsvParamUpdate,
+		eventCdrPgCsvParamSwitch,
+		eventCdrPgCsvParamDelete,
+		eventCdrPgCsvFieldAdd,
+		eventCdrPgCsvFieldUpdate,
+		eventCdrPgCsvFieldSwitch,
+		eventCdrPgCsvFieldDelete,
+		eventOdbcCdrGet,
+		eventOdbcCdrFieldGet,
+		eventOdbcCdrParamAdd,
+		eventOdbcCdrParamUpdate,
+		eventOdbcCdrParamSwitch,
+		eventOdbcCdrParamDelete,
+		eventOdbcCdrTableAdd,
+		eventOdbcCdrTableUpdate,
+		eventOdbcCdrTableSwitch,
+		eventOdbcCdrTableDelete,
+		eventOdbcCdrFieldAdd,
+		eventOdbcCdrFieldUpdate,
+		eventOdbcCdrFieldSwitch,
+		eventOdbcCdrFieldDelete,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
 func TestCoreRegistryIncludesConversationFamily(t *testing.T) {
 	events := []string{
 		eventGetConvPrivateMessages,
@@ -306,6 +641,49 @@ func TestCoreRegistryIncludesConversationFamily(t *testing.T) {
 		eventSendConvRoomMessage,
 	}
 	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesDialplanFamily(t *testing.T) {
+	assertAdminOnlyEventsDispatch(t, dialplanRegistryEvents())
+}
+
+func dialplanRegistryEvents() []string {
+	return []string{
+		eventSwitchDialplanNoProceed,
+		eventDialplanGetSettings,
+		eventDialplanGetContexts,
+		eventDialplanImport,
+		eventDialplanGetExtensions,
+		eventDialplanGetConditions,
+		eventDialplanGetExtDetails,
+		eventDialplanMoveExtension,
+		eventDialplanMoveCondition,
+		eventDialplanMoveAction,
+		eventDialplanMoveAntiaction,
+		eventDialplanAddRegex,
+		eventDialplanAddAction,
+		eventDialplanAddAntiaction,
+		eventDialplanDeleteRegex,
+		eventDialplanDeleteAction,
+		eventDialplanDeleteAntiaction,
+		eventDialplanUpdateRegex,
+		eventDialplanUpdateAction,
+		eventDialplanUpdateAntiaction,
+		eventDialplanSwitchRegex,
+		eventDialplanSwitchAction,
+		eventDialplanSwitchAntiaction,
+		eventDialplanAddContext,
+		eventDialplanAddExtension,
+		eventDialplanAddCondition,
+		eventDialplanRenameContext,
+		eventDialplanRenameExtension,
+		eventDialplanDeleteContext,
+		eventDialplanDeleteExtension,
+		eventDialplanSwitchExtContinue,
+		eventDialplanUpdateCondition,
+		eventDialplanSwitchCondition,
+		eventDialplanDeleteCondition,
+	}
 }
 
 func assertAdminOnlyEventsDispatch(t *testing.T, events []string) {
@@ -454,6 +832,58 @@ func TestSubscriptionRegistryHandlers(t *testing.T) {
 			t.Fatal("unauthorized subscription was added")
 		}
 	})
+}
+
+func messageMainHandlerEventInventory(t *testing.T) []string {
+	t.Helper()
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("cannot resolve test source path")
+	}
+	wsPath := filepath.Join(filepath.Dir(file), "ws.go")
+	body, err := os.ReadFile(wsPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	source := string(body)
+	start := strings.Index(source, "func messageMainHandler")
+	if start < 0 {
+		t.Fatal("messageMainHandler not found")
+	}
+	end := strings.Index(source[start:], "func checkRelogin")
+	if end < 0 {
+		t.Fatal("messageMainHandler end marker not found")
+	}
+	block := source[start : start+end]
+	caseRE := regexp.MustCompile(`(?m)^\s*case\s+([^:]+):`)
+	quotedRE := regexp.MustCompile(`"([^"]+)"`)
+	webStructEvents := map[string]string{
+		"webStruct.GetDirectoryUser": webStruct.GetDirectoryUser,
+	}
+	events := map[string]bool{}
+	for _, match := range caseRE.FindAllStringSubmatch(block, -1) {
+		caseExpr := strings.TrimSpace(match[1])
+		for _, quoted := range quotedRE.FindAllStringSubmatch(caseExpr, -1) {
+			events[quoted[1]] = true
+		}
+		if resolved, ok := webStructEvents[caseExpr]; ok {
+			events[resolved] = true
+		}
+	}
+	names := make([]string, 0, len(events))
+	for event := range events {
+		names = append(names, event)
+	}
+	sort.Strings(names)
+	return names
+}
+
+func stringSet(items []string) map[string]bool {
+	set := make(map[string]bool, len(items))
+	for _, item := range items {
+		set[item] = true
+	}
+	return set
 }
 
 func TestHEPDetailsRegistryPreservesEmptyPayloadBehavior(t *testing.T) {

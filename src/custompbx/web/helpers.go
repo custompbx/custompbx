@@ -1,6 +1,7 @@
 package web
 
 import (
+	"custompbx/daemonCache"
 	"custompbx/mainStruct"
 	"custompbx/webStruct"
 
@@ -21,6 +22,14 @@ type paginatedResult struct {
 
 func errorResponse(event, message string) webStruct.UserResponse {
 	return webStruct.UserResponse{Error: message, MessageType: event}
+}
+
+func successResponse(event string) webStruct.UserResponse {
+	return webStruct.UserResponse{MessageType: event}
+}
+
+func noAccessResponse() webStruct.UserResponse {
+	return webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "no_access"}
 }
 
 func dataResponse(event string, data interface{}) webStruct.UserResponse {

@@ -3,6 +3,8 @@ package web
 import (
 	"custompbx/cfg"
 	"custompbx/mainStruct"
+	"custompbx/webStruct"
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"net/http/httptest"
@@ -63,6 +65,78 @@ func TestPostAPIRequestRejectsMalformedMessage(t *testing.T) {
 
 	if rr.Code != http.StatusBadRequest {
 		t.Fatalf("status = %d, want %d", rr.Code, http.StatusBadRequest)
+	}
+}
+
+func TestPostAPIRequestDispatchesRegisteredEvent(t *testing.T) {
+	oldLookup := messageUserLookup
+	oldRegistry := coreEvents
+	defer func() {
+		messageUserLookup = oldLookup
+		coreEvents = oldRegistry
+	}()
+
+	messageUserLookup = func(data *webStruct.MessageData) (*mainStruct.WebUser, webStruct.UserResponse) {
+		return &mainStruct.WebUser{Id: 1, Login: "admin", GroupId: mainStruct.GetAdminId()}, webStruct.UserResponse{}
+	}
+	coreEvents = buildCoreEvents(map[string]eventHandler{
+		eventGetSettings: func(data *webStruct.MessageData) webStruct.UserResponse {
+			if data.Context == nil || data.Context.User == nil {
+				t.Fatal("registry handler did not receive request context user")
+			}
+			return webStruct.UserResponse{MessageType: data.Event, Data: "ok"}
+		},
+	})
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1", strings.NewReader(`{"event":"get_settings","data":{"token":"test-token"}}`))
+	rr := httptest.NewRecorder()
+
+	PostAPIRequest(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d body=%q", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	var resp webStruct.UserResponse
+	if err := json.Unmarshal(rr.Body.Bytes(), &resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.MessageType != eventGetSettings {
+		t.Fatalf("message type = %q, want %q", resp.MessageType, eventGetSettings)
+	}
+}
+
+func TestPostAPIRequestRegistryAccessCheckRejectsUser(t *testing.T) {
+	oldLookup := messageUserLookup
+	oldRegistry := coreEvents
+	defer func() {
+		messageUserLookup = oldLookup
+		coreEvents = oldRegistry
+	}()
+
+	messageUserLookup = func(data *webStruct.MessageData) (*mainStruct.WebUser, webStruct.UserResponse) {
+		return &mainStruct.WebUser{Id: 2, Login: "user", GroupId: mainStruct.GetUserId()}, webStruct.UserResponse{}
+	}
+	coreEvents = buildCoreEvents(map[string]eventHandler{
+		eventGetSettings: func(data *webStruct.MessageData) webStruct.UserResponse {
+			t.Fatal("handler should not run for unauthorized group")
+			return webStruct.UserResponse{}
+		},
+	})
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1", strings.NewReader(`{"event":"get_settings","data":{"token":"test-token"}}`))
+	rr := httptest.NewRecorder()
+
+	PostAPIRequest(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d body=%q", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	var resp webStruct.UserResponse
+	if err := json.Unmarshal(rr.Body.Bytes(), &resp); err != nil {
+		t.Fatal(err)
+	}
+	if resp.MessageType != "no_access" {
+		t.Fatalf("message type = %q, want no_access", resp.MessageType)
 	}
 }
 

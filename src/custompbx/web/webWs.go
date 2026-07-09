@@ -113,7 +113,7 @@ func loginOut(data *webStruct.MessageData) webStruct.UserResponse {
 	}
 
 	data.Context.SetUser(nil)
-	return webStruct.UserResponse{MessageType: data.Event}
+	return successResponse(data.Event)
 }
 
 func findUser(data *webStruct.MessageData) (*mainStruct.WebUser, webStruct.UserResponse) {
@@ -140,14 +140,16 @@ func findUser(data *webStruct.MessageData) (*mainStruct.WebUser, webStruct.UserR
 func checkAccessGroup(data *webStruct.MessageData, groupList []int) *webStruct.UserResponse {
 	if data.Context.User == nil {
 		log.Println("EVENT: ", data.Event, "no user!")
-		return &webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "no_access"}
+		resp := noAccessResponse()
+		return &resp
 	}
 	user := data.Context.User
 	group := mainStruct.GetWebUserGroup(user.GroupId)
 	if !group.ValidateGroupAccess(groupList) {
 		log.Println("GROUP: ", user.GroupId, group, user.GroupId)
 		log.Println("EVENT: ", data.Event, "USER: ", user.Login, " ACCESS DENIED!")
-		return &webStruct.UserResponse{Daemon: daemonCache.State, MessageType: "no_access"}
+		resp := noAccessResponse()
+		return &resp
 	}
 
 	return nil

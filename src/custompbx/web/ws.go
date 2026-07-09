@@ -31,69 +31,241 @@ import (
 )
 
 const (
-	eventLogin                     = "login"
-	eventSubscriptionList          = "SubscriptionList"
-	eventPersistentSubscription    = "PersistentSubscription"
-	eventRelogin                   = "relogin"
-	eventLogOut                    = "[Auth] Logout"
-	eventSwitchDialplanDebug       = "[Dialplan][Switch] Debug"
-	eventGetSettings               = "get_settings"
-	eventSetSettings               = "set_settings"
-	eventGetInstances              = "GetInstances"
-	eventUpdateInstanceDescription = "UpdateInstanceDescription"
-	eventGetWebSettings            = "GetWebSettings"
-	eventSaveWebSettings           = "SaveWebSettings"
-	eventGetCDR                    = "[CDR] Get"
-	eventGetHEP                    = "GetHEP"
-	eventGetHEPDetails             = "GetHEPDetails"
-	eventGetLogs                   = "GetLogs"
-	eventGetPhoneCreds             = "[Phone][Get] Creds"
-	eventSendFSCLICommand          = "SendFSCLICommand"
-	eventRealFSCLIConnect          = "RealFSCLIConnect"
-	eventRealFSCLICommand          = "RealFSCLICommand"
-	eventUpdateWebUserGroup        = "UpdateWebUserGroup"
-	eventGetWebDirUserTemplates    = "GetWebDirectoryUsersTemplates"
-	eventAddWebDirUserTemplate     = "AddWebDirectoryUsersTemplate"
-	eventDelWebDirUserTemplate     = "DelWebDirectoryUsersTemplate"
-	eventUpdateWebDirUserTemplate  = "UpdateWebDirectoryUsersTemplate"
-	eventSwitchWebDirUserTemplate  = "SwitchWebDirectoryUsersTemplate"
-	eventGetWebDirUserTplParams    = "GetWebDirectoryUsersTemplateParameters"
-	eventAddWebDirUserTplParam     = "AddWebDirectoryUsersTemplateParameter"
-	eventDelWebDirUserTplParam     = "DelWebDirectoryUsersTemplateParameter"
-	eventSwitchWebDirUserTplParam  = "SwitchWebDirectoryUsersTemplateParameter"
-	eventUpdateWebDirUserTplParam  = "UpdateWebDirectoryUsersTemplateParameter"
-	eventGetWebDirUserTplVars      = "GetWebDirectoryUsersTemplateVariables"
-	eventAddWebDirUserTplVar       = "AddWebDirectoryUsersTemplateVariable"
-	eventDelWebDirUserTplVar       = "DelWebDirectoryUsersTemplateVariable"
-	eventSwitchWebDirUserTplVar    = "SwitchWebDirectoryUsersTemplateVariable"
-	eventUpdateWebDirUserTplVar    = "UpdateWebDirectoryUsersTemplateVariable"
-	eventGetWebDirUserTplList      = "GetWebDirectoryUsersTemplatesList"
-	eventGetWebDirUserTplForm      = "GetWebDirectoryUsersTemplateForm"
-	eventCreateWebDirUserByTpl     = "CreateWebDirectoryUsersByTemplate"
-	eventSettingsUsersGet          = "[Settings][Users] Get"
-	eventGetWebUsersByDirectory    = "GetWebUsersByDirectory"
-	eventSettingsUsersAdd          = "[Settings][Users] Add"
-	eventSettingsUsersRename       = "[Settings][Users] Rename"
-	eventSettingsUsersDelete       = "[Settings][Users] Delete"
-	eventSettingsUsersSwitch       = "[Settings][Users][Switch] Web user"
-	eventSettingsUsersUpdatePass   = "[Settings][Users][Update] Password"
-	eventSettingsUsersUpdateLang   = "[Settings][Users][Update] Lang"
-	eventSettingsUsersUpdateSip    = "[Settings][Users][Update] Sip user"
-	eventSettingsUsersUpdateWS     = "[Settings][Users][Update] Ws"
-	eventSettingsUsersUpdateVerto  = "[Settings][Users][Update] Verto Ws"
-	eventSettingsUsersUpdateRTC    = "[Settings][Users][Update] WebRTC Lib"
-	eventSettingsUsersUpdateStun   = "[Settings][Users][Update] Stun"
-	eventSettingsUsersUpdateAvatar = "[Settings][Users][Update] Avatar"
-	eventSettingsUsersClearAvatar  = "[Settings][Users][Clear] Avatar"
-	eventGetConvPrivateMessages    = "GetConversationPrivateMessages"
-	eventGetConvPrivateCalls       = "GetConversationPrivateCalls"
-	eventGetConvRoomMessages       = "GetConversationRoomMessages"
-	eventSendConvPrivateMessage    = "SendConversationPrivateMessage"
-	eventSendConvPrivateCall       = "SendConversationPrivateCall"
-	eventSendConvRoomMessage       = "SendConversationRoomMessage"
+	eventLogin                      = "login"
+	eventSubscriptionList           = "SubscriptionList"
+	eventPersistentSubscription     = "PersistentSubscription"
+	eventRelogin                    = "relogin"
+	eventLogOut                     = "[Auth] Logout"
+	eventSwitchDialplanDebug        = "[Dialplan][Switch] Debug"
+	eventGetSettings                = "get_settings"
+	eventSetSettings                = "set_settings"
+	eventGetInstances               = "GetInstances"
+	eventUpdateInstanceDescription  = "UpdateInstanceDescription"
+	eventGetWebSettings             = "GetWebSettings"
+	eventSaveWebSettings            = "SaveWebSettings"
+	eventGetCDR                     = "[CDR] Get"
+	eventGetHEP                     = "GetHEP"
+	eventGetHEPDetails              = "GetHEPDetails"
+	eventGetLogs                    = "GetLogs"
+	eventGetPhoneCreds              = "[Phone][Get] Creds"
+	eventSendFSCLICommand           = "SendFSCLICommand"
+	eventRealFSCLIConnect           = "RealFSCLIConnect"
+	eventRealFSCLICommand           = "RealFSCLICommand"
+	eventUpdateWebUserGroup         = "UpdateWebUserGroup"
+	eventGetWebDirUserTemplates     = "GetWebDirectoryUsersTemplates"
+	eventAddWebDirUserTemplate      = "AddWebDirectoryUsersTemplate"
+	eventDelWebDirUserTemplate      = "DelWebDirectoryUsersTemplate"
+	eventUpdateWebDirUserTemplate   = "UpdateWebDirectoryUsersTemplate"
+	eventSwitchWebDirUserTemplate   = "SwitchWebDirectoryUsersTemplate"
+	eventGetWebDirUserTplParams     = "GetWebDirectoryUsersTemplateParameters"
+	eventAddWebDirUserTplParam      = "AddWebDirectoryUsersTemplateParameter"
+	eventDelWebDirUserTplParam      = "DelWebDirectoryUsersTemplateParameter"
+	eventSwitchWebDirUserTplParam   = "SwitchWebDirectoryUsersTemplateParameter"
+	eventUpdateWebDirUserTplParam   = "UpdateWebDirectoryUsersTemplateParameter"
+	eventGetWebDirUserTplVars       = "GetWebDirectoryUsersTemplateVariables"
+	eventAddWebDirUserTplVar        = "AddWebDirectoryUsersTemplateVariable"
+	eventDelWebDirUserTplVar        = "DelWebDirectoryUsersTemplateVariable"
+	eventSwitchWebDirUserTplVar     = "SwitchWebDirectoryUsersTemplateVariable"
+	eventUpdateWebDirUserTplVar     = "UpdateWebDirectoryUsersTemplateVariable"
+	eventGetWebDirUserTplList       = "GetWebDirectoryUsersTemplatesList"
+	eventGetWebDirUserTplForm       = "GetWebDirectoryUsersTemplateForm"
+	eventCreateWebDirUserByTpl      = "CreateWebDirectoryUsersByTemplate"
+	eventSettingsUsersGet           = "[Settings][Users] Get"
+	eventGetWebUsersByDirectory     = "GetWebUsersByDirectory"
+	eventSettingsUsersAdd           = "[Settings][Users] Add"
+	eventSettingsUsersRename        = "[Settings][Users] Rename"
+	eventSettingsUsersDelete        = "[Settings][Users] Delete"
+	eventSettingsUsersSwitch        = "[Settings][Users][Switch] Web user"
+	eventSettingsUsersUpdatePass    = "[Settings][Users][Update] Password"
+	eventSettingsUsersUpdateLang    = "[Settings][Users][Update] Lang"
+	eventSettingsUsersUpdateSip     = "[Settings][Users][Update] Sip user"
+	eventSettingsUsersUpdateWS      = "[Settings][Users][Update] Ws"
+	eventSettingsUsersUpdateVerto   = "[Settings][Users][Update] Verto Ws"
+	eventSettingsUsersUpdateRTC     = "[Settings][Users][Update] WebRTC Lib"
+	eventSettingsUsersUpdateStun    = "[Settings][Users][Update] Stun"
+	eventSettingsUsersUpdateAvatar  = "[Settings][Users][Update] Avatar"
+	eventSettingsUsersClearAvatar   = "[Settings][Users][Clear] Avatar"
+	eventGetConvPrivateMessages     = "GetConversationPrivateMessages"
+	eventGetConvPrivateCalls        = "GetConversationPrivateCalls"
+	eventGetConvRoomMessages        = "GetConversationRoomMessages"
+	eventSendConvPrivateMessage     = "SendConversationPrivateMessage"
+	eventSendConvPrivateCall        = "SendConversationPrivateCall"
+	eventSendConvRoomMessage        = "SendConversationRoomMessage"
+	eventSwitchDialplanNoProceed    = "DialplanChangeNotProceed"
+	eventDialplanGetSettings        = "DialplanGetSettings"
+	eventDialplanGetContexts        = "[Dialplan][Get] Contexts"
+	eventDialplanImport             = "[Dialplan][Import]"
+	eventDialplanGetExtensions      = "[Dialplan][Get] Extensions"
+	eventDialplanGetConditions      = "[Dialplan][Get] Conditions"
+	eventDialplanGetExtDetails      = "[Dialplan][Get] Extension details"
+	eventDialplanMoveExtension      = "[Dialplan][Move] Extension"
+	eventDialplanMoveCondition      = "[Dialplan][Move] Condition"
+	eventDialplanMoveAction         = "[Dialplan][Move] Action"
+	eventDialplanMoveAntiaction     = "[Dialplan][Move] Antiaction"
+	eventDialplanAddRegex           = "[Dialplan][Add] Regex"
+	eventDialplanAddAction          = "[Dialplan][Add] Action"
+	eventDialplanAddAntiaction      = "[Dialplan][Add] Antiaction"
+	eventDialplanDeleteRegex        = "[Dialplan][Delete] Regex"
+	eventDialplanDeleteAction       = "[Dialplan][Delete] Action"
+	eventDialplanDeleteAntiaction   = "[Dialplan][Delete] Antiaction"
+	eventDialplanUpdateRegex        = "[Dialplan][Update] Regex"
+	eventDialplanUpdateAction       = "[Dialplan][Update] Action"
+	eventDialplanUpdateAntiaction   = "[Dialplan][Update] Antiaction"
+	eventDialplanSwitchRegex        = "[Dialplan][Switch] Regex"
+	eventDialplanSwitchAction       = "[Dialplan][Switch] Action"
+	eventDialplanSwitchAntiaction   = "[Dialplan][Switch] Antiaction"
+	eventDialplanAddContext         = "[Dialplan][Add] Context"
+	eventDialplanAddExtension       = "[Dialplan][Add] Extension"
+	eventDialplanAddCondition       = "[Dialplan][Add] Condition"
+	eventDialplanRenameContext      = "[Dialplan][Rename] Context"
+	eventDialplanRenameExtension    = "[Dialplan][Rename] Extension"
+	eventDialplanDeleteContext      = "[Dialplan][Delete] Context"
+	eventDialplanDeleteExtension    = "[Dialplan][Delete] Extension"
+	eventDialplanSwitchExtContinue  = "[Dialplan][Switch] Extension Continue"
+	eventDialplanUpdateCondition    = "[Dialplan][Update] Condition"
+	eventDialplanSwitchCondition    = "[Dialplan][Switch] Condition"
+	eventDialplanDeleteCondition    = "[Dialplan][Delete] Condition"
+	eventDirDomainsGet              = "GetDirectoryDomains"
+	eventDirImport                  = "ImportDirectory"
+	eventDirDomainImportXML         = "ImportXMLDomain"
+	eventDirDomainAdd               = "AddDirectoryDomain"
+	eventDirDomainRename            = "RenameDirectoryDomain"
+	eventDirDomainSwitch            = "SwitchDirectoryDomain"
+	eventDirDomainDelete            = "DeleteDirectoryDomain"
+	eventDirDomainDetails           = "GetDirectoryDomainDetails"
+	eventDirDomainAddParam          = "AddDirectoryDomainParameter"
+	eventDirDomainUpdateParam       = "UpdateDirectoryDomainParameter"
+	eventDirDomainSwitchParam       = "SwitchDirectoryDomainParameter"
+	eventDirDomainDeleteParam       = "DeleteDirectoryDomainParameter"
+	eventDirDomainAddVar            = "AddDirectoryDomainVariable"
+	eventDirDomainUpdateVar         = "UpdateDirectoryDomainVariable"
+	eventDirDomainSwitchVar         = "SwitchDirectoryDomainVariable"
+	eventDirDomainDeleteVar         = "DeleteDirectoryDomainVariable"
+	eventDirUserDetails             = "GetDirectoryUserDetails"
+	eventDirUserAddParam            = "AddDirectoryUserParameter"
+	eventDirUserAddVar              = "AddDirectoryUserVariable"
+	eventDirUserDeleteParam         = "DeleteDirectoryUserParameter"
+	eventDirUserDeleteVar           = "DeleteDirectoryUserVariable"
+	eventDirUserUpdateParam         = "UpdateDirectoryUserParameter"
+	eventDirUserUpdateVar           = "UpdateDirectoryUserVariable"
+	eventDirUserUpdateCache         = "UpdateDirectoryUserCache"
+	eventDirUserUpdateCidr          = "UpdateDirectoryUserCidr"
+	eventDirUserUpdateNumberAlias   = "UpdateDirectoryUserNumberAlias"
+	eventDirUserAdd                 = "AddDirectoryUser"
+	eventDirUserImportXML           = "ImportXMLDomainUser"
+	eventDirUserDelete              = "DeleteDirectoryUser"
+	eventDirUserUpdateName          = "UpdateDirectoryUserName"
+	eventDirUserSwitch              = "SwitchDirectoryUser"
+	eventDirUserSwitchParam         = "SwitchDirectoryUserParameter"
+	eventDirUserSwitchVar           = "SwitchDirectoryUserVariable"
+	eventDirGroupsGet               = "GetDirectoryGroups"
+	eventDirGroupUsersGet           = "GetDirectoryGroupUsers"
+	eventDirGroupAdd                = "AddNewDirectoryGroup"
+	eventDirGroupDelete             = "DeleteDirectoryGroup"
+	eventDirGroupUpdateName         = "UpdateDirectoryGroupName"
+	eventDirGroupUserAdd            = "AddDirectoryGroupUser"
+	eventDirGroupUserDelete         = "DeleteDirectoryGroupUser"
+	eventDirUserGatewaysGet         = "GetDirectoryUserGateways"
+	eventDirUserGatewayDetails      = "GetDirectoryUserGatewayDetails"
+	eventDirUserGatewayAddParam     = "AddDirectoryUserGatewayParameter"
+	eventDirUserGatewayDeleteParam  = "DeleteDirectoryUserGatewayParameter"
+	eventDirUserGatewayUpdateParam  = "UpdateDirectoryUserGatewayParameter"
+	eventDirUserGatewaySwitchParam  = "SwitchDirectoryUserGatewayParameter"
+	eventDirUserGatewayAddVar       = "AddDirectoryUserGatewayVariable"
+	eventDirUserGatewayUpdateVar    = "UpdateDirectoryUserGatewayVariable"
+	eventDirUserGatewaySwitchVar    = "SwitchDirectoryUserGatewayVariable"
+	eventDirUserGatewayDeleteVar    = "DeleteDirectoryUserGatewayVariable"
+	eventDirUserGatewayAdd          = "AddDirectoryUserGateway"
+	eventDirUserGatewayDelete       = "DeleteDirectoryUserGateway"
+	eventDirUserGatewayUpdateName   = "UpdateDirectoryUserGatewayName"
+	eventConfigModuleReload         = "[Config][Reload] Module"
+	eventConfigModuleUnload         = "[Config][Unload] Module"
+	eventConfigModuleLoad           = "[Config][Load] Module"
+	eventConfigModuleSwitch         = "[Config][Switch] Module"
+	eventConfigModuleFromScratch    = "[Config][From scratch] Module"
+	eventConfigModuleImport         = "[Config][Import] Module"
+	eventConfigModulesImportAll     = "[Config][Import] All Modules"
+	eventConfigModuleTruncate       = "TruncateModuleConfig"
+	eventConfigModuleImportXML      = "ImportXMLModuleConfig"
+	eventConfigModuleAutoload       = "[Config][Autoload] Module"
+	eventACLListsGet                = "GetAclLists"
+	eventACLListAdd                 = "AddAclList"
+	eventACLListUpdateDefault       = "UpdateAclListDefault"
+	eventACLListUpdate              = "UpdateAclList"
+	eventACLListDelete              = "DelAclList"
+	eventACLListConfigUpdateDefault = "[Config] Update_acl_list_default"
+	eventACLNodesGet                = "GetAclNodes"
+	eventACLNodeAdd                 = "AddAclNode"
+	eventACLNodeDelete              = "DelAclNode"
+	eventACLNodeUpdate              = "UpdateAclNode"
+	eventACLNodeSwitch              = "SwitchAclNode"
+	eventACLNodeMove                = "MoveAclListNode"
+	eventSofiaGlobalSettingsGet     = "[Config] Get_sofia_global_settings"
+	eventSofiaGlobalSettingUpdate   = "[Config] Update_sofia_global_setting"
+	eventSofiaGlobalSettingSwitch   = "[Config] Switch_sofia_global_setting"
+	eventSofiaGlobalSettingAdd      = "[Config] Add_sofia_global_setting"
+	eventSofiaGlobalSettingDelete   = "[Config] Del_sofia_global_setting"
+	eventSofiaProfileParamsGet      = "[Config] Get_sofia_profiles_params"
+	eventSofiaProfileParamAdd       = "[Config] Add_sofia_profile_param"
+	eventSofiaProfileParamDelete    = "[Config] Del_sofia_profile_param"
+	eventSofiaProfileParamSwitch    = "[Config] Switch_sofia_profile_param"
+	eventSofiaProfileParamUpdate    = "[Config] Update_sofia_profile_param"
+	eventSofiaProfileGatewaysGet    = "[Config] Get_sofia_profile_gateways"
+	eventSofiaGatewayVarsGet        = "GetSofiaProfileGatewayVariables"
+	eventSofiaGatewayParamsGet      = "GetSofiaProfileGatewayParameters"
+	eventSofiaGatewayParamAdd       = "[Config] Add_sofia_profile_gateway_param"
+	eventSofiaGatewayParamUpdate    = "[Config] Update_sofia_profile_gateway_param"
+	eventSofiaGatewayParamSwitch    = "[Config] Switch_sofia_profile_gateway_param"
+	eventSofiaGatewayParamDelete    = "[Config] Del_sofia_profile_gateway_param"
+	eventSofiaGatewayVarAdd         = "[Config] Add_sofia_profile_gateway_var"
+	eventSofiaGatewayVarUpdate      = "[Config] Update_sofia_profile_gateway_var"
+	eventSofiaGatewayVarSwitch      = "[Config] Switch_sofia_profile_gateway_var"
+	eventSofiaGatewayVarDelete      = "[Config] Del_sofia_profile_gateway_var"
+	eventSofiaGatewayAdd            = "[Config] Add_sofia_profile_gateway"
+	eventSofiaGatewayDelete         = "[Config] Del_sofia_profile_gateway"
+	eventSofiaGatewayRename         = "[Config] Rename_sofia_profile_gateway"
+	eventSofiaProfileDomainsGet     = "[Config] Get_sofia_profile_domains"
+	eventSofiaProfileDomainAdd      = "[Config] Add_sofia_profile_domain"
+	eventSofiaProfileDomainDelete   = "[Config] Del_sofia_profile_domain"
+	eventSofiaProfileDomainSwitch   = "[Config] Switch_sofia_profile_domain"
+	eventSofiaProfileDomainUpdate   = "[Config] Update_sofia_profile_domain"
+	eventSofiaProfileAliasesGet     = "[Config] Get_sofia_profile_aliases"
+	eventSofiaProfileAliasAdd       = "[Config] Add_sofia_profile_alias"
+	eventSofiaProfileAliasDelete    = "[Config] Del_sofia_profile_alias"
+	eventSofiaProfileAliasSwitch    = "[Config] Switch_sofia_profile_alias"
+	eventSofiaProfileAliasUpdate    = "[Config] Update_sofia_profile_alias"
+	eventSofiaProfileAdd            = "[Config] Add_sofia_profile"
+	eventSofiaProfileRename         = "[Config] Rename_sofia_profile"
+	eventSofiaProfileDelete         = "[Config] Del_sofia_profile"
+	eventSofiaProfileCommand        = "[API] Sofia profile command"
+	eventSofiaProfileSwitch         = "[Config] Switch_sofia_profile"
+	eventCdrPgCsvGet                = "[Config][Get] Cdr_Pg_Csv"
+	eventCdrPgCsvParamAdd           = "[Config][Add] Cdr_Pg_Csv Parameter"
+	eventCdrPgCsvParamUpdate        = "[Config][Update] Cdr_Pg_Csv Parameter"
+	eventCdrPgCsvParamSwitch        = "[Config][Switch] Cdr_Pg_Csv Parameter"
+	eventCdrPgCsvParamDelete        = "[Config][Delete] Cdr_Pg_Csv Parameter"
+	eventCdrPgCsvFieldAdd           = "[Config][Add] Cdr_Pg_Csv Field"
+	eventCdrPgCsvFieldUpdate        = "[Config][Update] Cdr_Pg_Csv Field"
+	eventCdrPgCsvFieldSwitch        = "[Config][Switch] Cdr_Pg_Csv Field"
+	eventCdrPgCsvFieldDelete        = "[Config][Delete] Cdr_Pg_Csv Field"
+	eventOdbcCdrGet                 = "GetOdbcCdr"
+	eventOdbcCdrFieldGet            = "GetOdbcCdrField"
+	eventOdbcCdrParamAdd            = "AddOdbcCdrParameter"
+	eventOdbcCdrParamUpdate         = "UpdateOdbcCdrParameter"
+	eventOdbcCdrParamSwitch         = "SwitchOdbcCdrParameter"
+	eventOdbcCdrParamDelete         = "DeleteOdbcCdrParameter"
+	eventOdbcCdrTableAdd            = "AddOdbcCdrTable"
+	eventOdbcCdrTableUpdate         = "UpdateOdbcCdrTable"
+	eventOdbcCdrTableSwitch         = "SwitchOdbcCdrTable"
+	eventOdbcCdrTableDelete         = "DeleteOdbcCdrTable"
+	eventOdbcCdrFieldAdd            = "AddOdbcCdrField"
+	eventOdbcCdrFieldUpdate         = "UpdateOdbcCdrField"
+	eventOdbcCdrFieldSwitch         = "SwitchOdbcCdrField"
+	eventOdbcCdrFieldDelete         = "DeleteOdbcCdrField"
 )
 
 var eventChannel chan interface{}
+var messageUserLookup = findUser
 
 func onlyAdminGroup() []int {
 	return []int{mainStruct.GetAdminId()}
@@ -101,6 +273,14 @@ func onlyAdminGroup() []int {
 
 func onlyAdminAndManagerGroup() []int {
 	return []int{mainStruct.GetAdminId(), mainStruct.GetManagerId()}
+}
+
+func adminOnly() []int {
+	return onlyAdminGroup()
+}
+
+func adminOrManager() []int {
+	return onlyAdminAndManagerGroup()
 }
 
 func onlyAdminManagerAndUserGroup() []int {
@@ -197,16 +377,18 @@ func PostAPIRequest(w http.ResponseWriter, r *http.Request) {
 	var resp webStruct.UserResponse
 	msg.Data.Trim()
 	msg.Data.Event = msg.Event
+	msg.Data.Context = webStruct.CreateWsContext(nil)
 
 	// find user by token
-	user, _ := findUser(msg.Data)
+	user, _ := messageUserLookup(msg.Data)
 	if user == nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("401 Unauthorized"))
 		return
 	}
+	msg.Data.Context.SetUser(user)
 
-	resp = messageMainHandler(msg.Data)
+	resp = dispatchMessage(msg.Data, msg.Data.Context)
 	res, err := json.Marshal(resp)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -278,7 +460,7 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 	log.Println("EVENT: ", msg.Event)
 
 	// find user by token
-	user, response := findUser(msg.Data)
+	user, response := messageUserLookup(msg.Data)
 	if user == nil {
 		log.Println("EVENT: ", msg.Event, "NO USER")
 		sendWSResponse(wsContext, &response)
@@ -291,13 +473,15 @@ func messageHandler(msg *webStruct.Message, wsContext *webStruct.WsContext) {
 		return
 	}
 
-	if registeredResponse, ok := coreEvents.Dispatch(msg.Data, wsContext); ok {
-		sendWSResponse(wsContext, &registeredResponse)
-		return
-	}
-
-	resp := messageMainHandler(msg.Data)
+	resp := dispatchMessage(msg.Data, wsContext)
 	sendWSResponse(wsContext, &resp)
+}
+
+func dispatchMessage(data *webStruct.MessageData, wsContext *webStruct.WsContext) webStruct.UserResponse {
+	if registeredResponse, ok := coreEvents.Dispatch(data, wsContext); ok {
+		return registeredResponse
+	}
+	return messageMainHandler(data)
 }
 
 func sendWSResponse(wsContext *webStruct.WsContext, resp *webStruct.UserResponse) {
@@ -321,1061 +505,205 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Request:{"event":"GetDirectoryDomains","data":{"token":"example-token"}}
 	//Response:{"MessageType":"GetDirectoryDomains","data":{"4":{"id":4,"position":1,"enabled":true,"name":"45.61.54.76","parent":{"id":1},"sip_regs_counter":0}}}
 	//Errors:no id, DB error
-	case "GetDirectoryDomains":
-		msg.Id = cache.GetCurrentInstanceId()
-		resp = getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomain{}, onlyAdminGroup())
 	//Request:{"event":"ImportDirectory","data":{"token":"example-token"}}
 	//Response:{"MessageType":"ImportDirectory"}
 	//Errors:empty data, can't parse
-	case "ImportDirectory":
-		resp = getUser(msg, importDirectory, onlyAdminGroup())
 	//Request:{"event":"ImportXMLDomain","data":{"token":"example-token","file":"\r\n  <!--the domain or ip (the right hand side of the @ in the addr-->\r\n  <domain name=\"test_do\">\r\n    <params>\r\n      <param name=\"jsonrpc-allowed-methods\" value=\"verto\"/>>\r\n    </params>\r\n    <variables>\r\n      <variable name=\"record_stereo\" value=\"true\"/>\r\n      <variable name=\"default_gateway\" value=\"$${default_provider}\"/>\r\n    </variables>\r\n    <groups>\r\n      <group name=\"default\">\r\n\t<users>\r\n\t</users>\r\n      </group>\r\n    </groups>\r\n  </domain>"}}
 	//Response:{"MessageType":"ImportXMLDomain","data":{"6":{"id":6,"position":1,"enabled":true,"name":"45.61.54.76","parent":{"id":1},"sip_regs_counter":0},"7":{"id":7,"position":2,"enabled":true,"name":"test_do","parent":{"id":1},"sip_regs_counter":0}}}
 	//Errors:can't parse
-	case "ImportXMLDomain":
-		resp = getUser(msg, ImportXMLDomain, onlyAdminGroup())
-		if resp.Error != "" {
-			return resp
-		}
-		msg.Id = cache.GetCurrentInstanceId()
-		resp = getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomain{}, onlyAdminGroup())
 	//Request:{"event":"AddDirectoryDomain","data":{"token":"example-token","name":"test"}}
 	//Response:{"MessageType":"AddDirectoryDomain","data":{"id":9,"position":4,"enabled":true,"name":"test","parent":{"id":1},"sip_regs_counter":0}}
 	//Errors:DB error
-	case "AddDirectoryDomain":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomain{Name: msg.Name, Enabled: true, Parent: &mainStruct.FsInstance{Id: cache.GetCurrentInstanceId()}}, onlyAdminGroup())
 	//Request:{"event":"RenameDirectoryDomain","data":{"token":"example-token","id":9,"name":"test2"}}
 	//Response:{"MessageType":"RenameDirectoryDomain","data":{"id":9,"position":4,"enabled":true,"name":"test2","parent":{"id":1},"sip_regs_counter":0}}
 	//Errors:DB error
-	case "RenameDirectoryDomain":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomain{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
 	//Request:{"event":"SwitchDirectoryDomain","data":{"token":"example-token","id":8,"enabled":false}}
 	//Response:{"MessageType":"SwitchDirectoryDomain","data":{"id":8,"position":3,"enabled":false,"name":"test_do2","parent":{"id":1},"sip_regs_counter":0}}
 	//Errors:DB error
-	case "SwitchDirectoryDomain":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomain{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryDomain","data":{"token":"example-token","id":9}}
 	//Response:{"MessageType":"DeleteDirectoryDomain","data":{"id":9,"position":4,"enabled":true,"name":"test2","parent":{"id":1},"sip_regs_counter":0}}
 	//Errors:DB error
-	case "DeleteDirectoryDomain":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomain{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"GetDirectoryDomainDetails","data":{"token":"example-token","id":6}}
 	//Response:{"MessageType":"GetDirectoryDomainDetails","data":{"parameters":{"10":{"id":10,"position":2,"enabled":true,"name":"jsonrpc-allowed-methods","value":"verto","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}},"9":{"id":9,"position":1,"enabled":true,"name":"dial-string","value":"{^^:sip_invite_domain=${dialed_domain}:presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(*/${dialed_user}@${dialed_domain})},${verto_contact(${dialed_user}@${dialed_domain})}","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}},"variables":{"13":{"id":13,"position":1,"enabled":true,"name":"record_stereo","value":"true","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}},"14":{"id":14,"position":2,"enabled":true,"name":"default_gateway","value":"example.com","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}},"15":{"id":15,"position":3,"enabled":true,"name":"default_areacode","value":"918","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}},"16":{"id":16,"position":4,"enabled":true,"name":"transfer_fallback_extension","value":"operator","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}}}
 	//Errors:DB error
-	case "GetDirectoryDomainDetails":
-		resp1 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainParameter{}, onlyAdminGroup())
-		resp2 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainVariable{}, onlyAdminGroup())
-		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
-			S   interface{} `json:"parameters"`
-			Sch interface{} `json:"variables"`
-		}{S: resp1.Data, Sch: resp2.Data}}
 	//Request:{"event":"AddDirectoryDomainParameter","data":{"token":"example-token","id":6,"name":"paramn","value":"paramv"}}
 	//Response:{"MessageType":"AddDirectoryDomainParameter","data":{"id":15,"position":3,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:DB error
-	case "AddDirectoryDomainParameter":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomainParameter{Name: msg.Name, Value: msg.Value, Enabled: true, Parent: &altStruct.DirectoryDomain{Id: msg.Id}}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryDomainParameter","data":{"token":"example-token","id":15,"name":"paramn1","value":"paramv1"}}
 	//Response:{"MessageType":"UpdateDirectoryDomainParameter","data":{"id":15,"position":3,"enabled":true,"name":"paramn1","value":"paramv1","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "UpdateDirectoryDomainParameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainParameter{Id: msg.Id, Name: msg.Name, Value: msg.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
 	//Request:{"event":"SwitchDirectoryDomainParameter","data":{"token":"example-token","id":15,"enabled":false}}
 	//Response:{"MessageType":"SwitchDirectoryDomainParameter","data":{"id":15,"position":3,"enabled":false,"name":"paramn1","value":"paramv1","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "SwitchDirectoryDomainParameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainParameter{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryDomainParameter","data":{"token":"example-token","id":1}}
 	//Response:{"MessageType":"DeleteDirectoryDomainParameter","data":{"id":15,"position":3,"enabled":false,"name":"paramn1","value":"paramv1","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "DeleteDirectoryDomainParameter":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainParameter{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"AddDirectoryDomainVariable","data":{"token":"example-token","id":6,"name":"varn","value":"varv"}}
 	//Response:{"MessageType":"AddDirectoryDomainVariable","data":{"id":21,"position":5,"enabled":true,"name":"varn","value":"varv","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "AddDirectoryDomainVariable":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomainVariable{Name: msg.Name, Value: msg.Value, Enabled: true, Parent: &altStruct.DirectoryDomain{Id: msg.Id}}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryDomainVariable","data":{"token":"example-token","id":21,"name":"varn1","value":"varv1"}}
 	//Response:{"MessageType":"UpdateDirectoryDomainVariable","data":{"id":21,"position":5,"enabled":true,"name":"varn1","value":"varv1","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "UpdateDirectoryDomainVariable":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainVariable{Id: msg.Id, Name: msg.Name, Value: msg.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
 	//Request:{"event":"SwitchDirectoryDomainVariable","data":{"token":"example-token","id":21,"enabled":false}}
 	//Response:{"MessageType":"SwitchDirectoryDomainVariable","data":{"id":21,"position":5,"enabled":false,"name":"varn1","value":"varv1","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "SwitchDirectoryDomainVariable":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainVariable{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryDomainVariable","data":{"token":"example-token","id":2}}
 	//Response:{"MessageType":"DeleteDirectoryDomainVariable","data":{"id":21,"position":5,"enabled":false,"name":"varn1","value":"varv1","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "DeleteDirectoryDomainVariable":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainVariable{Id: msg.Id}, onlyAdminGroup())
 	//### Users
 	//Request:{"event":"GetDirectoryUsers","data":{"token":"example-token"}}
 	//Response:{"MessageType":"GetDirectoryUsers","data":{"domains":{"6":{"id":6,"position":1,"enabled":true,"name":"45.61.54.76","parent":{"id":1},"sip_regs_counter":0},"7":{"id":7,"position":2,"enabled":true,"name":"test_do","parent":{"id":1},"sip_regs_counter":0},"8":{"id":8,"position":3,"enabled":true,"name":"test_do2","parent":{"id":1},"sip_regs_counter":0}},"directory_users":{"100":{"id":100,"position":10,"enabled":true,"name":"1009","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"101":{"id":101,"position":11,"enabled":true,"name":"1010","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}}
 	//Errors:
-	case webStruct.GetDirectoryUser:
-		msg.Id = cache.GetCurrentInstanceId()
-		resp1 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomain{}, onlyAdminGroup())
-		domains, ok := resp1.Data.(map[int64]interface{})
-		if !ok {
-			return webStruct.UserResponse{Error: "domains not found", MessageType: msg.Event}
-		}
-		var ids []int64
-		for _, d := range domains {
-			domain, ok := d.(altStruct.DirectoryDomain)
-			if !ok || domain.Id == 0 {
-				continue
-			}
-			ids = append(ids, domain.Id)
-		}
-		msg.IntSlice = ids
-		resp2 := getUserForConfig(msg, getDirectoryByParents, &altStruct.DirectoryDomainUser{}, onlyAdminGroup())
-		users, ok := resp2.Data.(map[int64]interface{})
-		if !ok {
-			return webStruct.UserResponse{Error: "users not found", MessageType: msg.Event}
-		}
-		directoryCache := cache.GetDirectoryCache()
-		for k, u := range users {
-			user, ok := u.(altStruct.DirectoryDomainUser)
-			if !ok || user.Id == 0 {
-				continue
-			}
-			cUser := directoryCache.UserCache.GetById(user.Id)
-			if cUser == nil {
-				continue
-			}
-			cUser.UpdateUser(&user)
-			users[k] = user
-		}
-
-		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
-			S   interface{} `json:"domains"`
-			Sch interface{} `json:"directory_users"`
-		}{S: resp1.Data, Sch: users}}
 	//Request:{"event":"GetDirectoryUserDetails","data":{"token":"example-token","id":91}}
 	//Response:{"MessageType":"GetDirectoryUserDetails","data":{"parameters":{"93":{"id":93,"position":1,"enabled":true,"name":"password","value":"12345asdqwe123asd213fsfd3qrsd3qrrfd32rffd5uhr6","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}},"94":{"id":94,"position":2,"enabled":true,"name":"vm-password","value":"1000","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}},"variables":{"346":{"id":346,"position":1,"enabled":true,"name":"toll_allow","value":"domestic,international,local","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}},"347":{"id":347,"position":2,"enabled":true,"name":"accountcode","value":"1000","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}},"348":{"id":348,"position":3,"enabled":true,"name":"user_context","value":"default","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}},"349":{"id":349,"position":4,"enabled":true,"name":"effective_caller_id_name","value":"Extension 1000","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}},"350":{"id":350,"position":5,"enabled":true,"name":"effective_caller_id_number","value":"1000","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}},"351":{"id":351,"position":6,"enabled":true,"name":"outbound_caller_id_name","value":"FreeSWITCH","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}},"352":{"id":352,"position":7,"enabled":true,"name":"outbound_caller_id_number","value":"0000000000","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}},"353":{"id":353,"position":8,"enabled":true,"name":"callgroup","value":"techsupport","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}},"user":{"id":91,"position":1,"enabled":true,"name":"1000","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "GetDirectoryUserDetails":
-		userMsg := getUserForConfig(msg, getDirectoryById, &altStruct.DirectoryDomainUser{}, onlyAdminGroup())
-		user, ok := userMsg.Data.(altStruct.DirectoryDomainUser)
-		if !ok {
-			return webStruct.UserResponse{Error: "user not found", MessageType: msg.Event}
-		}
-		resp1 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainUserParameter{}, onlyAdminGroup())
-		resp2 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainUserVariable{}, onlyAdminGroup())
-		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
-			A interface{} `json:"parameters"`
-			B interface{} `json:"variables"`
-			C interface{} `json:"user"`
-		}{A: resp1.Data, B: resp2.Data, C: user}}
 	//Request:{"event":"AddDirectoryUserParameter","data":{"token":"example-token","id":91,"name":"paramn","value":"paramv"}}
 	//Response:{"MessageType":"AddDirectoryUserParameter","data":{"id":137,"position":3,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "AddDirectoryUserParameter":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomainUserParameter{Name: msg.Name, Value: msg.Value, Enabled: true, Parent: &altStruct.DirectoryDomainUser{Id: msg.Id}}, onlyAdminGroup())
 	//Request:{"event":"AddDirectoryUserVariable","data":{"token":"example-token","id":91,"name":"varn","value":"varv"}}
 	//Response:{"MessageType":"AddDirectoryUserVariable","data":{"id":514,"position":9,"enabled":true,"name":"varn","value":"varv","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "AddDirectoryUserVariable":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomainUserVariable{Name: msg.Name, Value: msg.Value, Enabled: true, Parent: &altStruct.DirectoryDomainUser{Id: msg.Id}}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryUserParameter","data":{"token":"example-token","id":13}}
 	//Response:{"MessageType":"DeleteDirectoryUserParameter","data":{"id":137,"position":3,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "DeleteDirectoryUserParameter":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainUserParameter{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryUserVariable","data":{"token":"example-token","id":51}}
 	//Response:{"MessageType":"DeleteDirectoryUserVariable","data":{"id":514,"position":9,"enabled":true,"name":"varn","value":"varv","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "DeleteDirectoryUserVariable":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainUserVariable{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryUserParameter","data":{"token":"example-token","id":138,"name":"paramn1","value":"paramv1"}}
 	//Response:{"MessageType":"UpdateDirectoryUserParameter","data":{"id":138,"position":3,"enabled":true,"name":"paramn1","value":"paramv1","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "UpdateDirectoryUserParameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUserParameter{Id: msg.Id, Name: msg.Name, Value: msg.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryUserVariable","data":{"token":"example-token","id":515,"name":"varn1","value":"varv1"}}
 	//Response:{"MessageType":"UpdateDirectoryUserVariable","data":{"id":515,"position":9,"enabled":true,"name":"varn1","value":"varv1","description":"","parent":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "UpdateDirectoryUserVariable":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUserVariable{Id: msg.Id, Name: msg.Name, Value: msg.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryUserCache","data":{"token":"example-token","value":"3000","id":91}}
 	//Response:{"MessageType":"UpdateDirectoryUserCache","data":{"id":91,"position":1,"enabled":true,"name":"1000","cache":3000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}
 	//Errors:
-	case "UpdateDirectoryUserCache":
-		cacheValue, err := strconv.ParseUint(msg.Value, 10, 32)
-		if err != nil {
-			return webStruct.UserResponse{Error: "wrong data", MessageType: msg.Event}
-		}
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUser{Id: msg.Id, Cache: uint(cacheValue)}, []string{"Cache"}}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryUserCidr","data":{"token":"example-token","value":"0.0.0.0","id":91}}
 	//Response:{"MessageType":"UpdateDirectoryUserCidr","data":{"id":91,"position":1,"enabled":true,"name":"1000","cache":3000,"cidr":"0.0.0.0","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}
 	//Errors:
-	case "UpdateDirectoryUserCidr":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUser{Id: msg.Id, Cidr: msg.Value}, []string{"Cidr"}}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryUserNumberAlias","data":{"token":"example-token","value":"555","id":91}}
 	//Response:{"MessageType":"UpdateDirectoryUserNumberAlias","data":{"id":91,"position":1,"enabled":true,"name":"1000","cache":3000,"cidr":"0.0.0.0","number_alias":"555","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}
 	//Errors:
-	case "UpdateDirectoryUserNumberAlias":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUser{Id: msg.Id, NumberAlias: msg.Value}, []string{"NumberAlias"}}, onlyAdminGroup())
 	//Request:{"event":"AddDirectoryUser","data":{"token":"example-token","name":"5000","id":6}}
 	//Response:{"MessageType":"AddDirectoryUser","data":{"115":{"id":115,"position":25,"enabled":true,"name":"5000","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "AddDirectoryUser":
-		resp = getUser(msg, addNewUser, onlyAdminGroup())
 	//Request:{"event":"ImportXMLDomainUser","data":{"token":"example-token","file":"<user id=\"1099\">\r\n    <params>\r\n      <param name=\"password\" value=\"$${default_password}\"/>\r\n      <param name=\"vm-password\" value=\"1099\"/>\r\n    </params>\r\n    <variables>\r\n      <variable name=\"toll_allow\" value=\"domestic,international,local\"/>\r\n      <variable name=\"accountcode\" value=\"1099\"/>\r\n      <variable name=\"user_context\" value=\"default\"/>\r\n      <variable name=\"effective_caller_id_name\" value=\"Extension 1990\"/>\r\n      <variable name=\"effective_caller_id_number\" value=\"1099\"/>\r\n      <variable name=\"outbound_caller_id_name\" value=\"$${outbound_caller_name}\"/>\r\n      <variable name=\"outbound_caller_id_number\" value=\"$${outbound_caller_id}\"/>\r\n      <variable name=\"callgroup\" value=\"techsupport\"/>\r\n    </variables>\r\n  </user>","id":6}}
 	//Response:{"MessageType":"ImportXMLDomainUser","data":{"100":{"id":100,"position":10,"enabled":true,"name":"1009","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"101":{"id":101,"position":11,"enabled":true,"name":"1010","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"102":{"id":102,"position":12,"enabled":true,"name":"1011","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"103":{"id":103,"position":13,"enabled":true,"name":"1012","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"104":{"id":104,"position":14,"enabled":true,"name":"1013","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"105":{"id":105,"position":15,"enabled":true,"name":"1014","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"106":{"id":106,"position":16,"enabled":true,"name":"1015","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"107":{"id":107,"position":17,"enabled":true,"name":"1016","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"108":{"id":108,"position":18,"enabled":true,"name":"1017","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"109":{"id":109,"position":19,"enabled":true,"name":"1018","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"110":{"id":110,"position":20,"enabled":true,"name":"1019","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"111":{"id":111,"position":21,"enabled":true,"name":"brian","cache":1000,"cidr":"192.0.2.0/24","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"112":{"id":112,"position":22,"enabled":true,"name":"default","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"113":{"id":113,"position":23,"enabled":true,"name":"example.com","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"114":{"id":114,"position":24,"enabled":true,"name":"SEP001120AABBCC","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"115":{"id":115,"position":25,"enabled":true,"name":"5000","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"116":{"id":116,"position":26,"enabled":true,"name":"1099","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"91":{"id":91,"position":1,"enabled":true,"name":"1000","cache":3000,"cidr":"0.0.0.0","number_alias":"555","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"92":{"id":92,"position":2,"enabled":true,"name":"1001","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"93":{"id":93,"position":3,"enabled":true,"name":"1002","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"94":{"id":94,"position":4,"enabled":true,"name":"1003","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"95":{"id":95,"position":5,"enabled":true,"name":"1004","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"96":{"id":96,"position":6,"enabled":true,"name":"1005","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"97":{"id":97,"position":7,"enabled":true,"name":"1006","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"98":{"id":98,"position":8,"enabled":true,"name":"1007","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"99":{"id":99,"position":9,"enabled":true,"name":"1008","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "ImportXMLDomainUser":
-		resp = getUser(msg, ImportXMLDomainUser, onlyAdminGroup())
-		if resp.Error != "" {
-			return resp
-		}
-		resp = getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainUser{}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryUser","data":{"token":"example-token","id":11}}
 	//Response:{"MessageType":"DeleteDirectoryUser","data":{"id":115,"position":25,"enabled":true,"name":"5000","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}
 	//Errors:
-	case "DeleteDirectoryUser":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainUser{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryUserName","data":{"token":"example-token","id":116,"name":"1098"}}
 	//Response:{"MessageType":"UpdateDirectoryUserName","data":{"id":116,"position":26,"enabled":true,"name":"1098","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}
 	//Errors:
-	case "UpdateDirectoryUserName":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUser{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
 	//Request:{"event":"SwitchDirectoryUser","data":{"token":"example-token","id":116,"enabled":false}}
 	//Response:{"MessageType":"SwitchDirectoryUser","data":{"id":116,"position":26,"enabled":false,"name":"1098","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}
 	//Errors:
-	case "SwitchDirectoryUser":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUser{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
 	//Request:{"event":"SwitchDirectoryUserParameter","data":{"token":"example-token","id":140,"enabled":false}}
 	//Response:{"MessageType":"SwitchDirectoryUserParameter","data":{"id":140,"position":2,"enabled":false,"name":"vm-password","value":"1099","description":"","parent":{"id":116,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "SwitchDirectoryUserParameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUserParameter{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
 	//Request:{"event":"SwitchDirectoryUserVariable","data":{"token":"example-token","id":516,"enabled":false}}
 	//Response:{"MessageType":"SwitchDirectoryUserVariable","data":{"id":516,"position":1,"enabled":false,"name":"toll_allow","value":"domestic,international,local","description":"","parent":{"id":116,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "SwitchDirectoryUserVariable":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUserVariable{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
 	//### Groups
 	//Request:{"event":"GetDirectoryGroups","data":{"token":"example-token"}}
 	//Response:{"MessageType":"GetDirectoryGroups","data":{"domains":{"6":{"id":6,"position":1,"enabled":true,"name":"45.61.54.76","parent":{"id":1},"sip_regs_counter":0},"7":{"id":7,"position":2,"enabled":true,"name":"test_do","parent":{"id":1},"sip_regs_counter":0},"8":{"id":8,"position":3,"enabled":true,"name":"test_do2","parent":{"id":1},"sip_regs_counter":0}},"list":{"10":{"id":10,"position":1,"enabled":true,"name":"default","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}},"11":{"id":11,"position":2,"enabled":true,"name":"sales","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}},"12":{"id":12,"position":3,"enabled":true,"name":"billing","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}},"13":{"id":13,"position":4,"enabled":true,"name":"support","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}},"14":{"id":14,"position":1,"enabled":true,"name":"default","description":"","parent":{"id":7,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}},"15":{"id":15,"position":1,"enabled":true,"name":"default","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}}}
 	//Errors:
-	case "GetDirectoryGroups":
-		msg.Id = cache.GetCurrentInstanceId()
-		resp1 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomain{}, onlyAdminGroup())
-		domains, ok := resp1.Data.(map[int64]interface{})
-		if !ok {
-			return webStruct.UserResponse{Error: "domains not found", MessageType: msg.Event}
-		}
-		var ids []int64
-		for _, d := range domains {
-			domain, ok := d.(altStruct.DirectoryDomain)
-			if !ok || domain.Id == 0 {
-				continue
-			}
-			ids = append(ids, domain.Id)
-		}
-		msg.IntSlice = ids
-		resp2 := getUserForConfig(msg, getDirectoryByParents, &altStruct.DirectoryDomainGroup{}, onlyAdminGroup())
-		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
-			S   interface{} `json:"domains"`
-			Sch interface{} `json:"list"`
-		}{S: resp1.Data, Sch: resp2.Data}}
 	//Request:{"event":"GetDirectoryGroupUsers","data":{"token":"example-token","id":12}}
 	//Response:{"MessageType":"GetDirectoryGroupUsers","data":{"group_users":{"114":{"id":114,"position":2,"enabled":true,"type":"","description":"","parent":{"id":12,"position":0,"enabled":false,"name":"","description":"","parent":null},"user":{"id":100,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}},"users":{"100":{"id":100,"position":10,"enabled":true,"name":"1009","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"101":{"id":101,"position":11,"enabled":true,"name":"1010","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}}
 	//Errors:
-	case "GetDirectoryGroupUsers":
-		resp0 := getUserForConfig(msg, getDirectoryById, &altStruct.DirectoryDomainGroup{}, onlyAdminGroup())
-		group, ok := resp0.Data.(altStruct.DirectoryDomainGroup)
-		if !ok || group.Id == 0 || group.Parent.Id == 0 {
-			return webStruct.UserResponse{Error: "group not found", MessageType: msg.Event}
-		}
-		resp1 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainGroupUser{}, onlyAdminGroup())
-		msg.Id = group.Parent.Id
-		resp2 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainUser{}, onlyAdminGroup())
-		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
-			S   interface{} `json:"group_users"`
-			Sch interface{} `json:"users"`
-		}{S: resp1.Data, Sch: resp2.Data}}
 	//Request:{"event":"AddNewDirectoryGroup","data":{"token":"example-token","id":6,"name":"new_group"}}
 	//Response:{"MessageType":"AddNewDirectoryGroup","data":{"id":16,"position":5,"enabled":true,"name":"new_group","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "AddNewDirectoryGroup":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomainGroup{Name: msg.Name, Enabled: true, Parent: &altStruct.DirectoryDomain{Id: msg.Id}}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryGroup","data":{"token":"example-token","id":1}}
 	//Response:{"MessageType":"DeleteDirectoryGroup","data":{"id":16,"position":5,"enabled":true,"name":"new_group","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "DeleteDirectoryGroup":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainGroup{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryGroupName","data":{"token":"example-token","id":17,"name":"newnew"}}
 	//Response:{"MessageType":"UpdateDirectoryGroupName","data":{"id":17,"position":5,"enabled":true,"name":"newnew","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0}}}
 	//Errors:
-	case "UpdateDirectoryGroupName":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainGroup{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
 	//Request:{"event":"AddDirectoryGroupUser","data":{"token":"example-token","id_int":91,"id":13}}
 	//Response:{"MessageType":"AddDirectoryGroupUser","data":{"id":120,"position":3,"enabled":true,"type":"","description":"","parent":{"id":13,"position":0,"enabled":false,"name":"","description":"","parent":null},"user":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "AddDirectoryGroupUser":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomainGroupUser{UserId: &altStruct.DirectoryDomainUser{Id: msg.IdInt}, Enabled: true, Parent: &altStruct.DirectoryDomainGroup{Id: msg.Id}}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryGroupUser","data":{"token":"example-token","id":12}}
 	//Response:{"MessageType":"DeleteDirectoryGroupUser","data":{"id":120,"position":3,"enabled":true,"type":"","description":"","parent":{"id":13,"position":0,"enabled":false,"name":"","description":"","parent":null},"user":{"id":91,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "DeleteDirectoryGroupUser":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainGroupUser{Id: msg.Id}, onlyAdminGroup())
 	//### Gateways
 	//Request:{"event":"GetDirectoryUserGateways","data":{"token":"example-token"}}
 	//Response:{"MessageType":"GetDirectoryUserGateways","data":{"domains":{"6":{"id":6,"position":1,"enabled":true,"name":"45.61.54.76","parent":{"id":1},"sip_regs_counter":0}},"directory_users":{"100":{"id":100,"position":10,"enabled":true,"name":"1009","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"101":{"id":101,"position":11,"enabled":true,"name":"1010","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"102":{"id":102,"position":12,"enabled":true,"name":"1011","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"103":{"id":103,"position":13,"enabled":true,"name":"1012","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"104":{"id":104,"position":14,"enabled":true,"name":"1013","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false},"105":{"id":105,"position":15,"enabled":true,"name":"1014","cache":1000,"cidr":"","number_alias":"","description":"","parent":{"id":6,"position":0,"enabled":false,"name":"","parent":null,"sip_regs_counter":0},"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}},"user_gateways":{"5":{"id":5,"position":1,"enabled":true,"name":"example.com","description":"","parent":{"id":113,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}}}
 	//Errors:
-	case "GetDirectoryUserGateways":
-		msg.Id = cache.GetCurrentInstanceId()
-		resp1 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomain{}, onlyAdminGroup())
-		msg.Id = 0
-		domains, ok := resp1.Data.(map[int64]interface{})
-		if !ok {
-			return webStruct.UserResponse{Error: "domains not found", MessageType: msg.Event}
-		}
-		for _, d := range domains {
-			domain, ok := d.(altStruct.DirectoryDomain)
-			if !ok || domain.Id == 0 {
-				continue
-			}
-			msg.Id = domain.Id
-			break
-		}
-		resp2 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainUser{}, onlyAdminGroup())
-		users, ok := resp2.Data.(map[int64]interface{})
-		if !ok {
-			return webStruct.UserResponse{Error: "users not found", MessageType: msg.Event}
-		}
-		var ids []int64
-		for _, u := range users {
-			user, ok := u.(altStruct.DirectoryDomainUser)
-			if !ok || user.Id == 0 {
-				continue
-			}
-			ids = append(ids, user.Id)
-		}
-		msg.IntSlice = ids
-		resp3 := getUserForConfig(msg, getDirectoryByParents, &altStruct.DirectoryDomainUserGateway{}, onlyAdminGroup())
-		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
-			S   interface{} `json:"domains"`
-			Sch interface{} `json:"directory_users"`
-			U   interface{} `json:"user_gateways"`
-		}{S: resp1.Data, Sch: resp2.Data, U: resp3.Data}}
 	//Request:{"event":"GetDirectoryUserGatewayDetails","data":{"token":"example-token","id":5}}
 	//Response:{"MessageType":"GetDirectoryUserGatewayDetails","data":{"parameters":{"29":{"id":29,"position":1,"enabled":true,"name":"username","value":"joeuser","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}},"30":{"id":30,"position":2,"enabled":true,"name":"password","value":"password","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}},"31":{"id":31,"position":3,"enabled":true,"name":"from-user","value":"joeuser","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}},"32":{"id":32,"position":4,"enabled":true,"name":"from-domain","value":"example.com","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}},"33":{"id":33,"position":5,"enabled":true,"name":"expire-seconds","value":"600","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}},"34":{"id":34,"position":6,"enabled":true,"name":"register","value":"false","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}},"35":{"id":35,"position":7,"enabled":true,"name":"retry-seconds","value":"30","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}},"36":{"id":36,"position":8,"enabled":true,"name":"extension","value":"5000","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}},"37":{"id":37,"position":9,"enabled":true,"name":"context","value":"public","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}}},"variables":{}}}
 	//Errors:
-	case "GetDirectoryUserGatewayDetails":
-		resp1 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainUserGatewayParameter{}, onlyAdminGroup())
-		resp2 := getUserForConfig(msg, getDirectoryByParent, &altStruct.DirectoryDomainUserGatewayVariable{}, onlyAdminGroup())
-		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
-			S   interface{} `json:"parameters"`
-			Sch interface{} `json:"variables"`
-		}{S: resp1.Data, Sch: resp2.Data}}
 	//Request:{"event":"AddDirectoryUserGatewayParameter","data":{"token":"example-token","id":5,"name":"paramn","value":"paramv"}}
 	//Response:{"MessageType":"AddDirectoryUserGatewayParameter","data":{"id":38,"position":10,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}}}
 	//Errors:
-	case "AddDirectoryUserGatewayParameter":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomainUserGatewayParameter{Name: msg.Name, Value: msg.Value, Enabled: true, Parent: &altStruct.DirectoryDomainUserGateway{Id: msg.Id}}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryUserGatewayParameter","data":{"token":"example-token","id":3}}
 	//Response:{"MessageType":"DeleteDirectoryUserGatewayParameter","data":{"id":38,"position":10,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}}}
 	//Errors:
-	case "DeleteDirectoryUserGatewayParameter":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainUserGatewayParameter{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryUserGatewayParameter","data":{"token":"example-token","id":39,"name":"param","value":"param_new_val"}}
 	//Response:{"MessageType":"UpdateDirectoryUserGatewayParameter","data":{"id":39,"position":10,"enabled":true,"name":"param","value":"param_new_val","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}}}
 	//Errors:
-	case "UpdateDirectoryUserGatewayParameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUserGatewayParameter{Id: msg.Id, Name: msg.Name, Value: msg.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
 	//Request:{"event":"AddDirectoryUserGatewayVariable","data":{"token":"example-token","id":5,"name":"varn","value":"varv","direction":"vard"}}
 	//Response:{"MessageType":"AddDirectoryUserGatewayVariable","data":{"id":4,"position":1,"enabled":true,"name":"varn","value":"varv","direction":"vard","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}}}
 	//Errors:
-	case "AddDirectoryUserGatewayVariable":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomainUserGatewayVariable{Name: msg.Name, Value: msg.Value, Direction: msg.Direction, Enabled: true, Parent: &altStruct.DirectoryDomainUserGateway{Id: msg.Id}}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryUserGatewayVariable","data":{"token":"example-token","id":4,"name":"varn","value":"varv2222","direction":"vard"}}
 	//Response:{"MessageType":"UpdateDirectoryUserGatewayVariable","data":{"id":4,"position":1,"enabled":true,"name":"varn","value":"varv2222","direction":"vard","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}}}
 	//Errors:
-	case "UpdateDirectoryUserGatewayVariable":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUserGatewayVariable{Id: msg.Id, Name: msg.Name, Value: msg.Value, Direction: msg.Direction}, []string{"Name", "Value", "Direction"}}, onlyAdminGroup())
 	//Request:{"event":"SwitchDirectoryUserGatewayVariable","data":{"token":"example-token","id":4,"enabled":false}}
 	//Response:{"MessageType":"SwitchDirectoryUserGatewayVariable","data":{"id":4,"position":1,"enabled":false,"name":"varn","value":"varv2222","direction":"vard","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}}}
 	//Errors:
-	case "SwitchDirectoryUserGatewayVariable":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUserGatewayVariable{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryUserGatewayVariable","data":{"token":"example-token","id":4}}
 	//Response:{"MessageType":"DeleteDirectoryUserGatewayVariable","data":{"id":4,"position":1,"enabled":false,"name":"varn","value":"varv2222","direction":"vard","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}}}
 	//Errors:
-	case "DeleteDirectoryUserGatewayVariable":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainUserGatewayVariable{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"AddDirectoryUserGateway","data":{"token":"example-token","name":"new_gw","id":93}}
 	//Response:{"MessageType":"AddDirectoryUserGateway","data":{"id":6,"position":1,"enabled":true,"name":"new_gw","description":"","parent":{"id":93,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "AddDirectoryUserGateway":
-		resp = getUserForConfig(msg, setConfig, &altStruct.DirectoryDomainUserGateway{Name: msg.Name, Enabled: true, Parent: &altStruct.DirectoryDomainUser{Id: msg.Id}}, onlyAdminGroup())
 	//Request:{"event":"DeleteDirectoryUserGateway","data":{"token":"example-token","id":6}}
 	//Response:{"MessageType":"DeleteDirectoryUserGateway","data":{"id":6,"position":1,"enabled":true,"name":"new_gw2","description":"","parent":{"id":93,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "DeleteDirectoryUserGateway":
-		resp = getUserForConfig(msg, delConfig, &altStruct.DirectoryDomainUserGateway{Id: msg.Id}, onlyAdminGroup())
 	//Request:{"event":"UpdateDirectoryUserGatewayName","data":{"token":"example-token","id":6,"name":"new_gw2"}}
 	//Response:{"MessageType":"UpdateDirectoryUserGatewayName","data":{"id":6,"position":1,"enabled":true,"name":"new_gw2","description":"","parent":{"id":93,"position":0,"enabled":false,"name":"","cache":0,"cidr":"","number_alias":"","description":"","parent":null,"call_date":0,"in_call":false,"talking":false,"last_uuid":"","call_direction":"","sip_register":false,"verto_register":false}}}
 	//Errors:
-	case "UpdateDirectoryUserGatewayName":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUserGateway{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
 	//Request:{"event":"SwitchDirectoryUserGatewayParameter","data":{"token":"example-token","id":39,"enabled":false}}
 	//Response:{"MessageType":"SwitchDirectoryUserGatewayParameter","data":{"id":39,"position":10,"enabled":false,"name":"param","value":"param_new_val","description":"","parent":{"id":5,"position":0,"enabled":false,"name":"","description":"","parent":null}}}
 	//Errors:
-	case "SwitchDirectoryUserGatewayParameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.DirectoryDomainUserGatewayParameter{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
 	//## Configuration
 	//### Modules
 	//Request:{"event":"[Config][Get] Modules","data":{"token":"example-token"}}
 	//Response:{"MessageType":"[Config][Get] Modules","modules":{"post_load_switch":{"id":43,"position":43,"enabled":true,"name":"post_load_switch.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"acl":{"id":1,"position":1,"enabled":true,"name":"acl.conf","module":"","loaded":false,"unloadable":true,"parent":{"id":1}},"callcenter":{"id":6,"position":6,"enabled":true,"name":"callcenter.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cdr_pg_csv":{"id":8,"position":8,"enabled":true,"name":"cdr_pg_csv.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"odbc_cdr":{"id":51,"position":51,"enabled":true,"name":"odbc_cdr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"lcr":{"id":24,"position":24,"enabled":true,"name":"lcr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sofia":{"id":42,"position":42,"enabled":true,"name":"sofia.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"verto":{"id":46,"position":46,"enabled":true,"name":"verto.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"shout":{"id":40,"position":40,"enabled":true,"name":"shout.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"redis":{"id":38,"position":38,"enabled":true,"name":"redis.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"nibblebill":{"id":29,"position":29,"enabled":true,"name":"nibblebill.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"db":{"id":14,"position":14,"enabled":true,"name":"db.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"distributor":{"id":17,"position":17,"enabled":true,"name":"distributor.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"memcache":{"id":26,"position":26,"enabled":true,"name":"memcache.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"avmd":{"id":5,"position":5,"enabled":true,"name":"avmd.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"tts_commandline":{"id":44,"position":44,"enabled":true,"name":"tts_commandline.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cdr_mongodb":{"id":7,"position":7,"enabled":true,"name":"cdr_mongodb.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"http_cache":{"id":23,"position":23,"enabled":true,"name":"http_cache.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"opus":{"id":31,"position":31,"enabled":true,"name":"opus.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"python":{"id":37,"position":37,"enabled":true,"name":"python.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"alsa":{"id":2,"position":2,"enabled":false,"name":"alsa.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"amr":{"id":52,"position":52,"enabled":true,"name":"amr.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"amrwb":{"id":4,"position":4,"enabled":true,"name":"amrwb.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cepstral":{"id":9,"position":9,"enabled":true,"name":"cepstral.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cidlookup":{"id":10,"position":10,"enabled":true,"name":"cidlookup.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"curl":{"id":13,"position":13,"enabled":true,"name":"curl.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"dialplan_directory":{"id":15,"position":15,"enabled":true,"name":"dialplan_directory.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"easyroute":{"id":18,"position":18,"enabled":true,"name":"easyroute.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"erlang_event":{"id":19,"position":19,"enabled":true,"name":"erlang_event.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"event_multicast":{"id":20,"position":20,"enabled":true,"name":"event_multicast.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"fax":{"id":21,"position":21,"enabled":true,"name":"fax.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"lua":{"id":25,"position":25,"enabled":true,"name":"lua.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"mongo":{"id":27,"position":27,"enabled":true,"name":"mongo.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"msrp":{"id":28,"position":28,"enabled":true,"name":"msrp.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"oreka":{"id":32,"position":32,"enabled":true,"name":"oreka.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"perl":{"id":34,"position":34,"enabled":true,"name":"perl.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"pocketsphinx":{"id":35,"position":35,"enabled":true,"name":"pocketsphinx.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sangoma_codec":{"id":39,"position":39,"enabled":true,"name":"sangoma_codec.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sndfile":{"id":41,"position":41,"enabled":true,"name":"sndfile.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"xml_cdr":{"id":48,"position":48,"enabled":true,"name":"xml_cdr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"xml_rpc":{"id":49,"position":49,"enabled":true,"name":"xml_rpc.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"zeroconf":{"id":50,"position":50,"enabled":true,"name":"zeroconf.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"directory":{"id":16,"position":16,"enabled":true,"name":"directory.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"fifo":{"id":22,"position":22,"enabled":true,"name":"fifo.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"opal":{"id":30,"position":30,"enabled":true,"name":"opal.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"osp":{"id":33,"position":33,"enabled":true,"name":"osp.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"unicall":{"id":45,"position":45,"enabled":true,"name":"unicall.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"conference":{"id":11,"position":11,"enabled":true,"name":"conference.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"conference_layouts":{"id":12,"position":12,"enabled":true,"name":"conference_layouts.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"post_load_modules":{"id":36,"position":36,"enabled":true,"name":"post_load_modules.conf","module":"","loaded":false,"unloadable":true,"parent":{"id":1}},"voicemail":{"id":47,"position":47,"enabled":true,"name":"voicemail.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}}}}
 	//Errors:
-	case webStruct.GetModules:
-		resp = getUser(msg, GetConfModules, onlyAdminGroup())
 	//Request:{"event":"[Config][Reload] Module","data":{"token":"example-token","id":52}}
 	//Response:{"MessageType":"[Config][Reload] Module"}
 	//Errors:
-	case "[Config][Reload] Module":
-		resp = getUser(msg, reloadConfModules, onlyAdminGroup())
 	//Request:{"event":"[Config][Unload] Module","data":{"token":"example-token","id":52}}
 	//Response:{"MessageType":"[Config][Unload] Module"}
 	//Errors:
-	case "[Config][Unload] Module":
-		resp = getUser(msg, unloadConfModules, onlyAdminGroup())
 	//Request:{"event":"[Config][Load] Module","data":{"token":"example-token","id":52}}
 	//Response:{"MessageType":"[Config][Load] Module"}
 	//Errors:
-	case "[Config][Load] Module":
-		resp = getUser(msg, loadConfModules, onlyAdminGroup())
 	//Request:{"event":"[Config][Switch] Module","data":{"token":"example-token","id":52,"enabled":false}}
 	//Response:{"MessageType":"[Config][Switch] Module","modules":{"post_load_switch":{"id":43,"position":43,"enabled":true,"name":"post_load_switch.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"acl":{"id":1,"position":1,"enabled":true,"name":"acl.conf","module":"","loaded":false,"unloadable":true,"parent":{"id":1}},"callcenter":{"id":6,"position":6,"enabled":true,"name":"callcenter.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cdr_pg_csv":{"id":8,"position":8,"enabled":true,"name":"cdr_pg_csv.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"odbc_cdr":{"id":51,"position":51,"enabled":true,"name":"odbc_cdr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"lcr":{"id":24,"position":24,"enabled":true,"name":"lcr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sofia":{"id":42,"position":42,"enabled":true,"name":"sofia.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"verto":{"id":46,"position":46,"enabled":true,"name":"verto.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"shout":{"id":40,"position":40,"enabled":true,"name":"shout.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"redis":{"id":38,"position":38,"enabled":true,"name":"redis.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"nibblebill":{"id":29,"position":29,"enabled":true,"name":"nibblebill.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"db":{"id":14,"position":14,"enabled":true,"name":"db.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"distributor":{"id":17,"position":17,"enabled":true,"name":"distributor.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"memcache":{"id":26,"position":26,"enabled":true,"name":"memcache.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"avmd":{"id":5,"position":5,"enabled":true,"name":"avmd.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"tts_commandline":{"id":44,"position":44,"enabled":true,"name":"tts_commandline.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cdr_mongodb":{"id":7,"position":7,"enabled":true,"name":"cdr_mongodb.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"http_cache":{"id":23,"position":23,"enabled":true,"name":"http_cache.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"opus":{"id":31,"position":31,"enabled":true,"name":"opus.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"python":{"id":37,"position":37,"enabled":true,"name":"python.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"alsa":{"id":2,"position":2,"enabled":false,"name":"alsa.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"amr":{"id":52,"position":52,"enabled":false,"name":"amr.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"amrwb":{"id":4,"position":4,"enabled":true,"name":"amrwb.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cepstral":{"id":9,"position":9,"enabled":true,"name":"cepstral.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cidlookup":{"id":10,"position":10,"enabled":true,"name":"cidlookup.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"curl":{"id":13,"position":13,"enabled":true,"name":"curl.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"dialplan_directory":{"id":15,"position":15,"enabled":true,"name":"dialplan_directory.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"easyroute":{"id":18,"position":18,"enabled":true,"name":"easyroute.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"erlang_event":{"id":19,"position":19,"enabled":true,"name":"erlang_event.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"event_multicast":{"id":20,"position":20,"enabled":true,"name":"event_multicast.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"fax":{"id":21,"position":21,"enabled":true,"name":"fax.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"lua":{"id":25,"position":25,"enabled":true,"name":"lua.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"mongo":{"id":27,"position":27,"enabled":true,"name":"mongo.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"msrp":{"id":28,"position":28,"enabled":true,"name":"msrp.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"oreka":{"id":32,"position":32,"enabled":true,"name":"oreka.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"perl":{"id":34,"position":34,"enabled":true,"name":"perl.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"pocketsphinx":{"id":35,"position":35,"enabled":true,"name":"pocketsphinx.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sangoma_codec":{"id":39,"position":39,"enabled":true,"name":"sangoma_codec.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sndfile":{"id":41,"position":41,"enabled":true,"name":"sndfile.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"xml_cdr":{"id":48,"position":48,"enabled":true,"name":"xml_cdr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"xml_rpc":{"id":49,"position":49,"enabled":true,"name":"xml_rpc.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"zeroconf":{"id":50,"position":50,"enabled":true,"name":"zeroconf.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"directory":{"id":16,"position":16,"enabled":true,"name":"directory.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"fifo":{"id":22,"position":22,"enabled":true,"name":"fifo.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"opal":{"id":30,"position":30,"enabled":true,"name":"opal.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"osp":{"id":33,"position":33,"enabled":true,"name":"osp.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"unicall":{"id":45,"position":45,"enabled":true,"name":"unicall.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"conference":{"id":11,"position":11,"enabled":true,"name":"conference.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"conference_layouts":{"id":12,"position":12,"enabled":true,"name":"conference_layouts.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"post_load_modules":{"id":36,"position":36,"enabled":true,"name":"post_load_modules.conf","module":"","loaded":false,"unloadable":true,"parent":{"id":1}},"voicemail":{"id":47,"position":47,"enabled":true,"name":"voicemail.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}}}}
 	//Errors:
-	case "[Config][Switch] Module":
-		resp = getUser(msg, switchConfModules, onlyAdminGroup())
 	//Request:{"event":"[Config][From scratch] Module","data":{"token":"example-token","name":"alsa"}}
 	//Response:{"MessageType":"[Config][From scratch] Module"}
 	//Errors:
-	case "[Config][From scratch] Module":
-		resp = getUser(msg, fromScratchConfModules, onlyAdminGroup())
 	//Request:{"event":"[Config][Import] Module","data":{"token":"example-token","name":"alsa"}}
 	//Response:{"MessageType":"[Config][Import] Module"}
 	//Errors:
-	case "[Config][Import] Module":
-		resp = getUser(msg, importConfModules, onlyAdminGroup())
 	//Request:{"event":"[Config][Import] All Modules","data":{"token":"example-token"}}
 	//Response:{"MessageType":"[Config][Import] All Modules"}
 	//Errors:
-	case "[Config][Import] All Modules":
-		resp = getUser(msg, importConfAllModules, onlyAdminGroup())
 	//Request:{"event":"TruncateModuleConfig","data":{"token":"example-token","id":54}}
 	//Response:{"MessageType":"TruncateModuleConfig","modules":{"post_load_switch":{"id":43,"position":43,"enabled":true,"name":"post_load_switch.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"acl":{"id":1,"position":1,"enabled":true,"name":"acl.conf","module":"","loaded":false,"unloadable":true,"parent":{"id":1}},"callcenter":{"id":6,"position":6,"enabled":true,"name":"callcenter.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cdr_pg_csv":{"id":8,"position":8,"enabled":true,"name":"cdr_pg_csv.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"odbc_cdr":{"id":51,"position":51,"enabled":true,"name":"odbc_cdr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"lcr":{"id":24,"position":24,"enabled":true,"name":"lcr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sofia":{"id":42,"position":42,"enabled":true,"name":"sofia.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"verto":{"id":46,"position":46,"enabled":true,"name":"verto.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"shout":{"id":40,"position":40,"enabled":true,"name":"shout.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"redis":{"id":38,"position":38,"enabled":true,"name":"redis.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"nibblebill":{"id":29,"position":29,"enabled":true,"name":"nibblebill.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"db":{"id":14,"position":14,"enabled":true,"name":"db.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"distributor":{"id":17,"position":17,"enabled":true,"name":"distributor.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"memcache":{"id":26,"position":26,"enabled":true,"name":"memcache.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"avmd":{"id":5,"position":5,"enabled":true,"name":"avmd.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"tts_commandline":{"id":44,"position":44,"enabled":true,"name":"tts_commandline.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cdr_mongodb":{"id":7,"position":7,"enabled":true,"name":"cdr_mongodb.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"http_cache":{"id":23,"position":23,"enabled":true,"name":"http_cache.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"opus":{"id":31,"position":31,"enabled":true,"name":"opus.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"python":{"id":37,"position":37,"enabled":true,"name":"python.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"alsa":null,"amr":{"id":52,"position":52,"enabled":false,"name":"amr.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"amrwb":{"id":4,"position":4,"enabled":true,"name":"amrwb.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cepstral":{"id":9,"position":9,"enabled":true,"name":"cepstral.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cidlookup":{"id":10,"position":10,"enabled":true,"name":"cidlookup.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"curl":{"id":13,"position":13,"enabled":true,"name":"curl.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"dialplan_directory":{"id":15,"position":15,"enabled":true,"name":"dialplan_directory.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"easyroute":{"id":18,"position":18,"enabled":true,"name":"easyroute.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"erlang_event":{"id":19,"position":19,"enabled":true,"name":"erlang_event.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"event_multicast":{"id":20,"position":20,"enabled":true,"name":"event_multicast.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"fax":{"id":21,"position":21,"enabled":true,"name":"fax.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"lua":{"id":25,"position":25,"enabled":true,"name":"lua.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"mongo":{"id":27,"position":27,"enabled":true,"name":"mongo.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"msrp":{"id":28,"position":28,"enabled":true,"name":"msrp.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"oreka":{"id":32,"position":32,"enabled":true,"name":"oreka.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"perl":{"id":34,"position":34,"enabled":true,"name":"perl.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"pocketsphinx":{"id":35,"position":35,"enabled":true,"name":"pocketsphinx.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sangoma_codec":{"id":39,"position":39,"enabled":true,"name":"sangoma_codec.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sndfile":{"id":41,"position":41,"enabled":true,"name":"sndfile.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"xml_cdr":{"id":48,"position":48,"enabled":true,"name":"xml_cdr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"xml_rpc":{"id":49,"position":49,"enabled":true,"name":"xml_rpc.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"zeroconf":{"id":50,"position":50,"enabled":true,"name":"zeroconf.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"directory":{"id":16,"position":16,"enabled":true,"name":"directory.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"fifo":{"id":22,"position":22,"enabled":true,"name":"fifo.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"opal":{"id":30,"position":30,"enabled":true,"name":"opal.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"osp":{"id":33,"position":33,"enabled":true,"name":"osp.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"unicall":{"id":45,"position":45,"enabled":true,"name":"unicall.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"conference":{"id":11,"position":11,"enabled":true,"name":"conference.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"conference_layouts":{"id":12,"position":12,"enabled":true,"name":"conference_layouts.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"post_load_modules":{"id":36,"position":36,"enabled":true,"name":"post_load_modules.conf","module":"","loaded":false,"unloadable":true,"parent":{"id":1}},"voicemail":{"id":47,"position":47,"enabled":true,"name":"voicemail.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}}}}
 	//Errors:
-	case "TruncateModuleConfig":
-		resp = getUser(msg, TruncateModuleConfig, onlyAdminGroup())
 	//Request:{"event":"ImportXMLModuleConfig","data":{"token":"example-token","file":"<configuration name=\"alsa.conf\" description=\"Soundcard Endpoint\">\r\n  <settings>\r\n    <!--Default dialplan and caller-id info -->\r\n    <param name=\"dialplan\" value=\"XML\"/>\r\n    <param name=\"cid-name\" value=\"N800 Alsa\"/>\r\n    <param name=\"cid-num\" value=\"5555551212\"/>\r\n\r\n    <!--audio sample rate and interval -->\r\n    <param name=\"sample-rate\" value=\"8000\"/>\r\n    <param name=\"codec-ms\" value=\"20\"/>\r\n  </settings>\r\n</configuration>"}}
 	//Response:{"MessageType":"ImportXMLModuleConfig","modules":{"post_load_switch":{"id":43,"position":43,"enabled":true,"name":"post_load_switch.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"acl":{"id":1,"position":1,"enabled":true,"name":"acl.conf","module":"","loaded":false,"unloadable":true,"parent":{"id":1}},"callcenter":{"id":6,"position":6,"enabled":true,"name":"callcenter.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cdr_pg_csv":{"id":8,"position":8,"enabled":true,"name":"cdr_pg_csv.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"odbc_cdr":{"id":51,"position":51,"enabled":true,"name":"odbc_cdr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"lcr":{"id":24,"position":24,"enabled":true,"name":"lcr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sofia":{"id":42,"position":42,"enabled":true,"name":"sofia.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"verto":{"id":46,"position":46,"enabled":true,"name":"verto.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"shout":{"id":40,"position":40,"enabled":true,"name":"shout.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"redis":{"id":38,"position":38,"enabled":true,"name":"redis.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"nibblebill":{"id":29,"position":29,"enabled":true,"name":"nibblebill.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"db":{"id":14,"position":14,"enabled":true,"name":"db.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"distributor":{"id":17,"position":17,"enabled":true,"name":"distributor.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"memcache":{"id":26,"position":26,"enabled":true,"name":"memcache.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"avmd":{"id":5,"position":5,"enabled":true,"name":"avmd.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"tts_commandline":{"id":44,"position":44,"enabled":true,"name":"tts_commandline.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cdr_mongodb":{"id":7,"position":7,"enabled":true,"name":"cdr_mongodb.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"http_cache":{"id":23,"position":23,"enabled":true,"name":"http_cache.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"opus":{"id":31,"position":31,"enabled":true,"name":"opus.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"python":{"id":37,"position":37,"enabled":true,"name":"python.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"alsa":{"id":55,"position":53,"enabled":true,"name":"alsa.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"amr":{"id":52,"position":52,"enabled":false,"name":"amr.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"amrwb":{"id":4,"position":4,"enabled":true,"name":"amrwb.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cepstral":{"id":9,"position":9,"enabled":true,"name":"cepstral.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"cidlookup":{"id":10,"position":10,"enabled":true,"name":"cidlookup.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"curl":{"id":13,"position":13,"enabled":true,"name":"curl.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"dialplan_directory":{"id":15,"position":15,"enabled":true,"name":"dialplan_directory.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"easyroute":{"id":18,"position":18,"enabled":true,"name":"easyroute.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"erlang_event":{"id":19,"position":19,"enabled":true,"name":"erlang_event.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"event_multicast":{"id":20,"position":20,"enabled":true,"name":"event_multicast.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"fax":{"id":21,"position":21,"enabled":true,"name":"fax.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"lua":{"id":25,"position":25,"enabled":true,"name":"lua.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"mongo":{"id":27,"position":27,"enabled":true,"name":"mongo.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"msrp":{"id":28,"position":28,"enabled":true,"name":"msrp.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"oreka":{"id":32,"position":32,"enabled":true,"name":"oreka.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"perl":{"id":34,"position":34,"enabled":true,"name":"perl.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"pocketsphinx":{"id":35,"position":35,"enabled":true,"name":"pocketsphinx.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sangoma_codec":{"id":39,"position":39,"enabled":true,"name":"sangoma_codec.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"sndfile":{"id":41,"position":41,"enabled":true,"name":"sndfile.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"xml_cdr":{"id":48,"position":48,"enabled":true,"name":"xml_cdr.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"xml_rpc":{"id":49,"position":49,"enabled":true,"name":"xml_rpc.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"zeroconf":{"id":50,"position":50,"enabled":true,"name":"zeroconf.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"directory":{"id":16,"position":16,"enabled":true,"name":"directory.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"fifo":{"id":22,"position":22,"enabled":true,"name":"fifo.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"opal":{"id":30,"position":30,"enabled":true,"name":"opal.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"osp":{"id":33,"position":33,"enabled":true,"name":"osp.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"unicall":{"id":45,"position":45,"enabled":true,"name":"unicall.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"conference":{"id":11,"position":11,"enabled":true,"name":"conference.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}},"conference_layouts":{"id":12,"position":12,"enabled":true,"name":"conference_layouts.conf","module":"","loaded":false,"unloadable":false,"parent":{"id":1}},"post_load_modules":{"id":36,"position":36,"enabled":true,"name":"post_load_modules.conf","module":"","loaded":false,"unloadable":true,"parent":{"id":1}},"voicemail":{"id":47,"position":47,"enabled":true,"name":"voicemail.conf","module":"","loaded":true,"unloadable":false,"parent":{"id":1}}}}
 	//Errors:
-	case "ImportXMLModuleConfig":
-		resp = getUser(msg, ImportXMLModuleConfig, onlyAdminGroup())
 	//Request:{"event":"[Config][Autoload] Module","data":{"token":"example-token","id":55}}
 	//Response:{"MessageType":"[Config][Autoload] Module","data":{"id":15,"position":12,"enabled":true,"name":"mod_alsa","description":"","parent":{"id":36,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
 	//Errors:
-	case "[Config][Autoload] Module":
-		res, err := intermediateDB.GetByIdFromDB(&altStruct.ConfigurationsList{Id: msg.Id})
-		if err != nil || res == nil {
-			return webStruct.UserResponse{Error: "module not found", MessageType: msg.Event}
-		}
-		module, ok := res.(altStruct.ConfigurationsList)
-		if !ok {
-			return webStruct.UserResponse{Error: "module not found", MessageType: msg.Event}
-		}
-		module.Module = mainStruct.GetModuleNameByConfName(module.Name)
-		result, err := intermediateDB.GetByValue(&altStruct.ConfigPostLoadModule{Name: module.Module, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigPostLoadModule{}))}, map[string]bool{"Parent": true, "Name": true})
-		if err != nil || module.Module == "" {
-			return webStruct.UserResponse{Error: "module not found", MessageType: msg.Event}
-		}
-		if len(result) == 0 {
-			resp = getUserForConfig(msg, setConfig, &altStruct.ConfigPostLoadModule{Name: module.Module, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigPostLoadModule{}))}, onlyAdminGroup())
-		} else {
-			postloadMod, ok := result[0].(altStruct.ConfigPostLoadModule)
-			if !ok {
-				return webStruct.UserResponse{Error: "module not found", MessageType: msg.Event}
-			}
-			resp = getUserForConfig(msg, updateConfig, struct {
-				S interface{}
-				A []string
-			}{&altStruct.ConfigPostLoadModule{Id: postloadMod.Id, Enabled: !postloadMod.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-		}
-	//### Acl
-	//Request:{"event":"GetAclLists","data":{"token":"example-token"}}
-	//Response:{"MessageType":"GetAclLists","data":{"1":{"id":1,"position":1,"enabled":true,"name":"lan","default":"allow","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"domains","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}}
-	//Errors:
-	case "GetAclLists":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigAclList{}, onlyAdminGroup())
-	//Request:{"event":"AddAclList","data":{"token":"example-token","name":"dddd","default":"deny"}}
-	//Response:{"MessageType":"AddAclList","data":{"id":4,"position":3,"enabled":true,"name":"dddd","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "AddAclList":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigAclList{Name: msg.Name, Default: msg.Default, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigAclList{}))}, onlyAdminGroup())
-	//Request:{"event":"UpdateAclList","data":{"token":"example-token","id":4,"value":"allow"}}
-	//Response:{"MessageType":"UpdateAclList","data":{"id":4,"position":3,"enabled":true,"name":"dddd2","default":"allow","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "UpdateAclListDefault":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigAclList{Id: msg.Id, Default: msg.Default}, []string{"Default"}}, onlyAdminGroup())
-		//Request:{"event":"UpdateAclList","data":{"token":"example-token","id":4,"name":"dddd2"}}
-	//Response:{"MessageType":"UpdateAclList","data":{"id":4,"position":3,"enabled":true,"name":"dddd2","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "UpdateAclList":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigAclList{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
-	//Request:{"event":"DelAclList","data":{"token":"example-token","id":4}}
-	//Response:{"MessageType":"DelAclList","data":{"id":4,"position":3,"enabled":true,"name":"dddd2","default":"deny","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "DelAclList":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigAclList{Id: msg.Id}, onlyAdminGroup())
-	//Request:{"event":"[Config] Update_acl_list_default","data":{"token":"example-token","value":"allow","id":5}}
-	//Response:{"MessageType":"[Config] Update_acl_list_default","data":{"id":5,"position":3,"enabled":true,"name":"ccc","default":"allow","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config] Update_acl_list_default":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigAclList{Id: msg.Id, Default: msg.Value}, []string{"Default"}}, onlyAdminGroup())
-	//Request:{"event":"GetAclNodes","data":{"token":"example-token","id":1}}
-	//Response:{"MessageType":"GetAclNodes","data":{"1":{"id":1,"position":1,"enabled":true,"type":"deny","cidr":"192.168.42.0/24","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}},"2":{"id":2,"position":4,"enabled":true,"type":"allow","cidr":"192.168.42.42/32","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}},"7":{"id":7,"position":5,"enabled":false,"type":"2","cidr":"2","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}}
-	//Errors:
-	case "GetAclNodes":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigAclNode{}, onlyAdminGroup())
-	//Request:{"event":"AddAclNode","data":{"token":"example-token","id":1,"node":{"type":"allow","cidr":"0.0.0.0","domain":""}}}
-	//Response:{"MessageType":"AddAclNode","data":{"id":9,"position":6,"enabled":true,"type":"allow","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
-	//Errors:
-	case "AddAclNode":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigAclNode{Type: msg.Node.Type, Cidr: msg.Node.Cidr, Domain: msg.Node.Domain, Enabled: true, Parent: &altStruct.ConfigAclList{Id: msg.Id}}, onlyAdminGroup())
-	//Request:{"event":"DelAclNode","data":{"token":"example-token","id":9}}
-	//Response:{"MessageType":"DelAclNode","data":{"id":9,"position":6,"enabled":true,"type":"allow","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
-	//Errors:
-	case "DelAclNode":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigAclNode{Id: msg.Id}, onlyAdminGroup())
-	//Request:{"event":"UpdateAclNode","data":{"token":"example-token","node":{"id":7,"type":"deny","cidr":"0.0.0.0","domain":""}}}
-	//Response:{"MessageType":"UpdateAclNode","data":{"id":7,"position":5,"enabled":true,"type":"deny","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
-	//Errors:
-	case "UpdateAclNode":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigAclNode{Id: msg.Node.Id, Type: msg.Node.Type, Cidr: msg.Node.Cidr, Domain: msg.Node.Domain}, []string{"Type", "Cidr", "Domain"}}, onlyAdminGroup())
-	//Request:{"event":"SwitchAclNode","data":{"token":"example-token","node":{"id":7,"enabled":false}}}
-	//Response:{"MessageType":"SwitchAclNode","data":{"id":7,"position":5,"enabled":false,"type":"deny","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}
-	//Errors:
-	case "SwitchAclNode":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigAclNode{Id: msg.Node.Id, Enabled: msg.Node.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"MoveAclListNode","data":{"token":"example-token","previous_index":1,"current_index":4,"id":1}}
-	//Response:{"MessageType":"MoveAclListNode","data":{"1":{"id":1,"position":4,"enabled":true,"type":"deny","cidr":"192.168.42.0/24","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}},"2":{"id":2,"position":3,"enabled":true,"type":"allow","cidr":"192.168.42.42/32","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}},"7":{"id":7,"position":5,"enabled":false,"type":"deny","cidr":"0.0.0.0","domain":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","default":"","description":"","parent":null}}}}
-	//Errors:
-	case "MoveAclListNode":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigAclNode{Id: msg.Id, Position: msg.CurrentIndex}, []string{"Position"}}, onlyAdminGroup())
-	//### Sofia
-	//Request:{"event":"[Config] Get_sofia_global_settings","data":{"token":"example-token"}}
-	//Response:{"MessageType":"[Config] Get_sofia_global_settings","data":{"1":{"id":1,"position":1,"enabled":true,"name":"log-level","value":"0","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"debug-presence","value":"0","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}}
-	//Errors:
-	case "[Config] Get_sofia_global_settings":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigSofiaGlobalSetting{}, onlyAdminGroup())
-	//Request:{"event":"[Config] Update_sofia_global_setting","data":{"token":"example-token","param":{"id":10,"name":"paramn2","value":"paramv2"}}}
-	//Response:{"MessageType":"[Config] Update_sofia_global_setting","data":{"id":10,"position":3,"enabled":true,"name":"paramn2","value":"paramv2","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config] Update_sofia_global_setting":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaGlobalSetting{Id: msg.Param.Id, Name: msg.Param.Name, Value: msg.Param.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Switch_sofia_global_setting","data":{"token":"example-token","param":{"id":2,"enabled":false}}}
-	//Response:{"MessageType":"[Config] Switch_sofia_global_setting","data":{"id":2,"position":2,"enabled":false,"name":"debug-presence","value":"0","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config] Switch_sofia_global_setting":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaGlobalSetting{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Add_sofia_global_setting","data":{"token":"example-token","param":{"name":"paramn","value":"paramv"}}}
-	//Response:{"MessageType":"[Config] Add_sofia_global_setting","data":{"id":10,"position":3,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config] Add_sofia_global_setting":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigSofiaGlobalSetting{Name: msg.Param.Name, Value: msg.Param.Value, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigSofiaGlobalSetting{}))}, onlyAdminGroup())
-	//Request:{"event":"[Config] Del_sofia_global_setting","data":{"token":"example-token","param":{"id":10}}}
-	//Response:{"MessageType":"[Config] Del_sofia_global_setting","data":{"id":10,"position":3,"enabled":true,"name":"paramn2","value":"paramv2","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config] Del_sofia_global_setting":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigSofiaGlobalSetting{Id: msg.Param.Id}, onlyAdminGroup())
-	//Request:{"event":"[Config] Get_sofia_profiles","data":{"token":"example-token"}}
-	//Response:{"MessageType":"[Config] Get_sofia_profiles","data":{"1":{"id":1,"position":1,"enabled":true,"name":"external-ipv6","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null},"started":true,"state":"RUNNING (0)","uri":"sip:mod_sofia@[::1]:5080"},"2":{"id":2,"position":2,"enabled":true,"name":"external","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null},"started":true,"state":"RUNNING (0)","uri":"sip:mod_sofia@45.61.54.76:5080"},"3":{"id":3,"position":3,"enabled":true,"name":"internal-ipv6","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null},"started":true,"state":"RUNNING (0)","uri":"sip:mod_sofia@[::1]:5060"},"4":{"id":4,"position":4,"enabled":true,"name":"internal","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null},"started":true,"state":"RUNNING (21) (WSS)","uri":"sips:mod_sofia@45.61.54.76:7443;transport=wss"}}}
-	//Errors:
-	case webStruct.GetSofiaProfiles:
-		//yeah getting profiles twice
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigSofiaProfile{}, onlyAdminGroup())
-		resp = setProfileStatuses(resp)
-	//Request:{"event":"[Config] Get_sofia_profiles_params","data":{"token":"example-token","id":1}}
-	//Response:{"MessageType":"[Config] Get_sofia_profiles_params","data":{"1":{"id":1,"position":1,"enabled":true,"name":"debug","value":"0","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"10":{"id":10,"position":10,"enabled":true,"name":"outbound-codec-prefs","value":"OPUS,G722,PCMU,PCMA,H264,VP8","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"11":{"id":11,"position":11,"enabled":true,"name":"hold-music","value":"local_stream://moh","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"12":{"id":12,"position":12,"enabled":true,"name":"rtp-timer-name","value":"soft","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"13":{"id":13,"position":13,"enabled":true,"name":"local-network-acl","value":"localnet.auto","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"14":{"id":14,"position":14,"enabled":true,"name":"manage-presence","value":"false","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"15":{"id":15,"position":15,"enabled":true,"name":"inbound-codec-negotiation","value":"generous","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"16":{"id":16,"position":16,"enabled":true,"name":"nonce-ttl","value":"60","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"17":{"id":17,"position":17,"enabled":true,"name":"auth-calls","value":"false","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"18":{"id":18,"position":18,"enabled":true,"name":"inbound-late-negotiation","value":"true","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"19":{"id":19,"position":19,"enabled":true,"name":"inbound-zrtp-passthru","value":"true","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"2":{"id":2,"position":2,"enabled":true,"name":"sip-trace","value":"no","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"20":{"id":20,"position":20,"enabled":true,"name":"rtp-ip","value":"::1","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"21":{"id":21,"position":21,"enabled":true,"name":"sip-ip","value":"::1","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"22":{"id":22,"position":22,"enabled":true,"name":"rtp-timeout-sec","value":"300","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"23":{"id":23,"position":23,"enabled":true,"name":"rtp-hold-timeout-sec","value":"1800","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"24":{"id":24,"position":24,"enabled":true,"name":"tls","value":"false","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"25":{"id":25,"position":25,"enabled":true,"name":"tls-only","value":"false","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"26":{"id":26,"position":26,"enabled":true,"name":"tls-bind-params","value":"transport=tls","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"27":{"id":27,"position":27,"enabled":true,"name":"tls-sip-port","value":"5081","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"28":{"id":28,"position":28,"enabled":true,"name":"tls-passphrase","value":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"29":{"id":29,"position":29,"enabled":true,"name":"tls-verify-date","value":"true","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"3":{"id":3,"position":3,"enabled":true,"name":"sip-capture","value":"no","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"30":{"id":30,"position":30,"enabled":true,"name":"tls-verify-policy","value":"none","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"31":{"id":31,"position":31,"enabled":true,"name":"tls-verify-depth","value":"2","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"32":{"id":32,"position":32,"enabled":true,"name":"tls-verify-in-subjects","value":"","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"33":{"id":33,"position":33,"enabled":true,"name":"tls-version","value":"tlsv1,tlsv1.1,tlsv1.2","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"4":{"id":4,"position":4,"enabled":true,"name":"rfc2833-pt","value":"101","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"5":{"id":5,"position":5,"enabled":true,"name":"sip-port","value":"5080","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"6":{"id":6,"position":6,"enabled":true,"name":"dialplan","value":"XML","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"7":{"id":7,"position":7,"enabled":true,"name":"context","value":"public","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"8":{"id":8,"position":8,"enabled":true,"name":"dtmf-duration","value":"2000","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}},"9":{"id":9,"position":9,"enabled":true,"name":"inbound-codec-prefs","value":"OPUS,G722,PCMU,PCMA,H264,VP8","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}}
-	//Errors:
-	case "[Config] Get_sofia_profiles_params":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigSofiaProfileParameter{}, onlyAdminGroup())
-	//Request:{"event":"[Config] Add_sofia_profile_param","data":{"token":"example-token","id":1,"param":{"name":"paramn","value":"paramv"}}}
-	//Response:{"MessageType":"[Config] Add_sofia_profile_param","data":{"id":180,"position":34,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Add_sofia_profile_param":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigSofiaProfileParameter{Name: msg.Param.Name, Value: msg.Param.Value, Enabled: true, Parent: &altStruct.ConfigSofiaProfile{Id: msg.Id}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Del_sofia_profile_param","data":{"token":"example-token","param":{"id":180}}}
-	//Response:{"MessageType":"[Config] Del_sofia_profile_param","data":{"id":180,"position":34,"enabled":true,"name":"paramn2","value":"paramv2","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Del_sofia_profile_param":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigSofiaProfileParameter{Id: msg.Param.Id}, onlyAdminGroup())
-	//Request:{"event":"[Config] Switch_sofia_profile_param","data":{"token":"example-token","param":{"id":180,"enabled":false}}}
-	//Response:{"MessageType":"[Config] Switch_sofia_profile_param","data":{"id":180,"position":34,"enabled":false,"name":"paramn","value":"paramv","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Switch_sofia_profile_param":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileParameter{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Update_sofia_profile_param","data":{"token":"example-token","param":{"id":180,"name":"paramn2","value":"paramv2"}}}
-	//Response:{"MessageType":"[Config] Update_sofia_profile_param","data":{"id":180,"position":34,"enabled":true,"name":"paramn2","value":"paramv2","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Update_sofia_profile_param":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileParameter{Id: msg.Param.Id, Name: msg.Param.Name, Value: msg.Param.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Get_sofia_profile_gateways","data":{"token":"example-token","id":2,"keep_subscription":true}}
-	//Response:{"MessageType":"[Config] Get_sofia_profile_gateways","data":{"9":{"id":9,"position":1,"enabled":true,"name":"test","description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""},"started":false,"state":""}}}
-	//Errors:
-	case "[Config] Get_sofia_profile_gateways":
-		//yeah getting gateways twice
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigSofiaProfileGateway{}, onlyAdminGroup())
-		gateways, ok := resp.Data.(map[int64]interface{})
-		if ok {
-			gatewaysX := fsesl.GetSofiaGatewaysStatuses()
-			for _, gatewayI := range gateways {
-				gateway, ok := gatewayI.(altStruct.ConfigSofiaProfileGateway)
-				if !ok {
-					continue
-				}
-				profileX := gatewaysX[gateway.Id]
-				if profileX == nil {
-					continue
-				}
-				gateway.Started = profileX.Started
-				gateway.State = profileX.State
-				gateways[gateway.Id] = gateway
-			}
-			resp.Data = gateways
-		}
-	//Request:
-	//Response:
-	//Errors:
-	case "GetSofiaProfileGatewayVariables":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigSofiaProfileGatewayVariable{}, onlyAdminGroup())
-	//Request:{"event":"GetSofiaProfileGatewayParameters","data":{"token":"example-token","id":9}}
-	//Response:{"MessageType":"GetSofiaProfileGatewayParameters","data":{"20":{"id":20,"position":1,"enabled":true,"name":"test","value":"param","description":"","parent":{"id":9,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":""}}}}
-	//Errors:
-	case "GetSofiaProfileGatewayParameters":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigSofiaProfileGatewayParameter{}, onlyAdminGroup())
-	//Request:{"event":"[Config] Add_sofia_profile_gateway_param","data":{"token":"example-token","id":9,"param":{"name":"paramn","value":"paramv"}}}
-	//Response:{"MessageType":"[Config] Add_sofia_profile_gateway_param","data":{"id":21,"position":2,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":9,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":""}}}
-	//Errors:
-	case "[Config] Add_sofia_profile_gateway_param":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigSofiaProfileGatewayParameter{Name: msg.Param.Name, Value: msg.Param.Value, Enabled: true, Parent: &altStruct.ConfigSofiaProfileGateway{Id: msg.Id}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Update_sofia_profile_gateway_param","data":{"token":"example-token","param":{"id":21,"name":"paramn2","value":"paramv2"}}}
-	//Response:{"MessageType":"[Config] Update_sofia_profile_gateway_param","data":{"id":21,"position":2,"enabled":true,"name":"paramn2","value":"paramv2","description":"","parent":{"id":9,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":""}}}
-	//Errors:
-	case "[Config] Update_sofia_profile_gateway_param":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileGatewayParameter{Id: msg.Param.Id, Name: msg.Param.Name, Value: msg.Param.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Switch_sofia_profile_gateway_param","data":{"token":"example-token","param":{"id":21,"enabled":false}}}
-	//Response:{"MessageType":"[Config] Switch_sofia_profile_gateway_param","data":{"id":21,"position":2,"enabled":false,"name":"paramn2","value":"paramv2","description":"","parent":{"id":9,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":""}}}
-	//Errors:
-	case "[Config] Switch_sofia_profile_gateway_param":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileGatewayParameter{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Del_sofia_profile_gateway_param","data":{"token":"example-token","param":{"id":2}}}
-	//Response:{"MessageType":"[Config] Del_sofia_profile_gateway_param","data":{"id":21,"position":2,"enabled":false,"name":"paramn2","value":"paramv2","description":"","parent":{"id":9,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":""}}}
-	//Errors:
-	case "[Config] Del_sofia_profile_gateway_param":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigSofiaProfileGatewayParameter{Id: msg.Param.Id}, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Config] Add_sofia_profile_gateway_var":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigSofiaProfileGatewayVariable{Name: msg.Param.Name, Value: msg.Param.Value, Enabled: true, Parent: &altStruct.ConfigSofiaProfileGateway{Id: msg.Id}}, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Config] Update_sofia_profile_gateway_var":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileGatewayVariable{Id: msg.Variable.Id, Name: msg.Variable.Name, Value: msg.Variable.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Config] Switch_sofia_profile_gateway_var":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileGatewayVariable{Id: msg.Variable.Id, Enabled: msg.Variable.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Config] Del_sofia_profile_gateway_var":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigSofiaProfileGatewayVariable{Id: msg.Variable.Id}, onlyAdminGroup())
-	//Request:{"event":"[Config] Add_sofia_profile_gateway","data":{"token":"example-token","name":"test_gw","id":2}}
-	//Response:{"MessageType":"[Config] Add_sofia_profile_gateway","data":{"id":10,"position":2,"enabled":true,"name":"test_gw","description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""},"started":false,"state":""}}
-	//Errors:
-	case "[Config] Add_sofia_profile_gateway":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigSofiaProfileGateway{Name: msg.Name, Enabled: true, Parent: &altStruct.ConfigSofiaProfile{Id: msg.Id}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Del_sofia_profile_gateway","data":{"token":"example-token","id":1}}
-	//Response:{"MessageType":"[Config] Del_sofia_profile_gateway","data":{"id":10,"position":2,"enabled":true,"name":"test_gw2","description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""},"started":false,"state":""}}
-	//Errors:
-	case "[Config] Del_sofia_profile_gateway":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigSofiaProfileGateway{Id: msg.Id}, onlyAdminGroup())
-	//Request:{"event":"[Config] Rename_sofia_profile_gateway","data":{"token":"example-token","id":10,"name":"test_gw2"}}
-	//Response:{"MessageType":"[Config] Rename_sofia_profile_gateway","data":{"id":10,"position":2,"enabled":true,"name":"test_gw2","description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""},"started":false,"state":""}}
-	//Errors:
-	case "[Config] Rename_sofia_profile_gateway":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileGateway{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Get_sofia_profile_domains","data":{"token":"example-token","id":2}}
-	//Response:{"MessageType":"[Config] Get_sofia_profile_domains","data":{"1":{"id":1,"position":1,"enabled":true,"name":"all","alias":false,"parse":true,"description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}}
-	//Errors:
-	case "[Config] Get_sofia_profile_domains":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigSofiaProfileDomain{}, onlyAdminGroup())
-	//Request:{"event":"[Config] Add_sofia_profile_domain","data":{"token":"example-token","id":2,"sofia_domain":{"name":"domain2","alias":true,"parse":false}}}
-	//Response:{"MessageType":"[Config] Add_sofia_profile_domain","data":{"id":12,"position":2,"enabled":true,"name":"domain2","alias":true,"parse":false,"description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Add_sofia_profile_domain":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigSofiaProfileDomain{Name: msg.SofiaDomain.Name, Alias: msg.SofiaDomain.Alias, Parse: msg.SofiaDomain.Parse, Enabled: true, Parent: &altStruct.ConfigSofiaProfile{Id: msg.Id}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Del_sofia_profile_domain","data":{"token":"example-token","sofia_domain":{"id":1}}}
-	//Response:{"MessageType":"[Config] Del_sofia_profile_domain","data":{"id":12,"position":2,"enabled":true,"name":"domain2","alias":true,"parse":false,"description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Del_sofia_profile_domain":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigSofiaProfileDomain{Id: msg.SofiaDomain.Id}, onlyAdminGroup())
-	//Request:{"event":"[Config] Switch_sofia_profile_domain","data":{"token":"example-token","sofia_domain":{"id":1,"enabled":false}}}
-	//Response:{"MessageType":"[Config] Switch_sofia_profile_domain","data":{"id":1,"position":1,"enabled":false,"name":"all","alias":false,"parse":true,"description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Switch_sofia_profile_domain":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileDomain{Id: msg.SofiaDomain.Id, Enabled: msg.SofiaDomain.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Update_sofia_profile_domain","data":{"token":"example-token","sofia_domain":{"id":1,"name":"all","alias":false,"parse":true}}}
-	//Response:{"MessageType":"[Config] Update_sofia_profile_domain","data":{"id":1,"position":1,"enabled":true,"name":"all","alias":false,"parse":true,"description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Update_sofia_profile_domain":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileDomain{Id: msg.SofiaDomain.Id, Name: msg.SofiaDomain.Name, Alias: msg.SofiaDomain.Alias, Parse: msg.SofiaDomain.Parse}, []string{"Name", "Alias", "Parse"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Get_sofia_profile_aliases","data":{"token":"example-token","id":2}}
-	//Response:{"MessageType":"[Config] Get_sofia_profile_aliases","data":{"4":{"id":4,"position":1,"enabled":true,"name":"domain_alias","description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}}
-	//Errors:
-	case "[Config] Get_sofia_profile_aliases":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigSofiaProfileAlias{}, onlyAdminGroup())
-	//Request:{"event":"[Config] Add_sofia_profile_alias","data":{"token":"example-token","id":2,"sofia_alias":{"name":"domain_alias2"}}}
-	//Response:{"MessageType":"[Config] Add_sofia_profile_alias","data":{"id":5,"position":2,"enabled":true,"name":"domain_alias2","description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Add_sofia_profile_alias":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigSofiaProfileAlias{Name: msg.SofiaAlias.Name, Enabled: true, Parent: &altStruct.ConfigSofiaProfile{Id: msg.Id}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Del_sofia_profile_alias","data":{"token":"example-token","sofia_alias":{"id":5}}}
-	//Response:{"MessageType":"[Config] Del_sofia_profile_alias","data":{"id":5,"position":2,"enabled":true,"name":"domain_alias2","description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Del_sofia_profile_alias":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigSofiaProfileAlias{Id: msg.SofiaAlias.Id}, onlyAdminGroup())
-	//Request:{"event":"[Config] Switch_sofia_profile_alias","data":{"token":"example-token","sofia_alias":{"id":4,"enabled":false}}}
-	//Response:{"MessageType":"[Config] Switch_sofia_profile_alias","data":{"id":4,"position":1,"enabled":false,"name":"domain_alias","description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Switch_sofia_profile_alias":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileAlias{Id: msg.SofiaAlias.Id, Enabled: msg.SofiaAlias.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Update_sofia_profile_alias","data":{"token":"example-token","sofia_alias":{"id":4,"name":"domain_alias3"}}}
-	//Response:{"MessageType":"[Config] Update_sofia_profile_alias","data":{"id":4,"position":1,"enabled":true,"name":"domain_alias3","description":"","parent":{"id":2,"position":0,"enabled":false,"name":"","description":"","parent":null,"started":false,"state":"","uri":""}}}
-	//Errors:
-	case "[Config] Update_sofia_profile_alias":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfileAlias{Id: msg.SofiaAlias.Id, Name: msg.SofiaAlias.Name}, []string{"Name"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Add_sofia_profile","data":{"token":"example-token","name":"new_profile"}}
-	//Response:{"MessageType":"[Config] Add_sofia_profile","data":{"id":19,"position":5,"enabled":true,"name":"new_profile","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null},"started":false,"state":"","uri":""}}
-	//Errors:
-	case "[Config] Add_sofia_profile":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigSofiaProfile{Name: msg.Name, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigSofiaProfile{}))}, onlyAdminGroup())
-	//Request:{"event":"[Config] Rename_sofia_profile","data":{"token":"example-token","id":19,"name":"new_profile2"}}
-	//Response:{"MessageType":"[Config] Rename_sofia_profile","data":{"id":19,"position":5,"enabled":true,"name":"new_profile2","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null},"started":false,"state":"","uri":""}}
-	//Errors:
-	case "[Config] Rename_sofia_profile":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfile{Id: msg.Id, Name: msg.Name}, []string{"Name"}}, onlyAdminGroup())
-	//Request:{"event":"[Config] Del_sofia_profile","data":{"token":"example-token","id":1}}
-	//Response:{"MessageType":"[Config] Del_sofia_profile","data":{"id":19,"position":5,"enabled":true,"name":"new_profile2","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null},"started":false,"state":"","uri":""}}
-	//Errors:
-	case "[Config] Del_sofia_profile":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigSofiaProfile{Id: msg.Id}, onlyAdminGroup())
-	//Request:{"event":"[API] Sofia profile command","data":{"token":"example-token","name":"stop","id":1,"id_int":0}}
-	//Response:{"MessageType":"[API] Sofia profile command"}
-	//Errors:
-	case "[API] Sofia profile command":
-		//TODO: replace
-		resp = getUser(msg, runProfileCommand, onlyAdminGroup())
-	//Request:{"event":"[Config] Switch_sofia_profile","data":{"token":"example-token","id":1,"enabled":false}}
-	//Response:{"MessageType":"[Config] Switch_sofia_profile","data":{"id":1,"position":1,"enabled":false,"name":"external-ipv6","description":"","parent":{"id":42,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null},"started":false,"state":"","uri":""}}
-	//Errors:
-	case "[Config] Switch_sofia_profile":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigSofiaProfile{Id: msg.Id, Enabled: *msg.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-		resp = setProfileStatuses(resp)
-	//### Cdr_Pg_Csv
-	//Request:{"event":"[Config][Get] Cdr_Pg_Csv","data":{"token":"example-token"}}
-	//Response:{"MessageType":"[Config][Get] Cdr_Pg_Csv","data":{"settings":{"1":{"id":1,"position":1,"enabled":true,"name":"db-info","value":"host=localhost dbname=cdr connect_timeout=10","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"legs","value":"a","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"3":{"id":3,"position":3,"enabled":true,"name":"spool-format","value":"csv","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"4":{"id":4,"position":4,"enabled":true,"name":"rotate-on-hup","value":"true","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}},"schemas":{}}}
-	//Errors:
-	case "[Config][Get] Cdr_Pg_Csv":
-		resp1 := getUserForConfig(msg, getConfig, &altStruct.ConfigCdrPgCsvSetting{}, onlyAdminGroup())
-		resp2 := getUserForConfig(msg, getConfig, &altStruct.ConfigCdrPgCsvSchema{}, onlyAdminGroup())
-		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
-			S   interface{} `json:"settings"`
-			Sch interface{} `json:"schemas"`
-		}{S: resp1.Data, Sch: resp2.Data}}
-	//Request:{"event":"[Config][Add] Cdr_Pg_Csv Parameter","data":{"token":"example-token","param":{"name":"paramn","value":"paramv"}}}
-	//Response:{"MessageType":"[Config][Add] Cdr_Pg_Csv Parameter","data":{"id":12,"position":5,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config][Add] Cdr_Pg_Csv Parameter":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigCdrPgCsvSetting{Name: msg.Param.Name, Value: msg.Param.Value, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigCdrPgCsvSetting{}))}, onlyAdminGroup())
-	//Request:{"event":"[Config][Update] Cdr_Pg_Csv Parameter","data":{"token":"example-token","param":{"id":12,"name":"paramn2","value":"paramv2"}}}
-	//Response:{"MessageType":"[Config][Update] Cdr_Pg_Csv Parameter","data":{"id":12,"position":5,"enabled":true,"name":"paramn2","value":"paramv2","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config][Update] Cdr_Pg_Csv Parameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigCdrPgCsvSetting{Id: msg.Param.Id, Name: msg.Param.Name, Value: msg.Param.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
-	//Request:{"event":"[Config][Switch] Cdr_Pg_Csv Parameter","data":{"token":"example-token","param":{"id":12,"enabled":false}}}
-	//Response:{"MessageType":"[Config][Switch] Cdr_Pg_Csv Parameter","data":{"id":12,"position":5,"enabled":false,"name":"paramn2","value":"paramv2","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config][Switch] Cdr_Pg_Csv Parameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigCdrPgCsvSetting{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"[Config][Delete] Cdr_Pg_Csv Parameter","data":{"token":"example-token","param":{"id":1}}}
-	//Response:{"MessageType":"[Config][Delete] Cdr_Pg_Csv Parameter","data":{"id":12,"position":5,"enabled":false,"name":"paramn2","value":"paramv2","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config][Delete] Cdr_Pg_Csv Parameter":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigCdrPgCsvSetting{Id: msg.Param.Id}, onlyAdminGroup())
-	//Request:{"event":"[Config][Add] Cdr_Pg_Csv Field","data":{"token":"example-token","field":{"var":"var","column":"column"}}}
-	//Response:{"MessageType":"[Config][Add] Cdr_Pg_Csv Field","data":{"id":21,"position":1,"enabled":true,"var":"var","column":"column","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config][Add] Cdr_Pg_Csv Field":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigCdrPgCsvSchema{Var: msg.Field.Var, Column: msg.Field.Column, Quote: msg.Field.Quote, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigCdrPgCsvSchema{}))}, onlyAdminGroup())
-	//Request:{"event":"[Config][Update] Cdr_Pg_Csv Field","data":{"token":"example-token","field":{"id":21,"var":"var2","column":"column2"}}}
-	//Response:{"MessageType":"[Config][Update] Cdr_Pg_Csv Field","data":{"id":21,"position":1,"enabled":true,"var":"var2","column":"column2","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config][Update] Cdr_Pg_Csv Field":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigCdrPgCsvSchema{Id: msg.Field.Id, Var: msg.Field.Var, Column: msg.Field.Column, Quote: msg.Field.Quote}, []string{"Var", "Column", "Quote"}}, onlyAdminGroup())
-	//Request:{"event":"[Config][Switch] Cdr_Pg_Csv Field","data":{"token":"example-token","field":{"id":21,"enabled":false}}}
-	//Response:{"MessageType":"[Config][Switch] Cdr_Pg_Csv Field","data":{"id":21,"position":1,"enabled":false,"var":"var2","column":"column2","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config][Switch] Cdr_Pg_Csv Field":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigCdrPgCsvSchema{Id: msg.Field.Id, Enabled: msg.Field.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"[Config][Delete] Cdr_Pg_Csv Field","data":{"token":"example-token","field":{"id":2}}}
-	//Response:{"MessageType":"[Config][Delete] Cdr_Pg_Csv Field","data":{"id":21,"position":1,"enabled":false,"var":"var2","column":"column2","description":"","parent":{"id":8,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "[Config][Delete] Cdr_Pg_Csv Field":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigCdrPgCsvSchema{Id: msg.Field.Id}, onlyAdminGroup())
-	//### GetOdbcCdr
-	//Request:{"event":"GetOdbcCdr","data":{"token":"example-token"}}
-	//Response:{"MessageType":"GetOdbcCdr","data":{"settings":{"1":{"id":1,"position":1,"enabled":true,"name":"safdfsadf","value":"dsafasdf","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"dfdsfd","value":"fdfd","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}},"tables":{"1":{"id":1,"position":1,"enabled":true,"name":"sfasf","log_leg":"asasasa2","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"cccc","log_leg":"","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}}}
-	//Errors:
-	case "GetOdbcCdr":
-		resp1 := getUserForConfig(msg, getConfig, &altStruct.ConfigOdbcCdrSetting{}, onlyAdminGroup())
-		resp2 := getUserForConfig(msg, getConfig, &altStruct.ConfigOdbcCdrTable{}, onlyAdminGroup())
-		resp = webStruct.UserResponse{MessageType: msg.Event, Data: struct {
-			S   interface{} `json:"settings"`
-			Sch interface{} `json:"tables"`
-		}{S: resp1.Data, Sch: resp2.Data}}
-	//Request:{"event":"GetOdbcCdrField","data":{"token":"example-token","id":1}}
-	//Response:{"MessageType":"GetOdbcCdrField","data":{"1":{"id":1,"position":1,"enabled":true,"name":"gg","chan_var_name":"gddd","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","log_leg":"","description":"","parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"sss","chan_var_name":"ssss","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","log_leg":"","description":"","parent":null}}}}
-	//Errors:
-	case "GetOdbcCdrField":
-		resp = getUserForConfig(msg, getConfig, &altStruct.ConfigOdbcCdrTableField{Parent: &altStruct.ConfigOdbcCdrTable{Id: msg.Id}}, onlyAdminGroup())
-	//Request:{"event":"AddOdbcCdrParameter","data":{"token":"example-token","param":{"name":"paramn","value":"paramv"}}}
-	//Response:{"MessageType":"AddOdbcCdrParameter","data":{"id":7,"position":3,"enabled":true,"name":"paramn","value":"paramv","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "AddOdbcCdrParameter":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigOdbcCdrSetting{Name: msg.Param.Name, Value: msg.Param.Value, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigOdbcCdrSetting{}))}, onlyAdminGroup())
-	//Request:{"event":"UpdateOdbcCdrParameter","data":{"token":"example-token","param":{"id":7,"name":"paramn2","value":"paramv2"}}}
-	//Response:{"MessageType":"UpdateOdbcCdrParameter","data":{"id":7,"position":3,"enabled":true,"name":"paramn2","value":"paramv2","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "UpdateOdbcCdrParameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigOdbcCdrSetting{Id: msg.Param.Id, Name: msg.Param.Name, Value: msg.Param.Value}, []string{"Name", "Value"}}, onlyAdminGroup())
-	//Request:{"event":"SwitchOdbcCdrParameter","data":{"token":"example-token","param":{"id":7,"enabled":false}}}
-	//Response:{"MessageType":"SwitchOdbcCdrParameter","data":{"id":7,"position":3,"enabled":false,"name":"paramn2","value":"paramv2","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "SwitchOdbcCdrParameter":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigOdbcCdrSetting{Id: msg.Param.Id, Enabled: msg.Param.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"DeleteOdbcCdrParameter","data":{"token":"example-token","param":{"id":7}}}
-	//Response:{"MessageType":"DeleteOdbcCdrParameter","data":{"id":7,"position":3,"enabled":false,"name":"paramn2","value":"paramv2","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "DeleteOdbcCdrParameter":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigOdbcCdrSetting{Id: msg.Param.Id}, onlyAdminGroup())
-	//Request:{"event":"AddOdbcCdrTable","data":{"token":"example-token","table":{"name":"new_table"}}}
-	//Response:{"MessageType":"AddOdbcCdrTable","data":{"id":9,"position":3,"enabled":true,"name":"new_table","log_leg":"","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "AddOdbcCdrTable":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigOdbcCdrTable{Name: msg.Table.Name, LogLeg: msg.Table.LogLeg, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigOdbcCdrTable{}))}, onlyAdminGroup())
-	//Request:{"event":"UpdateOdbcCdrTable","data":{"token":"example-token","table":{"id":9,"name":"new_table2","log_leg":""}}}
-	//Response:{"MessageType":"UpdateOdbcCdrTable","data":{"id":9,"position":3,"enabled":true,"name":"new_table2","log_leg":"","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "UpdateOdbcCdrTable":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigOdbcCdrTable{Id: msg.Table.Id, Name: msg.Table.Name, LogLeg: msg.Table.LogLeg}, []string{"Name", "LogLeg"}}, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "SwitchOdbcCdrTable":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigOdbcCdrTable{Id: msg.Table.Id, Enabled: msg.Table.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"DeleteOdbcCdrTable","data":{"token":"example-token","table":{"id":9}}}
-	//Response:{"MessageType":"DeleteOdbcCdrTable","data":{"id":9,"position":3,"enabled":true,"name":"new_table2","log_leg":"","description":"","parent":{"id":51,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}
-	//Errors:
-	case "DeleteOdbcCdrTable":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigOdbcCdrTable{Id: msg.Table.Id}, onlyAdminGroup())
-	//Request:{"event":"AddOdbcCdrField","data":{"token":"example-token","odbc_cdr_field":{"name":"new_field","chan_var_name":"New_chan_var_name"},"id":1}}
-	//Response:{"MessageType":"AddOdbcCdrField","data":{"id":4,"position":3,"enabled":true,"name":"new_field","chan_var_name":"New_chan_var_name","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","log_leg":"","description":"","parent":null}}}
-	//Errors:
-	case "AddOdbcCdrField":
-		resp = getUserForConfig(msg, setConfig, &altStruct.ConfigOdbcCdrTableField{Name: msg.OdbcCdrField.Name, ChanVarName: msg.OdbcCdrField.ChanVarName, Enabled: true, Parent: &altStruct.ConfigOdbcCdrTable{Id: msg.Id}}, onlyAdminGroup())
-	//Request:{"event":"UpdateOdbcCdrField","data":{"token":"example-token","odbc_cdr_field":{"id":4,"name":"new_field2","chan_var_name":"New_chan_var_name2"}}}
-	//Response:{"MessageType":"UpdateOdbcCdrField","data":{"id":4,"position":3,"enabled":true,"name":"new_field2","chan_var_name":"New_chan_var_name2","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","log_leg":"","description":"","parent":null}}}
-	//Errors:
-	case "UpdateOdbcCdrField":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigOdbcCdrTableField{Id: msg.OdbcCdrField.Id, Name: msg.OdbcCdrField.Name, ChanVarName: msg.OdbcCdrField.ChanVarName}, []string{"Name", "ChanVarName"}}, onlyAdminGroup())
-	//Request:{"event":"SwitchOdbcCdrField","data":{"token":"example-token","odbc_cdr_field":{"id":4,"enabled":false}}}
-	//Response:{"MessageType":"SwitchOdbcCdrField","data":{"id":4,"position":3,"enabled":false,"name":"new_field2","chan_var_name":"New_chan_var_name2","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","log_leg":"","description":"","parent":null}}}
-	//Errors:
-	case "SwitchOdbcCdrField":
-		resp = getUserForConfig(msg, updateConfig, struct {
-			S interface{}
-			A []string
-		}{&altStruct.ConfigOdbcCdrTableField{Id: msg.OdbcCdrField.Id, Enabled: msg.OdbcCdrField.Enabled}, []string{"Enabled"}}, onlyAdminGroup())
-	//Request:{"event":"DeleteOdbcCdrField","data":{"token":"example-token","odbc_cdr_field":{"id":4}}}
-	//Response:{"MessageType":"DeleteOdbcCdrField","data":{"id":4,"position":3,"enabled":false,"name":"new_field2","chan_var_name":"New_chan_var_name2","description":"","parent":{"id":1,"position":0,"enabled":false,"name":"","log_leg":"","description":"","parent":null}}}
-	//Errors:
-	case "DeleteOdbcCdrField":
-		resp = getUserForConfig(msg, delConfig, &altStruct.ConfigOdbcCdrTableField{Id: msg.OdbcCdrField.Id}, onlyAdminGroup())
+	//### Acl/Sofia/CDR
+	// Migrated to the WebSocket handler registry.
 	//### Verto
 	//Request:{"event":"[Config][Verto][Get]","data":{"token":"example-token"}}
 	//Response:{"MessageType":"[Config][Verto][Get]","data":{"settings":{"1":{"id":1,"position":1,"enabled":true,"name":"debug","value":"0","description":"","parent":{"id":46,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}},"profiles":{"1":{"id":1,"position":1,"enabled":true,"name":"default-v4","description":"","parent":{"id":46,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}},"2":{"id":2,"position":2,"enabled":true,"name":"default-v6","description":"","parent":{"id":46,"position":0,"enabled":false,"name":"","module":"","loaded":false,"unloadable":false,"parent":null}}}}}
@@ -3929,176 +3257,6 @@ func messageMainHandler(msg *webStruct.MessageData) webStruct.UserResponse {
 	//Request:
 	//Response:
 	//Errors:
-	case "DialplanChangeNotProceed":
-		resp = getUser(msg, SwitchDialplanNoProceed, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "DialplanGetSettings":
-		resp = getUser(msg, DialplanGetSettings, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Get] Contexts":
-		resp = getUser(msg, getDialplanContexts, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Import]":
-		resp = getUser(msg, importDialplan, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Get] Extensions":
-		resp = getUser(msg, getDialplanExtensions, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Get] Conditions":
-		resp = getUser(msg, getDialplanConditions, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Get] Extension details":
-		resp = getUser(msg, getDialplanExtenDetails, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Move] Extension":
-		resp = getUser(msg, moveDialplanExtension, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Move] Condition":
-		resp = getUser(msg, moveDialplanCondition, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Move] Action":
-		resp = getUser(msg, moveDialplanAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Move] Antiaction":
-		resp = getUser(msg, moveDialplanAntiAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Add] Regex":
-		resp = getUser(msg, addRegex, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Add] Action":
-		resp = getUser(msg, addAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Add] Antiaction":
-		resp = getUser(msg, addAntiAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Delete] Regex":
-		resp = getUser(msg, delRegex, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Delete] Action":
-		resp = getUser(msg, delAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Delete] Antiaction":
-		resp = getUser(msg, delAntiAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Update] Regex":
-		resp = getUser(msg, updateRegex, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Update] Action":
-		resp = getUser(msg, updateAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Update] Antiaction":
-		resp = getUser(msg, updateAntiAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Switch] Regex":
-		resp = getUser(msg, switchRegex, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Switch] Action":
-		resp = getUser(msg, switchAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Switch] Antiaction":
-		resp = getUser(msg, switchAntiAction, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Add] Context":
-		resp = getUser(msg, addContext, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Add] Extension":
-		resp = getUser(msg, addExtension, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Add] Condition":
-		resp = getUser(msg, addCondition, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Rename] Context":
-		resp = getUser(msg, renameContext, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Rename] Extension":
-		resp = getUser(msg, renameExtension, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Delete] Context":
-		resp = getUser(msg, deleteContext, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Delete] Extension":
-		resp = getUser(msg, deleteExtension, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Switch] Extension Continue":
-		resp = getUser(msg, switchExtensionContinue, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Update] Condition":
-		resp = getUser(msg, updateCondition, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Switch] Condition":
-		resp = getUser(msg, switchCondition, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
-	case "[Dialplan][Delete] Condition":
-		resp = getUser(msg, deleteCondition, onlyAdminGroup())
-	//Request:
-	//Response:
-	//Errors:
 	default:
 		resp = webStruct.UserResponse{Error: "Wrong event", MessageType: "none"}
 	}
@@ -4447,6 +3605,28 @@ func setProfileStatuses(resp webStruct.UserResponse) webStruct.UserResponse {
 			profiles[profile.Id] = profile
 		}
 		resp.Data = profiles
+	}
+	return resp
+}
+
+func setGatewayStatuses(resp webStruct.UserResponse) webStruct.UserResponse {
+	gateways, ok := resp.Data.(map[int64]interface{})
+	if ok {
+		gatewaysX := fsesl.GetSofiaGatewaysStatuses()
+		for _, gatewayI := range gateways {
+			gateway, ok := gatewayI.(altStruct.ConfigSofiaProfileGateway)
+			if !ok {
+				continue
+			}
+			gatewayX := gatewaysX[gateway.Id]
+			if gatewayX == nil {
+				continue
+			}
+			gateway.Started = gatewayX.Started
+			gateway.State = gatewayX.State
+			gateways[gateway.Id] = gateway
+		}
+		resp.Data = gateways
 	}
 	return resp
 }

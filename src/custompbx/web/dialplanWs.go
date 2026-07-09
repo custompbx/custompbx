@@ -10,7 +10,7 @@ import (
 func importDialplan(data *webStruct.MessageData) webStruct.UserResponse {
 	fsesl.GetXMLDialplan()
 
-	return webStruct.UserResponse{MessageType: data.Event}
+	return successResponse(data.Event)
 }
 
 func SwitchDialplanNoProceed(data *webStruct.MessageData) webStruct.UserResponse {
@@ -27,7 +27,7 @@ func SwitchDialplanNoProceed(data *webStruct.MessageData) webStruct.UserResponse
 func DialplanGetSettings(data *webStruct.MessageData) webStruct.UserResponse {
 	items := pbxcache.GetDialplan()
 	if items == nil {
-		return webStruct.UserResponse{MessageType: data.Event}
+		return successResponse(data.Event)
 	}
 
 	return webStruct.UserResponse{DialplanSettings: items, MessageType: data.Event}
