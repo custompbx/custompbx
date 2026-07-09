@@ -631,6 +631,65 @@ func TestCoreRegistryIncludesCDRConfigFamily(t *testing.T) {
 	assertAdminOnlyEventsDispatch(t, events)
 }
 
+func TestCoreRegistryIncludesLCRFamily(t *testing.T) {
+	events := []string{
+		eventLCRGet,
+		eventLCRProfileParamsGet,
+		eventLCRParamUpdate,
+		eventLCRParamSwitch,
+		eventLCRParamAdd,
+		eventLCRParamDelete,
+		eventLCRProfileParamAdd,
+		eventLCRProfileParamDelete,
+		eventLCRProfileParamSwitch,
+		eventLCRProfileParamUpdate,
+		eventLCRProfileAdd,
+		eventLCRProfileUpdate,
+		eventLCRProfileDelete,
+	}
+	assertAdminOnlyEventsDispatch(t, events)
+}
+
+func TestCoreRegistryIncludesSimpleModuleSettingFamilies(t *testing.T) {
+	assertAdminOnlyEventsDispatch(t, simpleModuleSettingEvents())
+}
+
+func TestCoreRegistryIncludesPostSwitchFamily(t *testing.T) {
+	assertAdminOnlyEventsDispatch(t, postSwitchRegistryEvents())
+}
+
+func TestCoreRegistryIncludesDirectoryConfigFamily(t *testing.T) {
+	assertAdminOnlyEventsDispatch(t, directoryConfigRegistryEvents())
+}
+
+func TestCoreRegistryIncludesFifoFamily(t *testing.T) {
+	assertAdminOnlyEventsDispatch(t, fifoRegistryEvents())
+}
+
+func TestCoreRegistryIncludesTelephonyModuleFamilies(t *testing.T) {
+	assertAdminOnlyEventsDispatch(t, telephonyModuleRegistryEvents())
+}
+
+func TestCombinedDataResponse(t *testing.T) {
+	resp := combinedDataResponse("event",
+		responseDataPair{name: "settings", data: "settings-data"},
+		responseDataPair{name: "profiles", data: "profiles-data"},
+	)
+	if resp.MessageType != "event" {
+		t.Fatalf("message type = %q, want event", resp.MessageType)
+	}
+	data, ok := resp.Data.(map[string]interface{})
+	if !ok {
+		t.Fatalf("data type = %T, want map[string]interface{}", resp.Data)
+	}
+	if data["settings"] != "settings-data" {
+		t.Fatalf("settings data = %v", data["settings"])
+	}
+	if data["profiles"] != "profiles-data" {
+		t.Fatalf("profiles data = %v", data["profiles"])
+	}
+}
+
 func TestCoreRegistryIncludesConversationFamily(t *testing.T) {
 	events := []string{
 		eventGetConvPrivateMessages,

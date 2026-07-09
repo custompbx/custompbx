@@ -9,7 +9,7 @@ ifneq ($(wildcard /usr/local/go/bin),)
     go_app:=/usr/local/go/bin/go
 endif
 
-.PHONY: install show install-dep build dep-front dep-back front back front-serve test docker-fmt docker-vet docker-test docker-race docker-frontend-build docker-integration-test docker-release
+.PHONY: install show install-dep build dep-front dep-back front back front-serve test docker-fmt docker-vet docker-test docker-race docker-frontend-build docker-integration-test docker-release docker-local-recreate docker-local-smoke
 
 install: install-dep build
 
@@ -69,3 +69,12 @@ docker-integration-test:
 
 docker-release:
 		@ docker build -f docker/Dockerfile .
+
+docker-local-recreate:
+		@ docker compose -f docker-compose.yml build custompbx
+		@ docker rm -f custompbx-host || true
+		@ docker compose -f docker-compose.yml up -d --no-deps custompbx
+		@ docker ps --filter name=custompbx-host --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+
+docker-local-smoke:
+		@ curl -kfsS --max-time 10 https://127.0.0.1:8081/ >/dev/null || curl -fsS --max-time 10 http://127.0.0.1:8080/ >/dev/null
