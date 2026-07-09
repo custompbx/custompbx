@@ -1,6 +1,7 @@
 package web
 
 import (
+	"custompbx/altStruct"
 	"custompbx/cfg"
 	"custompbx/mainStruct"
 	"custompbx/webStruct"
@@ -111,6 +112,13 @@ func TestMessageMainHandlerInventoryHasNoRegistryOverlap(t *testing.T) {
 		t.Fatalf("events are both registered and still present in messageMainHandler fallback: %s", strings.Join(overlap, ", "))
 	}
 	t.Logf("event inventory: registered=%d remaining_switch=%d", len(registered), len(remainingSwitchEvents))
+}
+
+func TestMessageMainHandlerFallbackHasNoWebSocketEventCases(t *testing.T) {
+	remainingSwitchEvents := messageMainHandlerEventInventory(t)
+	if len(remainingSwitchEvents) != 0 {
+		t.Fatalf("messageMainHandler fallback still has event cases: %s", strings.Join(remainingSwitchEvents, ", "))
+	}
 }
 
 func TestCoreRegistryIncludesMigratedEvents(t *testing.T) {
@@ -670,6 +678,124 @@ func TestCoreRegistryIncludesTelephonyModuleFamilies(t *testing.T) {
 	assertAdminOnlyEventsDispatch(t, telephonyModuleRegistryEvents())
 }
 
+func TestCoreRegistryIncludesConferenceFamily(t *testing.T) {
+	assertAdminOnlyEventsDispatch(t, conferenceRegistryEvents())
+}
+
+func TestCoreRegistryIncludesBackendVertoConfigFamily(t *testing.T) {
+	assertAdminOnlyEventsDispatch(t, vertoConfigRegistryEvents())
+}
+
+func TestCoreRegistryIncludesRemainingConfigFamilies(t *testing.T) {
+	assertAdminOnlyEventsDispatch(t, remainingConfigRegistryEvents())
+}
+
+func TestCallcenterDynamicUpdatePayloadMapsAgentFields(t *testing.T) {
+	data := &webStruct.MessageData{Event: eventCallcenterAgentUpdate}
+	data.Param = webStruct.Param{Id: 7, Name: "max_no_answer", Value: "5"}
+
+	payload, errText := callcenterDynamicUpdatePayload(data, &altStruct.Agent{Id: data.Param.Id})
+
+	if errText != "" {
+		t.Fatalf("unexpected error: %s", errText)
+	}
+	update, ok := payload.(struct {
+		S interface{}
+		A []string
+	})
+	if !ok {
+		t.Fatalf("payload type = %T", payload)
+	}
+	if len(update.A) != 1 || update.A[0] != "MaxNoAnswer" {
+		t.Fatalf("updated fields = %#v", update.A)
+	}
+	agent, ok := update.S.(*altStruct.Agent)
+	if !ok {
+		t.Fatalf("updated item type = %T", update.S)
+	}
+	if agent.Id != 7 || agent.MaxNoAnswer != 5 {
+		t.Fatalf("agent update = %+v", agent)
+	}
+}
+
+func TestCallcenterDynamicUpdatePayloadRejectsBadFieldsAndValues(t *testing.T) {
+	tests := []struct {
+		name  string
+		param webStruct.Param
+		want  string
+	}{
+		{name: "missing name", param: webStruct.Param{Value: "5"}, want: "wrong params"},
+		{name: "id field", param: webStruct.Param{Name: "id", Value: "5"}, want: "please dont"},
+		{name: "unknown field", param: webStruct.Param{Name: "missing", Value: "5"}, want: "unknown field"},
+		{name: "bad int", param: webStruct.Param{Name: "level", Value: "not-int"}, want: "invalid syntax"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data := &webStruct.MessageData{Event: eventCallcenterTierUpdate, Param: tt.param}
+
+			_, errText := callcenterDynamicUpdatePayload(data, &altStruct.Tier{Id: data.Param.Id})
+
+			if !strings.Contains(errText, tt.want) {
+				t.Fatalf("error = %q, want containing %q", errText, tt.want)
+			}
+		})
+	}
+}
+
+func TestConfigUpdatePayloadUsesUpdateConfigShape(t *testing.T) {
+	item := &altStruct.ConfigVertoSetting{Id: 7, Name: "debug"}
+
+	payload := configUpdatePayload(item, "Name", "Value")
+
+	update, ok := payload.(struct {
+		S interface{}
+		A []string
+	})
+	if !ok {
+		t.Fatalf("payload type = %T", payload)
+	}
+	if update.S != item {
+		t.Fatalf("payload item = %#v, want original item", update.S)
+	}
+	if strings.Join(update.A, ",") != "Name,Value" {
+		t.Fatalf("payload fields = %#v", update.A)
+	}
+}
+
+func TestConfigWithFieldsBuildsTopLevelParentedItem(t *testing.T) {
+	item := configWithFields(&altStruct.ConfigVertoProfile{}, map[string]interface{}{
+		"Name":    "profile-a",
+		"Enabled": true,
+		"Parent":  &altStruct.ConfigurationsList{Id: 46},
+	})
+
+	profile, ok := item.(*altStruct.ConfigVertoProfile)
+	if !ok {
+		t.Fatalf("item type = %T", item)
+	}
+	if profile.Name != "profile-a" || !profile.Enabled || profile.Parent == nil || profile.Parent.Id != 46 {
+		t.Fatalf("profile = %+v", profile)
+	}
+}
+
+func TestConfigWithFieldsBuildsChildParentedItem(t *testing.T) {
+	item := configWithFields(&altStruct.ConfigVertoProfileParameter{}, map[string]interface{}{
+		"Name":    "bind-local",
+		"Value":   "127.0.0.1:8081",
+		"Secure":  "true",
+		"Enabled": true,
+		"Parent":  &altStruct.ConfigVertoProfile{Id: 3},
+	})
+
+	param, ok := item.(*altStruct.ConfigVertoProfileParameter)
+	if !ok {
+		t.Fatalf("item type = %T", item)
+	}
+	if param.Name != "bind-local" || param.Value != "127.0.0.1:8081" || param.Secure != "true" || !param.Enabled || param.Parent == nil || param.Parent.Id != 3 {
+		t.Fatalf("param = %+v", param)
+	}
+}
+
 func TestCombinedDataResponse(t *testing.T) {
 	resp := combinedDataResponse("event",
 		responseDataPair{name: "settings", data: "settings-data"},
@@ -911,7 +1037,7 @@ func messageMainHandlerEventInventory(t *testing.T) []string {
 	}
 	end := strings.Index(source[start:], "func checkRelogin")
 	if end < 0 {
-		t.Fatal("messageMainHandler end marker not found")
+		end = len(source) - start
 	}
 	block := source[start : start+end]
 	caseRE := regexp.MustCompile(`(?m)^\s*case\s+([^:]+):`)

@@ -8,11 +8,6 @@ import (
 	"reflect"
 )
 
-type configUpdatePayload struct {
-	S interface{}
-	A []string
-}
-
 type responseDataPair struct {
 	name string
 	data interface{}
@@ -40,7 +35,7 @@ func configSet(factory func(*webStruct.MessageData) interface{}) eventHandler {
 
 func configUpdate(factory func(*webStruct.MessageData) interface{}, fields ...string) eventHandler {
 	return func(data *webStruct.MessageData) webStruct.UserResponse {
-		return getUserForConfig(data, updateConfig, configUpdatePayload{S: factory(data), A: fields}, adminOnly())
+		return getUserForConfig(data, updateConfig, configUpdatePayload(factory(data), fields...), adminOnly())
 	}
 }
 
@@ -52,6 +47,65 @@ func configDelete(factory func(*webStruct.MessageData) interface{}) eventHandler
 
 func configParentFor(sample interface{}) *altStruct.ConfigurationsList {
 	return getConfParent(altData.GetConfNameByStruct(sample))
+}
+
+func configUpdatePayload(item interface{}, fields ...string) interface{} {
+	return struct {
+		S interface{}
+		A []string
+	}{S: item, A: fields}
+}
+
+func configWithFields(sample interface{}, fields map[string]interface{}) interface{} {
+	return configValue(sample, func(v reflect.Value) {
+		for name, value := range fields {
+			setConfigField(v, name, value)
+		}
+	})
+}
+
+func configSetWithFields(sample interface{}, fields func(*webStruct.MessageData) map[string]interface{}) eventHandler {
+	return configSet(func(data *webStruct.MessageData) interface{} {
+		return configWithFields(sample, fields(data))
+	})
+}
+
+func configUpdateWithFields(sample interface{}, updateFields []string, fields func(*webStruct.MessageData) map[string]interface{}) eventHandler {
+	return configUpdate(func(data *webStruct.MessageData) interface{} {
+		return configWithFields(sample, fields(data))
+	}, updateFields...)
+}
+
+func configDeleteWithFields(sample interface{}, fields func(*webStruct.MessageData) map[string]interface{}) eventHandler {
+	return configDelete(func(data *webStruct.MessageData) interface{} {
+		return configWithFields(sample, fields(data))
+	})
+}
+
+func configGetNamedID(data *webStruct.MessageData) map[string]interface{} {
+	return map[string]interface{}{"Id": data.Id}
+}
+
+func configGetParamID(data *webStruct.MessageData) map[string]interface{} {
+	return map[string]interface{}{"Id": data.Param.Id}
+}
+
+func configSetTopLevelName(sample interface{}, name string) map[string]interface{} {
+	return map[string]interface{}{"Name": name, "Enabled": true, "Parent": configParentFor(sample)}
+}
+
+func configSetChildParamNameValue(parent interface{}) func(*webStruct.MessageData) map[string]interface{} {
+	return func(data *webStruct.MessageData) map[string]interface{} {
+		return map[string]interface{}{"Name": data.Param.Name, "Value": data.Param.Value, "Enabled": true, "Parent": parent}
+	}
+}
+
+func configUpdateParamNameValue(data *webStruct.MessageData) map[string]interface{} {
+	return map[string]interface{}{"Id": data.Param.Id, "Name": data.Param.Name, "Value": data.Param.Value}
+}
+
+func configSwitchParamEnabled(data *webStruct.MessageData) map[string]interface{} {
+	return map[string]interface{}{"Id": data.Param.Id, "Enabled": data.Param.Enabled}
 }
 
 func combinedDataResponse(event string, pairs ...responseDataPair) webStruct.UserResponse {
@@ -156,21 +210,31 @@ func validateSimpleParamSample(sample interface{}) {
 }
 
 func simpleParamConfigValue(sample interface{}, fill func(reflect.Value)) interface{} {
-	v := newSimpleParamConfigValue(sample)
+	v := newConfigValue(sample)
 	fill(v)
 	return v.Addr().Interface()
 }
 
 func newSimpleParamConfigValue(sample interface{}) reflect.Value {
+	return newConfigValue(sample)
+}
+
+func configValue(sample interface{}, fill func(reflect.Value)) interface{} {
+	v := newConfigValue(sample)
+	fill(v)
+	return v.Addr().Interface()
+}
+
+func newConfigValue(sample interface{}) reflect.Value {
 	t := reflect.TypeOf(sample)
 	if t == nil {
-		panic("simple config sample is nil")
+		panic("config sample is nil")
 	}
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
 	if t.Kind() != reflect.Struct {
-		panic(fmt.Sprintf("simple config sample %T must be a struct or pointer to struct", sample))
+		panic(fmt.Sprintf("config sample %T must be a struct or pointer to struct", sample))
 	}
 	return reflect.New(t).Elem()
 }
@@ -183,6 +247,18 @@ func setSimpleParamField(v reflect.Value, name string, value interface{}) {
 	rv := reflect.ValueOf(value)
 	if !rv.Type().AssignableTo(field.Type()) {
 		panic(fmt.Sprintf("simple config field %s.%s expects %s, got %s", v.Type(), name, field.Type(), rv.Type()))
+	}
+	field.Set(rv)
+}
+
+func setConfigField(v reflect.Value, name string, value interface{}) {
+	field := v.FieldByName(name)
+	if !field.IsValid() || !field.CanSet() {
+		panic(fmt.Sprintf("config value %s is missing settable %s field", v.Type(), name))
+	}
+	rv := reflect.ValueOf(value)
+	if !rv.Type().AssignableTo(field.Type()) {
+		panic(fmt.Sprintf("config field %s.%s expects %s, got %s", v.Type(), name, field.Type(), rv.Type()))
 	}
 	field.Set(rv)
 }
