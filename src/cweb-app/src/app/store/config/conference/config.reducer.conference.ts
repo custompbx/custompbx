@@ -109,7 +109,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -123,7 +123,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           conference: {...state.conference, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -144,7 +144,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -152,7 +152,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.StoreUpdateConferenceProfile: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       if (!state.conference) {
@@ -167,7 +167,7 @@ export function reducer(state = initialState, action: All): State {
           profiles: {...state.conference.profiles, [data.id]: data},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -175,7 +175,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.StoreUpdateConferenceChatPermission: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       if (!state.conference) {
@@ -190,14 +190,14 @@ export function reducer(state = initialState, action: All): State {
           chat_profiles: {...state.conference.chat_profiles, [data.id]: data},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case ConfigActionTypes.StoreAddConferenceCallerControlGroup:
     case ConfigActionTypes.StoreUpdateConferenceCallerControlGroup: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       if (!state.conference) {
@@ -213,14 +213,14 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDelConferenceRoom: {
       const id = action.payload.response.data?.id || 0;
       if (!state.conference.advertise[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.conference.advertise;
@@ -231,7 +231,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, advertise: {...rest, new: state.conference.advertise?.new || []},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -239,7 +239,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.StoreUpdateConferenceRoom: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -248,7 +248,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, advertise: {...state.conference.advertise, [data.id]: data},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -264,7 +264,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, advertise: {...state.conference.advertise, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -281,14 +281,14 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, advertise: {...state.conference.advertise, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreAddConferenceRoom: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...state.conference.advertise?.new || []];
 
@@ -306,7 +306,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, advertise: {...state.conference.advertise, [data.id]: data, new: rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -314,11 +314,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const group = state.conference.caller_controls[parentId];
       if (!group) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...group.controls?.new || []];
 
@@ -339,7 +339,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -386,11 +386,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const group = state.conference.caller_controls[parentId];
       if (!group || !group.controls[data.id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = group.controls;
@@ -404,7 +404,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -412,11 +412,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const group = state.conference.caller_controls[parentId];
       if (!group) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -428,7 +428,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -437,11 +437,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const group = state.conference.caller_controls[parentId];
       if (!group) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -453,14 +453,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreNewConferenceCallerControl: {
       const group = state.conference.caller_controls[action.payload.id];
       if (!group) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...group.controls?.new || [],
@@ -475,14 +475,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDropNewConferenceCallerControl: {
       const group = state.conference.caller_controls[action.payload.id];
       if (!group) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...group.controls.new.slice(0, action.payload.index),
@@ -499,7 +499,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -507,7 +507,7 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.response.data?.id || 0;
       const group = state.conference.caller_controls[id];
       if (!group) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.conference.caller_controls;
@@ -518,7 +518,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, caller_controls: {...rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -526,11 +526,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...profile.parameters?.new || []];
 
@@ -551,7 +551,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -598,11 +598,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.profiles[parentId];
       if (!profile || !profile.parameters[data.id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = profile.parameters;
@@ -616,7 +616,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -624,11 +624,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -640,7 +640,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -649,11 +649,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -665,14 +665,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreNewConferenceProfileParameter: {
       const profile = state.conference.profiles[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.parameters?.new || [],
@@ -687,14 +687,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDropNewConferenceProfileParameter: {
       const profile = state.conference.profiles[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.parameters.new.slice(0, action.payload.index),
@@ -711,7 +711,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -719,7 +719,7 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.response.data?.id || 0;
       const profile = state.conference.profiles[id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.conference.profiles;
@@ -730,7 +730,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, profiles: {...rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -738,11 +738,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.chat_profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...profile.users?.new || []];
 
@@ -763,7 +763,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -810,11 +810,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.chat_profiles[parentId];
       if (!profile || !profile.users[data.id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = profile.users;
@@ -828,7 +828,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -836,11 +836,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.chat_profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -852,7 +852,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -861,11 +861,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.chat_profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -877,14 +877,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreNewConferenceChatPermissionUser: {
       const profile = state.conference.chat_profiles[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.users?.new || [],
@@ -899,14 +899,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDropNewConferenceChatPermissionUser: {
       const profile = state.conference.chat_profiles[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.users.new.slice(0, action.payload.index),
@@ -923,7 +923,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -931,7 +931,7 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.response.data?.id || 0;
       const profile = state.conference.chat_profiles[id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.conference.chat_profiles;
@@ -942,7 +942,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, chat_profiles: {...rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -966,7 +966,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -974,11 +974,11 @@ export function reducer(state = initialState, action: All): State {
       const {data} = action.payload.response || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.layouts.conference_layouts[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -993,7 +993,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1001,11 +1001,11 @@ export function reducer(state = initialState, action: All): State {
       const {data} = action.payload.response || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.layouts.conference_layouts_groups[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -1020,14 +1020,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case StoreNewConferenceLayoutImage.type: {
       const profile = state.conference.layouts.conference_layouts[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const rest = profile.new || [];
@@ -1043,14 +1043,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case StoreDropConferenceLayoutImage.type: {
       const profile = state.conference.layouts.conference_layouts[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.new.slice(0, action.payload.index),
@@ -1070,14 +1070,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case StoreNewConferenceLayoutGroupLayout.type: {
       const profile = state.conference.layouts.conference_layouts_groups[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = profile.new || [];
       return {
@@ -1092,14 +1092,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case StoreDropConferenceLayoutGroupLayout.type: {
       const profile = state.conference.layouts.conference_layouts_groups[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.new.slice(0, action.payload.index),
@@ -1119,7 +1119,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1128,11 +1128,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const group = state.conference.layouts.conference_layouts[parentId];
       if (!group) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -1146,7 +1146,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case StoreSwitchConferenceLayoutGroupLayout.type:
@@ -1154,11 +1154,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const group = state.conference.layouts.conference_layouts_groups[parentId];
       if (!group) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -1175,7 +1175,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1183,11 +1183,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.layouts.conference_layouts[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...profile.new || []];
       if (action.payload.payload.index !== undefined) {
@@ -1208,7 +1208,7 @@ export function reducer(state = initialState, action: All): State {
             },
             errorMessage: action.payload.response.error || null,
           },
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         }
       };
     }
@@ -1216,11 +1216,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.layouts.conference_layouts_groups[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...profile.new || []];
       if (action.payload.payload.index !== undefined) {
@@ -1241,7 +1241,7 @@ export function reducer(state = initialState, action: All): State {
             },
             errorMessage: action.payload.response.error || null,
           },
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         }
       };
     }
@@ -1250,11 +1250,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.layouts.conference_layouts[parentId];
       if (!profile || !profile.images[data.id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = profile.images;
@@ -1270,7 +1270,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1278,11 +1278,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.conference.layouts.conference_layouts_groups[parentId];
       if (!profile || !profile.layouts[data.id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = profile.layouts;
@@ -1298,7 +1298,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1307,7 +1307,7 @@ export function reducer(state = initialState, action: All): State {
     case StoreUpdateConferenceLayout3D.type: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       if (!state.conference) {
@@ -1328,7 +1328,7 @@ export function reducer(state = initialState, action: All): State {
             [data.id]: {...data, images: {...state.conference.layouts.conference_layouts[data.id]?.images}}}},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1336,7 +1336,7 @@ export function reducer(state = initialState, action: All): State {
     case StoreUpdateConferenceLayoutGroup.type: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       if (!state.conference) {
@@ -1357,14 +1357,14 @@ export function reducer(state = initialState, action: All): State {
             [data.id]: {...data, layouts: {...state.conference.layouts.conference_layouts_groups[data.id]?.layouts}}}},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case StoreDelConferenceLayout.type: {
       const id = action.payload.response.data?.id || 0;
       if (!state.conference.layouts.conference_layouts[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.conference.layouts.conference_layouts;
@@ -1375,14 +1375,14 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, layouts: {...state.conference.layouts, conference_layouts: {...rest}},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case StoreDelConferenceLayoutGroup.type: {
       const id = action.payload.response.data?.id || 0;
       if (!state.conference.layouts.conference_layouts_groups[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.conference.layouts.conference_layouts_groups;
@@ -1393,7 +1393,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.conference, layouts: {...state.conference.layouts, conference_layouts_groups: {...rest}},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

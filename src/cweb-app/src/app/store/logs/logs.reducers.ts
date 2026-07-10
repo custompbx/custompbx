@@ -22,7 +22,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           errorMessage: action.payload.error,
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         };
     }
 
@@ -31,7 +31,7 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         logsData: action.payload.response.logs || [],
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

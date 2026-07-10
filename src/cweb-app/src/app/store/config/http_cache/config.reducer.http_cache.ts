@@ -247,14 +247,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDropNewHttpCacheProfileDomain: {
       const profile = state.http_cache.profiles[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.domains.new.slice(0, action.payload.index),
@@ -271,7 +271,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -280,7 +280,7 @@ export function reducer(state = initialState, action: All): State {
       const parentId = data?.parent?.id || 0;
       const profile = state.http_cache.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = profile.domains;
@@ -294,7 +294,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -303,11 +303,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data;
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.http_cache.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
 
@@ -320,7 +320,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -329,7 +329,7 @@ export function reducer(state = initialState, action: All): State {
       const parentId = data?.parent?.id || 0;
       const profile = state.http_cache.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...profile.domains.new || []];
 
@@ -350,7 +350,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -358,11 +358,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data;
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.http_cache.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
 
@@ -375,7 +375,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -383,11 +383,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data;
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.http_cache.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
 
@@ -400,7 +400,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

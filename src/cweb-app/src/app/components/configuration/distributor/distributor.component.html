@@ -1,13 +1,13 @@
-<app-inner-header name="Distributor" [loadCounter]="loadCounter"></app-inner-header>
-<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list && list.exists !== false">
+<app-inner-header name="Distributor" [loadCounter]="loadCounter()"></app-inner-header>
+<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+ <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list() && list().exists !== false">
   <mat-tab label="List">
     <mat-card>
       <mat-card-header>
         <mat-card-subtitle>Lists</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <div *ngFor="let item of onlyValues(list.lists); trackBy: trackByFn">
+        <div *ngFor="let item of onlyValues(list().lists); trackBy: trackByFn">
           <mat-expansion-panel (opened)="getDetails(item.id)" (closed)="clearDetails(item.id)">
             <mat-expansion-panel-header>
               <mat-panel-title>
@@ -98,7 +98,7 @@
   </mat-tab>
 
   <mat-tab label="Add">
-    <form class="spacer spacerb" (ngSubmit)="onDistributorListSubmit()" *ngIf="list">
+    <form class="spacer spacerb" (ngSubmit)="onDistributorListSubmit()" *ngIf="list()">
       <mat-form-field hideRequiredMarker>
         <mat-label>Name</mat-label>
         <input matInput placeholder="New list name" required name="name" [(ngModel)]="newItemName">
@@ -108,8 +108,8 @@
   </mat-tab>
 
   <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb" #deleteForm="ngForm"  *ngIf="list">
-      <div *ngFor="let item of onlyValues(list.lists); trackBy: trackByFn">
+    <form class="spacer spacerb" #deleteForm="ngForm"  *ngIf="list()">
+      <div *ngFor="let item of onlyValues(list().lists); trackBy: trackByFn">
         <mat-form-field hideRequiredMarker>
         <mat-label>Distributor list name</mat-label>
         <input matInput name="Distributor list name" required [ngModel]="item.name" [name]="'list::' + item.id">

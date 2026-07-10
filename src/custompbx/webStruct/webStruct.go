@@ -268,6 +268,8 @@ type WsContext struct {
 	writeTimeout     time.Duration
 	readTimeout      time.Duration
 	pingInterval     time.Duration
+	readLoopStarted  atomic.Bool
+	writeLoopStarted atomic.Bool
 }
 
 // Close closes the WebSocket connection and clears the send channel.
@@ -325,6 +327,14 @@ func (c *WsContext) RecordHandlerFailure() {
 
 // SendWaiter listens on the SendChannel and sends messages through the WebSocket connection.
 func (c *WsContext) SendWaiter() {
+	if !c.writeLoopStarted.CompareAndSwap(false, true) {
+		log.Printf("component=websocket connection_id=%d user_id=%d operation=start_write_loop result=already_started", c.ID, c.UserID())
+		return
+	}
+	if c.ws == nil {
+		c.CloseWithReason("missing websocket")
+		return
+	}
 	ping := time.NewTicker(c.pingInterval)
 	defer ping.Stop()
 	for {
@@ -373,6 +383,14 @@ func (c *WsContext) SendWaiter() {
 
 // ReadWaiter listens for incoming messages on the WebSocket connection and handles them using the provided handler function.
 func (c *WsContext) ReadWaiter(handler func(*Message, *WsContext)) {
+	if !c.readLoopStarted.CompareAndSwap(false, true) {
+		log.Printf("component=websocket connection_id=%d user_id=%d operation=start_read_loop result=already_started", c.ID, c.UserID())
+		return
+	}
+	if c.ws == nil {
+		c.CloseWithReason("missing websocket")
+		return
+	}
 	c.ws.SetReadLimit(1 << 20)
 	_ = c.ws.SetReadDeadline(time.Now().Add(c.readTimeout))
 	c.ws.SetPongHandler(func(string) error { return c.ws.SetReadDeadline(time.Now().Add(c.readTimeout)) })

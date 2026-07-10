@@ -31,7 +31,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.osp,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -43,55 +43,49 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           osp: {...state.osp, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
-      if (!state.osp) {
-        state.osp = <Iosp>{};
-        state.loadCounter = 0;
-      }
+      const osp = state.osp || <Iosp>{};
 
       return {
         ...state,
         osp: {
-          ...state.osp,
+          ...osp,
           settings: {...settings},
           profiles: {...profiles},
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case ConfigActionTypes.StoreAddOspProfile:
     case ConfigActionTypes.StoreUpdateOspProfile: {
       const data = action.payload.response.data;
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
-      if (!state.osp) {
-        state.osp = <Iosp>{};
-        state.loadCounter = 0;
-      }
+      const osp = state.osp || <Iosp>{};
 
       return {
         ...state,
         osp: {
-          ...state.osp,
-          profiles: {...state.osp.profiles, [data.id]: data},
+          ...osp,
+          profiles: {...osp.profiles, [data.id]: data},
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDelOspParameter: {
       const id = action.payload.response.data?.id || 0;
       if (!state.osp.settings[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.osp.settings;
@@ -102,7 +96,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.osp, settings: {...rest, new: state.osp.settings.new || []},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -116,7 +110,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.osp, settings: {...state.osp.settings, [data.id]: data},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -132,7 +126,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.osp, settings: {...state.osp.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -149,7 +143,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.osp, settings: {...state.osp.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -171,7 +165,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.osp, settings: {...state.osp.settings, [data.id]: data, new: rest},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -180,7 +174,7 @@ export function reducer(state = initialState, action: All): State {
       const parentId = data?.parent?.id || 0;
       const profile = state.osp.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...profile.parameters.new || []];
 
@@ -201,7 +195,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -249,7 +243,7 @@ export function reducer(state = initialState, action: All): State {
       const parentId = data?.parent?.id || 0;
       const profile = state.osp.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = profile.parameters;
@@ -263,7 +257,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -271,11 +265,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data;
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.osp.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -287,7 +281,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -296,11 +290,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data;
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.osp.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -312,7 +306,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -320,7 +314,7 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.id;
       const profile = state.osp.profiles[id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.parameters?.new || [],
@@ -335,14 +329,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDropNewOspProfileParameter: {
       const profile = state.osp.profiles[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.parameters.new.slice(0, action.payload.index),
@@ -359,18 +353,18 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDelOspProfile: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.osp.profiles[data.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = state.osp.profiles;
@@ -381,7 +375,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.osp, profiles: {...rest},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

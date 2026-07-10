@@ -115,12 +115,6 @@ func configSetTopLevelName(sample interface{}, name string) map[string]interface
 	return map[string]interface{}{"Name": name, "Enabled": true, "Parent": configParentFor(sample)}
 }
 
-func configSetChildParamNameValue(parent interface{}) func(*webStruct.MessageData) map[string]interface{} {
-	return func(data *webStruct.MessageData) map[string]interface{} {
-		return map[string]interface{}{"Name": data.Param.Name, "Value": data.Param.Value, "Enabled": true, "Parent": parent}
-	}
-}
-
 func configUpdateParamNameValue(data *webStruct.MessageData) map[string]interface{} {
 	return map[string]interface{}{"Id": data.Param.Id, "Name": data.Param.Name, "Value": data.Param.Value}
 }

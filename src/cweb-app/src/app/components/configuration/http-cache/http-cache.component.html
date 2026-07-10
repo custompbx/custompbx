@@ -1,19 +1,19 @@
-<app-inner-header name="Http cache" [loadCounter]="loadCounter"></app-inner-header>
-<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
-@if (list && list.exists !== false) {
+<app-inner-header name="Http cache" [loadCounter]="loadCounter()"></app-inner-header>
+<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+@if (list() && list().exists !== false) {
   <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
     >
     <mat-tab label="List">
-      @if (list && list.exists !== false) {
+      @if (list() && list().exists !== false) {
         <mat-card>
           <mat-card-header>
             <mat-card-subtitle>Settings</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <h3>Params:</h3>
-            <app-key-value-pad-2 [exist]="list.settings"
-              [items]="list.settings"
-              [newItems]="list.settings?.new"
+            <app-key-value-pad-2 [exist]="list().settings"
+              [items]="list().settings"
+              [newItems]="list().settings?.new"
               [id]="null"
               [toCopy]="null"
               [dispatchersCallbacks]="globalSettingsDispatchers"
@@ -27,7 +27,7 @@
           <mat-card-subtitle>Profiles</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          @for (item of onlyValues(list.profiles); track trackByFn($index, item)) {
+          @for (item of onlyValues(list().profiles); track trackByFn($index, item)) {
             <div class="panel-wrapper">
               <mat-expansion-panel (opened)="GetHttpCacheProfileParameters(item.id)"
                 [expanded]="panelCloser['profile' + item.id]">
@@ -136,7 +136,7 @@
                 <mat-tab label="Delete/Rename">
                   <form class="spacer spacerb" #deleteForm="ngForm">
                     <h3>Profiles:</h3>
-                    @for (profile of onlyValues(list.profiles); track trackByFn($index, profile)) {
+                    @for (profile of onlyValues(list().profiles); track trackByFn($index, profile)) {
                       <div>
                         <mat-form-field hideRequiredMarker>
                           <mat-label>Profile name</mat-label>
@@ -144,11 +144,11 @@
                             [name]="'profile::' + profile.id">
                           </mat-form-field>
                           <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
-                            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list.profiles[profile.id].name, 'rename')">
+                            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'rename')">
                             Update
                           </button>
                           <button mat-raised-button color="warn"
-                            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list.profiles[profile.id].name, 'delete')">
+                            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'delete')">
                             Delete
                           </button>
                         </div>

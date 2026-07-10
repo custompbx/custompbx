@@ -118,7 +118,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
     case DirectoryActionTypes.ReduceLoadCounter: {
       return {
         ...state,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
       };
     }
     case DirectoryActionTypes.CreateWebDirectoryUsersByTemplate:
@@ -209,28 +209,28 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
     case DirectoryActionTypes.StoreRenameDirectoryDomain: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
         ...state,
         domains: {...state.domains, [data.id]: data},
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case DirectoryActionTypes.StoreDeleteDirectoryDomain: {
       const data = action.payload.response.data || {};
       if (data.id === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const {[data.id]: toDel, ...rest} = state.domains;
       return {
         ...state,
         domains: {...rest},
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -240,13 +240,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const parameters = action.payload.response.data.parameters || {};
       const parentId = getParentId(variables) || getParentId(parameters);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
         domainDetails: {...state.domainDetails, [parentId]: {parameters: parameters, variables: variables}},
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -256,7 +256,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const data = action.payload.response.data || {};
       const parentId: number = data.parent?.id || 0;
       if (!data.id || !parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       let new_params = !!state.domainDetails[parentId]?.parameters ? state.domainDetails[parentId]?.parameters?.new || [] : [];
@@ -279,7 +279,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreUpdateDirectoryDomainVariable:
@@ -288,7 +288,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const data = action.payload.response.data || {};
       const parentId: number = data.parent?.id || 0;
       if (!data.id || !parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let new_vars = !!state.domainDetails[parentId]?.variables ? state.domainDetails[parentId]?.variables?.new || [] : [];
       if (isNumeric(action.payload.var_index)) {
@@ -310,17 +310,17 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.DropDirectoryDomainVariable: {
       const data = action.payload.response.data || {};
       const parentId: number = data.parent?.id || 0;
       if (!data.id || !parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       if (!state.domainDetails[parentId]?.variables) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = state.domainDetails[parentId]?.variables;
@@ -331,17 +331,17 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           ...state.domainDetails,
           [parentId]: {...state.domainDetails[parentId], variables: <Ivariables>{...rest}}},
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.DropDirectoryDomainParameter: {
       const data = action.payload.response.data || {};
       const parentId: number = data.parent?.id || 0;
       if (!data.id || !parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       if (!state.domainDetails[parentId]?.parameters) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = state.domainDetails[parentId]?.parameters;
@@ -353,7 +353,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           [parentId]: {...state.domainDetails[parentId], parameters: <Iparameters>{...rest}}
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreAddNewDirectoryDomainParameter: {
@@ -373,7 +373,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           },
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreAddNewDirectoryDomainVariable: {
@@ -393,7 +393,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           },
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteNewDirectoryDomainParameter: {
@@ -419,7 +419,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteNewDirectoryDomainVariable: {
@@ -445,7 +445,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.ClearDetails: {
@@ -453,21 +453,21 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       return {
         ...state,
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.UpdateFailure: {
       return {
         ...state,
         errorMessage: 'Cant get data from server',
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreGetDirectoryUsers: {
       const domains = action.payload.response.data?.domains || null;
       let users = action.payload.response.data['directory_users'] || {};
       if (!users) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       if (users.id) {
         users = {[users.id]: users};
@@ -487,7 +487,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
     case DirectoryActionTypes.StoreGetDirectoryUserDetails: {
       const data = action.payload.response.data || {};
       if (!data?.user?.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -498,7 +498,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StorePasteDirectoryDomainVariables: {
@@ -705,7 +705,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const data = action.payload.response.data || {};
       const parentId: number = data.parent?.id || 0;
       if (!data.id || !parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       let new_params = !!state.users[parentId]?.parameters ? state.users[parentId]?.parameters.new || [] : [];
@@ -735,7 +735,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const data = action.payload.response.data || {};
       const parentId: number = data.parent?.id || 0;
       if (!data.id || !parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       let new_vars = !!state.users[parentId]?.variables ? state.users[parentId]?.variables.new || [] : [];
@@ -776,7 +776,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           },
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreAddNewDirectoryUserVariable: {
@@ -796,7 +796,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           },
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteNewDirectoryUserVariable: {
@@ -822,7 +822,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteNewDirectoryUserParameter: {
@@ -848,14 +848,14 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteDirectoryUserParameter: {
       const data = action.payload.response.data || {};
       const parentId: number = data.parent?.id || 0;
       if (!data.id || !parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const {[data.id]: toDel, ...rest} = state.users[parentId]?.parameters;
       return {
@@ -870,14 +870,14 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           },
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteDirectoryUserVariable: {
       const data = action.payload.response.data || {};
       const parentId: number = data.parent?.id || 0;
       if (!data.id || !parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const {[data.id]: toDel, ...rest} = state.users[parentId]?.variables;
 
@@ -893,13 +893,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           },
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreUpdateDirectoryUserCache: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -910,13 +910,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreUpdateDirectoryUserNumberAlias: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -927,13 +927,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreUpdateDirectoryUserCidr: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -944,7 +944,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           }
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -953,7 +953,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
     case DirectoryActionTypes.StoreAddDirectoryUser: {
       const data = action.payload.response.data || {};
       if (!data) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -963,14 +963,14 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           ...data,
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreSwitchDirectoryUser:
     case DirectoryActionTypes.StoreUpdateDirectoryUserName: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -979,13 +979,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           [data.id]: {...state.users[data.id], ...data},
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteDirectoryUser: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = state.users;
@@ -993,7 +993,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         ...state,
         users: {...rest},
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1001,7 +1001,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const domains = action.payload.response.data['domains'] || {};
       const groups = action.payload.response.data['list'] || {};
       if (!domains) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -1016,7 +1016,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const groupUsers = action.payload.response.data['group_users'] || {};
       const users = action.payload.response.data['users'] || {};
       if (!groupUsers) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -1024,14 +1024,14 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         groupUsers: {...state.groupUsers, ...groupUsers},
         users: {...state.users, ...users},
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreUpdateDirectoryGroupName:
     case DirectoryActionTypes.StoreAddNewDirectoryGroup: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -1041,13 +1041,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           [data.id]: { ...state.groupNames[data.id], ...data},
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteDirectoryGroup: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = state.groupNames;
@@ -1056,13 +1056,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         ...state,
         groupNames: rest,
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreAddDirectoryGroupUser: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -1071,13 +1071,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           [data.id]: { ...state.groupUsers[data.id], ...data},
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteDirectoryGroupUser: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const {[data.id]: toDel, ...rest} = state.groupUsers;
 
@@ -1085,7 +1085,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         ...state,
         groupUsers: rest,
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1097,7 +1097,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         users: data['directory_users'],
         userGateways: data['user_gateways'],
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreGetDirectoryUserGatewayDetails: {
@@ -1105,14 +1105,14 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const parameters = action.payload.response.data.parameters || {};
       const parentId = getParentId(variables) || getParentId(parameters);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
         ...state,
         gatewayDetails: {...state.gatewayDetails, [parentId]: {parameters: parameters, variables: variables}},
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreUpdateDirectoryUserGatewayParameter:
@@ -1120,7 +1120,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -1128,7 +1128,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           ...state.gatewayDetails,
           [parentId]: {...state.gatewayDetails[parentId], parameters: {...state.gatewayDetails[parentId].parameters, [data.id]: data}}},
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreSwitchDirectoryUserGatewayVariable:
@@ -1136,7 +1136,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -1145,7 +1145,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           [parentId]: {...state.gatewayDetails[parentId], variables: {...state.gatewayDetails[parentId].variables, [data.id]: data}}
           },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1153,7 +1153,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const {[data.id]: toDel, ...rest} = state.gatewayDetails[parentId].variables;
 
@@ -1165,14 +1165,14 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
             variables: rest}
           },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteDirectoryUserGatewayParameter: {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const {[data.id]: toDel, ...rest} = state.gatewayDetails[parentId].parameters;
 
@@ -1184,14 +1184,14 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
             parameters: rest}
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreAddDirectoryUserGatewayVariable: {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...state.gatewayDetails[parentId].variables.new || []];
       if (action.payload.index !== undefined) {
@@ -1207,13 +1207,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         gatewayDetails: {...state.gatewayDetails, [parentId]: {...state.gatewayDetails[parentId],
             variables: {...state.gatewayDetails[parentId].variables, [data.id]: data, new: rest}}},
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreNewDirectoryUserGatewayParameter: {
       let details = state.gatewayDetails[action.payload.id];
       if (!details) {
-        // return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        // return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
         details = {parameters: <Iparameters>{}, variables: <IgatewayVariables>{}};
       }
       const rest = [
@@ -1228,13 +1228,13 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           },
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.DropNewDirectoryUserGatewayParameter: {
       const details = state.gatewayDetails[action.payload.id];
       if (!details) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...details.parameters.new.slice(0, action.payload.index),
@@ -1250,14 +1250,14 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           },
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDirectoryUserGatewayParameter: {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...state.gatewayDetails[parentId].parameters.new || []];
       if (action.payload.index !== undefined) {
@@ -1273,7 +1273,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         gatewayDetails: {...state.gatewayDetails, [parentId]: {...state.gatewayDetails[parentId],
             parameters: {...state.gatewayDetails[parentId].parameters, [data.id]: data, new: rest}}},
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreUpdateDirectoryUserGatewayName:
@@ -1281,7 +1281,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       const data = action.payload.response.data || {};
       const parentId: number = data.parent?.id || 0;
       if (!data.id || !parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -1291,27 +1291,27 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
           [data.id]: {...state.userGateways[data.id], ...data},
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case DirectoryActionTypes.StoreDeleteDirectoryUserGateway: {
       const data = action.payload.response.data || {};
       if (data.id === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const {[data.id]: toDel, ...rest} = state.userGateways;
       return {
         ...state,
         userGateways: rest,
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case DirectoryActionTypes.StoreNewDirectoryUserGatewayVariable: {
       let details = state.gatewayDetails[action.payload.id];
       if (!details) {
-        // return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        // return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
         details = {parameters: <Iparameters>{}, variables: <IgatewayVariables>{}};
       }
       if (!details.variables) {
@@ -1326,14 +1326,14 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         gatewayDetails: {...state.gatewayDetails, [action.payload.id]:
             {...details, variables: {...details.variables,  new: rest}}},
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case DirectoryActionTypes.DropNewDirectoryUserGatewayVariable: {
       const details = state.gatewayDetails[action.payload.id];
       if (!details) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...details.variables.new.slice(0, action.payload.index),
@@ -1346,7 +1346,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         gatewayDetails: {...state.gatewayDetails, [action.payload.id]:
             {...details, variables: {...details.variables,  new: rest}}},
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -1392,7 +1392,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       return {
         ...state,
         webUsersTemplates: data,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -1405,7 +1405,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       return {
         ...state,
         templatesItems: {...state.templatesItems, ...data},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }

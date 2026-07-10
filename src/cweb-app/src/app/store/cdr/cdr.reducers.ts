@@ -20,7 +20,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
     case CDRActionTypes.UPDATE_FAILURE: {
       return {
         ...state,
-        loadCounter: state.loadCounter >= 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter >= 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -35,7 +35,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         return {
           ...state,
           errorMessage: action.payload.error,
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         };
     }
 
@@ -44,7 +44,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
       return {
         ...state,
         settings: action.payload.response['web_settings'] || {},
-        loadCounter: --state.loadCounter,
+        loadCounter: state.loadCounter - 1,
         errorMessage: null};
     }
 
@@ -54,7 +54,7 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
         ...state,
         cdrData: action.payload.response.cdr || [],
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

@@ -32,7 +32,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.odbc_cdr,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -43,7 +43,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           odbc_cdr: {...state.odbc_cdr, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
       const odbcCdr = state.odbc_cdr ? state.odbc_cdr : <IodbcCdr>{};
@@ -57,14 +57,14 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreAddOdbcCdrTable: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0 };
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0 };
       }
       const odbcCdr = state.odbc_cdr ? state.odbc_cdr : <IodbcCdr>{};
 
@@ -75,14 +75,14 @@ export function reducer(state = initialState, action: All): State {
           tables: {...odbcCdr.tables, [data.id]: data},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDeleteOdbcCdrParameter: {
       const id = action.payload.response.data?.id || 0;
       if (!state.odbc_cdr.settings[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.odbc_cdr.settings;
@@ -93,7 +93,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.odbc_cdr, settings: {...rest, new: state.odbc_cdr.settings?.new || []},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -101,7 +101,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.StoreSwitchOdbcCdrParameter: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0 };
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0 };
       }
 
       return {
@@ -110,14 +110,14 @@ export function reducer(state = initialState, action: All): State {
           ...state.odbc_cdr, settings: {...state.odbc_cdr.settings, [data.id]: data},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreUpdateOdbcCdrTable: {
       const data = action.payload.response.data || {};
       if (!data.id || !state.odbc_cdr.tables[data.id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -126,7 +126,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.odbc_cdr, tables: {...state.odbc_cdr.tables, [data.id]: {...state.odbc_cdr.tables[data.id], ...data}},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -142,7 +142,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.odbc_cdr, settings: {...state.odbc_cdr.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -159,7 +159,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.odbc_cdr, settings: {...state.odbc_cdr.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -181,7 +181,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.odbc_cdr, settings: {...state.odbc_cdr.settings, [data.id]: data, new: rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -190,7 +190,7 @@ export function reducer(state = initialState, action: All): State {
       const parentId = data?.parent?.id || 0;
       const table = state.odbc_cdr.tables[parentId];
       if (!table) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...table.fields?.new || []];
 
@@ -211,7 +211,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 /////// paste
@@ -221,7 +221,7 @@ export function reducer(state = initialState, action: All): State {
       const parentId = data?.parent?.id || 0;
       const table = state.odbc_cdr.tables[parentId];
       if (!table || !table.fields[data.id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = table.fields;
@@ -235,7 +235,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -243,11 +243,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const table = state.odbc_cdr.tables[parentId];
       if (!table) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -259,7 +259,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -268,11 +268,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const table = state.odbc_cdr.tables[parentId];
       if (!table) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -284,14 +284,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreNewOdbcCdrField: {
       const table = state.odbc_cdr.tables[action.payload.id];
       if (!table) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...table.fields?.new || [],
@@ -307,14 +307,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDropNewOdbcCdrField: {
       const table = state.odbc_cdr.tables[action.payload.id];
       if (!table) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...table.fields.new.slice(0, action.payload.index),
@@ -331,14 +331,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDeleteOdbcCdrTable: {
       const id = action.payload.response.data?.id || 0;
       if (!state.odbc_cdr.tables[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.odbc_cdr.tables;
@@ -349,7 +349,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.odbc_cdr, tables: {...rest},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

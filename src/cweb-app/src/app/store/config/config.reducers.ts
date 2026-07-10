@@ -265,7 +265,7 @@ export function reducer(state = initialState, action: any): State {
     case ConfigActionTypes.UPDATE_FAILURE: {
       return {
         ...state,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         // errorMessage: 'Cant get data from server',
       };
     }
@@ -291,7 +291,7 @@ export function reducer(state = initialState, action: any): State {
       return {
         ...state,
         errorMessage: action.payload.error || '',
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -463,7 +463,7 @@ export function reducer(state = initialState, action: any): State {
           loadCounter: 0,
         };
       }
-      return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
     }
 
     default: {
@@ -475,7 +475,7 @@ export function reducer(state = initialState, action: any): State {
 export function increaseStateLoadField(state: State): State {
   return {
     ...state,
-    loadCounter: state.loadCounter++,
+    loadCounter: state.loadCounter + 1,
   };
 }
 export function decreaseStateLoadField(state: State): State {

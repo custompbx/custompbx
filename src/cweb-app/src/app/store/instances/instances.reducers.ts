@@ -38,7 +38,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         errorMessage: action.payload.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -48,7 +48,7 @@ export function reducer(state = initialState, action: All): State {
         instances: action.payload.response.fs_instances || {},
         currentInstanceId: action.payload.response.id || 0,
         errorMessage: action.payload.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -57,7 +57,7 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         instances: {...state.instances, ...action.payload.response.fs_instances},
         errorMessage: action.payload.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

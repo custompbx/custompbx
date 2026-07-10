@@ -48,7 +48,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         errorMessage: action.payload.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -59,7 +59,7 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         globalVariables: action.payload.response.global_variables || {},
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -73,7 +73,7 @@ export function reducer(state = initialState, action: All): State {
           ...rest,
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -87,7 +87,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.globalVariables, ...data,
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -103,7 +103,7 @@ export function reducer(state = initialState, action: All): State {
           ...rest
         ],
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -120,7 +120,7 @@ export function reducer(state = initialState, action: All): State {
           ...rest
         ],
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -146,7 +146,7 @@ export function reducer(state = initialState, action: All): State {
           ...rest
         ],
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

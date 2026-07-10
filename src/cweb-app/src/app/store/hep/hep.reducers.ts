@@ -28,7 +28,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           errorMessage: action.payload.error,
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         };
     }
 
@@ -37,7 +37,7 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         hepData: action.payload.response.heps || [],
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -46,7 +46,7 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         hepDetails: action.payload.response['hep_details'] || [],
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

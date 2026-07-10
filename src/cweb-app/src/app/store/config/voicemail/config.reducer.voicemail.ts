@@ -32,7 +32,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.voicemail,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -42,7 +42,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           voicemail: {...state.voicemail, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -59,7 +59,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -67,7 +67,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.StoreUpdateVoicemailProfile: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       if (!state.voicemail) {
@@ -83,7 +83,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -93,7 +93,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           voicemail: {...state.voicemail, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -110,14 +110,14 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDelVoicemailSetting: {
       const id = action.payload.response.data?.id || 0;
       if (!state.voicemail.parameters[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.voicemail.parameters;
@@ -128,7 +128,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.voicemail, parameters: {...rest, new: state.voicemail.parameters.new || []},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -142,7 +142,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.voicemail, parameters: {...state.voicemail.parameters, [data.id]: data},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -158,7 +158,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.voicemail, parameters: {...state.voicemail.parameters, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -175,7 +175,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.voicemail, parameters: {...state.voicemail.parameters, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -197,7 +197,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.voicemail, parameters: {...state.voicemail.parameters, [data.id]: data, new: rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -206,7 +206,7 @@ export function reducer(state = initialState, action: All): State {
       const parentId = data?.parent?.id || 0;
       const profile = state.voicemail.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...profile.parameters.new || []];
 
@@ -227,7 +227,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -275,7 +275,7 @@ export function reducer(state = initialState, action: All): State {
       const parentId = data?.parent?.id || 0;
       const profile = state.voicemail.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = profile.parameters;
@@ -289,7 +289,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -297,11 +297,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.voicemail.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -312,7 +312,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -321,11 +321,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const profile = state.voicemail.profiles[parentId];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,
@@ -336,14 +336,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreNewVoicemailProfileParameter: {
       const profile = state.voicemail.profiles[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.parameters?.new || [],
@@ -358,14 +358,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDropNewVoicemailProfileParameter: {
       const profile = state.voicemail.profiles[action.payload.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...profile.parameters.new.slice(0, action.payload.index),
@@ -382,7 +382,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -390,7 +390,7 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const profile = state.voicemail.profiles[data.id];
       if (!profile) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = state.voicemail.profiles;
@@ -401,7 +401,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.voicemail, profiles: {...rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

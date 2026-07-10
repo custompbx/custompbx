@@ -136,6 +136,24 @@ func TestWsContextCloseWithNilWebSocketIsSafeAndIdempotent(t *testing.T) {
 	}
 }
 
+func TestWaitersWithNilWebSocketCloseSafely(t *testing.T) {
+	context := CreateWsContext(nil)
+	closed := 0
+	context.onClose = func(*WsContext) { closed++ }
+
+	context.SendWaiter()
+	context.ReadWaiter(func(*Message, *WsContext) {
+		t.Fatal("handler should not run without websocket")
+	})
+
+	if closed != 1 {
+		t.Fatalf("close callback called %d times, want 1", closed)
+	}
+	if context.Enqueue(&UserResponse{MessageType: "after-close"}) {
+		t.Fatal("enqueue succeeded after nil websocket close")
+	}
+}
+
 func TestHubRegisterDuplicateConnectionIsIdempotent(t *testing.T) {
 	hub := NewWsHub()
 	context, _ := testWebSocketContext(t)

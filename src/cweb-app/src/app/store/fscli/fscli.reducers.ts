@@ -18,7 +18,7 @@ export function reducer(state = initialState, action: All): State {
     case FSCLIActionTypes.UPDATE_FAILURE: {
       return {
         ...state,
-        loadCounter: state.loadCounter >= 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter >= 0 ? state.loadCounter - 1 : 0,
       };
     }
     case FSCLIActionTypes.SendFSCLICommand: {
@@ -30,14 +30,14 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           errorMessage: action.payload.response.error,
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         };
       }
       return {
         ...state,
         fsCliData: action.payload.response.response || '',
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

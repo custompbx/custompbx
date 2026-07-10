@@ -47,7 +47,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.StoreSendCallcenterCommand: {
       return {
         ...state,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -58,7 +58,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -68,7 +68,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           callcenter: {...state.callcenter, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -84,7 +84,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -92,7 +92,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.StoreAddCallcenterQueue: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -101,7 +101,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, queues: {...state.callcenter?.queues, [data.id]: data},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -109,7 +109,7 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.response.data?.id || 0;
       const queue = state.callcenter?.queues[id];
       if (!queue) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.callcenter?.queues;
@@ -120,7 +120,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, queues: {...rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -142,14 +142,14 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, settings: {...state.callcenter?.settings, [data.id]: data, new: rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDelCallcenterSettings: {
       const id = action.payload.response.data?.id || 0;
       if (!state.callcenter?.settings[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.callcenter?.settings;
@@ -160,7 +160,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, settings: {...rest, new: state.callcenter?.settings.new || []},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -173,7 +173,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, settings: {...state.callcenter?.settings, ...data},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -181,7 +181,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.StoreUpdateCallcenterSettings: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -190,7 +190,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, settings: {...state.callcenter?.settings, [data.id]: data},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -206,7 +206,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, settings: {...state.callcenter?.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -223,7 +223,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, settings: {...state.callcenter?.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -231,11 +231,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const queue = state.callcenter?.queues[parentId];
       if (!queue) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...queue.parameters.new || []];
 
@@ -256,7 +256,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -303,11 +303,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const queue = state.callcenter?.queues[parentId];
       if (!queue || !queue.parameters[data.id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[data.id]: toDel, ...rest} = queue.parameters;
@@ -321,7 +321,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -329,11 +329,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const queue = state.callcenter?.queues[parentId];
       if (!queue) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -345,7 +345,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -354,11 +354,11 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
       const parentId = getParentId(data);
       if (parentId === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const queue = state.callcenter?.queues[parentId];
       if (!queue) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -370,14 +370,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreNewCallcenterQueueParam: {
       const queue = state.callcenter?.queues[action.payload.id];
       if (!queue) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...queue.parameters?.new || [],
@@ -392,14 +392,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDropNewCallcenterQueueParam: {
       const queue = state.callcenter?.queues[action.payload.id];
       if (!queue) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const rest = [
         ...queue.parameters.new.slice(0, action.payload.index),
@@ -416,7 +416,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -429,7 +429,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           callcenter: {...state.callcenter, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -449,7 +449,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -460,7 +460,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           callcenter: {...state.callcenter, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -485,7 +485,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -506,7 +506,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -514,7 +514,7 @@ export function reducer(state = initialState, action: All): State {
       const id: number = action.payload.response?.data?.id || 0;
       const agent = state.callcenter?.agents?.table || [];
       if (!agent) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = state.callcenter?.agents?.table || [];
       if (id) {
@@ -528,14 +528,14 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, agents: {...state.callcenter?.agents, table: [...rest]},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreUpdateCallcenterAgent: {
       const data = action.payload.response.data || {};
       if (!data || !data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const field = action.payload?.payload?.param?.name;
@@ -569,7 +569,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -580,7 +580,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           callcenter: {...state.callcenter, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -601,14 +601,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreAddCallcenterTier: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       if (!state.callcenter) {
@@ -625,7 +625,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -633,7 +633,7 @@ export function reducer(state = initialState, action: All): State {
       const id: number = action.payload.response?.data?.id || 0;
       const tier = state.callcenter?.tiers?.table || [];
       if (!tier) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = state.callcenter?.tiers?.table || [];
       if (id) {
@@ -647,14 +647,14 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, tiers: {...state.callcenter?.tiers, table: [...rest]},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreUpdateCallcenterTier: {
       const data = action.payload.response.data;
       if (!data || !data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const field = action.payload?.payload?.param?.name;
@@ -688,7 +688,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -698,7 +698,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           callcenter: {...state.callcenter, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -716,7 +716,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -726,7 +726,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           callcenter: {...state.callcenter, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -744,7 +744,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -755,7 +755,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           callcenter: {...state.callcenter, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -772,7 +772,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -780,7 +780,7 @@ export function reducer(state = initialState, action: All): State {
       const uuid: string = action.payload.response.uuid;
       const tier = state.callcenter?.members.table || [];
       if (!tier) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = state.callcenter?.members.table || [];
       if (uuid) {
@@ -794,7 +794,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.callcenter, members: {...state.callcenter?.members, table: [...rest]},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -803,7 +803,7 @@ export function reducer(state = initialState, action: All): State {
       const fieldName = action.payload.fieldName;
       const rowId = action.payload.rowId;
       if (!tableName || !fieldName || !rowId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       return {
         ...state,

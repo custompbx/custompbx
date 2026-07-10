@@ -66,12 +66,12 @@ export function reducer(state = initialState, action: All): State {
     case DataFlowActionTypes.UPDATE_FAILURE: {
       return {
         ...state,
-        loadCounter: state.loadCounter >= 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter >= 0 ? state.loadCounter - 1 : 0,
         // errorMessage: 'Cant get data from server',
       };
     }
     case DataFlowActionTypes.REDUCE_LOAD_COUNTER: {
-      return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
     }
 
     case DataFlowActionTypes.GET_DASHBOARD: {
@@ -125,7 +125,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         dashboardData: {...state.dashboardData, ...data},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

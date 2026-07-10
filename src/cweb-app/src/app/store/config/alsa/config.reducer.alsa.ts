@@ -22,7 +22,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.alsa,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -32,7 +32,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           alsa: {...state.alsa, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -49,14 +49,14 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDelAlsaParameter: {
       const id = action.payload.response.data?.id || 0;
       if (!state.alsa.settings[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.alsa.settings;
@@ -67,7 +67,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.alsa, settings: {...rest, new: state.alsa.settings?.new || []},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -81,7 +81,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.alsa, settings: {...state.alsa.settings, [data.id]: data},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -97,7 +97,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.alsa, settings: {...state.alsa.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -114,14 +114,14 @@ export function reducer(state = initialState, action: All): State {
           ...state.alsa, settings: {...state.alsa.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreAddAlsaParameter: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...state.alsa.settings?.new || []];
 
@@ -139,7 +139,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.alsa, settings: {...state.alsa.settings, [data.id]: data, new: rest},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

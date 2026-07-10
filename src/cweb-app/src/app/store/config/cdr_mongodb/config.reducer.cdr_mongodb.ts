@@ -23,7 +23,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cdr_mongodb,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -33,7 +33,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           cdr_mongodb: {...state.cdr_mongodb, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -50,14 +50,14 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDelCdrMongodbParameter: {
       const id = action.payload.response.data?.id || 0;
       if (!state.cdr_mongodb.settings[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.cdr_mongodb.settings;
@@ -68,7 +68,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cdr_mongodb, settings: {...rest, new: state.cdr_mongodb.settings.new || []},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -82,7 +82,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cdr_mongodb, settings: {...state.cdr_mongodb.settings, [data.id]: data},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -98,7 +98,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cdr_mongodb, settings: {...state.cdr_mongodb.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -115,7 +115,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cdr_mongodb, settings: {...state.cdr_mongodb.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -137,7 +137,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cdr_mongodb, settings: {...state.cdr_mongodb.settings, [data.id]: data, new: rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

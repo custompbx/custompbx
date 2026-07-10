@@ -25,7 +25,7 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
           ...state.post_load_modules,
         },
         errorMessage: action.payload.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -35,7 +35,7 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
         return {
           ...state,
           post_load_modules: {...state.post_load_modules, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -52,14 +52,14 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
           exists: action.payload.response.exists,
         },
         errorMessage: action.payload.response.error ||  '',
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDelPostLoadModule: {
       const id = action.payload.response.data?.id || 0;
       if (!state.post_load_modules.modules[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.post_load_modules.modules;
@@ -71,7 +71,7 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
           newModules: state.post_load_modules.newModules || [],
         },
         errorMessage: action.payload.response.error ||  '',
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -80,7 +80,7 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
     case ConfigActionTypes.StoreUpdatePostLoadModule: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -89,7 +89,7 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
           ...state.post_load_modules, modules: {...state.post_load_modules.modules, [data.id]: data},
         },
         errorMessage: action.payload.response.error ||  '',
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -106,7 +106,7 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
           newModules: rest,
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -124,14 +124,14 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
           newModules: rest,
         },
         errorMessage: null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreAddPostLoadModule: {
       const data = action.payload.response.data || {};
       if (!data.id) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       let rest = [...state.post_load_modules.newModules || []];
 
@@ -150,7 +150,7 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
           newModules: rest,
         },
         errorMessage: action.payload.response.error ||  '',
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

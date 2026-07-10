@@ -98,7 +98,7 @@ export function reducer(state = initialState, action: All): State {
     case SettingsActionTypes.StoreGotWebError: {
       return {
         ...state,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.error,
       };
     }
@@ -107,7 +107,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         settingsData: action.payload.response.settings,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -115,7 +115,7 @@ export function reducer(state = initialState, action: All): State {
     case SettingsActionTypes.UPDATE_FAILURE: {
       return {
         ...state,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: 'Cant get data from server',
       };
     }
@@ -127,7 +127,7 @@ export function reducer(state = initialState, action: All): State {
         webGroups: action.payload.response['web_users_groups'],
         wssUris: action.payload.response.options || [],
         vertoWsUris: action.payload.response['alt_options'] || [],
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -150,13 +150,13 @@ export function reducer(state = initialState, action: All): State {
       if (!data) {
         return {
           ...state,
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error,
         };
       }
       const ids = Object.keys(data);
       if (ids.length === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const id = ids[0];
       let newState = {...state};
@@ -220,7 +220,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsers: {...newState.webUsers},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -232,7 +232,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsers: {...rest},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -242,13 +242,13 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['tokens_list'] || [];
       const ids = Object.keys(data);
       if (ids.length === 0 || !state.webUsers[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
         ...state,
         webUsers: {...state.webUsers, [id]: {...state.webUsers[id], tokens: data}},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -258,13 +258,13 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['tokens_list'] || [];
       const ids = Object.keys(data);
       if (ids.length === 0 || !state.webUsers[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
       const tokens = state.webUsers[id]?.tokens || [];
       return {
         ...state,
         webUsers: {...state.webUsers, [id]: {...state.webUsers[id], tokens: [ ...tokens, ...data]}},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -273,7 +273,7 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.response.id;
       const afId = action.payload.response.affected_id;
       if (!id || !state.webUsers[id] || !afId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const tokens = state.webUsers[id]?.tokens || [];
@@ -282,7 +282,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsers: {...state.webUsers, [id]: {...state.webUsers[id], tokens: [...rest]}},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -292,7 +292,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsersTemplates: data,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -307,7 +307,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsersTemplates: {...state.webUsersTemplates, ...data},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -319,7 +319,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsersTemplates: {...rest},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -339,7 +339,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsersTemplateParameters: {...state.webUsersTemplateParameters, ...data},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -370,7 +370,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsersTemplateParameters: {...rest},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -390,7 +390,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsersTemplateVariables: {...state.webUsersTemplateVariables, ...data},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }
@@ -421,7 +421,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         webUsersTemplateVariables: {...rest},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
       };
     }

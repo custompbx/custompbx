@@ -36,12 +36,12 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
       closeObserver: {
         next: (event: CloseEvent) => {
           this.websocket$ = null;
-          this.connection$.next(false);
+          this.emitConnectionStatus(false);
         }
       },
       openObserver: {
         next: (event: Event) => {
-          this.connection$.next(true);
+          this.emitConnectionStatus(true);
         }
       }
     };
@@ -81,7 +81,7 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
     this.websocket$ = new WebSocketSubject(this.config);
 
     this.websocket$.subscribe({
-        next: (message) => this.wsMessages$.next(message),
+        next: (message) => this.emitMessage(message),
         error: (error: Event) => {
           if (!this.websocket$) {
             // run reconnect if errors
@@ -142,5 +142,13 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
     this.websocket$.complete();
     this.statusSub.unsubscribe();
     this.websocket$.unsubscribe();
+  }
+
+  private emitConnectionStatus(isConnected: boolean): void {
+    this.connection$.next(isConnected);
+  }
+
+  private emitMessage(message: IWsMessage<any>): void {
+    this.wsMessages$.next(message);
   }
 }

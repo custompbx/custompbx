@@ -34,7 +34,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.distributor,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -62,13 +62,13 @@ export function reducer(state = initialState, action: All): State {
           ...state.distributor, lists: {...state.distributor.lists, [data.id]: data},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case ConfigActionTypes.StoreDelDistributorList: {
       const id = action.payload.response.data?.id || 0;
       if (!state.distributor.lists[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.distributor.lists;
@@ -81,13 +81,13 @@ export function reducer(state = initialState, action: All): State {
             {...rest},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case ConfigActionTypes.StoreGetDistributorNodes: {
       const id = action.payload.id;
       if (!state.distributor.lists[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -97,7 +97,7 @@ export function reducer(state = initialState, action: All): State {
             [id]: {...state.distributor.lists[id], nodes: action.payload.response.data}},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case ConfigActionTypes.StoreSwitchDistributorNode:
@@ -106,7 +106,7 @@ export function reducer(state = initialState, action: All): State {
       const id = data?.id || 0;
       const parentId = data?.parent?.id || 0;
       if (!state.distributor.lists[parentId] || !state.distributor.lists[parentId].nodes[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       return {
@@ -119,7 +119,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -127,7 +127,7 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.response.data?.id || 0;
       const parentId = action.payload.response.data?.parent?.id || 0;
       if (!state.distributor.lists[parentId] || !state.distributor.lists[parentId].nodes[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.distributor.lists[parentId].nodes;
@@ -139,13 +139,13 @@ export function reducer(state = initialState, action: All): State {
             [parentId]: {...state.distributor.lists[parentId], nodes: <IdistributorNodes>{...rest}}},
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case ConfigActionTypes.StoreNewDistributorNode: {
       const id = action.payload;
       if (!state.distributor.lists[id].nodes) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const rest = [
@@ -160,13 +160,13 @@ export function reducer(state = initialState, action: All): State {
             [id]: {...state.distributor.lists[id], nodes: {...state.distributor.lists[id].nodes, new: rest}}},
           errorMessage: null
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case ConfigActionTypes.StoreDelNewDistributorNode: {
       const id = action.payload.id;
       if (!state.distributor.lists[id].nodes || !state.distributor.lists[id].nodes.new) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const rest = [
@@ -185,14 +185,14 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
     case ConfigActionTypes.StoreAddDistributorNode: {
       const data = action.payload.response.data || {};
       const parentId = data.parent?.id || 0;
       if (!parentId) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const rest = [
@@ -213,7 +213,7 @@ export function reducer(state = initialState, action: All): State {
           },
           errorMessage: action.payload.response.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

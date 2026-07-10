@@ -1,7 +1,6 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {computed, Component, effect, OnDestroy, OnInit} from '@angular/core';
 
 import {MaterialModule} from "../../../../material-module";
-import {Observable, Subscription} from 'rxjs';
 import {Iitem, IsimpleModule, IvertoParameterItem} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
@@ -31,22 +30,24 @@ import {
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
+import {KeyValuePadPositionComponent} from "../../key-value-pad-position/key-value-pad-position.component";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
 standalone: true,
-imports:  [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent],
+imports:  [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, KeyValuePadPositionComponent],
     selector: 'app-http-cache',
     templateUrl: './http-cache.component.html',
     styleUrls: ['./http-cache.component.css']
 })
 export class HttpCacheComponent implements OnInit, OnDestroy {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: IsimpleModule;
+  private configState = toSignal(this.store.pipe(select(selectConfigurationState)), {initialValue: {} as any});
+  public list = computed(() => this.configState().http_cache as IsimpleModule);
+  public loadCounter = computed(() => this.configState().loadCounter || 0);
+  private lastErrorMessage = computed(() => this.configState().http_cache?.errorMessage || null);
   public selectedIndex: number;
-  private lastErrorMessage: string;
-  public loadCounter: number;
   public globalSettingsDispatchers: object;
   public ProfileDomainsDispatchers: object;
   public ProfileDomainsMask: object;
@@ -60,23 +61,20 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
   ) {
     this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
-
-  ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.http_cache;
-      this.lastErrorMessage = configs.http_cache && configs.http_cache.errorMessage || null;
-      if (!this.lastErrorMessage) {
+    effect(() => {
+      const errorMessage = this.lastErrorMessage();
+      if (!errorMessage) {
         this.newProfileName = '';
       } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
+        this._snackBar.open('Error: ' + errorMessage + '!', null, {
           duration: 3000,
           panelClass: ['error-snack'],
         });
       }
     });
+  }
+
+  ngOnInit() {
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewHttpCacheParam.bind(this),
       switchItem: this.switchHttpCacheParam.bind(this),
@@ -100,7 +98,6 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.configs$.unsubscribe();
     if (this.route.snapshot?.data?.reconnectUpdater) {
        this.route.snapshot.data.reconnectUpdater.unsubscribe();
      }
@@ -261,7 +258,6 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
   }
 
   getFirstElement(obj): any {
-    console.log(obj);
     if (!obj) {
       return {};
     }

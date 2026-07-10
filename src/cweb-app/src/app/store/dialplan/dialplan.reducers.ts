@@ -110,13 +110,13 @@ export function reducer(state = initialState, action: All): State {
     case DialplanActionTypes.UPDATE_FAILURE: {
       return {
         ...state,
-        loadCounter: state.loadCounter >= 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter >= 0 ? state.loadCounter - 1 : 0,
         // errorMessage: 'Cant get data from server',
       };
     }
 
     case DialplanActionTypes.REDUCE_LOAD_COUNTER: {
-      return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+      return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
     }
 
     case DialplanActionTypes.SWITCH_DIALPLAN_STATIC:
@@ -167,7 +167,7 @@ export function reducer(state = initialState, action: All): State {
         ...state,
         contexts: {...data, },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -180,7 +180,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.contexts, ...data,
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -188,7 +188,7 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.response.id;
       if (!state.contexts[id]) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -201,7 +201,7 @@ export function reducer(state = initialState, action: All): State {
           ...rest,
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -211,7 +211,7 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['dialplan_extensions'];
       if (!state.contexts[id] || !Array.isArray(data)) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -232,7 +232,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.contexts, [id]: {...state.contexts[id], extensions: data},
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -241,7 +241,7 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['dialplan_extensions'];
       if (!state.contexts[id] || !Array.isArray(data)) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -253,7 +253,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.contexts, [id]: {...state.contexts[id], extensions: [...extensions, ...data]},
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -263,7 +263,7 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['dialplan_extensions'];
       if (!state.contexts[id] || !Array.isArray(data) || data.length === 0) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -281,7 +281,7 @@ export function reducer(state = initialState, action: All): State {
           },
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -290,7 +290,7 @@ export function reducer(state = initialState, action: All): State {
       const extenId = action.payload.response['affected_id'];
       if (!state.contexts[id]) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -305,7 +305,7 @@ export function reducer(state = initialState, action: All): State {
           },
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -315,14 +315,14 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['dialplan_conditions'];
       if (!data) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
       const ids = Object.keys(data);
       if (ids.length === 0) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -330,7 +330,7 @@ export function reducer(state = initialState, action: All): State {
 
       if (!state.contexts[contextId] || !Array.isArray(state.contexts[contextId].extensions) || !Array.isArray(data[id])) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -362,7 +362,7 @@ export function reducer(state = initialState, action: All): State {
           },
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -371,14 +371,14 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['dialplan_conditions'];
       if (!data) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
       const ids = Object.keys(data);
       if (ids.length === 0) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -386,7 +386,7 @@ export function reducer(state = initialState, action: All): State {
 
       if (!state.contexts[contextId] || !Array.isArray(state.contexts[contextId].extensions) || !Array.isArray(data[id])) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -411,7 +411,7 @@ export function reducer(state = initialState, action: All): State {
           },
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -421,14 +421,14 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['dialplan_conditions'];
       if (!data) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
       const ids = Object.keys(data);
       if (ids.length === 0) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -437,7 +437,7 @@ export function reducer(state = initialState, action: All): State {
         !Array.isArray(state.contexts[contextId].extensions) ||
         !Array.isArray(data[id]) || data[id].length === 0) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -464,7 +464,7 @@ export function reducer(state = initialState, action: All): State {
           },
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -473,21 +473,21 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['dialplan_conditions'];
       if (!data) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
       const ids = Object.keys(data);
       if (ids.length === 0) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
       const id = ids[0];
       if (!state.contexts[contextId] || !Array.isArray(state.contexts[contextId].extensions) || !Array.isArray(data[id])) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -508,7 +508,7 @@ export function reducer(state = initialState, action: All): State {
           },
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -529,7 +529,7 @@ export function reducer(state = initialState, action: All): State {
     case DialplanActionTypes.STORE_EXTENSIONS_DETAILS: {
       if (action.payload.response.error) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error,
         };
       }
@@ -538,14 +538,14 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response['dialplan_details'];
       if (!data) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
       const ids = Object.keys(data);
       if (ids.length === 0) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -556,7 +556,7 @@ export function reducer(state = initialState, action: All): State {
         // !extensions[0].conditions[id]
       ) {
         return {
-          ...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+          ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
@@ -609,7 +609,7 @@ export function reducer(state = initialState, action: All): State {
           },
         },
         errorMessage: action.payload.response.error || null,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -784,7 +784,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         debug: {...data},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error || null,
       };
     }
@@ -800,7 +800,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         staticDialplan: noProceed,
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error || null,
       };
     }
@@ -809,7 +809,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         debug: {log: [], enabled: state.debug.enabled},
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: null,
       };
     }

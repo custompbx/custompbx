@@ -1,7 +1,7 @@
-<app-inner-header name="LCR" [loadCounter]="loadCounter"></app-inner-header>
-<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
+<app-inner-header name="LCR" [loadCounter]="loadCounter()"></app-inner-header>
+<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
-               *ngIf="list && list.exists !== false">
+               *ngIf="list() && list().exists !== false">
   <mat-tab label="List">
     <mat-card>
       <mat-card-header>
@@ -18,9 +18,9 @@
             </mat-panel-description>
           </mat-expansion-panel-header>
           <h3>Params:</h3>
-          <app-key-value-pad-2 [exist]="list.settings"
-                               [items]="list.settings"
-                               [newItems]="list.settings?.new"
+          <app-key-value-pad-2 [exist]="list().settings"
+                               [items]="list().settings"
+                               [newItems]="list().settings?.new"
                                [id]="null"
                                [toCopy]="null"
                                [dispatchersCallbacks]="globalSettingsDispatchers"
@@ -35,7 +35,7 @@
         <mat-card-subtitle>Profiles</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <div *ngFor="let item of onlyValues(list.profiles); trackBy: trackByFn" class="panel-wrapper">
+        <div *ngFor="let item of onlyValues(list().profiles); trackBy: trackByFn" class="panel-wrapper">
           <mat-expansion-panel (opened)="getLcrProfilesParams(item.id)"
                                [expanded]="panelCloser['profile' + item.id]">
             <mat-expansion-panel-header>
@@ -47,7 +47,7 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
             <button mat-raised-button color="basic" (click)="copyProfile(item.id)"
-                    *ngIf="list.profiles[item.id] && (list.profiles[item.id].parameters)">Copy
+                    *ngIf="list().profiles[item.id] && (list().profiles[item.id].parameters)">Copy
             </button>
             <h3>Params:</h3>
             <div>
@@ -79,14 +79,14 @@
   <mat-tab label="Delete/Rename">
     <form class="spacer spacerb" #deleteForm="ngForm">
       <h3>Profiles:</h3>
-      <div *ngFor="let profile of onlyValues(list.profiles); trackBy: trackByFn">
+      <div *ngFor="let profile of onlyValues(list().profiles); trackBy: trackByFn">
         <mat-form-field hideRequiredMarker>
         <mat-label>Profile name</mat-label>
         <input matInput name="Profile name" required [ngModel]="profile.name"
                  [name]="'profile::' + profile.id">
         </mat-form-field>
         <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
-                (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list.profiles[profile.id].name, 'rename')">
+                (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'rename')">
           Update
         </button>
         <button mat-raised-button color="warn"

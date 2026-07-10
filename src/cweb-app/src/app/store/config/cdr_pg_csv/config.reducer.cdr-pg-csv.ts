@@ -34,7 +34,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cdr_pg_csv,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -43,7 +43,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           cdr_pg_csv: {...state.cdr_pg_csv, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
       const parameters = action.payload.response.data['settings'];
@@ -80,7 +80,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -91,7 +91,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           cdr_pg_csv: {...state.cdr_pg_csv, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
       const data = action.payload.response.data || {};
@@ -115,7 +115,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -126,7 +126,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           cdr_pg_csv: {...state.cdr_pg_csv, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
       const data = action.payload.response.data || {};
@@ -150,7 +150,7 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -166,7 +166,7 @@ export function reducer(state = initialState, action: All): State {
           newSettingParams: [...rest],
           errorMessage: null
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -182,7 +182,7 @@ export function reducer(state = initialState, action: All): State {
           newSchemaFields: [...rest],
           errorMessage: null
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -200,7 +200,7 @@ export function reducer(state = initialState, action: All): State {
           newSettingParams: [...rest],
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -218,14 +218,14 @@ export function reducer(state = initialState, action: All): State {
           newSchemaFields: [...rest],
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.STORE_DELETE_CDR_PG_CSV_PARAMETER: {
       const id = action.payload.response.data?.id || 0;
       if (!state.cdr_pg_csv.settings[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.cdr_pg_csv.settings;
@@ -236,14 +236,14 @@ export function reducer(state = initialState, action: All): State {
           ...state.cdr_pg_csv, settings: {...rest},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.STORE_DELETE_CDR_PG_CSV_FIELD: {
       const id = action.payload.response.data?.id || 0;
       if (!state.cdr_pg_csv.schema[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.cdr_pg_csv.schema;
@@ -254,7 +254,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cdr_pg_csv, schema: {...rest},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 

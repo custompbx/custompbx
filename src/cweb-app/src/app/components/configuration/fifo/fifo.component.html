@@ -1,6 +1,6 @@
-<app-inner-header name="Fifo" [loadCounter]="loadCounter"></app-inner-header>
-<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list && list.exists !== false">
+<app-inner-header name="Fifo" [loadCounter]="loadCounter()"></app-inner-header>
+<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+ <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list() && list().exists !== false">
   <mat-tab label="List">
     <mat-card>
       <mat-card-header>
@@ -17,9 +17,9 @@
             </mat-panel-description>
           </mat-expansion-panel-header>
           <h3>Params:</h3>
-          <app-key-value-pad-2 [exist]="list.settings"
-                               [items]="list.settings"
-                               [newItems]="list.settings?.new"
+          <app-key-value-pad-2 [exist]="list().settings"
+                               [items]="list().settings"
+                               [newItems]="list().settings?.new"
                                [id]="null"
                                [toCopy]="null"
                                [dispatchersCallbacks]="globalSettingsDispatchers"
@@ -34,7 +34,7 @@
         <mat-card-subtitle>Fifos</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <div *ngFor="let item of onlyValues(list.fifos); trackBy: trackByFn" class="panel-wrapper">
+        <div *ngFor="let item of onlyValues(list().fifos); trackBy: trackByFn" class="panel-wrapper">
           <mat-expansion-panel (opened)="getFifoFifosParams(item.id)"
                                [expanded]="panelCloser['fifo' + item.id]">
             <mat-expansion-panel-header>
@@ -61,7 +61,7 @@
               </form>
             </div>
             <button mat-raised-button color="basic" (click)="copyFifo(item.id)"
-                    *ngIf="list.fifos[item.id] && (list.fifos[item.id].members)">Copy
+                    *ngIf="list().fifos[item.id] && (list().fifos[item.id].members)">Copy
             </button>
             <h3>Members:</h3>
             <div>
@@ -94,7 +94,7 @@
   <mat-tab label="Delete/Rename">
     <form class="spacer spacerb" #deleteForm="ngForm">
       <h3>Fifo:</h3>
-      <div *ngFor="let fifo of onlyValues(list.fifos); trackBy: trackByFn">
+      <div *ngFor="let fifo of onlyValues(list().fifos); trackBy: trackByFn">
         <mat-form-field hideRequiredMarker>
         <mat-label>Fifo name</mat-label>
         <input matInput name="Fifo name" required [ngModel]="fifo.name"

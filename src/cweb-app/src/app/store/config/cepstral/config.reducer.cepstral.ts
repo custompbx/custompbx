@@ -23,7 +23,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cepstral,
           errorMessage: action.payload.error || null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -33,7 +33,7 @@ export function reducer(state = initialState, action: All): State {
         return {
           ...state,
           cepstral: {...state.cepstral, exists: action.payload.response.exists},
-          loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0
+          loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0
         };
       }
 
@@ -50,14 +50,14 @@ export function reducer(state = initialState, action: All): State {
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
     case ConfigActionTypes.StoreDelCepstralParameter: {
       const id = action.payload.response.data?.id || 0;
       if (!state.cepstral.settings[id]) {
-        return {...state, loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0};
+        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
       const {[id]: toDel, ...rest} = state.cepstral.settings;
@@ -68,7 +68,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cepstral, settings: {...rest, new: state.cepstral.settings.new || []},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -82,7 +82,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cepstral, settings: {...state.cepstral.settings, [data.id]: data},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -98,7 +98,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cepstral, settings: {...state.cepstral.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -115,7 +115,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cepstral, settings: {...state.cepstral.settings, new: rest},
           errorMessage: null,
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
@@ -137,7 +137,7 @@ export function reducer(state = initialState, action: All): State {
           ...state.cepstral, settings: {...state.cepstral.settings, [data.id]: data, new: rest},
           errorMessage: action.payload.response.error ||  '',
         },
-        loadCounter: state.loadCounter > 0 ? --state.loadCounter : 0,
+        loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
       };
     }
 
