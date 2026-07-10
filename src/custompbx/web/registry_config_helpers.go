@@ -21,6 +21,19 @@ type simpleParamConfigEvents struct {
 	Delete string
 }
 
+type namedConfigEvents struct {
+	Add    string
+	Update string
+	Delete string
+}
+
+type parentedParamConfigEvents struct {
+	Add    string
+	Delete string
+	Switch string
+	Update string
+}
+
 func configGet(sample interface{}) eventHandler {
 	return func(data *webStruct.MessageData) webStruct.UserResponse {
 		return getUserForConfig(data, getConfig, sample, adminOnly())
@@ -90,6 +103,14 @@ func configGetParamID(data *webStruct.MessageData) map[string]interface{} {
 	return map[string]interface{}{"Id": data.Param.Id}
 }
 
+func configDataIDName(data *webStruct.MessageData) map[string]interface{} {
+	return map[string]interface{}{"Id": data.Id, "Name": data.Name}
+}
+
+func configParamIDName(data *webStruct.MessageData) map[string]interface{} {
+	return map[string]interface{}{"Id": data.Param.Id, "Name": data.Param.Name}
+}
+
 func configSetTopLevelName(sample interface{}, name string) map[string]interface{} {
 	return map[string]interface{}{"Name": name, "Enabled": true, "Parent": configParentFor(sample)}
 }
@@ -114,6 +135,50 @@ func combinedDataResponse(event string, pairs ...responseDataPair) webStruct.Use
 		data[pair.name] = pair.data
 	}
 	return webStruct.UserResponse{MessageType: event, Data: data}
+}
+
+func registerNamedConfigMutationsForSample(
+	r *handlerRegistry,
+	overrides map[string]eventHandler,
+	events namedConfigEvents,
+	sample interface{},
+	name func(*webStruct.MessageData) string,
+	parent func(*webStruct.MessageData) interface{},
+) {
+	if events.Add != "" {
+		mustRegisterAdmin(r, events.Add, configSetWithFields(sample, func(data *webStruct.MessageData) map[string]interface{} {
+			return map[string]interface{}{"Name": name(data), "Enabled": true, "Parent": parent(data)}
+		}), overrides)
+	}
+	if events.Update != "" {
+		mustRegisterAdmin(r, events.Update, configUpdateWithFields(sample, []string{"Name"}, configDataIDName), overrides)
+	}
+	if events.Delete != "" {
+		mustRegisterAdmin(r, events.Delete, configDeleteWithFields(sample, configGetNamedID), overrides)
+	}
+}
+
+func registerParentedParamConfigMutationsForSample(
+	r *handlerRegistry,
+	overrides map[string]eventHandler,
+	events parentedParamConfigEvents,
+	sample interface{},
+	parent func(*webStruct.MessageData) interface{},
+) {
+	if events.Add != "" {
+		mustRegisterAdmin(r, events.Add, configSetWithFields(sample, func(data *webStruct.MessageData) map[string]interface{} {
+			return map[string]interface{}{"Name": data.Param.Name, "Value": data.Param.Value, "Enabled": true, "Parent": parent(data)}
+		}), overrides)
+	}
+	if events.Delete != "" {
+		mustRegisterAdmin(r, events.Delete, configDeleteWithFields(sample, configGetParamID), overrides)
+	}
+	if events.Switch != "" {
+		mustRegisterAdmin(r, events.Switch, configUpdateWithFields(sample, []string{"Enabled"}, configSwitchParamEnabled), overrides)
+	}
+	if events.Update != "" {
+		mustRegisterAdmin(r, events.Update, configUpdateWithFields(sample, []string{"Name", "Value"}, configUpdateParamNameValue), overrides)
+	}
 }
 
 func registerSimpleParamConfig(

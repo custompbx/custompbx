@@ -88,38 +88,29 @@ func registerCoreConferenceEvents(r *handlerRegistry, overrides map[string]event
 	mustRegisterAdmin(r, eventConferenceCallerControlUpdate, configUpdate(func(data *webStruct.MessageData) interface{} {
 		return &altStruct.ConfigConferenceCallerControlGroupControl{Id: data.Param.Id, Action: data.Param.Name, Digits: data.Param.Value}
 	}, "Action", "Digits"), overrides)
-	mustRegisterAdmin(r, eventConferenceCallerControlGroupAdd, configSet(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceCallerControlGroup{Name: data.Name, Enabled: true, Parent: configParentFor(&altStruct.ConfigConferenceCallerControlGroup{})}
-	}), overrides)
-	mustRegisterAdmin(r, eventConferenceCallerControlGroupUpdate, configUpdate(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceCallerControlGroup{Id: data.Id, Name: data.Name}
-	}, "Name"), overrides)
-	mustRegisterAdmin(r, eventConferenceCallerControlGroupDelete, configDelete(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceCallerControlGroup{Id: data.Id}
-	}), overrides)
+	registerNamedConfigMutationsForSample(r, overrides,
+		namedConfigEvents{Add: eventConferenceCallerControlGroupAdd, Update: eventConferenceCallerControlGroupUpdate, Delete: eventConferenceCallerControlGroupDelete},
+		&altStruct.ConfigConferenceCallerControlGroup{},
+		func(data *webStruct.MessageData) string { return data.Name },
+		func(_ *webStruct.MessageData) interface{} {
+			return configParentFor(&altStruct.ConfigConferenceCallerControlGroup{})
+		},
+	)
 
 	mustRegisterAdmin(r, eventConferenceProfileParametersGet, configGet(&altStruct.ConfigConferenceProfileParameter{}), overrides)
-	mustRegisterAdmin(r, eventConferenceProfileParameterAdd, configSet(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceProfileParameter{Name: data.Param.Name, Value: data.Param.Value, Enabled: true, Parent: &altStruct.ConfigConferenceProfile{Id: data.Id}}
-	}), overrides)
-	mustRegisterAdmin(r, eventConferenceProfileParameterDelete, configDelete(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceProfileParameter{Id: data.Param.Id}
-	}), overrides)
-	mustRegisterAdmin(r, eventConferenceProfileParameterSwitch, configUpdate(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceProfileParameter{Id: data.Param.Id, Enabled: data.Param.Enabled}
-	}, "Enabled"), overrides)
-	mustRegisterAdmin(r, eventConferenceProfileParameterUpdate, configUpdate(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceProfileParameter{Id: data.Param.Id, Name: data.Param.Name, Value: data.Param.Value}
-	}, "Name", "Value"), overrides)
-	mustRegisterAdmin(r, eventConferenceProfileAdd, configSet(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceProfile{Name: data.Name, Enabled: true, Parent: configParentFor(&altStruct.ConfigConferenceProfile{})}
-	}), overrides)
-	mustRegisterAdmin(r, eventConferenceProfileUpdate, configUpdate(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceProfile{Id: data.Id, Name: data.Name}
-	}, "Name"), overrides)
-	mustRegisterAdmin(r, eventConferenceProfileDelete, configDelete(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceProfile{Id: data.Id}
-	}), overrides)
+	registerParentedParamConfigMutationsForSample(r, overrides,
+		parentedParamConfigEvents{Add: eventConferenceProfileParameterAdd, Delete: eventConferenceProfileParameterDelete, Switch: eventConferenceProfileParameterSwitch, Update: eventConferenceProfileParameterUpdate},
+		&altStruct.ConfigConferenceProfileParameter{},
+		func(data *webStruct.MessageData) interface{} { return &altStruct.ConfigConferenceProfile{Id: data.Id} },
+	)
+	registerNamedConfigMutationsForSample(r, overrides,
+		namedConfigEvents{Add: eventConferenceProfileAdd, Update: eventConferenceProfileUpdate, Delete: eventConferenceProfileDelete},
+		&altStruct.ConfigConferenceProfile{},
+		func(data *webStruct.MessageData) string { return data.Name },
+		func(_ *webStruct.MessageData) interface{} {
+			return configParentFor(&altStruct.ConfigConferenceProfile{})
+		},
+	)
 
 	mustRegisterAdmin(r, eventConferenceChatPermissionUsersGet, configGet(&altStruct.ConfigConferenceChatPermissionProfileUser{}), overrides)
 	mustRegisterAdmin(r, eventConferenceChatPermissionUserAdd, configSet(func(data *webStruct.MessageData) interface{} {
@@ -134,20 +125,17 @@ func registerCoreConferenceEvents(r *handlerRegistry, overrides map[string]event
 	mustRegisterAdmin(r, eventConferenceChatPermissionUserUpdate, configUpdate(func(data *webStruct.MessageData) interface{} {
 		return &altStruct.ConfigConferenceChatPermissionProfileUser{Id: data.Param.Id, Name: data.Param.Name, Commands: data.Param.Value}
 	}, "Name", "Commands"), overrides)
-	mustRegisterAdmin(r, eventConferenceChatPermissionAdd, configSet(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceChatPermissionProfile{Name: data.Name, Enabled: true, Parent: configParentFor(&altStruct.ConfigConferenceChatPermissionProfile{})}
-	}), overrides)
-	mustRegisterAdmin(r, eventConferenceChatPermissionUpdate, configUpdate(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceChatPermissionProfile{Id: data.Id, Name: data.Name}
-	}, "Name"), overrides)
-	mustRegisterAdmin(r, eventConferenceChatPermissionDelete, configDelete(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceChatPermissionProfile{Id: data.Id}
-	}), overrides)
+	registerNamedConfigMutationsForSample(r, overrides,
+		namedConfigEvents{Add: eventConferenceChatPermissionAdd, Update: eventConferenceChatPermissionUpdate, Delete: eventConferenceChatPermissionDelete},
+		&altStruct.ConfigConferenceChatPermissionProfile{},
+		func(data *webStruct.MessageData) string { return data.Name },
+		func(_ *webStruct.MessageData) interface{} {
+			return configParentFor(&altStruct.ConfigConferenceChatPermissionProfile{})
+		},
+	)
 
 	mustRegisterAdmin(r, eventConferenceLayoutsGet, getConferenceLayouts, overrides)
-	mustRegisterAdmin(r, eventConferenceLayoutUpdate, configUpdate(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceLayout{Id: data.Id, Name: data.Name}
-	}, "Name"), overrides)
+	mustRegisterAdmin(r, eventConferenceLayoutUpdate, configUpdateWithFields(&altStruct.ConfigConferenceLayout{}, []string{"Name"}, configDataIDName), overrides)
 	mustRegisterAdmin(r, eventConferenceLayout3DUpdate, configUpdate(func(data *webStruct.MessageData) interface{} {
 		return &altStruct.ConfigConferenceLayout{Id: data.Id, Auto3dPosition: data.Value}
 	}, "Auto3dPosition"), overrides)
@@ -157,22 +145,16 @@ func registerCoreConferenceEvents(r *handlerRegistry, overrides map[string]event
 	mustRegisterAdmin(r, eventConferenceLayoutAdd, configSet(func(data *webStruct.MessageData) interface{} {
 		return &altStruct.ConfigConferenceLayout{Name: data.Name, Enabled: true, Parent: getConferenceLayoutConfig()}
 	}), overrides)
-	mustRegisterAdmin(r, eventConferenceLayoutDelete, configDelete(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceLayout{Id: data.Id}
-	}), overrides)
+	mustRegisterAdmin(r, eventConferenceLayoutDelete, configDeleteWithFields(&altStruct.ConfigConferenceLayout{}, configGetNamedID), overrides)
 
-	mustRegisterAdmin(r, eventConferenceLayoutGroupUpdate, configUpdate(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceLayoutGroup{Id: data.Id, Name: data.Name}
-	}, "Name"), overrides)
+	mustRegisterAdmin(r, eventConferenceLayoutGroupUpdate, configUpdateWithFields(&altStruct.ConfigConferenceLayoutGroup{}, []string{"Name"}, configDataIDName), overrides)
 	mustRegisterAdmin(r, eventConferenceLayoutGroupSwitch, configUpdate(func(data *webStruct.MessageData) interface{} {
 		return &altStruct.ConfigConferenceLayoutGroup{Id: data.Param.Id, Enabled: data.Param.Enabled}
 	}, "Enabled"), overrides)
 	mustRegisterAdmin(r, eventConferenceLayoutGroupAdd, configSet(func(data *webStruct.MessageData) interface{} {
 		return &altStruct.ConfigConferenceLayoutGroup{Name: data.Name, Enabled: true, Parent: getConferenceLayoutConfig()}
 	}), overrides)
-	mustRegisterAdmin(r, eventConferenceLayoutGroupDelete, configDelete(func(data *webStruct.MessageData) interface{} {
-		return &altStruct.ConfigConferenceLayoutGroup{Id: data.Id}
-	}), overrides)
+	mustRegisterAdmin(r, eventConferenceLayoutGroupDelete, configDeleteWithFields(&altStruct.ConfigConferenceLayoutGroup{}, configGetNamedID), overrides)
 
 	mustRegisterAdmin(r, eventConferenceLayoutGroupLayoutsGet, configGet(&altStruct.ConfigConferenceLayoutGroupLayout{}), overrides)
 	mustRegisterAdmin(r, eventConferenceLayoutGroupLayoutAdd, configSet(func(data *webStruct.MessageData) interface{} {

@@ -40,13 +40,12 @@ func registerCoreVertoConfigEvents(r *handlerRegistry, overrides map[string]even
 	mustRegisterAdmin(r, eventVertoProfileParamUpdate, configUpdateWithFields(&altStruct.ConfigVertoProfileParameter{}, []string{"Name", "Value", "secure"}, func(data *webStruct.MessageData) map[string]interface{} {
 		return map[string]interface{}{"Id": data.Param.Id, "Name": data.Param.Name, "Value": data.Param.Value, "Secure": data.Param.Secure}
 	}), overrides)
-	mustRegisterAdmin(r, eventVertoProfileAdd, configSetWithFields(&altStruct.ConfigVertoProfile{}, func(data *webStruct.MessageData) map[string]interface{} {
-		return configSetTopLevelName(&altStruct.ConfigVertoProfile{}, data.Name)
-	}), overrides)
-	mustRegisterAdmin(r, eventVertoProfileRename, configUpdateWithFields(&altStruct.ConfigVertoProfile{}, []string{"Name"}, func(data *webStruct.MessageData) map[string]interface{} {
-		return map[string]interface{}{"Id": data.Id, "Name": data.Name}
-	}), overrides)
-	mustRegisterAdmin(r, eventVertoProfileDelete, configDeleteWithFields(&altStruct.ConfigVertoProfile{}, configGetNamedID), overrides)
+	registerNamedConfigMutationsForSample(r, overrides,
+		namedConfigEvents{Add: eventVertoProfileAdd, Update: eventVertoProfileRename, Delete: eventVertoProfileDelete},
+		&altStruct.ConfigVertoProfile{},
+		func(data *webStruct.MessageData) string { return data.Name },
+		func(_ *webStruct.MessageData) interface{} { return configParentFor(&altStruct.ConfigVertoProfile{}) },
+	)
 }
 
 func getVertoConfig(data *webStruct.MessageData) webStruct.UserResponse {

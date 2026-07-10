@@ -5,6 +5,7 @@ import (
 	"custompbx/cfg"
 	"custompbx/mainStruct"
 	"custompbx/webStruct"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -796,6 +797,104 @@ func TestConfigWithFieldsBuildsChildParentedItem(t *testing.T) {
 	}
 }
 
+func TestConfigIDNameFieldHelpers(t *testing.T) {
+	data := &webStruct.MessageData{Id: 11, Name: "profile-a"}
+	got := configDataIDName(data)
+	if got["Id"] != int64(11) || got["Name"] != "profile-a" {
+		t.Fatalf("configDataIDName = %#v", got)
+	}
+
+	data.Param.Id = 22
+	data.Param.Name = "param-a"
+	got = configParamIDName(data)
+	if got["Id"] != int64(22) || got["Name"] != "param-a" {
+		t.Fatalf("configParamIDName = %#v", got)
+	}
+}
+
+func TestNamedConfigMutationRegistrationUsesAccessChecksAndOverrides(t *testing.T) {
+	events := namedConfigEvents{Add: "named-add", Update: "named-update", Delete: "named-delete"}
+	calls := map[string]int{}
+	r := newHandlerRegistry()
+	registerNamedConfigMutationsForSample(
+		r,
+		map[string]eventHandler{
+			events.Add: func(data *webStruct.MessageData) webStruct.UserResponse {
+				calls[data.Event]++
+				return webStruct.UserResponse{MessageType: data.Event}
+			},
+			events.Update: func(data *webStruct.MessageData) webStruct.UserResponse {
+				calls[data.Event]++
+				return webStruct.UserResponse{MessageType: data.Event}
+			},
+			events.Delete: func(data *webStruct.MessageData) webStruct.UserResponse {
+				calls[data.Event]++
+				return webStruct.UserResponse{MessageType: data.Event}
+			},
+		},
+		events,
+		&altStruct.ConfigVoicemailProfile{},
+		func(data *webStruct.MessageData) string { return data.Name },
+		func(_ *webStruct.MessageData) interface{} { return &altStruct.ConfigurationsList{Id: 1} },
+	)
+
+	for _, event := range []string{events.Add, events.Update, events.Delete} {
+		ctx := adminContext()
+		resp, ok := r.Dispatch(messageData(ctx, event), ctx)
+		if !ok || resp.MessageType != event {
+			t.Fatalf("%s dispatch resp=%+v ok=%t", event, resp, ok)
+		}
+		if calls[event] != 1 {
+			t.Fatalf("%s calls = %d, want 1", event, calls[event])
+		}
+
+		userCtx := userContext()
+		resp, ok = r.Dispatch(messageData(userCtx, event), userCtx)
+		if !ok || resp.MessageType != "no_access" {
+			t.Fatalf("%s unauthorized resp=%+v ok=%t", event, resp, ok)
+		}
+	}
+}
+
+func TestParentedParamConfigMutationRegistrationUsesAccessChecksAndOverrides(t *testing.T) {
+	events := parentedParamConfigEvents{Add: "param-add", Delete: "param-delete", Switch: "param-switch", Update: "param-update"}
+	calls := map[string]int{}
+	overrides := map[string]eventHandler{}
+	for _, event := range []string{events.Add, events.Delete, events.Switch, events.Update} {
+		event := event
+		overrides[event] = func(data *webStruct.MessageData) webStruct.UserResponse {
+			calls[data.Event]++
+			return webStruct.UserResponse{MessageType: data.Event}
+		}
+	}
+
+	r := newHandlerRegistry()
+	registerParentedParamConfigMutationsForSample(
+		r,
+		overrides,
+		events,
+		&altStruct.ConfigVoicemailProfileParameter{},
+		func(data *webStruct.MessageData) interface{} { return &altStruct.ConfigVoicemailProfile{Id: data.Id} },
+	)
+
+	for _, event := range []string{events.Add, events.Delete, events.Switch, events.Update} {
+		ctx := adminContext()
+		resp, ok := r.Dispatch(messageData(ctx, event), ctx)
+		if !ok || resp.MessageType != event {
+			t.Fatalf("%s dispatch resp=%+v ok=%t", event, resp, ok)
+		}
+		if calls[event] != 1 {
+			t.Fatalf("%s calls = %d, want 1", event, calls[event])
+		}
+
+		userCtx := userContext()
+		resp, ok = r.Dispatch(messageData(userCtx, event), userCtx)
+		if !ok || resp.MessageType != "no_access" {
+			t.Fatalf("%s unauthorized resp=%+v ok=%t", event, resp, ok)
+		}
+	}
+}
+
 func TestCombinedDataResponse(t *testing.T) {
 	resp := combinedDataResponse("event",
 		responseDataPair{name: "settings", data: "settings-data"},
@@ -813,6 +912,96 @@ func TestCombinedDataResponse(t *testing.T) {
 	}
 	if data["profiles"] != "profiles-data" {
 		t.Fatalf("profiles data = %v", data["profiles"])
+	}
+}
+
+func TestMigratedAggregateResponseShapes(t *testing.T) {
+	tests := []struct {
+		name  string
+		event string
+		keys  []string
+	}{
+		{
+			name:  "conference config",
+			event: "GetConference",
+			keys: []string{
+				"conference_rooms",
+				"conference_profiles",
+				"conference_caller_control_groups",
+				"conference_chat_permissions_profiles",
+			},
+		},
+		{
+			name:  "conference layouts",
+			event: "GetConferenceLayouts",
+			keys: []string{
+				"conference_layouts",
+				"conference_layouts_groups",
+			},
+		},
+		{
+			name:  "verto config",
+			event: "[Config][Verto][Get]",
+			keys: []string{
+				"settings",
+				"profiles",
+			},
+		},
+		{
+			name:  "callcenter import",
+			event: "ImportCallcenterAgentsAndTiers",
+			keys: []string{
+				"callcenter_agents",
+				"callcenter_tiers",
+			},
+		},
+		{
+			name:  "http cache config",
+			event: "GetHttpCache",
+			keys: []string{
+				"settings",
+				"profiles",
+			},
+		},
+		{
+			name:  "http cache profile parameters",
+			event: "GetHttpCacheProfileParameters",
+			keys: []string{
+				"domains",
+				"azure",
+				"aws_s3",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pairs := make([]responseDataPair, 0, len(tt.keys))
+			for _, key := range tt.keys {
+				pairs = append(pairs, responseDataPair{name: key, data: key + "-data"})
+			}
+			resp := combinedDataResponse(tt.event, pairs...)
+
+			if resp.MessageType != tt.event {
+				t.Fatalf("message type = %q, want %q", resp.MessageType, tt.event)
+			}
+			body, err := json.Marshal(resp.Data)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var got map[string]string
+			if err := json.Unmarshal(body, &got); err != nil {
+				t.Fatal(err)
+			}
+			if len(got) != len(tt.keys) {
+				t.Fatalf("keys = %v, want %v", sortedMapKeys(got), tt.keys)
+			}
+			for _, key := range tt.keys {
+				if got[key] != key+"-data" {
+					t.Fatalf("key %q = %q, want %q; all keys=%v", key, got[key], key+"-data", sortedMapKeys(got))
+				}
+			}
+		})
 	}
 }
 
@@ -1069,6 +1258,15 @@ func stringSet(items []string) map[string]bool {
 		set[item] = true
 	}
 	return set
+}
+
+func sortedMapKeys[V any](items map[string]V) []string {
+	keys := make([]string, 0, len(items))
+	for key := range items {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 func TestHEPDetailsRegistryPreservesEmptyPayloadBehavior(t *testing.T) {

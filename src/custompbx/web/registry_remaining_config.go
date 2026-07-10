@@ -162,13 +162,14 @@ func registerCoreHttpCacheEvents(r *handlerRegistry, overrides map[string]eventH
 		&altStruct.ConfigHttpCacheSetting{},
 	)
 	mustRegisterAdmin(r, eventHttpCacheProfileGet, configGet(&altStruct.ConfigHttpCacheProfile{}), overrides)
-	mustRegisterAdmin(r, eventHttpCacheProfileAdd, configSetWithFields(&altStruct.ConfigHttpCacheProfile{}, func(data *webStruct.MessageData) map[string]interface{} {
-		return configSetTopLevelName(&altStruct.ConfigHttpCacheProfile{}, data.Name)
-	}), overrides)
-	mustRegisterAdmin(r, eventHttpCacheProfileRename, configUpdateWithFields(&altStruct.ConfigHttpCacheProfile{}, []string{"Name"}, func(data *webStruct.MessageData) map[string]interface{} {
-		return map[string]interface{}{"Id": data.Id, "Name": data.Name}
-	}), overrides)
-	mustRegisterAdmin(r, eventHttpCacheProfileDelete, configDeleteWithFields(&altStruct.ConfigHttpCacheProfile{}, configGetNamedID), overrides)
+	registerNamedConfigMutationsForSample(r, overrides,
+		namedConfigEvents{Add: eventHttpCacheProfileAdd, Update: eventHttpCacheProfileRename, Delete: eventHttpCacheProfileDelete},
+		&altStruct.ConfigHttpCacheProfile{},
+		func(data *webStruct.MessageData) string { return data.Name },
+		func(_ *webStruct.MessageData) interface{} {
+			return configParentFor(&altStruct.ConfigHttpCacheProfile{})
+		},
+	)
 	mustRegisterAdmin(r, eventHttpCacheProfileParamsGet, getHttpCacheProfileParameters, overrides)
 	mustRegisterAdmin(r, eventHttpCacheProfileDomainAdd, configSetWithFields(&altStruct.ConfigHttpCacheProfileDomain{}, func(data *webStruct.MessageData) map[string]interface{} {
 		return map[string]interface{}{"Name": data.Param.Name, "Enabled": true, "Parent": &altStruct.ConfigHttpCacheProfile{Id: data.Id}}
@@ -195,13 +196,12 @@ func registerCoreHttpCacheEvents(r *handlerRegistry, overrides map[string]eventH
 
 func registerCoreDistributorEvents(r *handlerRegistry, overrides map[string]eventHandler) {
 	mustRegisterAdmin(r, eventDistributorGet, configGet(&altStruct.ConfigDistributorList{}), overrides)
-	mustRegisterAdmin(r, eventDistributorListAdd, configSetWithFields(&altStruct.ConfigDistributorList{}, func(data *webStruct.MessageData) map[string]interface{} {
-		return configSetTopLevelName(&altStruct.ConfigDistributorList{}, data.Name)
-	}), overrides)
-	mustRegisterAdmin(r, eventDistributorListUpdate, configUpdateWithFields(&altStruct.ConfigDistributorList{}, []string{"Name"}, func(data *webStruct.MessageData) map[string]interface{} {
-		return map[string]interface{}{"Id": data.Id, "Name": data.Name}
-	}), overrides)
-	mustRegisterAdmin(r, eventDistributorListDelete, configDeleteWithFields(&altStruct.ConfigDistributorList{}, configGetNamedID), overrides)
+	registerNamedConfigMutationsForSample(r, overrides,
+		namedConfigEvents{Add: eventDistributorListAdd, Update: eventDistributorListUpdate, Delete: eventDistributorListDelete},
+		&altStruct.ConfigDistributorList{},
+		func(data *webStruct.MessageData) string { return data.Name },
+		func(_ *webStruct.MessageData) interface{} { return configParentFor(&altStruct.ConfigDistributorList{}) },
+	)
 	mustRegisterAdmin(r, eventDistributorNodesGet, configGet(&altStruct.ConfigDistributorListNode{}), overrides)
 	mustRegisterAdmin(r, eventDistributorNodeAdd, configSet(func(data *webStruct.MessageData) interface{} {
 		return &altStruct.ConfigDistributorListNode{Name: data.DistributorNode.Name, Weight: data.DistributorNode.Weight, Enabled: true, Parent: &altStruct.ConfigDistributorList{Id: data.Id}}
@@ -219,9 +219,7 @@ func registerCoreDistributorEvents(r *handlerRegistry, overrides map[string]even
 
 func registerCorePostLoadModuleEvents(r *handlerRegistry, overrides map[string]eventHandler) {
 	mustRegisterAdmin(r, eventPostLoadModulesGet, configGet(&altStruct.ConfigPostLoadModule{}), overrides)
-	mustRegisterAdmin(r, eventPostLoadModuleUpdate, configUpdateWithFields(&altStruct.ConfigPostLoadModule{}, []string{"Name"}, func(data *webStruct.MessageData) map[string]interface{} {
-		return map[string]interface{}{"Id": data.Param.Id, "Name": data.Param.Name}
-	}), overrides)
+	mustRegisterAdmin(r, eventPostLoadModuleUpdate, configUpdateWithFields(&altStruct.ConfigPostLoadModule{}, []string{"Name"}, configParamIDName), overrides)
 	mustRegisterAdmin(r, webStruct.SwitchPostLoadModule, configUpdateWithFields(&altStruct.ConfigPostLoadModule{}, []string{"Enabled"}, configSwitchParamEnabled), overrides)
 	mustRegisterAdmin(r, webStruct.AddPostLoadModule, configSetWithFields(&altStruct.ConfigPostLoadModule{}, func(data *webStruct.MessageData) map[string]interface{} {
 		return configSetTopLevelName(&altStruct.ConfigPostLoadModule{}, data.Param.Name)
@@ -236,20 +234,20 @@ func registerCoreVoicemailEvents(r *handlerRegistry, overrides map[string]eventH
 	)
 	mustRegisterAdmin(r, eventVoicemailSettingsGet, configGet(&altStruct.ConfigVoicemailSetting{}), overrides)
 	mustRegisterAdmin(r, eventVoicemailProfilesGet, configGet(&altStruct.ConfigVoicemailProfile{}), overrides)
-	mustRegisterAdmin(r, eventVoicemailProfileAdd, configSetWithFields(&altStruct.ConfigVoicemailProfile{}, func(data *webStruct.MessageData) map[string]interface{} {
-		return configSetTopLevelName(&altStruct.ConfigVoicemailProfile{}, data.Name)
-	}), overrides)
-	mustRegisterAdmin(r, eventVoicemailProfileUpdate, configUpdateWithFields(&altStruct.ConfigVoicemailProfile{}, []string{"Name"}, func(data *webStruct.MessageData) map[string]interface{} {
-		return map[string]interface{}{"Id": data.Id, "Name": data.Name}
-	}), overrides)
-	mustRegisterAdmin(r, eventVoicemailProfileDelete, configDeleteWithFields(&altStruct.ConfigVoicemailProfile{}, configGetNamedID), overrides)
+	registerNamedConfigMutationsForSample(r, overrides,
+		namedConfigEvents{Add: eventVoicemailProfileAdd, Update: eventVoicemailProfileUpdate, Delete: eventVoicemailProfileDelete},
+		&altStruct.ConfigVoicemailProfile{},
+		func(data *webStruct.MessageData) string { return data.Name },
+		func(_ *webStruct.MessageData) interface{} {
+			return configParentFor(&altStruct.ConfigVoicemailProfile{})
+		},
+	)
 	mustRegisterAdmin(r, eventVoicemailProfileParamsGet, configGet(&altStruct.ConfigVoicemailProfileParameter{}), overrides)
-	mustRegisterAdmin(r, eventVoicemailProfileParamAdd, configSetWithFields(&altStruct.ConfigVoicemailProfileParameter{}, func(data *webStruct.MessageData) map[string]interface{} {
-		return map[string]interface{}{"Name": data.Param.Name, "Value": data.Param.Value, "Enabled": true, "Parent": &altStruct.ConfigVoicemailProfile{Id: data.Id}}
-	}), overrides)
-	mustRegisterAdmin(r, eventVoicemailProfileParamDelete, configDeleteWithFields(&altStruct.ConfigVoicemailProfileParameter{}, configGetParamID), overrides)
-	mustRegisterAdmin(r, eventVoicemailProfileParamSwitch, configUpdateWithFields(&altStruct.ConfigVoicemailProfileParameter{}, []string{"Enabled"}, configSwitchParamEnabled), overrides)
-	mustRegisterAdmin(r, eventVoicemailProfileParamUpdate, configUpdateWithFields(&altStruct.ConfigVoicemailProfileParameter{}, []string{"Name", "Value"}, configUpdateParamNameValue), overrides)
+	registerParentedParamConfigMutationsForSample(r, overrides,
+		parentedParamConfigEvents{Add: eventVoicemailProfileParamAdd, Delete: eventVoicemailProfileParamDelete, Switch: eventVoicemailProfileParamSwitch, Update: eventVoicemailProfileParamUpdate},
+		&altStruct.ConfigVoicemailProfileParameter{},
+		func(data *webStruct.MessageData) interface{} { return &altStruct.ConfigVoicemailProfile{Id: data.Id} },
+	)
 }
 
 func registerCoreGlobalVariableEvents(r *handlerRegistry, overrides map[string]eventHandler) {

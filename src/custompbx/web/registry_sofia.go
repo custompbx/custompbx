@@ -1,30 +1,33 @@
 package web
 
 import (
-	"custompbx/altData"
 	"custompbx/altStruct"
 	"custompbx/webStruct"
 )
 
 func registerCoreSofiaEvents(r *handlerRegistry, overrides map[string]eventHandler) {
 	mustRegisterAdmin(r, eventSofiaGlobalSettingsGet, getSofiaGlobalSettings, overrides)
-	mustRegisterAdmin(r, eventSofiaGlobalSettingUpdate, updateSofiaGlobalSetting, overrides)
-	mustRegisterAdmin(r, eventSofiaGlobalSettingSwitch, switchSofiaGlobalSetting, overrides)
-	mustRegisterAdmin(r, eventSofiaGlobalSettingAdd, addSofiaGlobalSetting, overrides)
-	mustRegisterAdmin(r, eventSofiaGlobalSettingDelete, deleteSofiaGlobalSetting, overrides)
+	registerSimpleParamConfigMutationsForSample(r, overrides,
+		simpleParamConfigEvents{Update: eventSofiaGlobalSettingUpdate, Switch: eventSofiaGlobalSettingSwitch, Add: eventSofiaGlobalSettingAdd, Delete: eventSofiaGlobalSettingDelete},
+		&altStruct.ConfigSofiaGlobalSetting{},
+	)
 	mustRegisterAdmin(r, webStruct.GetSofiaProfiles, getSofiaProfiles, overrides)
 	mustRegisterAdmin(r, eventSofiaProfileParamsGet, getSofiaProfileParams, overrides)
-	mustRegisterAdmin(r, eventSofiaProfileParamAdd, addSofiaProfileParam, overrides)
-	mustRegisterAdmin(r, eventSofiaProfileParamDelete, deleteSofiaProfileParam, overrides)
-	mustRegisterAdmin(r, eventSofiaProfileParamSwitch, switchSofiaProfileParam, overrides)
-	mustRegisterAdmin(r, eventSofiaProfileParamUpdate, updateSofiaProfileParam, overrides)
+	registerParentedParamConfigMutationsForSample(r, overrides,
+		parentedParamConfigEvents{Add: eventSofiaProfileParamAdd, Delete: eventSofiaProfileParamDelete, Switch: eventSofiaProfileParamSwitch, Update: eventSofiaProfileParamUpdate},
+		&altStruct.ConfigSofiaProfileParameter{},
+		func(data *webStruct.MessageData) interface{} { return &altStruct.ConfigSofiaProfile{Id: data.Id} },
+	)
 	mustRegisterAdmin(r, eventSofiaProfileGatewaysGet, getSofiaProfileGateways, overrides)
 	mustRegisterAdmin(r, eventSofiaGatewayVarsGet, getSofiaGatewayVariables, overrides)
 	mustRegisterAdmin(r, eventSofiaGatewayParamsGet, getSofiaGatewayParameters, overrides)
-	mustRegisterAdmin(r, eventSofiaGatewayParamAdd, addSofiaGatewayParam, overrides)
-	mustRegisterAdmin(r, eventSofiaGatewayParamUpdate, updateSofiaGatewayParam, overrides)
-	mustRegisterAdmin(r, eventSofiaGatewayParamSwitch, switchSofiaGatewayParam, overrides)
-	mustRegisterAdmin(r, eventSofiaGatewayParamDelete, deleteSofiaGatewayParam, overrides)
+	registerParentedParamConfigMutationsForSample(r, overrides,
+		parentedParamConfigEvents{Add: eventSofiaGatewayParamAdd, Delete: eventSofiaGatewayParamDelete, Switch: eventSofiaGatewayParamSwitch, Update: eventSofiaGatewayParamUpdate},
+		&altStruct.ConfigSofiaProfileGatewayParameter{},
+		func(data *webStruct.MessageData) interface{} {
+			return &altStruct.ConfigSofiaProfileGateway{Id: data.Id}
+		},
+	)
 	mustRegisterAdmin(r, eventSofiaGatewayVarAdd, addSofiaGatewayVar, overrides)
 	mustRegisterAdmin(r, eventSofiaGatewayVarUpdate, updateSofiaGatewayVar, overrides)
 	mustRegisterAdmin(r, eventSofiaGatewayVarSwitch, switchSofiaGatewayVar, overrides)
@@ -42,9 +45,12 @@ func registerCoreSofiaEvents(r *handlerRegistry, overrides map[string]eventHandl
 	mustRegisterAdmin(r, eventSofiaProfileAliasDelete, deleteSofiaProfileAlias, overrides)
 	mustRegisterAdmin(r, eventSofiaProfileAliasSwitch, switchSofiaProfileAlias, overrides)
 	mustRegisterAdmin(r, eventSofiaProfileAliasUpdate, updateSofiaProfileAlias, overrides)
-	mustRegisterAdmin(r, eventSofiaProfileAdd, addSofiaProfile, overrides)
-	mustRegisterAdmin(r, eventSofiaProfileRename, renameSofiaProfile, overrides)
-	mustRegisterAdmin(r, eventSofiaProfileDelete, deleteSofiaProfile, overrides)
+	registerNamedConfigMutationsForSample(r, overrides,
+		namedConfigEvents{Add: eventSofiaProfileAdd, Update: eventSofiaProfileRename, Delete: eventSofiaProfileDelete},
+		&altStruct.ConfigSofiaProfile{},
+		func(data *webStruct.MessageData) string { return data.Name },
+		func(_ *webStruct.MessageData) interface{} { return configParentFor(&altStruct.ConfigSofiaProfile{}) },
+	)
 	mustRegisterAdmin(r, eventSofiaProfileCommand, runProfileCommand, overrides)
 	mustRegisterAdmin(r, eventSofiaProfileSwitch, switchSofiaProfile, overrides)
 }
@@ -53,56 +59,12 @@ func getSofiaGlobalSettings(data *webStruct.MessageData) webStruct.UserResponse 
 	return getUserForConfig(data, getConfig, &altStruct.ConfigSofiaGlobalSetting{}, adminOnly())
 }
 
-func updateSofiaGlobalSetting(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigSofiaGlobalSetting{Id: data.Param.Id, Name: data.Param.Name, Value: data.Param.Value}, []string{"Name", "Value"}}, adminOnly())
-}
-
-func switchSofiaGlobalSetting(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigSofiaGlobalSetting{Id: data.Param.Id, Enabled: data.Param.Enabled}, []string{"Enabled"}}, adminOnly())
-}
-
-func addSofiaGlobalSetting(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, setConfig, &altStruct.ConfigSofiaGlobalSetting{Name: data.Param.Name, Value: data.Param.Value, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigSofiaGlobalSetting{}))}, adminOnly())
-}
-
-func deleteSofiaGlobalSetting(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, delConfig, &altStruct.ConfigSofiaGlobalSetting{Id: data.Param.Id}, adminOnly())
-}
-
 func getSofiaProfiles(data *webStruct.MessageData) webStruct.UserResponse {
 	return setProfileStatuses(getUserForConfig(data, getConfig, &altStruct.ConfigSofiaProfile{}, adminOnly()))
 }
 
 func getSofiaProfileParams(data *webStruct.MessageData) webStruct.UserResponse {
 	return getUserForConfig(data, getConfig, &altStruct.ConfigSofiaProfileParameter{}, adminOnly())
-}
-
-func addSofiaProfileParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, setConfig, &altStruct.ConfigSofiaProfileParameter{Name: data.Param.Name, Value: data.Param.Value, Enabled: true, Parent: &altStruct.ConfigSofiaProfile{Id: data.Id}}, adminOnly())
-}
-
-func deleteSofiaProfileParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, delConfig, &altStruct.ConfigSofiaProfileParameter{Id: data.Param.Id}, adminOnly())
-}
-
-func switchSofiaProfileParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigSofiaProfileParameter{Id: data.Param.Id, Enabled: data.Param.Enabled}, []string{"Enabled"}}, adminOnly())
-}
-
-func updateSofiaProfileParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigSofiaProfileParameter{Id: data.Param.Id, Name: data.Param.Name, Value: data.Param.Value}, []string{"Name", "Value"}}, adminOnly())
 }
 
 func getSofiaProfileGateways(data *webStruct.MessageData) webStruct.UserResponse {
@@ -115,28 +77,6 @@ func getSofiaGatewayVariables(data *webStruct.MessageData) webStruct.UserRespons
 
 func getSofiaGatewayParameters(data *webStruct.MessageData) webStruct.UserResponse {
 	return getUserForConfig(data, getConfig, &altStruct.ConfigSofiaProfileGatewayParameter{}, adminOnly())
-}
-
-func addSofiaGatewayParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, setConfig, &altStruct.ConfigSofiaProfileGatewayParameter{Name: data.Param.Name, Value: data.Param.Value, Enabled: true, Parent: &altStruct.ConfigSofiaProfileGateway{Id: data.Id}}, adminOnly())
-}
-
-func updateSofiaGatewayParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigSofiaProfileGatewayParameter{Id: data.Param.Id, Name: data.Param.Name, Value: data.Param.Value}, []string{"Name", "Value"}}, adminOnly())
-}
-
-func switchSofiaGatewayParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigSofiaProfileGatewayParameter{Id: data.Param.Id, Enabled: data.Param.Enabled}, []string{"Enabled"}}, adminOnly())
-}
-
-func deleteSofiaGatewayParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, delConfig, &altStruct.ConfigSofiaProfileGatewayParameter{Id: data.Param.Id}, adminOnly())
 }
 
 func addSofiaGatewayVar(data *webStruct.MessageData) webStruct.UserResponse {
@@ -226,21 +166,6 @@ func updateSofiaProfileAlias(data *webStruct.MessageData) webStruct.UserResponse
 		S interface{}
 		A []string
 	}{&altStruct.ConfigSofiaProfileAlias{Id: data.SofiaAlias.Id, Name: data.SofiaAlias.Name}, []string{"Name"}}, adminOnly())
-}
-
-func addSofiaProfile(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, setConfig, &altStruct.ConfigSofiaProfile{Name: data.Name, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigSofiaProfile{}))}, adminOnly())
-}
-
-func renameSofiaProfile(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigSofiaProfile{Id: data.Id, Name: data.Name}, []string{"Name"}}, adminOnly())
-}
-
-func deleteSofiaProfile(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, delConfig, &altStruct.ConfigSofiaProfile{Id: data.Id}, adminOnly())
 }
 
 func switchSofiaProfile(data *webStruct.MessageData) webStruct.UserResponse {

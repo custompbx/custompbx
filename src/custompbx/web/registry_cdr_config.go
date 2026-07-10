@@ -8,20 +8,20 @@ import (
 
 func registerCoreCDREvents(r *handlerRegistry, overrides map[string]eventHandler) {
 	mustRegisterAdmin(r, eventCdrPgCsvGet, getCdrPgCsv, overrides)
-	mustRegisterAdmin(r, eventCdrPgCsvParamAdd, addCdrPgCsvParam, overrides)
-	mustRegisterAdmin(r, eventCdrPgCsvParamUpdate, updateCdrPgCsvParam, overrides)
-	mustRegisterAdmin(r, eventCdrPgCsvParamSwitch, switchCdrPgCsvParam, overrides)
-	mustRegisterAdmin(r, eventCdrPgCsvParamDelete, deleteCdrPgCsvParam, overrides)
+	registerSimpleParamConfigMutationsForSample(r, overrides,
+		simpleParamConfigEvents{Update: eventCdrPgCsvParamUpdate, Switch: eventCdrPgCsvParamSwitch, Add: eventCdrPgCsvParamAdd, Delete: eventCdrPgCsvParamDelete},
+		&altStruct.ConfigCdrPgCsvSetting{},
+	)
 	mustRegisterAdmin(r, eventCdrPgCsvFieldAdd, addCdrPgCsvField, overrides)
 	mustRegisterAdmin(r, eventCdrPgCsvFieldUpdate, updateCdrPgCsvField, overrides)
 	mustRegisterAdmin(r, eventCdrPgCsvFieldSwitch, switchCdrPgCsvField, overrides)
 	mustRegisterAdmin(r, eventCdrPgCsvFieldDelete, deleteCdrPgCsvField, overrides)
 	mustRegisterAdmin(r, eventOdbcCdrGet, getOdbcCdr, overrides)
 	mustRegisterAdmin(r, eventOdbcCdrFieldGet, getOdbcCdrField, overrides)
-	mustRegisterAdmin(r, eventOdbcCdrParamAdd, addOdbcCdrParam, overrides)
-	mustRegisterAdmin(r, eventOdbcCdrParamUpdate, updateOdbcCdrParam, overrides)
-	mustRegisterAdmin(r, eventOdbcCdrParamSwitch, switchOdbcCdrParam, overrides)
-	mustRegisterAdmin(r, eventOdbcCdrParamDelete, deleteOdbcCdrParam, overrides)
+	registerSimpleParamConfigMutationsForSample(r, overrides,
+		simpleParamConfigEvents{Update: eventOdbcCdrParamUpdate, Switch: eventOdbcCdrParamSwitch, Add: eventOdbcCdrParamAdd, Delete: eventOdbcCdrParamDelete},
+		&altStruct.ConfigOdbcCdrSetting{},
+	)
 	mustRegisterAdmin(r, eventOdbcCdrTableAdd, addOdbcCdrTable, overrides)
 	mustRegisterAdmin(r, eventOdbcCdrTableUpdate, updateOdbcCdrTable, overrides)
 	mustRegisterAdmin(r, eventOdbcCdrTableSwitch, switchOdbcCdrTable, overrides)
@@ -39,28 +39,6 @@ func getCdrPgCsv(data *webStruct.MessageData) webStruct.UserResponse {
 		responseDataPair{name: "settings", data: resp1.Data},
 		responseDataPair{name: "schemas", data: resp2.Data},
 	)
-}
-
-func addCdrPgCsvParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, setConfig, &altStruct.ConfigCdrPgCsvSetting{Name: data.Param.Name, Value: data.Param.Value, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigCdrPgCsvSetting{}))}, adminOnly())
-}
-
-func updateCdrPgCsvParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigCdrPgCsvSetting{Id: data.Param.Id, Name: data.Param.Name, Value: data.Param.Value}, []string{"Name", "Value"}}, adminOnly())
-}
-
-func switchCdrPgCsvParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigCdrPgCsvSetting{Id: data.Param.Id, Enabled: data.Param.Enabled}, []string{"Enabled"}}, adminOnly())
-}
-
-func deleteCdrPgCsvParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, delConfig, &altStruct.ConfigCdrPgCsvSetting{Id: data.Param.Id}, adminOnly())
 }
 
 func addCdrPgCsvField(data *webStruct.MessageData) webStruct.UserResponse {
@@ -96,28 +74,6 @@ func getOdbcCdr(data *webStruct.MessageData) webStruct.UserResponse {
 
 func getOdbcCdrField(data *webStruct.MessageData) webStruct.UserResponse {
 	return getUserForConfig(data, getConfig, &altStruct.ConfigOdbcCdrTableField{Parent: &altStruct.ConfigOdbcCdrTable{Id: data.Id}}, adminOnly())
-}
-
-func addOdbcCdrParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, setConfig, &altStruct.ConfigOdbcCdrSetting{Name: data.Param.Name, Value: data.Param.Value, Enabled: true, Parent: getConfParent(altData.GetConfNameByStruct(&altStruct.ConfigOdbcCdrSetting{}))}, adminOnly())
-}
-
-func updateOdbcCdrParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigOdbcCdrSetting{Id: data.Param.Id, Name: data.Param.Name, Value: data.Param.Value}, []string{"Name", "Value"}}, adminOnly())
-}
-
-func switchOdbcCdrParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, updateConfig, struct {
-		S interface{}
-		A []string
-	}{&altStruct.ConfigOdbcCdrSetting{Id: data.Param.Id, Enabled: data.Param.Enabled}, []string{"Enabled"}}, adminOnly())
-}
-
-func deleteOdbcCdrParam(data *webStruct.MessageData) webStruct.UserResponse {
-	return getUserForConfig(data, delConfig, &altStruct.ConfigOdbcCdrSetting{Id: data.Param.Id}, adminOnly())
 }
 
 func addOdbcCdrTable(data *webStruct.MessageData) webStruct.UserResponse {
