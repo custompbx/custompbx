@@ -1,4 +1,7 @@
-<app-inner-header name="Fifo" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="Fifo" [loadCounter]="loadCounter()" [status]="statusText()" [statusTone]="statusTone()" [errorMessage]="errorMessage()">
+  <button mat-stroked-button type="button" (click)="expandAllPanels()">Expand all</button>
+  <button mat-stroked-button type="button" (click)="collapseAllPanels()">Collapse all</button>
+</app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list() && list().exists !== false">
   <mat-tab label="List">
@@ -7,7 +10,7 @@
         <mat-card-subtitle>Settings</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <mat-expansion-panel>
+        <mat-expansion-panel [expanded]="settingsExpanded">
           <mat-expansion-panel-header>
             <mat-panel-title>
               Settings
@@ -22,6 +25,7 @@
                                [newItems]="list().settings?.new"
                                [id]="null"
                                [toCopy]="null"
+                               [pending]="loadCounter() > 0"
                                [dispatchersCallbacks]="globalSettingsDispatchers"
           >
           </app-key-value-pad-2>
@@ -70,6 +74,7 @@
                                    [newItems]="item.members?.new"
                                    [id]="item.id"
                                    [toCopy]="toCopyFifo"
+                                   [pending]="loadCounter() > 0"
                                    [dispatchersCallbacks]="fifoSettingsDispatchers"
                                    [fieldsMask]="memberMask"
               >

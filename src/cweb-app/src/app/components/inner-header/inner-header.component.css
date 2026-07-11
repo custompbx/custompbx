@@ -15,4 +15,15 @@
 h1 { margin: 0; font-size: 24px; line-height: 1.2; font-weight: 650; letter-spacing: -.02em; }
 p { margin: 6px 0 0; color: var(--cpbx-text-muted); font-size: 14px; }
 .page-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.page-error {
+  align-items: flex-start;
+  background: var(--color-danger-soft, #fef2f2);
+  border-bottom: 1px solid var(--color-danger, #dc2626);
+  color: var(--color-danger-text, #991b1b);
+  display: flex;
+  gap: 10px;
+  padding: 12px 24px;
+}
+.page-error strong { display: block; font-size: 14px; }
+.page-error p { color: inherit; margin: 4px 0 0; }
 @media (max-width: 767px) { .page-header { align-items: flex-start; flex-direction: column; padding: 16px; } .page-actions { width: 100%; justify-content: flex-start; } }

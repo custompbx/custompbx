@@ -1,7 +1,7 @@
 import {computed, Component, effect, OnDestroy, OnInit} from '@angular/core';
 
 import {MaterialModule} from "../../../../material-module";
-import {Iitem, IsimpleModule, IvertoParameterItem} from '../../../store/config/config.state.struct';
+import {Ihttpcache, Iitem, IvertoParameterItem} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {AbstractControl, FormsModule} from '@angular/forms';
@@ -44,9 +44,11 @@ imports:  [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBan
 export class HttpCacheComponent implements OnInit, OnDestroy {
 
   private configState = toSignal(this.store.pipe(select(selectConfigurationState)), {initialValue: {} as any});
-  public list = computed(() => this.configState().http_cache as IsimpleModule);
+  public list = computed(() => this.configState().http_cache as Ihttpcache);
   public loadCounter = computed(() => this.configState().loadCounter || 0);
-  private lastErrorMessage = computed(() => this.configState().http_cache?.errorMessage || null);
+  public errorMessage = computed(() => this.configState().http_cache?.errorMessage || null);
+  public statusText = computed(() => this.loadCounter() > 0 ? 'Saving…' : null);
+  public statusTone = computed(() => this.errorMessage() ? 'danger' : this.loadCounter() > 0 ? 'warning' : 'default');
   public selectedIndex: number;
   public globalSettingsDispatchers: object;
   public ProfileDomainsDispatchers: object;
@@ -62,7 +64,7 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
   ) {
     this.selectedIndex = 0;
     effect(() => {
-      const errorMessage = this.lastErrorMessage();
+      const errorMessage = this.errorMessage();
       if (!errorMessage) {
         this.newProfileName = '';
       } else {
@@ -170,6 +172,23 @@ export class HttpCacheComponent implements OnInit, OnDestroy {
   GetHttpCacheProfileParameters(id) {
     this.panelCloser['profile' + id] = true;
     this.store.dispatch(new GetHttpCacheProfileParameters({id: id}));
+  }
+
+  expandAllPanels() {
+    this.onlyValues(this.list()?.profiles).forEach((profile) => {
+      if (profile?.id) {
+        this.panelCloser['profile' + profile.id] = true;
+        this.store.dispatch(new GetHttpCacheProfileParameters({id: profile.id}));
+      }
+    });
+  }
+
+  collapseAllPanels() {
+    this.onlyValues(this.list()?.profiles).forEach((profile) => {
+      if (profile?.id) {
+        this.panelCloser['profile' + profile.id] = false;
+      }
+    });
   }
 
   updateProfileDomain(param: IvertoParameterItem) {

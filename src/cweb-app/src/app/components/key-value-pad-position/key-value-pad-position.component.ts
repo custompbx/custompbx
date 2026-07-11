@@ -4,6 +4,8 @@ import {MaterialModule} from "../../../material-module";
 import {AbstractControl, FormsModule} from '@angular/forms';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {ResizeInputDirective} from "../../directives/resize-input.directive";
+import {MatBottomSheet} from "@angular/material/bottom-sheet";
+import {ConfirmBottomSheetComponent} from "../confirm-bottom-sheet/confirm-bottom-sheet.component";
 
 @Component({
 standalone: true,
@@ -27,8 +29,10 @@ export class KeyValuePadPositionComponent implements OnInit {
     extraField2?: {name: string, style?: object, depend?: string, value?: string},
   };
   @Input() grandParentId: number;
+  @Input() pending = false;
+  public filterText = '';
 
-  constructor() { }
+  constructor(private bottomSheet: MatBottomSheet) { }
 
   ngOnInit() {
     if (!this.fieldsMask) {
@@ -53,6 +57,12 @@ export class KeyValuePadPositionComponent implements OnInit {
     return nameObject && nameObject.valid && (nameObject.dirty || obj1 || obj2 || value);
   }
 
+  canSaveExisting(item: any, nameObject: AbstractControl,
+                valueObject: AbstractControl, valueObject1: AbstractControl, valueObject2: AbstractControl): boolean {
+    return this.isReadyToSend(nameObject, valueObject, valueObject1, valueObject2)
+      && !this.nameValidationMessage(nameObject?.value, item?.id);
+  }
+
   isNewReadyToSend(nameObject: AbstractControl,
                    valueObject: AbstractControl, valueObject1: AbstractControl, valueObject2: AbstractControl): boolean {
     let obj1 = true;
@@ -70,6 +80,12 @@ export class KeyValuePadPositionComponent implements OnInit {
     return nameObject && nameObject.valid && value && obj1 && obj2;
   }
 
+  canAddNew(index: number, nameObject: AbstractControl,
+                   valueObject: AbstractControl, valueObject1: AbstractControl, valueObject2: AbstractControl): boolean {
+    return this.isNewReadyToSend(nameObject, valueObject, valueObject1, valueObject2)
+      && !this.nameValidationMessage(nameObject?.value, null, index);
+  }
+
   isArray(obj: any): boolean {
     return Array.isArray(obj);
   }
@@ -78,6 +94,10 @@ export class KeyValuePadPositionComponent implements OnInit {
     if (item.id) {
       return item.id;
     }
+  }
+
+  clearFilter(): void {
+    this.filterText = '';
   }
 
   addNewItemField() {
@@ -109,17 +129,34 @@ export class KeyValuePadPositionComponent implements OnInit {
     this.dispatchersCallbacks['deleteItem'](obj);
   }
 
+  confirmDeleteItem(obj: any): void {
+    const name = this.itemDisplayName(obj);
+    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, {
+      data: {
+        action: 'delete',
+        case1Text: `Delete item "${name}"?`,
+        message: 'This removes the item from the configuration after the server confirms the change.',
+      },
+    });
+
+    sheet.afterDismissed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.deleteItem(obj);
+      }
+    });
+  }
+
   updateItem(id: number, name: string, value: string, exta1?: string, exta2?: string) {
     if (!this.dispatchersCallbacks || !this.dispatchersCallbacks['updateItem']) {
       return;
     }
-    const obj = {id: id, name: name, value: value};
+    const obj = {id: id, name: this.trimValue(name), value: this.trimValue(value)};
 
     if (this.fieldsMask.extraField1) {
-      obj[this.fieldsMask.extraField1.name] = exta1;
+      obj[this.fieldsMask.extraField1.name] = this.trimValue(exta1);
     }
     if (this.fieldsMask.extraField2) {
-      obj[this.fieldsMask.extraField2.name] = exta2;
+      obj[this.fieldsMask.extraField2.name] = this.trimValue(exta2);
     }
     this.dispatchersCallbacks['updateItem'](obj);
   }
@@ -143,15 +180,15 @@ export class KeyValuePadPositionComponent implements OnInit {
       return;
     }
 
-    const args = [this.id, index, name];
+    const args = [this.id, index, this.trimValue(name)];
     if (value !== undefined) {
-      args.push(value);
+      args.push(this.trimValue(value));
     }
     if (this.fieldsMask.extraField1) {
-      args.push(extraField1);
+      args.push(this.trimValue(extraField1));
     }
     if (this.fieldsMask.extraField2) {
-      args.push(extraField2);
+      args.push(this.trimValue(extraField2));
     }
 
     this.dispatchersCallbacks['addItem'](...args);
@@ -188,7 +225,7 @@ export class KeyValuePadPositionComponent implements OnInit {
     if (!obj) {
       return [];
     }
-    const arr = Object.values(obj).sort(
+    const arr = Object.values(obj).filter((item) => item?.id && !this.isArray(item)).sort(
       function (a, b) {
         if (a.position > b.position) {
           return 1;
@@ -202,6 +239,62 @@ export class KeyValuePadPositionComponent implements OnInit {
     return arr;
   }
 
+  filteredSortedValues(obj: object): Array<any> {
+    const values = this.onlySortedValues(obj);
+    const query = this.filterText.trim().toLowerCase();
+    if (!query) {
+      return values;
+    }
+    return values.filter((item) => this.searchableText(item).includes(query));
+  }
+
+  hasItems(obj: object): boolean {
+    return this.onlySortedValues(obj).length > 0;
+  }
+
+  totalItemCount(obj: object): number {
+    return this.onlySortedValues(obj).length;
+  }
+
+  showFilter(obj: object): boolean {
+    return this.totalItemCount(obj) > 1;
+  }
+
+  visibleItemCount(obj: object): number {
+    return this.filteredSortedValues(obj).length;
+  }
+
+  hasNewItems(): boolean {
+    return (this.newItems || []).some((item) => !!item);
+  }
+
+  isRowDirty(form: any, id: number): boolean {
+    return this.controlsForItem(form, id).some((control) => control?.dirty);
+  }
+
+  markItemPristine(form: any, id: number): void {
+    this.controlsForItem(form, id).forEach((control) => control?.markAsPristine());
+  }
+
+  resetItemForm(form: any, item: any): void {
+    this.setControlValue(form, 'itemName' + item.id, item?.[this.fieldsMask.name.name]);
+    this.setControlValue(form, 'itemValue' + item.id, item?.[this.fieldsMask.value?.name]);
+    this.setControlValue(form, 'itemExtraField1' + item.id, item?.[this.fieldsMask.extraField1?.name]);
+    this.setControlValue(form, 'itemExtraField2' + item.id, item?.[this.fieldsMask.extraField2?.name]);
+    this.markItemPristine(form, item.id);
+  }
+
+  nameValidationMessage(name: string, id?: number, newIndex?: number): string | null {
+    const normalizedName = this.normalizeName(name);
+    if (!normalizedName) {
+      return 'Name is required.';
+    }
+    if (this.hasDuplicateName(normalizedName, id, newIndex)) {
+      return 'Another item already uses this name.';
+    }
+    return null;
+  }
+
   dropAction(event: CdkDragDrop<string[]>, parent: Array<any>) {
     if (!this.dispatchersCallbacks || !this.dispatchersCallbacks['dropActionItem']) {
       return;
@@ -211,5 +304,66 @@ export class KeyValuePadPositionComponent implements OnInit {
     }
 
     this.dispatchersCallbacks['dropActionItem'](event, parent);
+  }
+
+  private controlsForItem(form: any, id: number): AbstractControl[] {
+    return [
+      form?.controls?.['itemName' + id],
+      form?.controls?.['itemValue' + id],
+      form?.controls?.['itemExtraField1' + id],
+      form?.controls?.['itemExtraField2' + id],
+    ].filter(Boolean);
+  }
+
+  private setControlValue(form: any, name: string, value: any): void {
+    const control = form?.controls?.[name];
+    if (control) {
+      control.setValue(value ?? '');
+    }
+  }
+
+  private searchableText(item: any): string {
+    return [
+      item?.[this.fieldsMask.name.name],
+      item?.[this.fieldsMask.value?.name],
+      item?.[this.fieldsMask.extraField1?.name],
+      item?.[this.fieldsMask.extraField2?.name],
+      item?.id?.toString(),
+    ]
+      .filter((value) => value !== undefined && value !== null)
+      .join(' ')
+      .toLowerCase();
+  }
+
+  private hasDuplicateName(name: string, id?: number, newIndex?: number): boolean {
+    const existingDuplicate = this.onlySortedValues(this.items).some((item) => {
+      if (!item?.id || item.id === id || this.isArray(item)) {
+        return false;
+      }
+      return this.normalizeName(item?.[this.fieldsMask.name.name]) === name;
+    });
+
+    if (existingDuplicate) {
+      return true;
+    }
+
+    return (this.newItems || []).some((item, index) => {
+      if (!item || index === newIndex) {
+        return false;
+      }
+      return this.normalizeName(item.name) === name;
+    });
+  }
+
+  private itemDisplayName(item: any): string {
+    return this.trimValue(item?.[this.fieldsMask.name.name]) || `#${item?.id || ''}`.trim();
+  }
+
+  private normalizeName(value: any): string {
+    return (this.trimValue(value) || '').toString().toLowerCase();
+  }
+
+  private trimValue(value: any): any {
+    return typeof value === 'string' ? value.trim() : value;
   }
 }

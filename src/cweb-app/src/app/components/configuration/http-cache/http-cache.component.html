@@ -1,4 +1,7 @@
-<app-inner-header name="Http cache" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="Http cache" [loadCounter]="loadCounter()" [status]="statusText()" [statusTone]="statusTone()" [errorMessage]="errorMessage()">
+  <button mat-stroked-button type="button" (click)="expandAllPanels()">Expand all</button>
+  <button mat-stroked-button type="button" (click)="collapseAllPanels()">Collapse all</button>
+</app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
   <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
@@ -16,6 +19,7 @@
               [newItems]="list().settings?.new"
               [id]="null"
               [toCopy]="null"
+              [pending]="loadCounter() > 0"
               [dispatchersCallbacks]="globalSettingsDispatchers"
               >
             </app-key-value-pad-2>
@@ -114,6 +118,7 @@
                               [newItems]="item.domains?.new"
                               [id]="item.id"
                               [toCopy]="toCopyProfile"
+                              [pending]="loadCounter() > 0"
                               [dispatchersCallbacks]="ProfileDomainsDispatchers"
                               [fieldsMask]="ProfileDomainsMask"
                               >

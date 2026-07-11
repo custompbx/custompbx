@@ -36,10 +36,13 @@ export class OspComponent implements OnInit, OnDestroy {
   private configState = toSignal(this.store.pipe(select(selectConfigurationState)), {initialValue: {} as any});
   public list = computed(() => this.configState().osp as Iosp);
   public loadCounter = computed(() => this.configState().loadCounter || 0);
-  private lastErrorMessage = computed(() => this.configState().osp?.errorMessage || null);
+  public errorMessage = computed(() => this.configState().osp?.errorMessage || null);
+  public statusText = computed(() => this.loadCounter() > 0 ? 'Saving…' : null);
+  public statusTone = computed(() => this.errorMessage() ? 'danger' : this.loadCounter() > 0 ? 'warning' : 'default');
   private newProfileName: string;
   public selectedIndex: number;
   private panelCloser = [];
+  public settingsExpanded = false;
   private toCopyProfile: number;
   public globalSettingsDispatchers: object;
   public profileSettingsDispatchers: object;
@@ -52,7 +55,7 @@ export class OspComponent implements OnInit, OnDestroy {
   ) {
     this.selectedIndex = 0;
     effect(() => {
-      const errorMessage = this.lastErrorMessage();
+      const errorMessage = this.errorMessage();
       if (!errorMessage) {
         this.newProfileName = '';
       } else {
@@ -125,6 +128,25 @@ export class OspComponent implements OnInit, OnDestroy {
   getOspProfilesParams(id) {
     this.panelCloser['profile' + id] = true;
     this.store.dispatch(new GetOspProfileParameters({id: id}));
+  }
+
+  expandAllPanels() {
+    this.settingsExpanded = true;
+    this.onlyValues(this.list()?.profiles).forEach((profile) => {
+      if (profile?.id) {
+        this.panelCloser['profile' + profile.id] = true;
+        this.store.dispatch(new GetOspProfileParameters({id: profile.id}));
+      }
+    });
+  }
+
+  collapseAllPanels() {
+    this.settingsExpanded = false;
+    this.onlyValues(this.list()?.profiles).forEach((profile) => {
+      if (profile?.id) {
+        this.panelCloser['profile' + profile.id] = false;
+      }
+    });
   }
 
   updateProfileParam(param: Iitem) {

@@ -1,6 +1,6 @@
-<app-inner-header name="ODBC CDR" [loadCounter]="loadCounter"></app-inner-header>
-<app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
-@if (list && list.exists !== false) {
+<app-inner-header name="ODBC CDR" [loadCounter]="loadCounter()"></app-inner-header>
+<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+@if (list() && list().exists !== false) {
   <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
     <mat-tab label="List">
       <mat-card>
@@ -9,12 +9,13 @@
         </mat-card-header>
         <mat-card-content>
           <h3>Params:</h3>
-          <app-key-value-pad-2 [exist]="list.settings"
-            [items]="list.settings"
-            [newItems]="list.settings?.new"
+          <app-key-value-pad-2 [exist]="list().settings"
+            [items]="list().settings"
+            [newItems]="list().settings?.new"
             [id]="null"
             [toCopy]="null"
             [dispatchersCallbacks]="globalSettingsDispatchers"
+            [pending]="loadCounter() > 0"
             >
           </app-key-value-pad-2>
         </mat-card-content>
@@ -24,7 +25,7 @@
           <mat-card-subtitle>Tables</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          @for (table of onlyValues(list.tables); track trackByFnId($index, table)) {
+          @for (table of onlyValues(list().tables); track trackByFnId($index, table)) {
             <div>
               <mat-expansion-panel (opened)="GetOdbcCdrField(table.id)"
                 [expanded]="panelCloser['fifo' + table.id]">
@@ -62,6 +63,7 @@
                     [toCopy]="null"
                     [dispatchersCallbacks]="fieldsDispatchers"
                     [fieldsMask]="tableFieldMask"
+                    [pending]="loadCounter() > 0"
                     >
                   </app-key-value-pad-2>
                 </mat-expansion-panel>
@@ -81,10 +83,10 @@
       </mat-tab>
       <mat-tab label="Delete/Rename">
         <form class="spacer spacerb" #deleteForm="ngForm">
-          @if (list.tables) {
+          @if (list().tables) {
             <div>
               <h3>Tables:</h3>
-              @for (table of onlyValues(list.tables); track table) {
+              @for (table of onlyValues(list().tables); track table) {
                 <div>
                   <mat-form-field hideRequiredMarker>
                     <mat-label>Table name</mat-label>

@@ -1,7 +1,6 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, computed, effect, OnDestroy, OnInit} from '@angular/core';
 
 import {MaterialModule} from "../../../../material-module";
-import {Observable, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {MatBottomSheet} from '@angular/material/bottom-sheet';
@@ -23,6 +22,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
 standalone: true,
@@ -33,14 +33,13 @@ imports:  [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBan
 })
 export class OdbcCdrComponent implements OnInit, OnDestroy {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: IodbcCdr;
-  private newTableName: string;
+  private configState = toSignal(this.store.pipe(select(selectConfigurationState)), {initialValue: {} as any});
+  public list = computed(() => this.configState().odbc_cdr as IodbcCdr);
+  public loadCounter = computed(() => this.configState().loadCounter || 0);
+  public newTableName: string;
   public selectedIndex: number;
   private lastErrorMessage: string;
   private panelCloser = [];
-  public loadCounter: number;
   public tableId: number;
   public globalSettingsDispatchers: object;
   public fieldsDispatchers: object;
@@ -53,24 +52,19 @@ export class OdbcCdrComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
   ) {
     this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
-
-  ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.odbc_cdr;
-      this.lastErrorMessage = configs.odbc_cdr && configs.odbc_cdr.errorMessage || null;
-      if (!this.lastErrorMessage) {
-        this.newTableName = '';
-        this.selectedIndex = 0;
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
+    effect(() => {
+      const message = this.list()?.errorMessage || null;
+      if (message && message !== this.lastErrorMessage) {
+        this._snackBar.open('Error: ' + message + '!', null, {
           duration: 3000,
           panelClass: ['error-snack'],
         });
       }
+      this.lastErrorMessage = message;
     });
+  }
+
+  ngOnInit() {
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewParam.bind(this),
       switchItem: this.switchParam.bind(this),
@@ -93,7 +87,6 @@ export class OdbcCdrComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.configs$.unsubscribe();
     if (this.route.snapshot?.data?.reconnectUpdater) {
        this.route.snapshot.data.reconnectUpdater.unsubscribe();
      }
@@ -238,12 +231,11 @@ export class OdbcCdrComponent implements OnInit, OnDestroy {
       if (action === 'delete') {
         this.store.dispatch(new DeleteOdbcCdrTable({table: {id: Number(id)}}));
       } else if (action === 'rename') {
-        console.log(this.list.tables[id]);
         const table = <Itable>{};
-        table.id = this.list.tables[id].id;
-        table.enabled = this.list.tables[id].enabled;
+        table.id = this.list().tables[id].id;
+        table.enabled = this.list().tables[id].enabled;
         table.name = newName;
-        table.log_leg = this.list.tables[id].log_leg;
+        table.log_leg = this.list().tables[id].log_leg;
         this.updateTable(table);
       }
     });

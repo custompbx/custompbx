@@ -16,3 +16,12 @@
   </div>
   <div class="page-actions" aria-label="Page actions"><ng-content></ng-content></div>
 </header>
+@if (errorMessage) {
+  <section class="page-error" role="alert">
+    <mat-icon aria-hidden="true">error</mat-icon>
+    <div>
+      <strong>Last operation failed</strong>
+      <p>{{errorMessage}}</p>
+    </div>
+  </section>
+}

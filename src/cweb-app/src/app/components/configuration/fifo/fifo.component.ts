@@ -36,10 +36,13 @@ export class FifoComponent implements OnInit, OnDestroy {
   private configState = toSignal(this.store.pipe(select(selectConfigurationState)), {initialValue: {} as any});
   public list = computed(() => this.configState().fifo as Ififo);
   public loadCounter = computed(() => this.configState().loadCounter || 0);
-  private lastErrorMessage = computed(() => this.configState().fifo?.errorMessage || null);
+  public errorMessage = computed(() => this.configState().fifo?.errorMessage || null);
+  public statusText = computed(() => this.loadCounter() > 0 ? 'Saving…' : null);
+  public statusTone = computed(() => this.errorMessage() ? 'danger' : this.loadCounter() > 0 ? 'warning' : 'default');
   private newFifoName: string;
   public selectedIndex: number;
   private panelCloser = [];
+  public settingsExpanded = false;
   private toCopyFifo: number;
   public globalSettingsDispatchers: object;
   public fifoSettingsDispatchers: object;
@@ -53,7 +56,7 @@ export class FifoComponent implements OnInit, OnDestroy {
   ) {
     this.selectedIndex = 0;
     effect(() => {
-      const errorMessage = this.lastErrorMessage();
+      const errorMessage = this.errorMessage();
       if (!errorMessage) {
         this.newFifoName = '';
       } else {
@@ -133,6 +136,25 @@ export class FifoComponent implements OnInit, OnDestroy {
   getFifoFifosParams(id) {
     this.panelCloser['fifo' + id] = true;
     this.store.dispatch(new GetFifoFifoMembers({id: id}));
+  }
+
+  expandAllPanels() {
+    this.settingsExpanded = true;
+    this.onlyValues(this.list()?.fifos).forEach((fifo) => {
+      if (fifo?.id) {
+        this.panelCloser['fifo' + fifo.id] = true;
+        this.store.dispatch(new GetFifoFifoMembers({id: fifo.id}));
+      }
+    });
+  }
+
+  collapseAllPanels() {
+    this.settingsExpanded = false;
+    this.onlyValues(this.list()?.fifos).forEach((fifo) => {
+      if (fifo?.id) {
+        this.panelCloser['fifo' + fifo.id] = false;
+      }
+    });
   }
 
   updateFifoMember(param: IfifoMember) {

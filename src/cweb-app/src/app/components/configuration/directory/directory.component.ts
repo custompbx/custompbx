@@ -1,7 +1,6 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, computed, effect, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {MaterialModule} from "../../../../material-module";
-import {Observable, Subscription} from 'rxjs';
 import {Iitem, Idirectory} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
@@ -23,25 +22,26 @@ import {
 } from '../../../store/config/directory/config.actions.directory';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
+import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
 standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent],
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-directory',
   templateUrl: './directory.component.html',
   styleUrls: ['./directory.component.css']
 })
 export class DirectoryComponent implements OnInit, OnDestroy {
 
-  public configs: Observable<any>;
-  public configs$: Subscription;
-  public list: Idirectory;
-  private newProfileName: string;
+  private configState = toSignal(this.store.pipe(select(selectConfigurationState)), {initialValue: {} as any});
+  public list = computed(() => this.configState().directory as Idirectory);
+  public loadCounter = computed(() => this.configState().loadCounter || 0);
+  public newProfileName: string;
   public selectedIndex: number;
   private lastErrorMessage: string;
   private panelCloser = [];
-  public loadCounter: number;
-  private toCopyProfile: number;
+  public toCopyProfile: number;
   public globalSettingsDispatchers: object;
   public profileSettingsDispatchers: object;
 
@@ -52,23 +52,19 @@ export class DirectoryComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
   ) {
     this.selectedIndex = 0;
-    this.configs = this.store.pipe(select(selectConfigurationState));
-  }
-
-  ngOnInit() {
-    this.configs$ = this.configs.subscribe((configs) => {
-      this.loadCounter = configs.loadCounter;
-      this.list = configs.directory;
-      this.lastErrorMessage = configs.directory && configs.directory.errorMessage || null;
-      if (!this.lastErrorMessage) {
-        this.newProfileName = '';
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
+    effect(() => {
+      const message = this.list()?.errorMessage || null;
+      if (message && message !== this.lastErrorMessage) {
+        this._snackBar.open('Error: ' + message + '!', null, {
           duration: 3000,
           panelClass: ['error-snack'],
         });
       }
+      this.lastErrorMessage = message;
     });
+  }
+
+  ngOnInit() {
     this.globalSettingsDispatchers = {
       addNewItemField: this.addNewDirectoryParam.bind(this),
       switchItem: this.switchDirectoryParam.bind(this),
@@ -90,7 +86,6 @@ export class DirectoryComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.configs$.unsubscribe();
     if (this.route.snapshot?.data?.reconnectUpdater) {
        this.route.snapshot.data.reconnectUpdater.unsubscribe();
      }
@@ -201,7 +196,7 @@ export class DirectoryComponent implements OnInit, OnDestroy {
   }
 
   copyProfile(key) {
-    if (!this.list.profiles[key]) {
+    if (!this.list()?.profiles?.[key]) {
       this.toCopyProfile = 0;
       return;
     }

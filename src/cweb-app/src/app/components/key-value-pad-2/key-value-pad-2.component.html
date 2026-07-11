@@ -1,10 +1,28 @@
 @if (exist) {
-  <form #form="ngForm">
-    @for (item of onlyValues(items); track trackByFnId($index, item)) {
-      <div class="spacer">
+  @if (showFilter(items)) {
+  <div class="kv-toolbar">
+    <mat-form-field appearance="outline" class="kv-filter" floatLabel="always">
+      <mat-label>Filter items</mat-label>
+      <input matInput type="search" [(ngModel)]="filterText" [ngModelOptions]="{standalone: true}"
+        placeholder="Search name, value, or id">
+      @if (filterText) {
+        <button mat-icon-button matSuffix type="button" aria-label="Clear filter" (click)="clearFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+    <span class="kv-count">{{ visibleItemCount(items) }} / {{ totalItemCount(items) }} shown</span>
+  </div>
+  }
+  <form #form="ngForm" class="kv-list">
+    @for (item of filteredValues(items); track trackByFnId($index, item)) {
+      <div class="kv-row" [class.kv-row--dirty]="isRowDirty(form, item.id)">
         @if (item.id && !isArray(item)) {
-          <div>
-            <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.name?.style">
+          <div class="kv-row-content">
+            @if (isRowDirty(form, item.id)) {
+              <span class="kv-dirty-badge">Unsaved</span>
+            }
+            <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.name?.style">
               <mat-label>{{ fieldsMask.name.name }}</mat-label>
               <input matInput [placeholder]="fieldsMask.name.name"
                 [ngModel]="item[fieldsMask.name.name]" required
@@ -13,9 +31,12 @@
                 appResizeInput
                 [resizeOnString]="item[fieldsMask.name.name]"
                 >
+              @if (nameValidationMessage(form.controls['itemName' + item.id]?.value, item.id)) {
+                <mat-error>{{ nameValidationMessage(form.controls['itemName' + item.id]?.value, item.id) }}</mat-error>
+              }
               </mat-form-field>
               @if (fieldsMask.value) {
-                <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.value?.style">
+                <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.value?.style">
                   <mat-label>{{ fieldsMask.value.name }}</mat-label>
                   <input matInput [placeholder]="fieldsMask.value.name"
                     [ngModel]="item[fieldsMask.value.name]"
@@ -27,7 +48,7 @@
                   </mat-form-field>
                 }
                 @if (fieldsMask.extraField1) {
-                  <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField1?.style">
+                  <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField1?.style">
                     <mat-label>{{ fieldsMask.extraField1.name }}</mat-label>
                     <input matInput [placeholder]="fieldsMask.extraField1.name"
                       [ngModel]="item[fieldsMask.extraField1.name]"
@@ -39,7 +60,7 @@
                     </mat-form-field>
                   }
                   @if (fieldsMask.extraField2) {
-                    <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField2?.style">
+                    <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField2?.style">
                       <mat-label>{{ fieldsMask.extraField2.name }}</mat-label>
                       <input matInput [placeholder]="fieldsMask.extraField2.name"
                         [ngModel]="item[fieldsMask.extraField2.name]"
@@ -51,7 +72,7 @@
                       </mat-form-field>
                     }
                     @if (fieldsMask.extraField3) {
-                      <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField3?.style">
+                      <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField3?.style">
                         <mat-label>{{ fieldsMask.extraField3.name }}</mat-label>
                         <input matInput [placeholder]="fieldsMask.extraField3.name"
                           [ngModel]="item[fieldsMask.extraField3.name]"
@@ -63,7 +84,7 @@
                         </mat-form-field>
                       }
                       @if (fieldsMask.extraField4) {
-                        <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField4?.style">
+                        <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField4?.style">
                           <mat-label>{{ fieldsMask.extraField4.name }}</mat-label>
                           <input matInput [placeholder]="fieldsMask.extraField4.name"
                             [ngModel]="item[fieldsMask.extraField4.name]"
@@ -75,7 +96,7 @@
                           </mat-form-field>
                         }
                         @if (fieldsMask.extraField5) {
-                          <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField5?.style">
+                          <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField5?.style">
                             <mat-label>{{ fieldsMask.extraField5.name }}</mat-label>
                             <input matInput [placeholder]="fieldsMask.extraField5.name"
                               [ngModel]="item[fieldsMask.extraField5.name]"
@@ -87,7 +108,7 @@
                             </mat-form-field>
                           }
                           @if (fieldsMask.extraField6) {
-                            <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField6?.style">
+                            <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField6?.style">
                               <mat-label>{{ fieldsMask.extraField6.name }}</mat-label>
                               <input matInput [placeholder]="fieldsMask.extraField6.name"
                                 [ngModel]="item[fieldsMask.extraField6.name]"
@@ -99,7 +120,7 @@
                               </mat-form-field>
                             }
                             @if (fieldsMask.extraField7) {
-                              <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField7?.style">
+                              <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField7?.style">
                                 <mat-label>{{ fieldsMask.extraField7.name }}</mat-label>
                                 <input matInput [placeholder]="fieldsMask.extraField7.name"
                                   [ngModel]="item[fieldsMask.extraField7.name]"
@@ -110,8 +131,10 @@
                                   >
                                 </mat-form-field>
                               }
-                              <button mat-button color="accent" class="but-spacer-left"
-              [disabled]="!isReadyToSend(
+                              @if (isRowDirty(form, item.id)) {
+                              <button mat-flat-button color="primary" class="but-spacer-left"
+              [disabled]="pending || !canSaveExisting(
+                 item,
                  form.controls['itemName' + item.id],
                  form.controls['itemValue' + item.id],
                  form.controls['itemExtraField1' + item.id],
@@ -132,40 +155,50 @@
                     form.controls['itemExtraField4' + item.id]?.value,
                     form.controls['itemExtraField5' + item.id]?.value,
                     form.controls['itemExtraField6' + item.id]?.value,
-                    form.controls['itemExtraField7' + item.id]?.value);
-                    form.controls['itemName' + item.id].markAsPristine();
-                    form.controls['itemValue' + item.id]?.markAsPristine();">
-                                Update
+                    form.controls['itemExtraField7' + item.id]?.value);">
+                                Save
                               </button>
+                                <button mat-button type="button" class="but-spacer-left"
+                                  [disabled]="pending"
+                                  (click)="resetItemForm(form, item)">
+                                  Reset
+                                </button>
+                              }
                               @if (item.enabled) {
-                                <button mat-raised-button color="accent"
-                                  class="but-spacer-left switch-button"
+                                <button mat-stroked-button
+                                  class="but-spacer-left switch-button switch-button--disable"
+                                  [disabled]="pending"
                                   (click)="switchItem(item)">
                                   Disable
                                 </button>
                               }
                               @if (!item.enabled) {
-                                <button mat-raised-button color="primary"
-                                  class="but-spacer-left switch-button"
+                                <button mat-stroked-button
+                                  class="but-spacer-left switch-button switch-button--enable"
+                                  [disabled]="pending"
                                   (click)="switchItem(item)">
                                   Enable
                                 </button>
                               }
-                              <button mat-raised-button color="warn" class="but-spacer-left"
-                                (click)="deleteItem(item)">
+                              <button mat-button color="warn" class="but-spacer-left"
+                                [disabled]="pending"
+                                (click)="confirmDeleteItem(item)">
                                 Delete
                               </button>
                             </div>
                           }
                         </div>
                       }
+                      @if (hasNewItems()) {
+                        <div class="kv-draft-title">Draft items</div>
+                      }
                       @if (newItems) {
                         <div>
                           @for (item of newItems; track item; let i = $index) {
-                            <div class="spacer">
                               @if (item) {
-                                <div>
-                                  <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.name?.style">
+                            <div class="kv-row kv-row--new">
+                                <div class="kv-row-content">
+                                  <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.name?.style">
                                     <mat-label>{{ fieldsMask.name.name }}</mat-label>
                                     <input matInput
                                       [placeholder]="fieldsMask.name.name"
@@ -174,9 +207,12 @@
                                       appResizeInput
                                       [resizeOnString]="item.name"
                                       >
+                                    @if (nameValidationMessage(form.controls['newItemName' + i]?.value, null, i)) {
+                                      <mat-error>{{ nameValidationMessage(form.controls['newItemName' + i]?.value, null, i) }}</mat-error>
+                                    }
                                     </mat-form-field>
                                     @if (fieldsMask.value) {
-                                      <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.value?.style">
+                                      <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.value?.style">
                                         <mat-label>{{ fieldsMask.value.name }}</mat-label>
                                         <input matInput
                                           [placeholder]="fieldsMask.value.name"
@@ -188,7 +224,7 @@
                                         </mat-form-field>
                                       }
                                       @if (fieldsMask.extraField1) {
-                                        <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField1?.style">
+                                        <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField1?.style">
                                           <mat-label>{{ fieldsMask.extraField1.name }}</mat-label>
                                           <input matInput
                                             [placeholder]="fieldsMask.extraField1.name"
@@ -201,7 +237,7 @@
                                           </mat-form-field>
                                         }
                                         @if (fieldsMask.extraField2) {
-                                          <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField2?.style">
+                                          <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField2?.style">
                                             <mat-label>{{ fieldsMask.extraField2.name }}</mat-label>
                                             <input matInput
                                               [placeholder]="fieldsMask.extraField2.name"
@@ -214,7 +250,7 @@
                                             </mat-form-field>
                                           }
                                           @if (fieldsMask.extraField3) {
-                                            <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField3?.style">
+                                            <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField3?.style">
                                               <mat-label>{{ fieldsMask.extraField3.name }}</mat-label>
                                               <input matInput
                                                 [placeholder]="fieldsMask.extraField3.name"
@@ -227,7 +263,7 @@
                                               </mat-form-field>
                                             }
                                             @if (fieldsMask.extraField4) {
-                                              <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField4?.style">
+                                              <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField4?.style">
                                                 <mat-label>{{ fieldsMask.extraField4.name }}</mat-label>
                                                 <input matInput
                                                   [placeholder]="fieldsMask.extraField4.name"
@@ -240,7 +276,7 @@
                                                 </mat-form-field>
                                               }
                                               @if (fieldsMask.extraField5) {
-                                                <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField5?.style">
+                                                <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField5?.style">
                                                   <mat-label>{{ fieldsMask.extraField5.name }}</mat-label>
                                                   <input matInput
                                                     [placeholder]="fieldsMask.extraField5.name"
@@ -253,7 +289,7 @@
                                                   </mat-form-field>
                                                 }
                                                 @if (fieldsMask.extraField6) {
-                                                  <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField6?.style">
+                                                  <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField6?.style">
                                                     <mat-label>{{ fieldsMask.extraField6.name }}</mat-label>
                                                     <input matInput
                                                       [placeholder]="fieldsMask.extraField6.name"
@@ -266,7 +302,7 @@
                                                     </mat-form-field>
                                                   }
                                                   @if (fieldsMask.extraField7) {
-                                                    <mat-form-field hideRequiredMarker [ngStyle]="fieldsMask.extraField7?.style">
+                                                    <mat-form-field hideRequiredMarker floatLabel="always" [ngStyle]="fieldsMask.extraField7?.style">
                                                       <mat-label>{{ fieldsMask.extraField7.name }}</mat-label>
                                                       <input matInput
                                                         [placeholder]="fieldsMask.extraField7.name"
@@ -278,8 +314,9 @@
                                                         >
                                                       </mat-form-field>
                                                     }
-                                                    <button mat-button color="accent" class="but-spacer-left"
-                [disabled]="!isNewReadyToSend(
+                                                    <button mat-flat-button color="primary" class="but-spacer-left"
+                [disabled]="pending || !canAddNew(
+                   i,
                    form.controls['newItemName' + i],
                    form.controls['newItemValue' + i],
                    form.controls['newItemExtraField1' + i],
@@ -302,26 +339,34 @@
                     form.controls['newItemExtraField6' + i]?.value,
                     form.controls['newItemExtraField7' + i]?.value
                     )">
-                                                      Update
+                                                      Save
                                                     </button>
                                                     <button mat-button color="warn" class="but-spacer-left"
+                                                      [disabled]="pending"
                                                       (click)="dropNewItem(i)">
-                                                      Delete
+                                                      Cancel
                                                     </button>
                                                   </div>
+                            </div>
                                                 }
-                                              </div>
                                             }
                                           </div>
                                         }
                                       </form>
                                     }
-                                    <button mat-raised-button color="accent" class="spacer" (click)="addNewItemField()">
-                                      Add
+                                    @if (hasItems(items) && visibleItemCount(items) === 0) {
+                                      <div class="kv-empty-state">No items match this filter.</div>
+                                    }
+                                    @if (!hasItems(items)) {
+                                      <div class="kv-empty-state">No items yet. Add the first one below.</div>
+                                    }
+                                    <button mat-raised-button color="accent" class="kv-add-button" [disabled]="pending" (click)="addNewItemField()">
+                                      + Add item
                                     </button>
                                     @if (toCopy && toCopy !== id) {
-                                      <button mat-raised-button color="primary" class="but-spacer-left" (click)="pasteItems()"
+                                      <button mat-raised-button color="primary" class="but-spacer-left" [disabled]="pending" (click)="pasteItems()"
                                         >
                                         Paste
                                       </button>
                                     }
+

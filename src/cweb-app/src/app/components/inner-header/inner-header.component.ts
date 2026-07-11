@@ -16,6 +16,7 @@ export class InnerHeaderComponent implements OnInit {
   @Input() status: string;
   @Input() statusTone: 'default' | 'success' | 'warning' | 'danger' = 'default';
   @Input() loadCounter: number;
+  @Input() errorMessage: string | null;
 
   constructor() { }
 

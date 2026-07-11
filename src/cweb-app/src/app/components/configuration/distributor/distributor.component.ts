@@ -34,9 +34,12 @@ export class DistributorComponent implements OnInit, OnDestroy {
   private configState = toSignal(this.store.pipe(select(selectConfigurationState)), {initialValue: {} as any});
   public list = computed(() => this.configState().distributor as Idistributor);
   public loadCounter = computed(() => this.configState().loadCounter || 0);
-  private lastErrorMessage = computed(() => this.configState().distributor?.errorMessage || null);
+  public errorMessage = computed(() => this.configState().distributor?.errorMessage || null);
+  public statusText = computed(() => this.loadCounter() > 0 ? 'Saving…' : null);
+  public statusTone = computed(() => this.errorMessage() ? 'danger' : this.loadCounter() > 0 ? 'warning' : 'default');
   private newItemName: string;
   public selectedIndex: number;
+  public expandedLists = [];
 
   constructor(
     private store: Store<AppState>,
@@ -46,7 +49,7 @@ export class DistributorComponent implements OnInit, OnDestroy {
   ) {
     this.selectedIndex = 0;
     effect(() => {
-      const errorMessage = this.lastErrorMessage();
+      const errorMessage = this.errorMessage();
       if (!errorMessage) {
         this.newItemName = '';
         this.selectedIndex = 0;
@@ -71,7 +74,25 @@ export class DistributorComponent implements OnInit, OnDestroy {
   }
 
   getDetails(id) {
+    this.expandedLists['list' + id] = true;
     this.store.dispatch(new GetDistributorNodes({id: id}));
+  }
+
+  expandAllPanels() {
+    this.onlyValues(this.list()?.lists).forEach((list) => {
+      if (list?.id) {
+        this.expandedLists['list' + list.id] = true;
+        this.store.dispatch(new GetDistributorNodes({id: list.id}));
+      }
+    });
+  }
+
+  collapseAllPanels() {
+    this.onlyValues(this.list()?.lists).forEach((list) => {
+      if (list?.id) {
+        this.expandedLists['list' + list.id] = false;
+      }
+    });
   }
 
   checkDirty(condition: AbstractControl): boolean {
@@ -109,6 +130,7 @@ export class DistributorComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DelDistributorNode({distributor_node: node}));
   }
   clearDetails(id) {
+    this.expandedLists['list' + id] = false;
     //  this.store.dispatch(new ClearDetails(id));
   }
 
