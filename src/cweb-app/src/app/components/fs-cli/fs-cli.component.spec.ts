@@ -8,7 +8,7 @@ describe('FscliComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ FsCliComponent ]
+      imports: [ FsCliComponent ],
     })
     .compileComponents();
   }));

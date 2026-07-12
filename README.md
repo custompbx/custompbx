@@ -49,6 +49,7 @@ Additional options can be found in the Makefile.
 - docker-vet
 - docker-test
 - docker-race
+- docker-frontend-test
 - docker-frontend-build
 - docker-integration-test
 - docker-release
@@ -70,13 +71,20 @@ make docker-fmt
 make docker-vet
 make docker-test
 make docker-race
+make docker-frontend-test
 make docker-frontend-build
 make docker-integration-test
 make docker-release
 ```
 
 The Docker build uses `npm ci` and builds embedded frontend assets from container-generated static output. Runtime secrets and local `config.json` are excluded from the Docker build context.
-Run Angular unit tests in WSL or CI Linux with `npm ci` followed by `npm test -- --watch=false --browsers=ChromeHeadless`. Docker Desktop is kept for production frontend compilation, not browser-based unit tests.
+Run Angular unit tests through the Chromium-backed Docker target:
+
+```
+make docker-frontend-test
+```
+
+For WSL or CI Linux without Docker, use `npm ci` followed by `npm run test:ci` from `src/cweb-app`.
 
 You can start Docker with PostgresDB + Freeswitch + Custompbx by using the command:
 ```

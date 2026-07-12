@@ -13,10 +13,31 @@ RUN npm ci
 # Copy frontend files
 COPY src/cweb-app/src ./src
 COPY src/cweb-app/.browserslistrc ./
+COPY src/cweb-app/.postcssrc.json ./
 COPY src/cweb-app/angular.json ./
 COPY src/cweb-app/tsconfig.json ./
 
 RUN npm run build
+
+FROM node:22 AS frontend-test
+WORKDIR /app
+
+ENV CHROME_BIN=/usr/bin/chromium
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends chromium && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY src/cweb-app/package*.json ./
+RUN npm ci
+
+COPY src/cweb-app/src ./src
+COPY src/cweb-app/.browserslistrc ./
+COPY src/cweb-app/.postcssrc.json ./
+COPY src/cweb-app/angular.json ./
+COPY src/cweb-app/tsconfig.json ./
+
+RUN npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox
 
 ### STAGE 2: Build Golang backend ###
 FROM golang:1.25.11 AS backend-base

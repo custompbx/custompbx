@@ -2,19 +2,24 @@
 @if (loadCounter() === 0 && !(list() | keyvalue)?.length) {
   <mat-card>
     <mat-card-content>
-      Here no any domains yet. You can create it or try to import from existing config at domains page.
-      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+      <div class="directory-empty">
+        <div>
+          <h3>No domains yet</h3>
+          <p>Create or import a domain before adding groups.</p>
+        </div>
+      <button mat-stroked-button color="basic" class="switch-button"
         routerLink="/directory/domains">
         Go to domains
       </button>
+      </div>
     </mat-card-content>
   </mat-card>
 }
 @if ((list() | keyvalue)?.length) {
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
+  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
     <mat-tab label="List">
       @for (domain of list() | keyvalue; track domain) {
-        <div>
+        <div class="directory-domain-section">
           <mat-card>
             <mat-card-header>
               <mat-card-subtitle>Domain: <b>{{domain.value.name}}</b></mat-card-subtitle>
@@ -31,34 +36,30 @@
                       Click to get details
                     </mat-panel-description>
                   </mat-expansion-panel-header>
-                  <button mat-raised-button class="add-button example-list" color="accent"
-                    (click)="manageGroup[group.id]=!manageGroup[group.id]">Manage
+                  <button mat-stroked-button class="group-manage-button" color="basic"
+                    (click)="manageGroup[group.id]=!manageGroup[group.id]">
+                    {{manageGroup[group.id] ? 'Done' : 'Manage'}}
                   </button>
-                  <div class="example-list users-to-del">
+                  <div class="group-user-grid">
                     @for (gUser of onlyValuesByParent(listGroupUsers(), group.id); track gUser) {
-                      <mat-card class="float-card example-box"
-                        >
-                        @if (manageGroup[group.id]) {
-                          <button mat-flat-button color="warn" class="action" (click)="delUser(gUser.id)">Remove</button>
-                        }
-                        <mat-card-actions class="vert-centered">
+                      <div class="group-user-card group-user-card--bound">
+                        <div class="group-user-main">
                           <mat-icon class="icon-spacer">face</mat-icon>
                           <span class="user-name">{{listDomainUsers()[gUser.user?.id]?.name}}</span>
-                        </mat-card-actions>
-                      </mat-card>
+                        </div>
+                        @if (manageGroup[group.id]) {
+                          <button type="button" class="group-user-action group-user-action--remove" (click)="delUser(gUser.id)">Remove</button>
+                        }
+                      </div>
                     }
-                  </div>
-                  <div class="users-to-add example-list">
                     @for (user of onlyValuesByParent(listDomainUsers(), Number(domain.key)); track user) {
                       @if (bound()[group.id] && !bound()[group.id][user.id] && manageGroup[group.id]) {
-                        <div>
-                          <mat-card class="float-card example-box">
-                            <button mat-flat-button color="primary" class="action" (click)="addUser(user.id, group.id)">Add</button>
-                            <mat-card-actions class="vert-centered">
-                              <mat-icon class="icon-spacer">face</mat-icon>
-                              <span class="user-name">{{user.name}}</span>
-                            </mat-card-actions>
-                          </mat-card>
+                        <div class="group-user-card group-user-card--available">
+                          <div class="group-user-main">
+                            <mat-icon class="icon-spacer">face</mat-icon>
+                            <span class="user-name">{{user.name}}</span>
+                          </div>
+                          <button type="button" class="group-user-action group-user-action--add" (click)="addUser(user.id, group.id)">Add</button>
                         </div>
                       }
                     }
@@ -71,47 +72,49 @@
       }
     </mat-tab>
     <mat-tab label="Add">
-      <form class="spacer spacerb filter-container" (ngSubmit)="onGroupSubmit()">
-        <mat-form-field hideRequiredMarker>
-          <mat-label>Domain</mat-label>
-          <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
-            <mat-option>--</mat-option>
+      <form class="cpbx-form-panel" (ngSubmit)="onGroupSubmit()">
+        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Domain</span>
+<select class="cpbx-select" required name="domainId" [(ngModel)]="domainId">
+<option [ngValue]="null" disabled hidden>Domain</option>
+            <option>--</option>
             @for (domain of list() | keyvalue; track domain) {
-              <mat-option [value]="domain.key">{{domain.value.name}}</mat-option>
+              <option [ngValue]="domain.key">{{domain.value.name}}</option>
             }
           <!--mat-hint>{{selectDomain.value?.sound}}</mat-hint-->
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New group name" required name="name" [ngModel]="newGroupName()" (ngModelChange)="newGroupName.set($event)">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
+        </select>
+</label>
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New group name" required name="name" [ngModel]="newGroupName()" (ngModelChange)="newGroupName.set($event)" class="cpbx-input">
+</label>
+      <button mat-flat-button color="primary" type="submit">Submit</button>
     </form>
   </mat-tab>
   <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb filter-container" #deleteForm="ngForm">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Domain</mat-label>
-        <mat-select required name="domainId" [(ngModel)]="domainId" disableOptionCentering>
-          <mat-option>--</mat-option>
+    <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Domain</span>
+<select class="cpbx-select" required name="domainId" [(ngModel)]="domainId">
+<option [ngValue]="null" disabled hidden>Domain</option>
+          <option>--</option>
           @for (domain of list() | keyvalue; track domain) {
-            <mat-option [value]="domain.key">{{domain.value.name}}</mat-option>
+            <option [ngValue]="domain.key">{{domain.value.name}}</option>
           }
         <!--mat-hint>{{selectDomain.value?.sound}}</mat-hint-->
-      </mat-select>
-    </mat-form-field>
+      </select>
+</label>
     @for (group of onlyValuesByParent(groupList(), domainId); track group) {
-      <div>
-        <mat-form-field hideRequiredMarker>
-          <mat-label>Group name</mat-label>
-          <input matInput name="group name" required [ngModel]="group.name" [name]="'group::' + group.id">
-        </mat-form-field>
-        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['group::' + group.id])"
+      <div class="cpbx-edit-row">
+        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Group name</span>
+<input name="group name" required [ngModel]="group.name" [name]="'group::' + group.id" placeholder="Group name" class="cpbx-input">
+</label>
+        <button mat-flat-button color="primary" [disabled]="checkDirty(deleteForm.controls['group::' + group.id])"
           (click)="openBottomSheet(group.id, deleteForm.controls['group::' + group.id].value, group, 'rename')">
           Update
         </button>
-        <button mat-raised-button color="warn"
+        <button mat-stroked-button color="warn"
           (click)="openBottomSheet(group.id, deleteForm.controls['group::' + group.id].value, group, 'delete')">
           Delete
         </button>

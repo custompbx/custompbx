@@ -1,69 +1,72 @@
 <app-inner-header name="Logs" [loadCounter]="loadCounter()"></app-inner-header>
-<div>
-  <div class="filter-container">
-    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+<div class="logs-card">
+  <div class="cpbx-form-panel">
+    <button mat-stroked-button color="basic" class="switch-button"
             (click)="getRecords()">
       Get Records
     </button>
   </div>
-  <div class="filter-container">
-    <mat-form-field hideRequiredMarker>
-      <mat-label>Filter Field</mat-label>
-      <mat-select [(ngModel)]="filter().field" [disabled]="!columns" disableOptionCentering>
-        <mat-option [value]="null">
+  <div class="cpbx-form-panel">
+    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Filter Field</span>
+<select class="cpbx-select" [(ngModel)]="filter().field" [disabled]="!columns">
+<option [ngValue]="null" disabled hidden>Filter Field</option>
+        <option [ngValue]="null">
           ---
-        </mat-option>
+        </option>
         @for (val of columns; track val) {
-          <mat-option [value]="val">
+          <option [ngValue]="val">
             {{ val }}
-          </mat-option>
+          </option>
         }
-      </mat-select>
-    </mat-form-field>
+      </select>
+</label>
 
-    <mat-form-field hideRequiredMarker>
-      <mat-label>Operand</mat-label>
-      <mat-select [(ngModel)]="filter().operand" [disabled]="!filter().field">
+    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Operand</span>
+<select class="cpbx-select" [(ngModel)]="filter().operand" [disabled]="!filter().field">
+<option [ngValue]="null" disabled hidden>Operand</option>
         @for (val of operands; track val) {
-          <mat-option [value]="val">
+          <option [ngValue]="val">
             {{ val }}
-          </mat-option>
+          </option>
         }
-      </mat-select>
-    </mat-form-field>
+      </select>
+</label>
 
-    <mat-form-field hideRequiredMarker>
-      <mat-label>Value</mat-label>
-      <input matInput name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required>
-    </mat-form-field>
+    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Value</span>
+<input name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required placeholder="Value" class="cpbx-input">
+</label>
     @if (!filters()[toEditFilter()]) {
-      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+      <button mat-stroked-button color="basic" class="switch-button"
               [disabled]="!filter().field_value || !filter().operand || !filter().field"
               (click)="addFilter()">
         Add filter
       </button>
     } @else {
-      <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+      <button mat-flat-button color="primary" class="switch-button"
               [disabled]="!filter().field_value || !filter().operand || !filter().field"
               (click)="saveFilter()">
         Edit filter
       </button>
     }
-    <mat-form-field hideRequiredMarker>
-      <mat-label>Order Field</mat-label>
-      <mat-select [(ngModel)]="sortColumns" [disabled]="!columns" disableOptionCentering>
-        <mat-option [value]="null">
+    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Order Field</span>
+<select class="cpbx-select" [(ngModel)]="sortColumns" [disabled]="!columns">
+<option [ngValue]="null" disabled hidden>Order Field</option>
+        <option [ngValue]="null">
           ---
-        </mat-option>
-        <mat-option *ngFor="let val of columns" [value]="val">
+        </option>
+        <option *ngFor="let val of columns" [ngValue]="val">
           {{ val }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+        </option>
+      </select>
+</label>
     <mat-checkbox [(ngModel)]="sortObject().desc" class="checkbox-spacer-left"
                   [disabled]="sortObject().fields.length == 0 && !sortColumns">DESC
     </mat-checkbox>
-    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+    <button mat-stroked-button color="basic" class="switch-button"
             [disabled]="!sortColumns"
             (click)="addSorter()">
       Add sorting

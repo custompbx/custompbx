@@ -40,10 +40,11 @@ import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {KeyValuePadComponent} from "../../key-value-pad/key-value-pad.component";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {State} from "../../../store/directory/directory.reducers";
+import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent],
+  imports: [MaterialModule, FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, CpbxSelectDirective],
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
@@ -87,7 +88,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   public toCopy: number;
   public userParamDispatchers: object;
   public userVarDispatchers: object;
-  public domainIds: Array<number> = [];
+  public domainIds = signal<Array<number>>([]);
   public XMLBody: string;
   public editorInited: boolean;
 
@@ -255,7 +256,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   // Domain list filtered by domainIds
   public filteredDomains = computed(() => {
     const list = this.list(); // Read the domains list from state
-    const domainIds = this.domainIds; // Read the local filter array
+    const domainIds = this.domainIds(); // Read the local filter array
 
     if (domainIds.length === 0) {
       return list;

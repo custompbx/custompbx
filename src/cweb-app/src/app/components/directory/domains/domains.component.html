@@ -1,27 +1,30 @@
 <app-inner-header name="Domains" [loadCounter]="loadCounter()"></app-inner-header>
-<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
+<mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
   <mat-tab label="List">
     @if (loadCounter() === 0 && !onlyValues(domainsList())?.length) {
-      <mat-card>
+      <mat-card class="domains-empty-card">
         <mat-card-content>
-          Here no any domains yet. You can start creating them or try to import from existing config.
-          <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+          <div class="domains-empty">
+            <div>
+              <h3>No domains yet</h3>
+              <p>Create a domain or import an existing FreeSWITCH directory config.</p>
+            </div>
+          <button mat-stroked-button color="basic" class="switch-button"
             (click)="importDirectory()">
             Import
           </button>
+          </div>
         </mat-card-content>
       </mat-card>
     }
     @if (onlyValues(domainsList())?.length) {
       <mat-card>
         <mat-card-header>
-          <mat-card-header>
-            <mat-card-subtitle>Domains</mat-card-subtitle>
-          </mat-card-header>
+          <mat-card-subtitle>Domains</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          @for (domain of onlyValues(domainsList()); track trackByFnId($index, domain)) {
-            <div>
+          <div class="domains-list">
+            @for (domain of onlyValues(domainsList()); track trackByFnId($index, domain)) {
               <mat-expansion-panel (opened)="getDetails(domain.id)" (closed)="clearDetails(domain.id)">
                 <mat-expansion-panel-header>
                   <mat-panel-title>
@@ -32,13 +35,12 @@
                   </mat-panel-description>
                 </mat-expansion-panel-header>
                 @if (listDetails()[domain.id] && (listDetails()[domain.id].parameters || listDetails()[domain.id].variables)) {
-                  <button mat-raised-button color="basic" (click)="copy(domain.id)"
-                    >
+                  <button mat-stroked-button color="basic" class="domains-copy-button" (click)="copy(domain.id)">
                     Copy
                   </button>
                 }
-                <h3>Parameters:</h3>
-                <div>
+                <section class="domains-detail-section">
+                  <h3>Parameters</h3>
                   <app-key-value-pad [exist]="listDetails()[domain.id]"
                     [items]="listDetails()[domain.id]?.parameters"
                     [newItems]="listDetails()[domain.id]?.parameters?.new"
@@ -48,9 +50,9 @@
                     [dispatchers]="domainParamDispatchers"
                     >
                   </app-key-value-pad>
-                </div>
-                <h3>Variables:</h3>
-                <div>
+                </section>
+                <section class="domains-detail-section">
+                  <h3>Variables</h3>
                   <app-key-value-pad [exist]="listDetails()[domain.id]"
                     [items]="listDetails()[domain.id]?.variables"
                     [newItems]="listDetails()[domain.id]?.variables?.new"
@@ -60,25 +62,25 @@
                     [dispatchers]="domainVarDispatchers"
                     >
                   </app-key-value-pad>
-                </div>
+                </section>
               </mat-expansion-panel>
-            </div>
-          }
+            }
+          </div>
         </mat-card-content>
       </mat-card>
     }
   </mat-tab>
   <mat-tab label="Add">
-    <form class="spacer filter-container" (ngSubmit)="onDomainSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New domain name" required name="name" [(ngModel)]="newDomainName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
+    <form class="cpbx-form-panel" (ngSubmit)="onDomainSubmit()">
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New domain name" required name="name" [ngModel]="newDomainName()" (ngModelChange)="newDomainName.set($event)" class="cpbx-input">
+</label>
+      <button mat-flat-button color="primary" type="submit">Submit</button>
     </form>
     <mat-card>
       <mat-card-content>
-        <button mat-raised-button color="basic" class="but-spacer-left switch-button spacer-bottom"
+        <button mat-stroked-button color="basic" class="switch-button spacer-bottom"
           [disabled]="!XMLBody"
           (click)="ImportXMLDomain()"
           >
@@ -101,33 +103,30 @@
     </mat-card>
   </mat-tab>
   <mat-tab label="Delete/Rename">
-    <form class="spacer filter-container" #deleteForm="ngForm">
+    <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
       @for (domain of onlyValues(domainsList()); track trackByFnId($index, domain)) {
-        <div>
-          <mat-form-field hideRequiredMarker>
-            <input matInput placeholder="domain name" required [ngModel]="domain.name"
-              [name]="'domain::' + domain.id">
-            </mat-form-field>
-            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['domain::' + domain.id])"
-              class="but-spacer-left"
+        <div class="cpbx-edit-row">
+          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Domain name</span>
+<input placeholder="domain name" required [ngModel]="domain.name" [name]="'domain::' + domain.id" class="cpbx-input">
+</label>
+            <button mat-flat-button color="primary" [disabled]="checkDirty(deleteForm.controls['domain::' + domain.id])"
               (click)="openBottomSheet(domain.id, deleteForm.controls['domain::' + domain.id].value, domain.name, 'rename')">
               Update
             </button>
             @if (domain.enabled) {
-              <button mat-raised-button color="accent"
-                class="but-spacer-left switch-button"
+              <button mat-stroked-button color="basic" class="switch-button"
                 (click)="switchDomain(domain)">
                 Disable
               </button>
             }
             @if (!domain.enabled) {
-              <button mat-raised-button color="primary"
-                class="but-spacer-left switch-button"
+              <button mat-stroked-button color="primary" class="switch-button"
                 (click)="switchDomain(domain)">
                 Enable
               </button>
             }
-            <button mat-raised-button color="warn" class="but-spacer-left"
+            <button mat-stroked-button color="warn"
               (click)="openBottomSheet(domain.id, deleteForm.controls['domain::' + domain.id].value, domain.name, 'delete')">
               Delete
             </button>

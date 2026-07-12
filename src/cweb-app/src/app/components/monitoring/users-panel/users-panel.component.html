@@ -1,150 +1,160 @@
 <app-inner-header name="Users Panel" [loadCounter]="loadCounter()"></app-inner-header>
-<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedIndexChange)="mainTabChanged($event)">
+
+<mat-tab-group class="cpbx-tabs users-panel-tabs" mat-stretch-tabs="false" mat-align-tabs="start"
+  (selectedIndexChange)="mainTabChanged($event)">
   <mat-tab label="Directory">
-    <div class="filter-container">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Domain</mat-label>
-        <mat-select required [(ngModel)]="domainIds" multiple disableOptionCentering>
+    <div class="filter-container users-panel-filters">
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Domain</span>
+<select class="cpbx-select" required [(ngModel)]="domainIds" multiple>
           @for (domain of list() | keyvalue; track domain) {
-            <mat-option [value]="domain.key">{{domain.value.name}}</mat-option>
+            <option [ngValue]="domain.key">{{ domain.value.name }}</option>
           }
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Status</mat-label>
-        <mat-select required [(ngModel)]="chosenUserStatuses" multiple disableOptionCentering>
+        </select>
+</label>
+
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Status</span>
+<select class="cpbx-select" required [(ngModel)]="chosenUserStatuses" multiple>
           @for (status of userStatuses; track status) {
-            <mat-option [value]="status">{{status}}</mat-option>
+            <option [ngValue]="status">{{ status }}</option>
           }
-        </mat-select>
-      </mat-form-field>
-      <mat-checkbox [(ngModel)]="agentsListEnabled" class="checkbox-spacer-left" (change)="agentsListChange()" [disabled]="">
+        </select>
+</label>
+
+      <mat-checkbox [(ngModel)]="agentsListEnabled" class="users-panel-checkbox"
+        (change)="agentsListChange()">
         Callcenter Statuses
       </mat-checkbox>
+
       @if (agentsListEnabled) {
-        <mat-checkbox [(ngModel)]="agentsListOnly" class="checkbox-spacer-left">
+        <mat-checkbox [(ngModel)]="agentsListOnly" class="users-panel-checkbox">
           Show only with agents
         </mat-checkbox>
       }
     </div>
-    @for (domain of domainFilter() | keyvalue; track trackByFnId($index, domain)) {
-      <div class="domain-div">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-subtitle>Domain:</mat-card-subtitle>
-            <mat-card-title>{{domain.value.name}}</mat-card-title>
+
+    <div class="users-panel-sections">
+      @for (domain of domainFilter() | keyvalue; track trackByFnId($index, domain)) {
+        <mat-card class="users-section-card">
+          <mat-card-header class="users-section-header">
+            <mat-card-subtitle>Domain</mat-card-subtitle>
+            <mat-card-title>{{ domain.value.name }}</mat-card-title>
           </mat-card-header>
+
           <mat-card-content class="domain-users">
-            <!--[class]="getUserCardClass(user.value)"-->
             @for (user of usersFilter(onlyValuesByParent(userListWithTimers(), Number(domain.key))); track user) {
-              <div>
-                <mat-card class="user-card">
-                  <mat-card-header class="card-header">
-                    <div mat-card-avatar>
-                      @if (!additionalData()[user.id]?.avatar_format) {
-                        <mat-icon  class="header-image">face</mat-icon>
-                      }
-                      @if (additionalData()[user.id]?.avatar_format) {
-                        <img
-                          class="avatar-img header-image" [src]="'./assets/img/avatar/' + additionalData()[user.id]?.id + '.' + additionalData()[user.id]?.avatar_format"
-                          >
-                      }
-                    </div>
-                    <mat-card-title>{{user.name}}</mat-card-title>
-                    <mat-card-subtitle class="subtitle">{{additionalData()[user.id]?.login || 'User Name Here'}}</mat-card-subtitle>
-                  </mat-card-header>
-                  <!--<img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu">-->
-                  <mat-toolbar class="status-bar" [color]="getUserCardColor(user)">
-                    {{getUserStatus(user)}}
-                    @if (user['call_direction'] != '') {
-                      <mat-icon [ngClass]="{'up-side-down': user['call_direction'] === 'inbound'}">get_app</mat-icon>
+              <mat-card class="user-card">
+                <mat-card-header class="card-header">
+                  <div mat-card-avatar class="avatar-shell">
+                    @if (!additionalData()[user.id]?.avatar_format) {
+                      <mat-icon class="header-image">face</mat-icon>
                     }
-                    <span class="example-spacer"></span>
-                    {{user.actionTimer | formatTimer}}
-                  </mat-toolbar>
-                  @if (getAgentState(user); as agent;) {
-                    <mat-toolbar mat-card-image class="cc-bar" [color]="getAgentCardColor(agent)">
-                      <b>{{agent.state}}</b>
-                      <span class="example-spacer"></span>
-                      <b>{{agent.status}}</b>
-                    </mat-toolbar>
+                    @if (additionalData()[user.id]?.avatar_format) {
+                      <img class="avatar-img header-image"
+                        [src]="'./assets/img/avatar/' + additionalData()[user.id]?.id + '.' + additionalData()[user.id]?.avatar_format"
+                        alt="">
+                    }
+                  </div>
+                  <mat-card-title>{{ user.name }}</mat-card-title>
+                  <mat-card-subtitle class="subtitle">{{ additionalData()[user.id]?.login || 'No login' }}</mat-card-subtitle>
+                </mat-card-header>
+
+                <div class="status-bar" [ngClass]="'status-bar--' + getUserCardColor(user)">
+                  <span>{{ getUserStatus(user) }}</span>
+                  <span class="example-spacer"></span>
+                  @if (user['call_direction'] != '') {
+                    <mat-icon [ngClass]="{'up-side-down': user['call_direction'] === 'inbound'}">get_app</mat-icon>
                   }
-                  <mat-card-actions class="action-pad">
-                    <button mat-button class="connect-button"
-                      [disabled]="!user['talking'] && !user['in_call'] && !(user['sip_register'] || user['verto_register']) || !phoneStatus() || phoneUser() === user.name"
-                      (click)="connectToUser(user, domain.value.name)"
-                      >
-                      Connect
-                    </button>
-                  </mat-card-actions>
-                </mat-card>
-              </div>
+                  <span>{{ user.actionTimer | formatTimer }}</span>
+                </div>
+
+                @if (getAgentState(user); as agent;) {
+                  <div class="cc-bar" [ngClass]="'status-bar--' + getAgentCardColor(agent)">
+                    <span>{{ agent.state }}</span>
+                    <span class="example-spacer"></span>
+                    <span>{{ agent.status }}</span>
+                  </div>
+                }
+
+                <mat-card-actions class="action-pad">
+                  <button mat-stroked-button class="connect-button"
+                    [disabled]="!user['talking'] && !user['in_call'] && !(user['sip_register'] || user['verto_register']) || !phoneStatus() || phoneUser() === user.name"
+                    (click)="connectToUser(user, domain.value.name)">
+                    Connect
+                  </button>
+                </mat-card-actions>
+              </mat-card>
             }
           </mat-card-content>
         </mat-card>
-      </div>
-    }
-  </mat-tab>
-  <mat-tab label="Callcenter">
-    <div class="filter-container">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Queue</mat-label>
-        <mat-select required [(ngModel)]="queueIds" multiple disableOptionCentering>
-          @for (queue of queuesList() | keyvalue; track queue) {
-            <mat-option [value]="queue.key">{{queue.value.name}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Status</mat-label>
-        <mat-select required [(ngModel)]="chosenAgentStatuses" multiple disableOptionCentering>
-          @for (status of agentStatuses; track status) {
-            <mat-option [value]="status">{{status}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+      }
     </div>
-    @for (queue of queueFilter() | keyvalue; track trackByFnId($index, queue)) {
-      <div class="domain-div">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-subtitle>Queue:</mat-card-subtitle>
-            <mat-card-title>{{queue.value.name}}</mat-card-title>
+  </mat-tab>
+
+  <mat-tab label="Callcenter">
+    <div class="filter-container users-panel-filters">
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Queue</span>
+<select class="cpbx-select" required [(ngModel)]="queueIds" multiple>
+          @for (queue of queuesList() | keyvalue; track queue) {
+            <option [ngValue]="queue.key">{{ queue.value.name }}</option>
+          }
+        </select>
+</label>
+
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Status</span>
+<select class="cpbx-select" required [(ngModel)]="chosenAgentStatuses" multiple>
+          @for (status of agentStatuses; track status) {
+            <option [ngValue]="status">{{ status }}</option>
+          }
+        </select>
+</label>
+    </div>
+
+    <div class="users-panel-sections">
+      @for (queue of queueFilter() | keyvalue; track trackByFnId($index, queue)) {
+        <mat-card class="users-section-card">
+          <mat-card-header class="users-section-header">
+            <mat-card-subtitle>Queue</mat-card-subtitle>
+            <mat-card-title>{{ queue.value.name }}</mat-card-title>
           </mat-card-header>
+
           <mat-card-content class="domain-users">
             @for (agent of agentsFilter(queue.value.name); track agent) {
-              <div>
-                <mat-card class="user-card ">
-                  <mat-card-header>
-                    <div mat-card-avatar>
-                      <mat-icon class="header-image">account_circle</mat-icon>
-                    </div>
-                    <mat-card-title>{{cutNameAndDomain(agent.name)[0]}}</mat-card-title>
-                    <mat-card-subtitle class="subtitle">{{cutNameAndDomain(agent.name)[1]}}</mat-card-subtitle>
-                  </mat-card-header>
-                  <mat-toolbar mat-card-image [color]="getAgentCardColor(agent)">
-                    {{getAgentStatus(agent)}}
+              <mat-card class="user-card">
+                <mat-card-header class="card-header">
+                  <div mat-card-avatar class="avatar-shell">
+                    <mat-icon class="header-image">account_circle</mat-icon>
+                  </div>
+                  <mat-card-title>{{ cutNameAndDomain(agent.name)[0] }}</mat-card-title>
+                  <mat-card-subtitle class="subtitle">{{ cutNameAndDomain(agent.name)[1] }}</mat-card-subtitle>
+                </mat-card-header>
+
+                <div class="status-bar" [ngClass]="'status-bar--' + getAgentCardColor(agent)">
+                  <span>{{ getAgentStatus(agent) }}</span>
+                  <span class="example-spacer"></span>
+                  <span>{{ agent.actionTimer | formatTimer }}</span>
+                </div>
+
+                @if (getUserForAgent(agent.id); as user;) {
+                  <div class="cc-bar" [ngClass]="'status-bar--' + getUserCardColor(user)">
+                    <span>{{ getUserStatus(user) }}</span>
                     <span class="example-spacer"></span>
-                    {{agent.actionTimer | formatTimer}}
-                  </mat-toolbar>
-                  @if (getUserForAgent(agent.id); as user;) {
-                    <mat-toolbar mat-card-image class="cc-bar" [color]="getUserCardColor(user)">
-                      <b>{{getUserStatus(user)}}</b>
-                      <span class="example-spacer"></span>
-                    </mat-toolbar>
-                  }
-                  <mat-card-actions class="action-pad">
-                    <button mat-button class="connect-button">
-                      Connect
-                    </button>
-                  </mat-card-actions>
-                </mat-card>
-              </div>
+                  </div>
+                }
+
+                <mat-card-actions class="action-pad">
+                  <button mat-stroked-button class="connect-button">
+                    Connect
+                  </button>
+                </mat-card-actions>
+              </mat-card>
             }
           </mat-card-content>
         </mat-card>
-      </div>
-    }
-
+      }
+    </div>
   </mat-tab>
 </mat-tab-group>

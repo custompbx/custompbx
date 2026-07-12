@@ -2,13 +2,26 @@ import {Component, Input, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {MaterialModule} from "../../../material-module";
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {ResizeInputDirective} from "../../directives/resize-input.directive";
+import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {MatBottomSheet} from "@angular/material/bottom-sheet";
 import {ConfirmBottomSheetComponent} from "../confirm-bottom-sheet/confirm-bottom-sheet.component";
 
+type FieldSlot = 'name' | 'value' | 'extraField1' | 'extraField2' | 'extraField3' | 'extraField4' | 'extraField5' | 'extraField6' | 'extraField7';
+type FieldSize = 'sm' | 'md' | 'wide';
+type FieldConfig = {
+  slot: FieldSlot,
+  name: string,
+  style?: Record<string, string>,
+  depend?: string,
+  value?: string,
+  required?: boolean,
+  options?: string[],
+  size?: FieldSize,
+};
+
 @Component({
 standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, ResizeInputDirective],
+  imports: [CommonModule, MaterialModule, FormsModule],
     selector: 'app-key-value-pad-2',
     templateUrl: './key-value-pad-2.component.html',
     styleUrls: ['./key-value-pad-2.component.css']
@@ -22,19 +35,31 @@ export class KeyValuePad2Component implements OnInit {
   @Input() toCopy: number;
   @Input() dispatchersCallbacks: any;
   @Input() fieldsMask: {
-    name: {name: string, style?: object, depend?: string, value?: string},
-    value?: {name: string, style?: object, depend?: string, value?: string},
-    extraField1?: {name: string, style?: object, depend?: string, value?: string},
-    extraField2?: {name: string, style?: object, depend?: string, value?: string},
-    extraField3?: {name: string, style?: object, depend?: string, value?: string},
-    extraField4?: {name: string, style?: object, depend?: string, value?: string},
-    extraField5?: {name: string, style?: object, depend?: string, value?: string},
-    extraField6?: {name: string, style?: object, depend?: string, value?: string},
-    extraField7?: {name: string, style?: object, depend?: string, value?: string},
+    name: {name: string, style?: Record<string, string>, depend?: string, value?: string, options?: string[], size?: FieldSize, required?: boolean},
+    value?: {name: string, style?: Record<string, string>, depend?: string, value?: string, options?: string[], size?: FieldSize, required?: boolean},
+    extraField1?: {name: string, style?: Record<string, string>, depend?: string, value?: string, options?: string[], size?: FieldSize, required?: boolean},
+    extraField2?: {name: string, style?: Record<string, string>, depend?: string, value?: string, options?: string[], size?: FieldSize, required?: boolean},
+    extraField3?: {name: string, style?: Record<string, string>, depend?: string, value?: string, options?: string[], size?: FieldSize, required?: boolean},
+    extraField4?: {name: string, style?: Record<string, string>, depend?: string, value?: string, options?: string[], size?: FieldSize, required?: boolean},
+    extraField5?: {name: string, style?: Record<string, string>, depend?: string, value?: string, options?: string[], size?: FieldSize, required?: boolean},
+    extraField6?: {name: string, style?: Record<string, string>, depend?: string, value?: string, options?: string[], size?: FieldSize, required?: boolean},
+    extraField7?: {name: string, style?: Record<string, string>, depend?: string, value?: string, options?: string[], size?: FieldSize, required?: boolean},
   };
   @Input() grandParentId: number;
   @Input() pending = false;
+  @Input() sortable = false;
   public filterText = '';
+  protected readonly fieldSlots: FieldSlot[] = [
+    'name',
+    'value',
+    'extraField1',
+    'extraField2',
+    'extraField3',
+    'extraField4',
+    'extraField5',
+    'extraField6',
+    'extraField7',
+  ];
 
   constructor(private bottomSheet: MatBottomSheet) { }
 
@@ -149,6 +174,128 @@ export class KeyValuePad2Component implements OnInit {
     if (item.id) {
       return item.id;
     }
+  }
+
+  fieldConfigs(): FieldConfig[] {
+    return this.fieldSlots
+      .map((slot) => ({slot, ...(this.fieldsMask?.[slot] || {})}))
+      .filter((field): field is FieldConfig => !!field.name)
+      .map((field) => ({...field, required: field.required ?? field.slot === 'name'}));
+  }
+
+  fieldClass(field: FieldConfig): string {
+    const classes = [];
+    if (field.size) {
+      classes.push(`kv-field--${field.size}`);
+      if (field.options?.length) {
+        classes.push('kv-field--select');
+      }
+      return classes.join(' ');
+    }
+    const widthValue = field.style?.['max-width'] || field.style?.['width'];
+    const width = typeof widthValue === 'string' ? Number.parseInt(widthValue, 10) : Number.NaN;
+    if (Number.isFinite(width) && width <= 120) {
+      classes.push('kv-field--sm');
+    }
+    if (Number.isFinite(width) && width >= 420) {
+      classes.push('kv-field--wide');
+    }
+    if (field.options?.length) {
+      classes.push('kv-field--select');
+    }
+    return classes.join(' ');
+  }
+
+  optionLabel(option: string): string {
+    return option === '' ? 'Default' : option;
+  }
+
+  controlName(prefix: 'item' | 'newItem', field: FieldConfig, idOrIndex: number): string {
+    const suffix = field.slot === 'name'
+      ? 'Name'
+      : field.slot === 'value'
+        ? 'Value'
+        : field.slot.charAt(0).toUpperCase() + field.slot.slice(1);
+    return prefix + suffix + idOrIndex;
+  }
+
+  itemFieldValue(item: any, field: FieldConfig): any {
+    return item?.[field.name];
+  }
+
+  setNewItemField(item: any, field: FieldConfig, value: any): void {
+    if (!item) {
+      return;
+    }
+    if (field.slot === 'name') {
+      item.name = value;
+      return;
+    }
+    if (field.slot === 'value') {
+      item.value = value;
+      return;
+    }
+    item[field.name] = value;
+  }
+
+  newItemFieldValue(item: any, field: FieldConfig): any {
+    if (field.slot === 'name') {
+      return item?.name;
+    }
+    if (field.slot === 'value') {
+      return item?.value;
+    }
+    return item?.[field.name];
+  }
+
+  isFieldDisabled(item: any, field: FieldConfig): boolean {
+    return !item?.enabled || this.disIf(field.depend, field.value);
+  }
+
+  isNewFieldDisabled(item: any, field: FieldConfig): boolean {
+    return this.disIf(item?.[field.depend], field.value);
+  }
+
+  canSaveExistingForm(form: any, item: any): boolean {
+    const controls = this.fieldConfigs().map((field) => form.controls[this.controlName('item', field, item.id)]);
+    return this.canSaveExisting(
+      item,
+      controls[0],
+      controls[1],
+      controls[2],
+      controls[3],
+      controls[4],
+      controls[5],
+      controls[6],
+      controls[7],
+      controls[8],
+    );
+  }
+
+  saveExistingFromForm(form: any, item: any): void {
+    const values = this.fieldConfigs().map((field) => form.controls[this.controlName('item', field, item.id)]?.value);
+    this.updateItem(item.id, values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8]);
+  }
+
+  canAddNewForm(form: any, index: number): boolean {
+    const controls = this.fieldConfigs().map((field) => form.controls[this.controlName('newItem', field, index)]);
+    return this.canAddNew(
+      index,
+      controls[0],
+      controls[1],
+      controls[2],
+      controls[3],
+      controls[4],
+      controls[5],
+      controls[6],
+      controls[7],
+      controls[8],
+    );
+  }
+
+  addNewFromForm(form: any, index: number): void {
+    const values = this.fieldConfigs().map((field) => form.controls[this.controlName('newItem', field, index)]?.value);
+    this.addItem(index, values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8]);
   }
 
   clearFilter(): void {
@@ -300,7 +447,7 @@ export class KeyValuePad2Component implements OnInit {
   }
 
   filteredValues(obj: object): Array<any> {
-    const values = this.itemValues(obj);
+    const values = this.displayValues(obj);
     const query = this.filterText.trim().toLowerCase();
     if (!query) {
       return values;
@@ -313,7 +460,7 @@ export class KeyValuePad2Component implements OnInit {
   }
 
   totalItemCount(obj: object): number {
-    return this.itemValues(obj).length;
+    return this.displayValues(obj).length;
   }
 
   showFilter(obj: object): boolean {
@@ -362,6 +509,36 @@ export class KeyValuePad2Component implements OnInit {
 
   private presentControls(...controls: AbstractControl[]): AbstractControl[] {
     return controls.filter(Boolean);
+  }
+
+  displayValues(obj: object): Array<any> {
+    const values = this.itemValues(obj);
+    if (!this.sortable) {
+      return values;
+    }
+    return [...values].sort((a, b) => {
+      if (a.position > b.position) {
+        return 1;
+      }
+      if (a.position < b.position) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+
+  dropAction(event: CdkDragDrop<string[]>, parent: Array<any>) {
+    if (!this.sortable || !this.dispatchersCallbacks || !this.dispatchersCallbacks['dropActionItem']) {
+      return;
+    }
+    if (!parent[event.previousIndex] || !parent[event.currentIndex]) {
+      return;
+    }
+    if (parent[event.previousIndex].position === parent[event.currentIndex].position) {
+      return;
+    }
+
+    this.dispatchersCallbacks['dropActionItem'](event, parent);
   }
 
   private controlsForItem(form: any, id: number): AbstractControl[] {
@@ -414,6 +591,7 @@ export class KeyValuePad2Component implements OnInit {
 
   private enabledExtraFieldValues(values: string[]): string[] {
     return this.extraFieldValueEntries(values)
+      .filter((entry) => entry.value !== undefined)
       .map((entry) => this.trimValue(entry.value));
   }
 

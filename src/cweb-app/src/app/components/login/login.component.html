@@ -1,39 +1,36 @@
-<div class="center">
-  <div class="second">
-    <img class="logo-big" src="./assets/img/logo-big.png" alt="logo">
-
-    <form class="login-form" (ngSubmit)="onSubmit()" ngNativeValidate>
-      <mat-form-field class="login-full-width" hideRequiredMarker>
-        <input
-          matInput
-          [(ngModel)]="user.login"
-          name="login"
-          placeholder="Login"
-          value=""
-          required
-          >
-        </mat-form-field>
-
-        <mat-form-field class="login-full-width" hideRequiredMarker>
-          <input
-            matInput
-            [(ngModel)]="user.password"
-            name="password"
-            type="password"
-            placeholder="Password"
-            required
-            autocomplete="off"
-            >
-          </mat-form-field>
-
-          <button mat-flat-button type="submit" color="basic">Login</button>
-        </form>
-        @if (userService.errorMessage) {
-          <div>
-            <div>
-              {{userService.errorMessage}}
-            </div>
-          </div>
-        }
+<main class="login-page">
+  <section class="login-shell" aria-label="CustomPBX login">
+    <div class="brand-panel">
+      <img class="logo" src="./assets/img/logo-big.png" alt="CustomPBX">
+      <div class="brand-copy">
+        <h1>CustomPBX</h1>
+        <p>Sign in to manage your PBX, calls, routing and system configuration.</p>
       </div>
     </div>
+
+    <form class="login-card" (ngSubmit)="onSubmit()" ngNativeValidate>
+      <div class="login-card__header">
+        <h2>Welcome back</h2>
+        <p>Use your administrator credentials to continue.</p>
+      </div>
+
+      <label class="login-field">
+        <span>Login</span>
+        <input [(ngModel)]="user.login" name="login" placeholder="admin" required autocomplete="username" autofocus>
+      </label>
+
+      <label class="login-field">
+        <span>Password</span>
+        <input [(ngModel)]="user.password" name="password" type="password" placeholder="Enter password" required autocomplete="current-password">
+      </label>
+
+      @if (userService.errorMessage) {
+        <div class="login-error" role="alert">
+          {{userService.errorMessage}}
+        </div>
+      }
+
+      <button class="login-submit" type="submit">Sign in</button>
+    </form>
+  </section>
+</main>

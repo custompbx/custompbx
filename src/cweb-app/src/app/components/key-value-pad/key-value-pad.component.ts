@@ -1,19 +1,15 @@
-import {Component, Input, OnInit} from '@angular/core';
-
-import {MaterialModule} from "../../../material-module";
-import {AbstractControl, FormsModule} from '@angular/forms';
+import {Component, Input} from '@angular/core';
 import {Store} from '@ngrx/store';
-import {ResizeInputDirective} from "../../directives/resize-input.directive";
+import {KeyValuePad2Component} from '../key-value-pad-2/key-value-pad-2.component';
 
 @Component({
-standalone: true,
-  imports: [MaterialModule, FormsModule, ResizeInputDirective],
-    selector: 'app-key-value-pad',
-    templateUrl: './key-value-pad.component.html',
-    styleUrls: ['./key-value-pad.component.css']
+  standalone: true,
+  imports: [KeyValuePad2Component],
+  selector: 'app-key-value-pad',
+  templateUrl: './key-value-pad.component.html',
+  styleUrls: ['./key-value-pad.component.css'],
 })
-export class KeyValuePadComponent implements OnInit {
-
+export class KeyValuePadComponent {
   @Input() items: object;
   @Input() newItems: Array<any>;
   @Input() exist: boolean;
@@ -22,87 +18,49 @@ export class KeyValuePadComponent implements OnInit {
   @Input() store: Store<any>;
   @Input() dispatchers: any;
 
-  constructor() { }
+  readonly fieldsMask = {name: {name: 'name'}, value: {name: 'value'}};
 
-  ngOnInit() {
-  }
-
-  isReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return this.controlsAreValid(nameObject, valueObject) && (nameObject.dirty || valueObject.dirty);
-  }
-
-  isNewReadyToSend(nameObject: AbstractControl, valueObject: AbstractControl): boolean {
-    return this.controlsAreValid(nameObject, valueObject);
-  }
-
-  isArray(obj: any): boolean {
-    return Array.isArray(obj);
-  }
-
-  trackByFnId(index, item) {
-    if (item.id) {
-      return item.id;
-    }
-  }
-
-  addItemField() {
-    if (!this.dispatchers || !this.dispatchers['addItemField']) {
-      return;
-    }
-    this.store.dispatch(new this.dispatchers['addItemField']({id: this.id}));
-  }
-
-  switchItem(object) {
-    if (!this.dispatchers || !this.dispatchers['switchItem']) {
-      return;
-    }
-    this.store.dispatch(new this.dispatchers['switchItem']({id: object.id, enabled: !object.enabled}));
-  }
-
-  newItem(index: number, name: string, value: string) {
-    if (!this.dispatchers || !this.dispatchers['newItem']) {
-      return;
-    }
-    this.store.dispatch(new this.dispatchers['newItem']({id: this.id, index: index, name: name, value: value}));
-  }
-
-  dropNewItem(index: number) {
-    if (!this.dispatchers || !this.dispatchers['dropNewItem']) {
-      return;
-    }
-    this.store.dispatch(new this.dispatchers['dropNewItem']({id: this.id, index: index}));
-  }
-
-  deleteItem(index: number) {
-    if (!this.dispatchers || !this.dispatchers['deleteItem']) {
-      return;
-    }
-    this.store.dispatch(new this.dispatchers['deleteItem']({id: this.id, index: index}));
-  }
-
-  updateItem(id: number, name: string, value: string) {
-    if (!this.dispatchers || !this.dispatchers['updateItem']) {
-      return;
-    }
-    this.store.dispatch(new this.dispatchers['updateItem']({id: id, name: name, value: value}));
-  }
-
-  pasteItems() {
-    if (!this.dispatchers || !this.dispatchers['pasteItems']) {
-      return;
-    }
-    this.store.dispatch(new this.dispatchers['pasteItems']({from_id: this.toCopy, to_id: this.id}));
-  }
-
-  onlyValues(obj: object): Array<any> {
-    if (!obj) {
-      return [];
-    }
-    return Object.values(obj);
-  }
-
-  private controlsAreValid(...controls: AbstractControl[]): boolean {
-    return controls.every((control) => !!control && control.valid);
-  }
-
+  readonly dispatchersCallbacks = {
+    addNewItemField: () => {
+      if (this.dispatchers?.addItemField) {
+        this.store.dispatch(new this.dispatchers.addItemField({id: this.id}));
+      }
+    },
+    switchItem: (item: any) => {
+      if (this.dispatchers?.switchItem) {
+        this.store.dispatch(new this.dispatchers.switchItem({id: item.id, enabled: !item.enabled}));
+      }
+    },
+    addItem: (...args: any[]) => {
+      if (!this.dispatchers?.newItem) {
+        return;
+      }
+      const index = args.length >= 4 ? args[1] : args[0];
+      const name = args.length >= 4 ? args[2] : args[1];
+      const value = args.length >= 4 ? args[3] : args[2];
+      this.store.dispatch(new this.dispatchers.newItem({id: this.id, index, name, value}));
+    },
+    dropNewItem: (...args: any[]) => {
+      if (!this.dispatchers?.dropNewItem) {
+        return;
+      }
+      const index = args.length >= 2 ? args[1] : args[0];
+      this.store.dispatch(new this.dispatchers.dropNewItem({id: this.id, index}));
+    },
+    deleteItem: (item: any) => {
+      if (this.dispatchers?.deleteItem) {
+        this.store.dispatch(new this.dispatchers.deleteItem({id: this.id, index: item.id}));
+      }
+    },
+    updateItem: (item: any) => {
+      if (this.dispatchers?.updateItem) {
+        this.store.dispatch(new this.dispatchers.updateItem({id: item.id, name: item.name, value: item.value}));
+      }
+    },
+    pasteItems: () => {
+      if (this.dispatchers?.pasteItems) {
+        this.store.dispatch(new this.dispatchers.pasteItems({from_id: this.toCopy, to_id: this.id}));
+      }
+    },
+  };
 }

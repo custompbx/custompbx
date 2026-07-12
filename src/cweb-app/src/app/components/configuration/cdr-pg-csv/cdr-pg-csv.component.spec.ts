@@ -8,7 +8,7 @@ describe('AclComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CdrPgCsvComponent ]
+      imports: [ CdrPgCsvComponent ],
     })
     .compileComponents();
   }));

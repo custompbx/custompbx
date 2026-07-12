@@ -99,8 +99,8 @@ export class PostLoadSwitchComponent {
       pasteItems: null,
     };
     this.defaultPtimesMask = {
-      name: {name: 'codec_name'},
-      value: {name: 'codec_ptime'},
+      name: {name: 'codec_name', size: 'md'},
+      value: {name: 'codec_ptime', size: 'sm'},
     };
   }
 

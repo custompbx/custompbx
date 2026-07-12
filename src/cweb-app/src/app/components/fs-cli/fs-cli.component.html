@@ -4,17 +4,13 @@
 <mat-toolbar color="basic">
   <span>FS_CLI</span>
 </mat-toolbar>
-<div>
-  <div class="filter-container">
-    <mat-form-field hideRequiredMarker>
-      <mat-label>Value</mat-label>
-      <input matInput name="value" [ngModel]="command()" (ngModelChange)="command.set($event)"
-        appResizeInput
-        [resizeOnString]="command()" required
-        (keyup.enter)="runCommand()"
-        >
-      </mat-form-field>
-      <button mat-raised-button color="basic" class="but-spacer-left switch-button" [disabled]="!command()"
+<div class="fs-cli-card">
+  <div class="cpbx-form-panel">
+    <label class="cpbx-field cpbx-field--wide">
+<span class="cpbx-label">Command</span>
+<input name="value" placeholder="Enter FreeSWITCH command" [ngModel]="command()" (ngModelChange)="command.set($event)" appResizeInput [resizeOnString]="command()" required (keyup.enter)="runCommand()" class="cpbx-input">
+</label>
+      <button mat-flat-button color="primary" class="switch-button" [disabled]="!command()"
         (click)="runCommand()">
         Run Command
       </button>

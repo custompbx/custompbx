@@ -12,8 +12,8 @@ describe('SystemComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ HepComponent ],
       imports: [
+        HepComponent,
         NoopAnimationsModule,
         MatPaginatorModule,
         MatSortModule,

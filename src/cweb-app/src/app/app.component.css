@@ -21,7 +21,20 @@ mat-sidenav {
 .menu-sidenav {
   padding: 12px 10px 24px;
 }
-.app-main { min-width: 0; min-height: calc(100vh - 64px); }
+.app-main {
+  display: block;
+  min-width: 0;
+  min-height: calc(100vh - 64px);
+}
+
+.app-main > router-outlet {
+  display: none;
+}
+
+.app-main > :not(router-outlet) {
+  display: block;
+  min-height: 0;
+}
 /*
 .cdk-overlay-container {
   position: unset;

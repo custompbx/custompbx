@@ -87,7 +87,12 @@ export class FifoComponent implements OnInit, OnDestroy {
       updateItem: this.updateFifoMember.bind(this),
       pasteItems: this.pasteFifoMembers.bind(this),
     };
-    this.memberMask = {name: {name: 'timeout'}, value: {name: 'simo'}, extraField1: {name: 'lag'}, extraField2: {name: 'body'}};
+    this.memberMask = {
+      name: {name: 'timeout', size: 'sm'},
+      value: {name: 'simo', size: 'sm'},
+      extraField1: {name: 'lag', size: 'sm'},
+      extraField2: {name: 'body', size: 'wide'},
+    };
   }
   UpdateConferenceCallerControl
   ngOnDestroy() {

@@ -48,10 +48,11 @@ import { GetDirectoryDomains, GetDirectoryUsers } from '../../store/directory/di
 import { Isettings, IwebUser } from '../../store/settings/settings.reducers';
 import { InnerHeaderComponent } from "../inner-header/inner-header.component";
 import {ResizeInputDirective} from "../../directives/resize-input.directive";
+import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective],
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective],
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']

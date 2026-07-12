@@ -1,7 +1,7 @@
 <app-inner-header name="ACL" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
+  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
     <mat-tab label="List">
       <mat-card>
         <mat-card-header>
@@ -22,13 +22,17 @@
                 <form #details="ngForm">
                   <h3>Default:</h3>
                   @if (item.id) {
-                    <div class="spacer">
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Default</mat-label>
-                        <input matInput name="default" [ngModel]="item.default" required
-                          [name]="'default' + item.id">
-                        </mat-form-field>
-                        <button mat-button color="accent"
+                    <div class="cpbx-edit-row">
+                        <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Default</span>
+<select class="cpbx-select" required [ngModel]="item.default" [name]="'default' + item.id">
+<option [ngValue]="null" disabled hidden>Default</option>
+                            @for (val of aclBehavior; track val) {
+                              <option [ngValue]="val">{{val}}</option>
+                            }
+                          </select>
+</label>
+                        <button mat-flat-button color="primary"
                           [disabled]="!isvalueReadyToSend(details.controls['default' + item.id])"
                           (click)="updateDefault(item.id, details.controls['default' + item.id])">
                           Update
@@ -40,102 +44,82 @@
                       <div cdkDropList
                         (cdkDropListDropped)="dropAction($event, onlySortedValues(item.nodes))">
                         @for (node of onlySortedValues(item.nodes); track node.id) {
-                          <div class="spacer" cdkDrag>
+                          <div class="cpbx-edit-row" cdkDrag>
                             @if (node.id && !isArray(node)) {
-                              <div>
+                              <ng-container>
                                 <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
-                                <mat-form-field hideRequiredMarker>
-                                  <mat-label>Cidr</mat-label>
-                                  <input matInput name="cidr" [(ngModel)]="node.cidr" required
-                                    [disabled]="!node.enabled || node.domain != ''"
-                                    [name]="'nodeCidr' + node.id"
-                                    appResizeInput
-                                    [resizeOnString]="node.cidr"
-                                    >
-                                  </mat-form-field>
-                                  <mat-form-field hideRequiredMarker>
-                                    <mat-label>Domain</mat-label>
-                                    <input matInput name="domain" [(ngModel)]="node.domain" required
-                                      [disabled]="!node.enabled || node.cidr != ''"
-                                      [name]="'nodeDomain' + node.id"
-                                      appResizeInput
-                                      [resizeOnString]="node.domain"
-                                      >
-                                    </mat-form-field>
-                                    <mat-form-field hideRequiredMarker>
-                                      <mat-label>Type</mat-label>
-                                      <input matInput name="type" [(ngModel)]="node.type" required
-                                        [disabled]="!node.enabled"
-                                        [name]="'nodeType' + node.id"
-                                        appResizeInput
-                                        [resizeOnString]="node.type"
-                                        >
-                                      </mat-form-field>
-                                      <button mat-button color="accent" class="but-spacer-left"
+                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Cidr</span>
+<input name="cidr" [(ngModel)]="node.cidr" required [disabled]="!node.enabled || node.domain != ''" [name]="'nodeCidr' + node.id" appResizeInput [resizeOnString]="node.cidr" placeholder="Cidr" class="cpbx-input">
+</label>
+                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Domain</span>
+<input name="domain" [(ngModel)]="node.domain" required [disabled]="!node.enabled || node.cidr != ''" [name]="'nodeDomain' + node.id" appResizeInput [resizeOnString]="node.domain" placeholder="Domain" class="cpbx-input">
+</label>
+                                    <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Type</span>
+<select class="cpbx-select" required [(ngModel)]="node.type" [disabled]="!node.enabled" [name]="'nodeType' + node.id">
+<option [ngValue]="null" disabled hidden>Type</option>
+                                        @for (val of aclBehavior; track val) {
+                                          <option [ngValue]="val">{{val}}</option>
+                                        }
+                                      </select>
+</label>
+                                      <button mat-flat-button color="primary"
                                         [disabled]="!isReadyToSendThree(details.controls['nodeType' + node.id], details.controls['nodeCidr' + node.id], details.controls['nodeDomain' + node.id])"
                                         (click)="updateNode(node)">
                                         Update
                                       </button>
                                       @if (node.enabled) {
-                                        <button mat-raised-button color="accent"
-                                          class="but-spacer-left switch-button" (click)="switchNode(node)">
+                                        <button mat-stroked-button color="basic"
+                                          class="switch-button" (click)="switchNode(node)">
                                           Disable
                                         </button>
                                       } @else {
-                                        <button mat-raised-button color="primary"
-                                          class="but-spacer-left switch-button" (click)="switchNode(node)">
+                                        <button mat-stroked-button color="primary"
+                                          class="switch-button" (click)="switchNode(node)">
                                           Enable
                                         </button>
                                       }
-                                      <button mat-raised-button color="warn" class="but-spacer-left" (click)="deleteNode(node)">
+                                      <button mat-stroked-button color="warn" (click)="deleteNode(node)">
                                         Delete
                                       </button>
-                                    </div>
+                                    </ng-container>
                                   }
                                 </div>
                               }
                               @if (item && item.nodes) {
                                 <div>
                                   @for (node of item.nodes.new; track node; let i = $index) {
-                                    <div class="spacer">
+                                    <div class="cpbx-edit-row">
                                       @if (node) {
-                                        <div class="spacer">
-                                          <mat-form-field hideRequiredMarker>
-                                            <mat-label>Cidr</mat-label>
-                                            <input matInput name="cidr" required
-                                              [(ngModel)]="node.cidr"
-                                              [name]="'newNodeCidr' + i"
-                                              appResizeInput
-                                              [resizeOnString]="node.cidr"
-                                              [disabled]="node.domain != null && node.domain != ''"
-                                              >
-                                            </mat-form-field>
-                                            <mat-form-field hideRequiredMarker>
-                                              <mat-label>Domain</mat-label>
-                                              <input matInput name="domain" required
-                                                [(ngModel)]="node.domain"
-                                                [name]="'newNodeDomain' + i"
-                                                appResizeInput
-                                                [resizeOnString]="node.domain"
-                                                [disabled]="node.cidr != null && node.cidr != ''"
-                                                >
-                                              </mat-form-field>
-                                              <mat-form-field hideRequiredMarker>
-                                                <mat-label>Type</mat-label>
-                                                <input matInput name="type" [(ngModel)]="node.type" required [name]="'newNodeType' + i"
-                                                  appResizeInput
-                                                  [resizeOnString]="node.type"
-                                                  >
-                                                </mat-form-field>
-                                                <button mat-button color="accent" class="but-spacer-left"
+                                        <ng-container>
+                                          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Cidr</span>
+<input name="cidr" required [(ngModel)]="node.cidr" [name]="'newNodeCidr' + i" appResizeInput [resizeOnString]="node.cidr" [disabled]="node.domain != null && node.domain != ''" placeholder="Cidr" class="cpbx-input">
+</label>
+                                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Domain</span>
+<input name="domain" required [(ngModel)]="node.domain" [name]="'newNodeDomain' + i" appResizeInput [resizeOnString]="node.domain" [disabled]="node.cidr != null && node.cidr != ''" placeholder="Domain" class="cpbx-input">
+</label>
+                                              <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Type</span>
+<select class="cpbx-select" required [(ngModel)]="node.type" [name]="'newNodeType' + i">
+<option [ngValue]="null" disabled hidden>Type</option>
+                                                  @for (val of aclBehavior; track val) {
+                                                    <option [ngValue]="val">{{val}}</option>
+                                                  }
+                                                </select>
+</label>
+                                                <button mat-flat-button color="primary"
                                                   [disabled]="!isReadyToSendThree(details.controls['newNodeType' + i], details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])"
                                                   (click)="newNode(item.id, i, details.controls['newNodeType' + i].value, details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])">
                                                   Update
                                                 </button>
-                                                <button mat-button color="warn" (click)="dropNewNode(item.id, i)" class="but-spacer-left">
+                                                <button mat-stroked-button color="warn" (click)="dropNewNode(item.id, i)">
                                                   Delete
                                                 </button>
-                                              </div>
+                                              </ng-container>
                                             }
                                           </div>
                                         }
@@ -143,7 +127,7 @@
                                     }
                                   </div>
                                 }
-                                <button mat-raised-button color="accent" class="spacer" (click)="addAclNodeField(item.id)">
+                                <button mat-flat-button color="primary" type="button" (click)="addAclNodeField(item.id)">
                                   Add
                                 </button>
                               </form>
@@ -155,37 +139,38 @@
                   </mat-tab>
                   <mat-tab label="Add">
                     @if (list()) {
-                      <form class="spacer spacerb" (ngSubmit)="onAclListSubmit()">
-                        <mat-form-field hideRequiredMarker>
-                          <mat-label>Name</mat-label>
-                          <input matInput placeholder="New ACL list name" required name="name" [(ngModel)]="newItemName">
-                        </mat-form-field>
-                        <mat-form-field hideRequiredMarker>
-                          <mat-label>Default</mat-label>
-                          <mat-select required name="default" [(ngModel)]="defaultBehavior" disableOptionCentering>
+                      <form class="cpbx-form-panel" (ngSubmit)="onAclListSubmit()">
+                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New ACL list name" required name="name" [(ngModel)]="newItemName" class="cpbx-input">
+</label>
+                        <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Default</span>
+<select class="cpbx-select" required name="default" [(ngModel)]="defaultBehavior">
+<option [ngValue]="null" disabled hidden>Default</option>
                             @for (val of aclBehavior; track val) {
-                              <mat-option [value]="val">{{val}}</mat-option>
+                              <option [ngValue]="val">{{val}}</option>
                             }
-                          </mat-select>
-                        </mat-form-field>
-                        <button mat-raised-button color="primary" type="submit">Submit</button>
+                          </select>
+</label>
+                        <button mat-flat-button color="primary" type="submit">Submit</button>
                       </form>
                     }
                   </mat-tab>
                   <mat-tab label="Delete/Rename">
                     @if (list()) {
-                      <form class="spacer spacerb" #deleteForm="ngForm" >
+                      <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm" >
                         @for (item of onlyValues(list().lists); track item.id) {
-                          <div>
-                            <mat-form-field hideRequiredMarker>
-                              <mat-label>ACL list name</mat-label>
-                              <input matInput name="ACL list name" required [ngModel]="item.name" [name]="'list::' + item.id">
-                            </mat-form-field>
-                            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['list::' + item.id])"
+                          <div class="cpbx-edit-row">
+                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">ACL list name</span>
+<input name="ACL list name" required [ngModel]="item.name" [name]="'list::' + item.id" placeholder="ACL list name" class="cpbx-input">
+</label>
+                            <button mat-flat-button color="primary" [disabled]="checkDirty(deleteForm.controls['list::' + item.id])"
                               (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'rename')">
                               Update
                             </button>
-                            <button mat-raised-button color="warn"
+                            <button mat-stroked-button color="warn"
                               (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'delete')">
                               Delete
                             </button>

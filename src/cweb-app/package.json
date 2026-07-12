@@ -7,7 +7,8 @@
     "start_dev": "ng serve --configuration=dev",
     "build_dev": "ng build --configuration=dev",
     "build": "ng build --configuration=production",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox"
   },
   "private": true,
   "dependencies": {
@@ -44,14 +45,17 @@
     "@angular/cli": "21.2.18",
     "@angular/compiler-cli": "21.2.17",
     "@angular/language-service": "21.2.17",
+    "@tailwindcss/postcss": "^4.3.2",
     "@types/jasmine": "~3.6.0",
-    "@types/node": "^18.17.18",
+    "@types/node": "^26.1.1",
     "jasmine-core": "~3.8.0",
     "karma": "~6.4.1",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.7.0",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^4.3.2",
     "ts-node": "~10.9.1",
     "typescript": "5.9.3"
   },

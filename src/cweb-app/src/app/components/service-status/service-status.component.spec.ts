@@ -8,7 +8,7 @@ describe('ServiceStatusComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ServiceStatusComponent ]
+      imports: [ ServiceStatusComponent ],
     })
     .compileComponents();
   }));

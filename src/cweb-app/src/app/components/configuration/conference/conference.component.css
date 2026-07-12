@@ -1,28 +1,3 @@
-.but-spacer-left {
-  margin-left: 5px;
-}
-
-mat-form-field {
-  padding: 0 5px;
-}
-
-.spacerb {
-  margin-top: 15px;
-}
-
-.panel-wrapper {
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.panel-wrapper-top {
-  padding-top: 5px;
-}
-
-.panel-wrapper:last-child {
-  padding-bottom: 5px;
-}
-
 article {
   display: inline-grid;
   grid-template-columns: auto ;
@@ -47,14 +22,10 @@ section {
   margin-top: 15px;
 }
 
-.mat-expansion-panel {
-  border-radius: 0;
-}
-
-.mat-expansion-panel-header {
-  border-radius: 0;
-}
-
 .secure{
   max-width: 55px;
+}
+
+.config-copy-button {
+  margin-bottom: 1rem;
 }

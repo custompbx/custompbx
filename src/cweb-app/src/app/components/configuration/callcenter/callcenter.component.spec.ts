@@ -8,7 +8,7 @@ describe('CallcenterComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CallcenterComponent ]
+      imports: [ CallcenterComponent ],
     })
     .compileComponents();
   }));

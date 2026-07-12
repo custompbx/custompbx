@@ -1,51 +1,37 @@
-.type-icon {
-  color: #757575;
-  margin-right: 5px;
+.directory-empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-mat-form-field {
-  padding: 0 5px;
+.directory-empty h3 {
+  margin: 0 0 .25rem;
+  color: var(--cpbx-text);
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-.spacerb {
-  margin-top: 15px;
+.directory-empty p {
+  margin: 0;
+  color: var(--cpbx-muted);
 }
 
-.plusbut {
-  font-size: 40px;
-  display: inline;
+.directory-domain-section {
+  margin-bottom: 1rem;
 }
 
-.oversize {
-  height: 50px;
-  width: 50px;
+.directory-copy-button {
+  margin-bottom: 1rem;
 }
 
-.panel-wrapper {
-  padding-left: 5px;
-  padding-right: 5px;
+.icon-spacer {
+  margin-right: .35rem;
 }
 
-.panel-wrapper:last-child {
-  padding-bottom: 5px;
-}
-
-.but-spacer-left {
-  margin-left: 5px;
-}
-
-.mat-expansion-panel {
-  border-radius: 0;
-}
-
-.mat-expansion-panel-header {
-  border-radius: 0;
-}
-
-
-
-.but-spacer-left {
-  margin-left: 5px;
+.xml-area {
+  width: 100%;
+  overflow: hidden;
 }
 
 .mat-progress-bar {

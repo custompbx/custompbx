@@ -7,36 +7,74 @@
   top: 0;
   z-index: 900;
   min-height: 64px;
-  box-shadow: 0 2px 14px rgba(30, 35, 70, .16);
+  border-bottom: 1px solid rgba(226, 232, 240, .95);
+  background:
+    linear-gradient(90deg, rgba(238, 242, 255, .9), rgba(255, 255, 255, .96) 26%, #ffffff);
+  color: var(--cpbx-text);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, .06);
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: white;
+  color: var(--cpbx-text);
   text-decoration: none;
-  margin-left: 6px;
+  margin-left: 8px;
   min-width: 0;
+  border-radius: 999px;
+  padding: 5px 10px 5px 6px;
+  transition: background .16s ease, box-shadow .16s ease;
+}
+
+.brand:hover {
+  background: rgba(238, 242, 255, .8);
 }
 
 .brand-logo {
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
+  border-radius: 999px;
 }
 
 .brand-name {
-  font-size: 18px;
-  font-weight: 400;
+  font-size: 17px;
+  font-weight: 600;
   line-height: 1;
+  letter-spacing: -.01em;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(248, 250, 252, .86);
+}
+
+.app-toolbar .header-icon-button,
+.app-toolbar > button[mat-icon-button] {
+  color: #475569;
+}
+
+.app-toolbar .header-icon-button:hover,
+.app-toolbar > button[mat-icon-button]:hover {
+  background: #eef2ff;
+  color: var(--cpbx-primary);
+}
+
+.app-toolbar .header-icon-button:disabled {
+  color: #cbd5e1;
+}
+
 .user-name {
   font-size: 14px;
+  font-weight: 600;
   line-height: 1;
   max-width: 160px;
   overflow: hidden;
@@ -46,9 +84,28 @@
 @media (max-width: 767px) { .brand-name, .user-name { display: none; } }
 
 .user-block {
+  appearance: none;
+  border: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  margin-left: 8px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--cpbx-text);
+  cursor: pointer;
+  transition: background .16s ease, color .16s ease;
+}
+
+.user-block:hover {
+  background: #eef2ff;
+  color: var(--cpbx-primary);
+}
+
+.user-block:focus-visible {
+  outline: 3px solid rgba(57, 73, 171, .28);
+  outline-offset: 2px;
 }
 
 .avatar-img {

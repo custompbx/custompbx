@@ -48,10 +48,6 @@
   margin-bottom: 0;
 }
 
-.filter-container > mat-form-field {
-  margin-left: 10px;
-}
-
 .avatar-img {
   display: inline-block;
   height: 45px;
@@ -92,6 +88,11 @@
   flex-direction: column;
   align-items: flex-start;
   margin: 0 12px;
+}
+
+.conversation-search-field {
+  margin-top: 12px;
+  width: 100%;
 }
 
 .sidenav-container {

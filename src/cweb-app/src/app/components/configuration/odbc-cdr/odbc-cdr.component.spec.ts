@@ -8,7 +8,7 @@ describe('AclComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ OdbcCdrComponent ]
+      imports: [ OdbcCdrComponent ],
     })
     .compileComponents();
   }));

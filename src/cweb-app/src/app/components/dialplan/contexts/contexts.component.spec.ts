@@ -8,7 +8,7 @@ describe('ContextsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ContextsComponent ]
+      imports: [ ContextsComponent ],
     })
     .compileComponents();
   }));

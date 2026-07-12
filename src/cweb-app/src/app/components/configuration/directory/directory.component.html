@@ -1,6 +1,6 @@
 <app-inner-header name="Directory" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
+ <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
                *ngIf="list() && list().exists !== false">
   <mat-tab label="List">
     <mat-card>
@@ -8,7 +8,7 @@
         <mat-card-subtitle>Settings</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <mat-expansion-panel>
+        <mat-expansion-panel class="cpbx-expansion-panel">
           <mat-expansion-panel-header>
             <mat-panel-title>
               Settings
@@ -37,7 +37,7 @@
       </mat-card-header>
       <mat-card-content>
         <div *ngFor="let item of onlyValues(list().profiles); trackBy: trackByFn" class="panel-wrapper">
-          <mat-expansion-panel (opened)="getDirectoryProfilesParams(item.id)"
+          <mat-expansion-panel class="cpbx-expansion-panel" (opened)="getDirectoryProfilesParams(item.id)"
                                [expanded]="panelCloser['profile' + item.id]">
             <mat-expansion-panel-header>
               <mat-panel-title>
@@ -47,7 +47,7 @@
                 Click to get details
               </mat-panel-description>
             </mat-expansion-panel-header>
-            <button mat-raised-button color="basic" (click)="copyProfile(item.id)"
+            <button mat-flat-button color="basic" (click)="copyProfile(item.id)"
                     *ngIf="list().profiles[item.id] && (list().profiles[item.id].parameters)">Copy
             </button>
             <h3>Params:</h3>
@@ -69,32 +69,35 @@
   </mat-tab>
 
   <mat-tab label="Add">
-    <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
+    <form class="cpbx-form-panel" (ngSubmit)="onProfileSubmit()">
+      <label class="kv-field">
+        <span class="kv-label">Name</span>
+        <input class="kv-input" placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
+      </label>
+      <button class="kv-button kv-button--primary" type="submit">Submit</button>
     </form>
   </mat-tab>
 
   <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb" #deleteForm="ngForm">
-      <h3>Profile:</h3>
-      <div *ngFor="let profile of onlyValues(list().profiles); trackBy: trackByFn">
-        <mat-form-field hideRequiredMarker>
-        <mat-label>Profile name</mat-label>
-        <input matInput name="Profile name" required [ngModel]="profile.name"
-                 [name]="'profile::' + profile.id">
-        </mat-form-field>
-        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
-                (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, profile.name, 'rename')">
-          Update
-        </button>
-        <button mat-raised-button color="warn"
-                (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, profile.name, 'delete')">
-          Delete
-        </button>
+    <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
+      <h3 class="cpbx-form-title">Profile:</h3>
+      <div class="cpbx-edit-row" *ngFor="let profile of onlyValues(list().profiles); trackBy: trackByFn">
+        <label class="kv-field">
+          <span class="kv-label">Profile name</span>
+          <input class="kv-input" required [ngModel]="profile.name"
+            [name]="'profile::' + profile.id">
+        </label>
+        <div class="kv-actions">
+          <button class="kv-button kv-button--primary" type="button"
+            [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
+            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, profile.name, 'rename')">
+            Update
+          </button>
+          <button class="kv-button kv-button--danger" type="button"
+            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, profile.name, 'delete')">
+            Delete
+          </button>
+        </div>
       </div>
     </form>
   </mat-tab>

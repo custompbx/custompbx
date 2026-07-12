@@ -3,7 +3,7 @@
   <mat-card>
     <mat-card-content>
       No global variables set in database you can import them from freeswitch instance
-      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+      <button mat-stroked-button color="basic" class="switch-button"
               (click)="ImportGlobalVariables()">
         Import
       </button>
@@ -21,105 +21,86 @@
         <div cdkDropList
              (cdkDropListDropped)="dropAction($event, onlySortedValues(list()))">
           @for (variable of onlySortedValues(list()); track variable.id) {
-            <div class="spacer" cdkDrag>
+            <div class="cpbx-edit-row" cdkDrag>
               @if (variable.id && !isArray(variable)) {
-                <div>
+                <ng-container>
                   <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>Name</mat-label>
-                    <input matInput name="name" [(ngModel)]="variable.name" required
-                           [disabled]="!variable.enabled || variable.dynamic"
-                           [name]="'variableName' + variable.id"
-                           appResizeInput
-                           [resizeOnString]="variable.name"
-                    >
-                  </mat-form-field>
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>Value</mat-label>
-                    <input matInput name="value" [(ngModel)]="variable.value" required
-                           [disabled]="!variable.enabled || variable.dynamic"
-                           [name]="'variableValue' + variable.id"
-                           appResizeInput
-                           [resizeOnString]="variable.value"
-                    >
-                  </mat-form-field>
-                  <mat-form-field hideRequiredMarker class="var-type">
-                    <mat-label>Type</mat-label>
-                    <mat-select [(ngModel)]="variable.type"
-                                [disabled]="!variable.enabled || variable.dynamic"
-                                [name]="'variableType' + variable.id"
-                                disableOptionCentering>
+                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="variable.name" required [disabled]="!variable.enabled || variable.dynamic" [name]="'variableName' + variable.id" appResizeInput [resizeOnString]="variable.name" placeholder="Name" class="cpbx-input">
+</label>
+                  <label class="cpbx-field cpbx-field--wide">
+<span class="cpbx-label">Value</span>
+<input name="value" [(ngModel)]="variable.value" required [disabled]="!variable.enabled || variable.dynamic" [name]="'variableValue' + variable.id" appResizeInput [resizeOnString]="variable.value" placeholder="Value" class="cpbx-input">
+</label>
+                  <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Type</span>
+<select class="cpbx-select" [(ngModel)]="variable.type" [disabled]="!variable.enabled || variable.dynamic" [name]="'variableType' + variable.id">
+<option [ngValue]="null" disabled hidden>Type</option>
                       @for (val of variableTypes; track $index) {
-                        <mat-option [value]="val">
+                        <option [ngValue]="val">
                           {{val}}
-                        </mat-option>
+                        </option>
                       }
-                    </mat-select>
-                  </mat-form-field>
-                  <button mat-button color="accent" class="but-spacer-left"
+                    </select>
+</label>
+                  <button mat-flat-button color="primary" type="button"
                           [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.id], details.controls['variableValue' + variable.id], details.controls['variableType' + variable.id]) || variable.dynamic"
                           (click)="updateGlobalVariable(variable)">
                     Update
                   </button>
-                  <button *ngIf="variable.enabled" mat-raised-button color="accent"
+                  <button *ngIf="variable.enabled" mat-stroked-button color="basic" type="button"
                           [disabled]="variable.dynamic"
-                          class="but-spacer-left switch-button" (click)="switchGlobalVariable(variable)">
+                          class="switch-button" (click)="switchGlobalVariable(variable)">
                     Disable
                   </button>
-                  <button *ngIf="!variable.enabled" mat-raised-button color="primary"
+                  <button *ngIf="!variable.enabled" mat-stroked-button color="primary" type="button"
                           [disabled]="variable.dynamic"
-                          class="but-spacer-left switch-button" (click)="switchGlobalVariable(variable)">
+                          class="switch-button" (click)="switchGlobalVariable(variable)">
                     Enable
                   </button>
-                  <button mat-raised-button color="warn" class="but-spacer-left" (click)="deleteGlobalVariable(variable)"
+                  <button mat-stroked-button color="warn" type="button" (click)="deleteGlobalVariable(variable)"
                           [disabled]="variable.dynamic">
                     Delete
                   </button>
-                </div>
+                </ng-container>
               }
             </div>
           }
           @if (list()) {
             <div>
               @for (variable of newList(); track $index; let i = $index) {
-                <div class="spacer">
+                <div class="cpbx-edit-row">
                   @if (variable) {
-                    <div class="spacer">
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Name</mat-label>
-                        <input matInput name="name" [(ngModel)]="variable.name" required [name]="'newName' + i"
-                               appResizeInput
-                               [resizeOnString]="variable.name"
-                        >
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Value</mat-label>
-                        <input matInput name="value" [(ngModel)]="variable.value" required [name]="'newValue' + i"
-                               appResizeInput
-                               [resizeOnString]="variable.value"
-                        >
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker class="var-type">
-                        <mat-label>Type</mat-label>
-                        <mat-select [(ngModel)]="variable.type"
-                                    [name]="'newType' + i"
-                                    disableOptionCentering>
+                    <ng-container>
+                      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="variable.name" required [name]="'newName' + i" appResizeInput [resizeOnString]="variable.name" placeholder="Name" class="cpbx-input">
+</label>
+                      <label class="cpbx-field cpbx-field--wide">
+<span class="cpbx-label">Value</span>
+<input name="value" [(ngModel)]="variable.value" required [name]="'newValue' + i" appResizeInput [resizeOnString]="variable.value" placeholder="Value" class="cpbx-input">
+</label>
+                      <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Type</span>
+<select class="cpbx-select" [(ngModel)]="variable.type" [name]="'newType' + i">
+<option [ngValue]="null" disabled hidden>Type</option>
                           @for (val of variableTypes; track $index) {
-                            <mat-option [value]="val">
+                            <option [ngValue]="val">
                               {{val}}
-                            </mat-option>
+                            </option>
                           }
-                        </mat-select>
-                      </mat-form-field>
-                      <button mat-button color="accent" class="but-spacer-left"
+                        </select>
+</label>
+                      <button mat-flat-button color="primary" type="button"
                               [disabled]="!isReadyToSendThree(details.controls['newValue' + i], details.controls['newName' + i], details.controls['newNodeDomain' + i])"
                               (click)="newGlobalVariable(i, details.controls['newName' + i].value, details.controls['newValue' + i].value, details.controls['newType' + i].value)">
                         Update
                       </button>
-                      <button mat-button color="warn" (click)="dropNewGlobalVariable(i)" class="but-spacer-left">
+                      <button mat-stroked-button color="warn" type="button" (click)="dropNewGlobalVariable(i)">
                         Delete
                       </button>
-                    </div>
+                    </ng-container>
                   }
                 </div>
               }
@@ -127,7 +108,7 @@
           }
         </div>
       }
-      <button mat-raised-button color="accent" class="spacer" (click)="addNewGlobalVariable()">
+      <button mat-flat-button color="primary" type="button" (click)="addNewGlobalVariable()">
         Add
       </button>
     </form>

@@ -13,6 +13,7 @@ import {FormsModule} from "@angular/forms";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {SvgSeqDiagramComponent} from "../svg-seq-diagram/svg-seq-diagram.component";
 import {NgClass} from "@angular/common";
+import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
 
 export interface IfilterField {
   field: string | null;
@@ -157,7 +158,7 @@ export class BottomSheetExportComponent {
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, SvgSeqDiagramComponent, NgClass],
+  imports: [MaterialModule, FormsModule, InnerHeaderComponent, SvgSeqDiagramComponent, NgClass, CpbxSelectDirective],
   selector: 'app-hep',
   templateUrl: './hep.component.html',
   styleUrls: ['./hep.component.css']

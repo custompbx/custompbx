@@ -1,13 +1,13 @@
 <app-inner-header name="Callcenter" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"
+  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"
     >
     <mat-tab label="List">
       <mat-card>
         <mat-card-content>
           @if (list() && list().queues) {
-            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedIndexChange)="tabChanged($event)">
+            <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" (selectedIndexChange)="tabChanged($event)">
               <mat-tab label="Queues">
                 @for (item of onlyValues(list().queues); track trackByFnId($index, item)) {
                   <div class="panel-wrapper">
@@ -22,7 +22,7 @@
                         </mat-panel-description>
                       </mat-expansion-panel-header>
                       @if (list().queues[item.id] && (list().queues[item.id].parameters)) {
-                        <button mat-raised-button color="basic" (click)="copyQueue(item.id)"
+                        <button mat-flat-button color="basic" (click)="copyQueue(item.id)"
                           >Copy
                         </button>
                       }
@@ -44,7 +44,7 @@
                   <mat-card>
                     <mat-card-actions>
                       There no any agents. You can start creating them and tiers or import while module is loaded.
-                      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                      <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                         (click)="ImportCallcenterAgentsAndTiers()">
                         Import
                       </button>
@@ -53,7 +53,7 @@
                 }
                 <div>
                   <div class="filter-container">
-                    <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                    <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                       (click)="GetCallcenterAgents()">
                       Get List
                     </button>
@@ -62,13 +62,13 @@
                     <mat-form-field hideRequiredMarker>
                       <mat-label>Field</mat-label>
                       <mat-select [(ngModel)]="filter.field" [disabled]="!columns()" disableOptionCentering>
-                        <mat-option [value]="null">
+                        <option [ngValue]="null">
                           ---
-                        </mat-option>
+                        </option>
                         @for (val of columns(); track val) {
-                          <mat-option [value]="val">
+                          <option [ngValue]="val">
                             {{val}}
-                          </mat-option>
+                          </option>
                         }
                       </mat-select>
                     </mat-form-field>
@@ -76,9 +76,9 @@
                       <mat-label>Operand</mat-label>
                       <mat-select [(ngModel)]="filter.operand" [disabled]="!filter.field" disableOptionCentering>
                         @for (val of operands; track val) {
-                          <mat-option [value]="val">
+                          <option [ngValue]="val">
                             {{val}}
-                          </mat-option>
+                          </option>
                         }
                       </mat-select>
                     </mat-form-field>
@@ -88,14 +88,14 @@
                         required>
                       </mat-form-field>
                       @if (!filters[toEditAgentFilter]) {
-                        <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                           [disabled]="!this.filter.operand || !this.filter.field"
                           (click)="addFilter()">
                           Add filter
                         </button>
                       }
                       @if (filters[toEditAgentFilter]) {
-                        <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+                        <button mat-flat-button color="accent" class="but-spacer-left switch-button"
                           [disabled]="!this.filter.operand || !this.filter.field"
                           (click)="saveFilter()">
                           Edit filter
@@ -104,20 +104,20 @@
                       <mat-form-field hideRequiredMarker class="checkbox-spacer-left">
                         <mat-label>Field</mat-label>
                         <mat-select [(ngModel)]="sortColumns" [disabled]="!columns()" disableOptionCentering>
-                          <mat-option [value]="null">
+                          <option [ngValue]="null">
                             ---
-                          </mat-option>
+                          </option>
                           @for (val of columns(); track val) {
-                            <mat-option [value]="val">
+                            <option [ngValue]="val">
                               {{val}}
-                            </mat-option>
+                            </option>
                           }
                         </mat-select>
                       </mat-form-field>
                       <mat-checkbox [(ngModel)]="sortObject.desc" class="checkbox-spacer-left"
                         [disabled]="sortObject.fields.length == 0 && !sortColumns">DESC
                       </mat-checkbox>
-                      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                      <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                         [disabled]="!sortColumns"
                         (click)="addSorter()">
                         Add sorting
@@ -217,7 +217,7 @@
                     <mat-card>
                       <mat-card-content>
                         There no any tiers. You can start creating them and agents or import while module is loaded.
-                        <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                           (click)="ImportCallcenterAgentsAndTiers()">
                           Import
                         </button>
@@ -226,7 +226,7 @@
                   }
                   <div>
                     <div class="filter-container">
-                      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                      <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                         (click)="GetCallcenterTiers()">
                         Get List
                       </button>
@@ -235,13 +235,13 @@
                       <mat-form-field hideRequiredMarker>
                         <mat-label>Field</mat-label>
                         <mat-select [(ngModel)]="tiersFilter.field" [disabled]="!tiersColumns()" disableOptionCentering>
-                          <mat-option [value]="null">
+                          <option [ngValue]="null">
                             ---
-                          </mat-option>
+                          </option>
                           @for (val of tiersColumns(); track val) {
-                            <mat-option [value]="val">
+                            <option [ngValue]="val">
                               {{val}}
-                            </mat-option>
+                            </option>
                           }
                         </mat-select>
                       </mat-form-field>
@@ -249,9 +249,9 @@
                         <mat-label>Operand</mat-label>
                         <mat-select [(ngModel)]="tiersFilter.operand" [disabled]="!tiersFilter.field" disableOptionCentering>
                           @for (val of operands; track val) {
-                            <mat-option [value]="val">
+                            <option [ngValue]="val">
                               {{val}}
-                            </mat-option>
+                            </option>
                           }
                         </mat-select>
                       </mat-form-field>
@@ -261,14 +261,14 @@
                           required>
                         </mat-form-field>
                         @if (!filters[toEditTierFilter]) {
-                          <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                          <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                             [disabled]="!this.tiersFilter.operand || !this.tiersFilter.field"
                             (click)="tiersAddFilter()">
                             Add filter
                           </button>
                         }
                         @if (filters[toEditTierFilter]) {
-                          <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+                          <button mat-flat-button color="accent" class="but-spacer-left switch-button"
                             [disabled]="!this.tiersFilter.operand || !this.tiersFilter.field"
                             (click)="saveTierFilter()">
                             Edit filter
@@ -277,20 +277,20 @@
                         <mat-form-field hideRequiredMarker class="checkbox-spacer-left">
                           <mat-label>Field</mat-label>
                           <mat-select [(ngModel)]="tiersSortColumns" [disabled]="!tiersColumns()" disableOptionCentering>
-                            <mat-option [value]="null">
+                            <option [ngValue]="null">
                               ---
-                            </mat-option>
+                            </option>
                             @for (val of tiersColumns(); track val) {
-                              <mat-option [value]="val">
+                              <option [ngValue]="val">
                                 {{val}}
-                              </mat-option>
+                              </option>
                             }
                           </mat-select>
                         </mat-form-field>
                         <mat-checkbox [(ngModel)]="tiersSortObject.desc" class="checkbox-spacer-left"
                           [disabled]="tiersSortObject.fields.length == 0 && !tiersSortColumns">DESC
                         </mat-checkbox>
-                        <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                           [disabled]="!tiersSortColumns"
                           (click)="tiersAddSorter()">
                           Add sorting
@@ -387,7 +387,7 @@
                   </mat-tab>
                   <mat-tab label="Members">
                     <div class="filter-container">
-                      <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                      <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                         (click)="GetCallcenterMembers()">
                         Get List
                       </button>
@@ -396,13 +396,13 @@
                       <mat-form-field hideRequiredMarker>
                         <mat-label>Field</mat-label>
                         <mat-select [(ngModel)]="membersFilter.field" [disabled]="!membersColumns()" disableOptionCentering>
-                          <mat-option [value]="null">
+                          <option [ngValue]="null">
                             ---
-                          </mat-option>
+                          </option>
                           @for (val of membersColumns(); track val) {
-                            <mat-option [value]="val">
+                            <option [ngValue]="val">
                               {{val}}
-                            </mat-option>
+                            </option>
                           }
                         </mat-select>
                       </mat-form-field>
@@ -410,9 +410,9 @@
                         <mat-label>Operand</mat-label>
                         <mat-select [(ngModel)]="membersFilter.operand" [disabled]="!membersFilter.field" disableOptionCentering>
                           @for (val of operands; track val) {
-                            <mat-option [value]="val">
+                            <option [ngValue]="val">
                               {{val}}
-                            </mat-option>
+                            </option>
                           }
                         </mat-select>
                       </mat-form-field>
@@ -422,14 +422,14 @@
                           required>
                         </mat-form-field>
                         @if (!filters[toEditMemberFilter]) {
-                          <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                          <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                             [disabled]="!this.membersFilter.operand || !this.membersFilter.field"
                             (click)="membersAddFilter()">
                             Add filter
                           </button>
                         }
                         @if (filters[toEditMemberFilter]) {
-                          <button mat-raised-button color="accent" class="but-spacer-left switch-button"
+                          <button mat-flat-button color="accent" class="but-spacer-left switch-button"
                             [disabled]="!this.membersFilter.operand || !this.membersFilter.field"
                             (click)="saveMemberFilter()">
                             Edit filter
@@ -438,20 +438,20 @@
                         <mat-form-field hideRequiredMarker class="checkbox-spacer-left">
                           <mat-label>Field</mat-label>
                           <mat-select [(ngModel)]="membersSortColumns" [disabled]="!membersColumns()" disableOptionCentering>
-                            <mat-option [value]="null">
+                            <option [ngValue]="null">
                               ---
-                            </mat-option>
+                            </option>
                             @for (val of membersColumns(); track val) {
-                              <mat-option [value]="val">
+                              <option [ngValue]="val">
                                 {{val}}
-                              </mat-option>
+                              </option>
                             }
                           </mat-select>
                         </mat-form-field>
                         <mat-checkbox [(ngModel)]="membersSortObject.desc" class="checkbox-spacer-left"
                           [disabled]="membersSortObject.fields.length == 0 && !membersSortColumns">DESC
                         </mat-checkbox>
-                        <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                        <button mat-flat-button color="basic" class="but-spacer-left switch-button"
                           [disabled]="!membersSortColumns"
                           (click)="membersAddSorter()">
                           Add sorting
@@ -541,19 +541,19 @@
                                 <span class=" grid-inner-title">{{queue.name}}</span>
                               </section>
                               <section>
-                                <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                <button mat-flat-button color="basic" class="but-spacer-left switch-button grid-inner"
                                   (click)="queueCommand(queue.id, 0, 'load')">
                                   Load
                                 </button>
                               </section>
                               <section>
-                                <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                <button mat-flat-button color="basic" class="but-spacer-left switch-button grid-inner"
                                   (click)="queueCommand(queue.id, 0, 'load')">
                                   Reload
                                 </button>
                               </section>
                               <section>
-                                <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                <button mat-flat-button color="basic" class="but-spacer-left switch-button grid-inner"
                                   (click)="queueCommand(queue.id, 0, 'load')">
                                   Unload
                                 </button>
@@ -587,55 +587,55 @@
             </mat-card>
           </mat-tab>
           <mat-tab label="Add">
-            <form class="spacer spacerb" (ngSubmit)="AddCallcenterQueue()">
-              <mat-form-field hideRequiredMarker>
+            <form class="cpbx-form-panel" (ngSubmit)="AddCallcenterQueue()">
+              <mat-form-field class="cpbx-field--md" hideRequiredMarker>
                 <mat-label>Queue Name</mat-label>
                 <input matInput placeholder="New queue name" required name="name" [(ngModel)]="newQueueName">
               </mat-form-field>
-              <button mat-raised-button color="primary" type="submit" [disabled]="!newQueueName">Submit</button>
+              <button mat-flat-button color="primary" type="submit" [disabled]="!newQueueName">Submit</button>
             </form>
-            <form class="spacer spacerb" (ngSubmit)="AddCallcenterAgent()">
-              <mat-form-field hideRequiredMarker>
+            <form class="cpbx-form-panel" (ngSubmit)="AddCallcenterAgent()">
+              <mat-form-field class="cpbx-field--md" hideRequiredMarker>
                 <mat-label>New Agent Name</mat-label>
                 <input matInput placeholder="New agent name" name="name" [(ngModel)]="newAgentName" required>
               </mat-form-field>
-              <button mat-raised-button color="primary" type="submit" [disabled]="!newAgentName">Submit</button>
+              <button mat-flat-button color="primary" type="submit" [disabled]="!newAgentName">Submit</button>
             </form>
-            <form class="spacer spacerb" (ngSubmit)="AddCallcenterTier()">
-              <mat-form-field hideRequiredMarker>
+            <form class="cpbx-form-panel" (ngSubmit)="AddCallcenterTier()">
+              <mat-form-field class="cpbx-field--md" hideRequiredMarker>
                 <mat-label>Queue</mat-label>
                 <mat-select required name="queue" [(ngModel)]="queueId" disableOptionCentering>
                   @for (val of onlyValues(list().queues); track trackByFnId($index, val)) {
-                    <mat-option [value]="val.id">
+                    <option [ngValue]="val.id">
                       {{val.name}}
-                    </mat-option>
+                    </option>
                   }
                 </mat-select>
               </mat-form-field>
-              <mat-form-field hideRequiredMarker>
+              <mat-form-field class="cpbx-field--md" hideRequiredMarker>
                 <mat-label>Tier Agent Name</mat-label>
                 <input matInput placeholder="agent name" name="name" [(ngModel)]="agentName" required>
               </mat-form-field>
-              <button mat-raised-button color="primary" type="submit" [disabled]="!queueId || !agentName">Submit</button>
+              <button mat-flat-button color="primary" type="submit" [disabled]="!queueId || !agentName">Submit</button>
             </form>
           </mat-tab>
           <mat-tab label="Delete/Rename">
-            <form class="spacer spacerb" #deleteForm="ngForm">
-              <h3>Queues:</h3>
+            <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
+              <h3 class="cpbx-form-title">Queues</h3>
               @if (list().queues) {
-                <div>
+                <div class="cpbx-form-panel cpbx-form-panel--stack">
                   @for (queue of onlyValues(list().queues); track trackByFnId($index, queue)) {
-                    <div>
-                      <mat-form-field hideRequiredMarker>
+                    <div class="cpbx-edit-row">
+                      <mat-form-field class="cpbx-field--md" hideRequiredMarker>
                         <mat-label>Queue name</mat-label>
                         <input matInput name="Queue name" required [ngModel]="queue.name"
                           [name]="'queue::' + queue.id">
                         </mat-form-field>
-                        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['queue::' + queue.id])"
+                        <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['queue::' + queue.id])"
                           (click)="openBottomSheetQueue(queue.id, deleteForm.controls['queue::' + queue.id].value, list().queues[queue.id].name, 'rename')">
                           Update
                         </button>
-                        <button mat-raised-button color="warn"
+                        <button mat-stroked-button color="warn" type="button"
                           (click)="openBottomSheetQueue(queue.id, deleteForm.controls['queue::' + queue.id].value, list().queues[queue.id].name, 'delete')">
                           Delete
                         </button>

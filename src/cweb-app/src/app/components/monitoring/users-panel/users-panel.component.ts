@@ -20,11 +20,12 @@ import {FormatTimerPipe} from "../../../pipes/format-timer.pipe";
 import {toSignal} from "@angular/core/rxjs-interop";
 import {State as PhoneState} from "../../../store/phone/phone.reducers";
 import {State as ConfigState} from "../../../store/config/config.state.struct";
+import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 
 
 @Component({
 standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, FormatTimerPipe],
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, FormatTimerPipe, CpbxSelectDirective],
     selector: 'app-users-panel',
     templateUrl: './users-panel.component.html',
     styleUrls: ['./users-panel.component.css']
@@ -212,7 +213,7 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
   }
 
   trackByFnId(index, item) {
-    return item.value.id;
+    return item?.value?.id ?? item?.key ?? index;
   }
 
   getUserCardColor(user: object): string {
@@ -278,7 +279,7 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
 
   usersFilter (users: []): Array<any> {
     const res = [];
-    if (!users && Array.isArray(users)) {
+    if (!Array.isArray(users)) {
       return res;
     }
     users.forEach(

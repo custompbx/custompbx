@@ -1,7 +1,7 @@
 <app-inner-header name="Unicall" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
+  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
     <mat-tab label="list">
       <mat-card>
         <mat-card-header>
@@ -48,7 +48,7 @@
                   </mat-panel-description>
                 </mat-expansion-panel-header>
                 @if (list().spans[item.id] && (list().spans[item.id].parameters)) {
-                <button mat-raised-button color="basic" (click)="copySpan(item.id)">Copy
+                <button mat-stroked-button color="basic" class="config-copy-button" (click)="copySpan(item.id)">Copy
                 </button>
                 }
                 <h3>Params:</h3>
@@ -71,30 +71,29 @@
     </mat-tab>
 
     <mat-tab label="Add">
-      <form class="spacer spacerb" (ngSubmit)="onSpanSubmit()">
-        <mat-form-field hideRequiredMarker>
-          <mat-label>Name</mat-label>
-          <input matInput placeholder="New span id" required name="name" [(ngModel)]="newSpanId">
-        </mat-form-field>
-        <button mat-raised-button color="primary" type="submit">Submit</button>
+      <form class="cpbx-form-panel" (ngSubmit)="onSpanSubmit()">
+        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New span id" required name="name" [(ngModel)]="newSpanId" class="cpbx-input">
+</label>
+        <button mat-flat-button color="primary" type="submit">Submit</button>
       </form>
     </mat-tab>
 
     <mat-tab label="Delete/Rename">
-      <form class="spacer spacerb" #deleteForm="ngForm">
-        <h3>Span:</h3>
+      <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
+        <h3 class="cpbx-form-title">Span</h3>
         @for (span of onlyValues(list().spans); track span.id) {
-          <div>
-            <mat-form-field hideRequiredMarker>
-              <mat-label>Span id</mat-label>
-              <input matInput name="Span id" required [ngModel]="span.span_id"
-                     [name]="'span::' + span.id">
-            </mat-form-field>
-            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['span::' + span.id])"
+          <div class="cpbx-edit-row">
+            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Span id</span>
+<input name="Span id" required [ngModel]="span.span_id" [name]="'span::' + span.id" placeholder="Span id" class="cpbx-input">
+</label>
+            <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['span::' + span.id])"
                     (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'rename')">
               Update
             </button>
-            <button mat-raised-button color="warn"
+            <button mat-stroked-button color="warn" type="button"
                     (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'delete')">
               Delete
             </button>

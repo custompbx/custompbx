@@ -1,7 +1,7 @@
 <app-inner-header name="ODBC CDR" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start">
     <mat-tab label="List">
       <mat-card>
         <mat-card-header>
@@ -39,15 +39,13 @@
                 </mat-expansion-panel-header>
                 <h3>Log Leg</h3>
                 @if (table.id) {
-                  <div class="spacer">
+                  <div class="cpbx-edit-row">
                     <form #details="ngForm">
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>Log-leg</mat-label>
-                        <input matInput name="log-leg" [(ngModel)]="table.log_leg"
-                          [disabled]="!table.enabled"
-                          [name]="'tableLogLeg' + table.id">
-                        </mat-form-field>
-                        <button mat-button color="accent" class="but-spacer-left"
+                      <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Log-leg</span>
+<input name="log-leg" [(ngModel)]="table.log_leg" [disabled]="!table.enabled" [name]="'tableLogLeg' + table.id" placeholder="Log-leg" class="cpbx-input">
+</label>
+                        <button mat-flat-button color="primary" type="button"
                           [disabled]="!isReadyToSendOne(details.controls['tableLogLeg' + table.id])"
                           (click)="updateTable(table)">
                           Update
@@ -73,31 +71,30 @@
         </mat-card>
       </mat-tab>
       <mat-tab label="Add">
-        <form class="spacer spacerb" (ngSubmit)="onTableSubmit()">
-          <mat-form-field hideRequiredMarker>
-            <mat-label>Name</mat-label>
-            <input matInput placeholder="New table name" required name="name" [(ngModel)]="newTableName">
-          </mat-form-field>
-          <button mat-raised-button color="primary" type="submit">Submit</button>
+        <form class="cpbx-form-panel" (ngSubmit)="onTableSubmit()">
+          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New table name" required name="name" [(ngModel)]="newTableName" class="cpbx-input">
+</label>
+          <button mat-flat-button color="primary" type="submit">Submit</button>
         </form>
       </mat-tab>
       <mat-tab label="Delete/Rename">
-        <form class="spacer spacerb" #deleteForm="ngForm">
+        <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
           @if (list().tables) {
             <div>
-              <h3>Tables:</h3>
+              <h3 class="cpbx-form-title">Tables</h3>
               @for (table of onlyValues(list().tables); track table) {
-                <div>
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>Table name</mat-label>
-                    <input matInput name="Table name" required [ngModel]="table.name"
-                      [name]="'Table::' + table.id">
-                    </mat-form-field>
-                    <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['Table::' + table.id])"
+                <div class="cpbx-edit-row">
+                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Table name</span>
+<input name="Table name" required [ngModel]="table.name" [name]="'Table::' + table.id" placeholder="Table name" class="cpbx-input">
+</label>
+                    <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['Table::' + table.id])"
                       (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'rename')">
                       Update
                     </button>
-                    <button mat-raised-button color="warn"
+                    <button mat-stroked-button color="warn" type="button"
                       (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'delete')">
                       Delete
                     </button>

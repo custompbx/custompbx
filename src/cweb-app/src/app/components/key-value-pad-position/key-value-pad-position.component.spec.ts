@@ -8,7 +8,7 @@ describe('KeyValuePadComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ KeyValuePadPositionComponent ]
+      imports: [ KeyValuePadPositionComponent ],
     })
     .compileComponents();
   }));

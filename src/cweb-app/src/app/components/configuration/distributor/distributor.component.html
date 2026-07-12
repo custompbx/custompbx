@@ -3,7 +3,7 @@
   <button mat-stroked-button type="button" (click)="collapseAllPanels()">Collapse all</button>
 </app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list() && list().exists !== false">
+ <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list() && list().exists !== false">
   <mat-tab label="List">
     <mat-card>
       <mat-card-header>
@@ -24,76 +24,60 @@
             <form #details="ngForm">
               <h3>Nodes:</h3>
               <div *ngIf="item && item.nodes">
-                <div class="spacer" *ngFor="let node of onlyValues(item.nodes)">
-                  <div *ngIf="node.id && !isArray(node)">
-                    <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput name="name" [(ngModel)]="node.name" required
-                             [disabled]="!node.enabled"
-                             [name]="'nodeName' + node.id"
-                             appResizeInput
-                             [resizeOnString]="node.name"
-                      >
-                    </mat-form-field>
-                    <mat-form-field hideRequiredMarker>
-        <mat-label>Weight</mat-label>
-        <input matInput name="weight" [(ngModel)]="node.weight" required
-                             [disabled]="!node.enabled"
-                             [name]="'nodeMain' + node.id"
-                             appResizeInput
-                             [resizeOnString]="node.weight"
-                      >
-                    </mat-form-field>
-                    <button mat-button color="accent" class="but-spacer-left"
+                <div class="cpbx-edit-row" *ngFor="let node of onlyValues(item.nodes)">
+                  <div class="cpbx-edit-row" *ngIf="node.id && !isArray(node)">
+                    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="node.name" required [disabled]="!node.enabled" [name]="'nodeName' + node.id" appResizeInput [resizeOnString]="node.name" placeholder="Name" class="cpbx-input">
+</label>
+                    <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Weight</span>
+<input name="weight" [(ngModel)]="node.weight" required [disabled]="!node.enabled" [name]="'nodeMain' + node.id" appResizeInput [resizeOnString]="node.weight" placeholder="Weight" class="cpbx-input">
+</label>
+                    <button mat-flat-button color="primary" type="button"
                             [disabled]="loadCounter() > 0 || !isReadyToSend(details.controls['nodeName' + node.id], details.controls['nodeMain' + node.id])"
                             (click)="updateNode(node)">
                       Update
                     </button>
-                    <button *ngIf="node.enabled" mat-raised-button color="accent"
+                    <button *ngIf="node.enabled" mat-stroked-button color="basic" type="button"
                             [disabled]="loadCounter() > 0"
-                            class="but-spacer-left switch-button" (click)="switchNode(node)">
+                            class="switch-button" (click)="switchNode(node)">
                       Disable
                     </button>
-                    <button *ngIf="!node.enabled" mat-raised-button color="primary"
+                    <button *ngIf="!node.enabled" mat-stroked-button color="primary" type="button"
                             [disabled]="loadCounter() > 0"
-                            class="but-spacer-left switch-button" (click)="switchNode(node)">
+                            class="switch-button" (click)="switchNode(node)">
                       Enable
                     </button>
-                    <button mat-raised-button color="warn" class="but-spacer-left" [disabled]="loadCounter() > 0" (click)="deleteNode(node)">
+                    <button mat-stroked-button color="warn" type="button" [disabled]="loadCounter() > 0" (click)="deleteNode(node)">
                       Delete
                     </button>
                   </div>
                 </div>
                 <div *ngIf="item && item.nodes">
-                  <div class="spacer" *ngFor="let node of item.nodes.new; let i = index">
-                    <div *ngIf="node">
-                      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput name="name" [(ngModel)]="node.name" required [name]="'newNodeName' + i"
-                               appResizeInput
-                               [resizeOnString]="node.name"
-                        >
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-        <mat-label>Weight</mat-label>
-        <input matInput name="weight" [(ngModel)]="node.weight" required [name]="'newNodeWeight' + i"
-                               appResizeInput
-                               [resizeOnString]="node.weight"
-                        >
-                      </mat-form-field>
-                      <button mat-button color="accent" class="but-spacer-left"
+                  <div class="cpbx-edit-row" *ngFor="let node of item.nodes.new; let i = index">
+                    <div class="cpbx-edit-row" *ngIf="node">
+                      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="node.name" required [name]="'newNodeName' + i" appResizeInput [resizeOnString]="node.name" placeholder="Name" class="cpbx-input">
+</label>
+                      <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Weight</span>
+<input name="weight" [(ngModel)]="node.weight" required [name]="'newNodeWeight' + i" appResizeInput [resizeOnString]="node.weight" placeholder="Weight" class="cpbx-input">
+</label>
+                      <button mat-flat-button color="primary" type="button"
                               [disabled]="loadCounter() > 0 || !isReadyToSend(details.controls['newNodeName' + i], details.controls['newNodeWeight' + i])"
                               (click)="newNode(item.id, i, details.controls['newNodeName' + i].value, details.controls['newNodeWeight' + i])">
                         Update
                       </button>
-                      <button mat-button color="warn" [disabled]="loadCounter() > 0" (click)="dropNewNode(item.id, i)" class="but-spacer-left">
+                      <button mat-stroked-button color="warn" type="button" [disabled]="loadCounter() > 0" (click)="dropNewNode(item.id, i)">
                         Delete
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
-              <button mat-raised-button color="accent" class="spacer" [disabled]="loadCounter() > 0" (click)="addDistributorNodeField(item.id)">
+              <button mat-flat-button color="primary" type="button" [disabled]="loadCounter() > 0" (click)="addDistributorNodeField(item.id)">
                 Add
               </button>
             </form>
@@ -104,27 +88,27 @@
   </mat-tab>
 
   <mat-tab label="Add">
-    <form class="spacer spacerb" (ngSubmit)="onDistributorListSubmit()" *ngIf="list()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New list name" required name="name" [(ngModel)]="newItemName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" name="submit" [disabled]="loadCounter() > 0">Submit</button>
+    <form class="cpbx-form-panel" (ngSubmit)="onDistributorListSubmit()" *ngIf="list()">
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New list name" required name="name" [(ngModel)]="newItemName" class="cpbx-input">
+</label>
+      <button mat-flat-button color="primary" name="submit" [disabled]="loadCounter() > 0">Submit</button>
     </form>
   </mat-tab>
 
   <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb" #deleteForm="ngForm"  *ngIf="list()">
-      <div *ngFor="let item of onlyValues(list().lists); trackBy: trackByFn">
-        <mat-form-field hideRequiredMarker>
-        <mat-label>Distributor list name</mat-label>
-        <input matInput name="Distributor list name" required [ngModel]="item.name" [name]="'list::' + item.id">
-        </mat-form-field>
-        <button mat-button color="accent" [disabled]="loadCounter() > 0 || checkDirty(deleteForm.controls['list::' + item.id])"
+    <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm"  *ngIf="list()">
+      <div class="cpbx-edit-row" *ngFor="let item of onlyValues(list().lists); trackBy: trackByFn">
+        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Distributor list name</span>
+<input name="Distributor list name" required [ngModel]="item.name" [name]="'list::' + item.id" placeholder="Distributor list name" class="cpbx-input">
+</label>
+        <button mat-flat-button color="primary" type="button" [disabled]="loadCounter() > 0 || checkDirty(deleteForm.controls['list::' + item.id])"
                 (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'rename')">
           Update
         </button>
-        <button mat-raised-button color="warn"
+        <button mat-stroked-button color="warn" type="button"
                 [disabled]="loadCounter() > 0"
                 (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'delete')">
           Delete

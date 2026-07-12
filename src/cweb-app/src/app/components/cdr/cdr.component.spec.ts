@@ -12,8 +12,8 @@ describe('SystemComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CdrComponent ],
       imports: [
+        CdrComponent,
         NoopAnimationsModule,
         MatPaginatorModule,
         MatSortModule,

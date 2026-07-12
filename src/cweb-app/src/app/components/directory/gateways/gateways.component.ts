@@ -15,6 +15,7 @@ import {
   DeleteDirectoryUserGateway,
   UpdateDirectoryUserGatewayName,
   UpdateDirectoryUserGatewayVariable,
+  GetDirectoryUsers,
   AddDirectoryUserGatewayVariable,
   StoreNewDirectoryUserGatewayVariable,
   DeleteDirectoryUserGatewayVariable,
@@ -33,15 +34,17 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {KeyValuePadComponent} from "../../key-value-pad/key-value-pad.component";
+import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, RouterLink, KeyValuePadComponent],
+  imports: [MaterialModule, FormsModule, RouterLink, KeyValuePadComponent, InnerHeaderComponent, CpbxSelectDirective],
   selector: 'app-gateways',
   templateUrl: './gateways.component.html',
   styleUrls: ['./gateways.component.css']
 })
-export class GatewaysComponent implements OnDestroy {
+export class GatewaysComponent implements OnInit, OnDestroy {
 
   // --- Dependency Injection using inject() ---
   protected store = inject(Store<AppState>);
@@ -103,6 +106,12 @@ export class GatewaysComponent implements OnDestroy {
       this.selectedIndex = this.selectedIndex === 1 ? 0 : this.selectedIndex;
     }
   });
+
+  ngOnInit() {
+    if (Object.keys(this.userList()).length === 0) {
+      this.store.dispatch(new GetDirectoryUsers(null));
+    }
+  }
 
   ngOnDestroy() {
     if (this.route.snapshot?.data?.reconnectUpdater) {

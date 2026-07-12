@@ -53,6 +53,7 @@ import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bo
 import {ActivatedRoute} from '@angular/router';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ResizeInputDirective} from "../../../directives/resize-input.directive";
+import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 
 @Pipe({
   name: 'objectDataToName',
@@ -78,7 +79,7 @@ export class ObjectToNamePipe implements PipeTransform {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ObjectToNamePipe, ResizeInputDirective], // Include the new standalone pipe
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ObjectToNamePipe, ResizeInputDirective, CpbxSelectDirective], // Include the new standalone pipe
   selector: 'app-contexts',
   templateUrl: './contexts.component.html',
   styleUrls: ['./contexts.component.css']

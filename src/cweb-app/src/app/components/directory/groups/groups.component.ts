@@ -20,10 +20,11 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {State} from "../../../store/directory/directory.reducers";
+import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, RouterLink],
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, RouterLink, CpbxSelectDirective],
   selector: 'app-groups',
   templateUrl: './groups.component.html',
   styleUrls: ['./groups.component.css']

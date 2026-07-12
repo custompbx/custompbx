@@ -1,34 +1,44 @@
-mat-form-field {
-  padding: 0 5px;
+.domains-empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-.spacerb {
-  margin-top: 15px;
+.domains-empty h3 {
+  margin: 0 0 .25rem;
+  color: var(--cpbx-text);
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-.plusbut {
-  font-size: 40px;
-  display: inline;
+.domains-empty p {
+  margin: 0;
+  color: var(--cpbx-muted);
 }
 
-.oversize {
-  height: 50px;
-  width: 50px;
+.domains-list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
 }
 
-.mat-expansion-panel {
-  border-radius: 0;
+.domains-copy-button {
+  margin-bottom: 1rem;
 }
 
-.mat-expansion-panel-header {
-  border-radius: 0;
+.domains-detail-section {
+  margin-top: 1rem;
 }
 
-.but-spacer-left {
-  margin-left: 5px;
+.domains-detail-section h3 {
+  margin: 0 0 .75rem;
+  color: var(--cpbx-text);
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-.xml-area{
+.xml-area {
   width: 100%;
   overflow: hidden;
 }

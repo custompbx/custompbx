@@ -1,12 +1,12 @@
 <app-inner-header name="Dialplan" [loadCounter]="loadCounter()"></app-inner-header>
 @if (list()) {
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [selectedIndex]="selectedIndex()" (selectedIndexChange)="mainTabChanged($event)">
+  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [selectedIndex]="selectedIndex()" (selectedIndexChange)="mainTabChanged($event)">
     <mat-tab label="List">
       @if (loadCounter() === 0 && !onlyValues(list())?.length) {
         <mat-card>
           <mat-card-content>
             Here no any contexts yet. You can start creating them or try to import from existing config.
-            <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+            <button mat-stroked-button color="basic" class="switch-button"
               (click)="importDialplan()">
               Import
             </button>
@@ -51,7 +51,7 @@
                                 </mat-panel-description>
                               </mat-expansion-panel-header>
                               <mat-checkbox class="continue-box" [checked]="extension.continue === 'true'" (change)="switchContinue(extension)">Continue</mat-checkbox>
-                              <button mat-raised-button color="accent"
+                              <button mat-flat-button color="primary" type="button"
                                 (click)="addCondition(extension.id)">
                                 Add Condition
                               </button>
@@ -76,168 +76,130 @@
                                           <div class="spacer">
                                             @if (!condition.regex) {
                                               <div >
-                                                <mat-form-field hideRequiredMarker>
-                                                  <mat-label>Field</mat-label>
-                                                  <input matInput name="field" [(ngModel)]="condition.field" required
-                                                    [disabled]="!condition.enabled"
-                                                    [name]="'conditionField' + condition.id">
-                                                  </mat-form-field>
-                                                  <mat-form-field hideRequiredMarker>
-                                                    <mat-label>Expression</mat-label>
-                                                    <input matInput name="expression" [(ngModel)]="condition.expression"
-                                                      required
-                                                      [disabled]="!condition.enabled"
-                                                      [name]="'conditionExpression' + condition.id">
-                                                    </mat-form-field>
+                                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Field</span>
+<input name="field" [(ngModel)]="condition.field" required [disabled]="!condition.enabled" [name]="'conditionField' + condition.id" placeholder="Field" class="cpbx-input">
+</label>
+                                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Expression</span>
+<input name="expression" [(ngModel)]="condition.expression" required [disabled]="!condition.enabled" [name]="'conditionExpression' + condition.id" placeholder="Expression" class="cpbx-input">
+</label>
                                                   </div>
                                                 }
                                                 @if (!condition.field && !condition.regex) {
                                                   <div>
-                                                    <mat-form-field hideRequiredMarker>
-                                                      <mat-label>Dst</mat-label>
-                                                      <input matInput name="dst" [(ngModel)]="condition.dst" required
-                                                        [disabled]="!condition.enabled"
-                                                        [name]="'conditionDst' + condition.id">
-                                                      </mat-form-field>
-                                                      <mat-form-field hideRequiredMarker>
-                                                        <mat-label>Hour</mat-label>
-                                                        <input matInput name="hour" [(ngModel)]="condition.hour" required
-                                                          [disabled]="!condition.enabled"
-                                                          [name]="'conditionHour' + condition.id">
-                                                        </mat-form-field>
+                                                    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Dst</span>
+<input name="dst" [(ngModel)]="condition.dst" required [disabled]="!condition.enabled" [name]="'conditionDst' + condition.id" placeholder="Dst" class="cpbx-input">
+</label>
+                                                      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Hour</span>
+<input name="hour" [(ngModel)]="condition.hour" required [disabled]="!condition.enabled" [name]="'conditionHour' + condition.id" placeholder="Hour" class="cpbx-input">
+</label>
                                                       </div>
                                                     }
                                                     @if (!condition.field && !condition.regex) {
                                                       <div>
-                                                        <mat-form-field hideRequiredMarker>
-                                                          <mat-label>Mday</mat-label>
-                                                          <input matInput name="mday" [(ngModel)]="condition.mday" required
-                                                            [disabled]="!condition.enabled"
-                                                            [name]="'conditionMday' + condition.id">
-                                                          </mat-form-field>
-                                                          <mat-form-field hideRequiredMarker>
-                                                            <mat-label>Minday</mat-label>
-                                                            <input matInput name="minday" [(ngModel)]="condition.minday" required
-                                                              [disabled]="!condition.enabled"
-                                                              [name]="'conditionMinday' + condition.id">
-                                                            </mat-form-field>
+                                                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Mday</span>
+<input name="mday" [(ngModel)]="condition.mday" required [disabled]="!condition.enabled" [name]="'conditionMday' + condition.id" placeholder="Mday" class="cpbx-input">
+</label>
+                                                          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Minday</span>
+<input name="minday" [(ngModel)]="condition.minday" required [disabled]="!condition.enabled" [name]="'conditionMinday' + condition.id" placeholder="Minday" class="cpbx-input">
+</label>
                                                           </div>
                                                         }
                                                         @if (!condition.field && !condition.regex) {
                                                           <div>
-                                                            <mat-form-field hideRequiredMarker>
-                                                              <mat-label>Minute</mat-label>
-                                                              <input matInput name="minute" [(ngModel)]="condition.minute" required
-                                                                [disabled]="!condition.enabled"
-                                                                [name]="'conditionMinute' + condition.id">
-                                                              </mat-form-field>
-                                                              <mat-form-field hideRequiredMarker>
-                                                                <mat-label>Mon</mat-label>
-                                                                <input matInput name="mon" [(ngModel)]="condition.mon" required
-                                                                  [disabled]="!condition.enabled"
-                                                                  [name]="'conditionMon' + condition.id">
-                                                                </mat-form-field>
+                                                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Minute</span>
+<input name="minute" [(ngModel)]="condition.minute" required [disabled]="!condition.enabled" [name]="'conditionMinute' + condition.id" placeholder="Minute" class="cpbx-input">
+</label>
+                                                              <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Mon</span>
+<input name="mon" [(ngModel)]="condition.mon" required [disabled]="!condition.enabled" [name]="'conditionMon' + condition.id" placeholder="Mon" class="cpbx-input">
+</label>
                                                               </div>
                                                             }
                                                             @if (!condition.field && !condition.regex) {
                                                               <div>
-                                                                <mat-form-field hideRequiredMarker>
-                                                                  <mat-label>Mweek</mat-label>
-                                                                  <input matInput name="mweek" [(ngModel)]="condition.mweek" required
-                                                                    [disabled]="!condition.enabled"
-                                                                    [name]="'conditionMweek' + condition.id">
-                                                                  </mat-form-field>
-                                                                  <mat-form-field hideRequiredMarker>
-                                                                    <mat-label>Date-time</mat-label>
-                                                                    <input matInput name="date-time" [(ngModel)]="condition.date_time" required
-                                                                      [disabled]="!condition.enabled"
-                                                                      [name]="'conditionDate_time' + condition.id">
-                                                                    </mat-form-field>
+                                                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Mweek</span>
+<input name="mweek" [(ngModel)]="condition.mweek" required [disabled]="!condition.enabled" [name]="'conditionMweek' + condition.id" placeholder="Mweek" class="cpbx-input">
+</label>
+                                                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Date-time</span>
+<input name="date-time" [(ngModel)]="condition.date_time" required [disabled]="!condition.enabled" [name]="'conditionDate_time' + condition.id" placeholder="Date-time" class="cpbx-input">
+</label>
                                                                   </div>
                                                                 }
                                                                 @if (!condition.field && !condition.regex) {
                                                                   <div>
-                                                                    <mat-form-field hideRequiredMarker>
-                                                                      <mat-label>Time_of_day</mat-label>
-                                                                      <input matInput name="time_of_day" [(ngModel)]="condition.time_of_day"
-                                                                        required
-                                                                        [disabled]="!condition.enabled"
-                                                                        [name]="'conditionTime_of_day' + condition.id">
-                                                                      </mat-form-field>
-                                                                      <mat-form-field hideRequiredMarker>
-                                                                        <mat-label>Tz_offset</mat-label>
-                                                                        <input matInput name="tz_offset" [(ngModel)]="condition.tz_offset" required
-                                                                          [disabled]="!condition.enabled"
-                                                                          [name]="'conditionTz_offset' + condition.id">
-                                                                        </mat-form-field>
+                                                                    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Time_of_day</span>
+<input name="time_of_day" [(ngModel)]="condition.time_of_day" required [disabled]="!condition.enabled" [name]="'conditionTime_of_day' + condition.id" placeholder="Time_of_day" class="cpbx-input">
+</label>
+                                                                      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Tz_offset</span>
+<input name="tz_offset" [(ngModel)]="condition.tz_offset" required [disabled]="!condition.enabled" [name]="'conditionTz_offset' + condition.id" placeholder="Tz_offset" class="cpbx-input">
+</label>
                                                                       </div>
                                                                     }
                                                                     @if (!condition.field && !condition.regex) {
                                                                       <div>
-                                                                        <mat-form-field hideRequiredMarker>
-                                                                          <mat-label>Wday</mat-label>
-                                                                          <input matInput name="wday" [(ngModel)]="condition.wday" required
-                                                                            [disabled]="!condition.enabled"
-                                                                            [name]="'conditionWday' + condition.id">
-                                                                          </mat-form-field>
-                                                                          <mat-form-field hideRequiredMarker>
-                                                                            <mat-label>Week</mat-label>
-                                                                            <input matInput name="week" [(ngModel)]="condition.week" required
-                                                                              [disabled]="!condition.enabled"
-                                                                              [name]="'conditionWeek' + condition.id">
-                                                                            </mat-form-field>
+                                                                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Wday</span>
+<input name="wday" [(ngModel)]="condition.wday" required [disabled]="!condition.enabled" [name]="'conditionWday' + condition.id" placeholder="Wday" class="cpbx-input">
+</label>
+                                                                          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Week</span>
+<input name="week" [(ngModel)]="condition.week" required [disabled]="!condition.enabled" [name]="'conditionWeek' + condition.id" placeholder="Week" class="cpbx-input">
+</label>
                                                                           </div>
                                                                         }
                                                                         @if (!condition.field && !condition.regex) {
                                                                           <div>
-                                                                            <mat-form-field hideRequiredMarker>
-                                                                              <mat-label>Yday</mat-label>
-                                                                              <input matInput name="yday" [(ngModel)]="condition.yday" required
-                                                                                [disabled]="!condition.enabled"
-                                                                                [name]="'conditionYday' + condition.id">
-                                                                              </mat-form-field>
-                                                                              <mat-form-field hideRequiredMarker>
-                                                                                <mat-label>Year</mat-label>
-                                                                                <input matInput name="year" [(ngModel)]="condition.year" required
-                                                                                  [disabled]="!condition.enabled"
-                                                                                  [name]="'conditionYear' + condition.id">
-                                                                                </mat-form-field>
+                                                                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Yday</span>
+<input name="yday" [(ngModel)]="condition.yday" required [disabled]="!condition.enabled" [name]="'conditionYday' + condition.id" placeholder="Yday" class="cpbx-input">
+</label>
+                                                                              <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Year</span>
+<input name="year" [(ngModel)]="condition.year" required [disabled]="!condition.enabled" [name]="'conditionYear' + condition.id" placeholder="Year" class="cpbx-input">
+</label>
                                                                               </div>
                                                                             }
                                                                             <div>
                                                                               @if (!condition.field) {
-                                                                                <mat-form-field hideRequiredMarker>
-                                                                                  <mat-label>Regex</mat-label>
-                                                                                  <input matInput name="regex" [(ngModel)]="condition.regex" required
-                                                                                    [disabled]="!condition.enabled"
-                                                                                    [name]="'conditionRegex' + condition.id">
-                                                                                  </mat-form-field>
+                                                                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Regex</span>
+<input name="regex" [(ngModel)]="condition.regex" required [disabled]="!condition.enabled" [name]="'conditionRegex' + condition.id" placeholder="Regex" class="cpbx-input">
+</label>
                                                                                 }
-                                                                                <mat-form-field hideRequiredMarker>
-                                                                                  <mat-label>Break</mat-label>
-                                                                                  <input matInput name="break" [(ngModel)]="condition.break" required
-                                                                                    [disabled]="!condition.enabled"
-                                                                                    [name]="'conditionBreak' + condition.id">
-                                                                                  </mat-form-field>
-                                                                                  <button mat-button color="accent" class="but-spacer-left"
+                                                                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Break</span>
+<input name="break" [(ngModel)]="condition.break" required [disabled]="!condition.enabled" [name]="'conditionBreak' + condition.id" placeholder="Break" class="cpbx-input">
+</label>
+                                                                                  <button mat-flat-button color="primary" class="but-spacer-left"
                                                                                     (click)="updateCondition(condition)">
                                                                                     Update
                                                                                   </button>
                                                                                   @if (condition.enabled) {
-                                                                                    <button mat-raised-button color="accent"
+                                                                                    <button mat-flat-button color="accent"
                                                                                       class="but-spacer-left switch-button"
                                                                                       (click)="switchCondition(condition)">
                                                                                       Disable
                                                                                     </button>
                                                                                   }
                                                                                   @if (!condition.enabled) {
-                                                                                    <button mat-raised-button color="primary"
+                                                                                    <button mat-flat-button color="primary"
                                                                                       class="but-spacer-left switch-button"
                                                                                       (click)="switchCondition(condition)">
                                                                                       Enable
                                                                                     </button>
                                                                                   }
-                                                                                  <button mat-raised-button color="warn" class="but-spacer-left"
+                                                                                  <button mat-flat-button color="warn" class="but-spacer-left"
                                                                                     (click)="openBottomSheetCondition(condition, 'condition')">
                                                                                     Delete
                                                                                   </button>
@@ -252,38 +214,34 @@
                                                                                     <div>
                                                                                       @if (regex) {
                                                                                         <div>
-                                                                                          <mat-form-field hideRequiredMarker>
-                                                                                            <mat-label>Field</mat-label>
-                                                                                            <input matInput name="field" [(ngModel)]="regex.field" required
-                                                                                              [disabled]="!regex.enabled"
-                                                                                              [name]="'regexField' + regex.id">
-                                                                                            </mat-form-field>
-                                                                                            <mat-form-field hideRequiredMarker>
-                                                                                              <mat-label>Expression</mat-label>
-                                                                                              <input matInput name="expression" [(ngModel)]="regex.expression" required
-                                                                                                [disabled]="!regex.enabled"
-                                                                                                [name]="'regexExpression' + regex.id">
-                                                                                              </mat-form-field>
-                                                                                              <button mat-button color="accent" class="but-spacer-left"
+                                                                                          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Field</span>
+<input name="field" [(ngModel)]="regex.field" required [disabled]="!regex.enabled" [name]="'regexField' + regex.id" placeholder="Field" class="cpbx-input">
+</label>
+                                                                                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Expression</span>
+<input name="expression" [(ngModel)]="regex.expression" required [disabled]="!regex.enabled" [name]="'regexExpression' + regex.id" placeholder="Expression" class="cpbx-input">
+</label>
+                                                                                              <button mat-flat-button color="primary" class="but-spacer-left"
                                                                                                 [disabled]="!isReadyToSend(details.controls['regexField' + regex.id], details.controls['regexExpression' + regex.id])"
                                                                                                 (click)="updateRegex(regex)">
                                                                                                 Update
                                                                                               </button>
                                                                                               @if (regex.enabled) {
-                                                                                                <button mat-raised-button color="accent"
+                                                                                                <button mat-flat-button color="accent"
                                                                                                   class="but-spacer-left switch-button"
                                                                                                   (click)="switchRegex(regex)">
                                                                                                   Disable
                                                                                                 </button>
                                                                                               }
                                                                                               @if (!regex.enabled) {
-                                                                                                <button mat-raised-button color="primary"
+                                                                                                <button mat-flat-button color="primary"
                                                                                                   class="but-spacer-left switch-button"
                                                                                                   (click)="switchRegex(regex)">
                                                                                                   Enable
                                                                                                 </button>
                                                                                               }
-                                                                                              <button mat-raised-button color="warn" class="but-spacer-left"
+                                                                                              <button mat-flat-button color="warn" class="but-spacer-left"
                                                                                                 (click)="deleteRegex(regex)">
                                                                                                 Delete
                                                                                               </button>
@@ -296,24 +254,20 @@
                                                                                           <div>
                                                                                             @if (newRegex) {
                                                                                               <div class="spacer">
-                                                                                                <mat-form-field hideRequiredMarker>
-                                                                                                  <mat-label>Field</mat-label>
-                                                                                                  <input matInput name="field" [(ngModel)]="newRegex.field" required
-                                                                                                    [disabled]="!newRegex.enabled"
-                                                                                                    [name]="'newRegexField' + i">
-                                                                                                  </mat-form-field>
-                                                                                                  <mat-form-field hideRequiredMarker>
-                                                                                                    <mat-label>Expression</mat-label>
-                                                                                                    <input matInput name="expression" [(ngModel)]="newRegex.expression" required
-                                                                                                      [disabled]="!newRegex.enabled"
-                                                                                                      [name]="'newRegexExpression' + i">
-                                                                                                    </mat-form-field>
-                                                                                                    <button mat-button color="accent" class="but-spacer-left"
+                                                                                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Field</span>
+<input name="field" [(ngModel)]="newRegex.field" required [disabled]="!newRegex.enabled" [name]="'newRegexField' + i" placeholder="Field" class="cpbx-input">
+</label>
+                                                                                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Expression</span>
+<input name="expression" [(ngModel)]="newRegex.expression" required [disabled]="!newRegex.enabled" [name]="'newRegexExpression' + i" placeholder="Expression" class="cpbx-input">
+</label>
+                                                                                                    <button mat-flat-button color="primary" class="but-spacer-left"
                                                                                                       [disabled]="!isReadyToSend(details.controls['newRegexField' + i], details.controls['newRegexExpression' + i])"
                                                                                                       (click)="addRegex(context.id, extension.id, condition.id, i, newRegex)">
                                                                                                       Update
                                                                                                     </button>
-                                                                                                    <button mat-button color="warn" class="but-spacer-left"
+                                                                                                    <button mat-stroked-button color="warn" class="but-spacer-left"
                                                                                                       (click)="delNewRegex(i, context.id, extension.id, condition.id)">
                                                                                                       Delete
                                                                                                     </button>
@@ -321,7 +275,7 @@
                                                                                                 }
                                                                                               </div>
                                                                                             }
-                                                                                            <button mat-raised-button color="accent"
+                                                                                            <button mat-flat-button color="accent"
                                                                                               (click)="addNewRegex(context.id, extension.id, condition.id)">
                                                                                               Add
                                                                                             </button>
@@ -336,52 +290,40 @@
                                                                                             @if (action) {
                                                                                               <div>
                                                                                                 <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
-                                                                                                <mat-form-field hideRequiredMarker>
-                                                                                                  <mat-label>Name</mat-label>
-                                                                                                  <input matInput name="name" [(ngModel)]="action.application" required
-                                                                                                    [disabled]="!action.enabled"
-                                                                                                    [name]="'actionApplication' + action.id"
-                                                                                                    appResizeInput
-                                                                                                    [resizeOnString]="action.application"
-                                                                                                    >
-                                                                                                  </mat-form-field>
-                                                                                                  <mat-form-field hideRequiredMarker [ngClass]="{'expanded': !inlineActions[action.application]}">
-                                                                                                    <mat-label>Data</mat-label>
-                                                                                                    <input matInput name="data" [(ngModel)]="action.data" required
-                                                                                                      [disabled]="!action.enabled"
-                                                                                                      [name]="'actionData' + action.id"
-                                                                                                      appResizeInput
-                                                                                                      [resizeOnString]="action.data"
-                                                                                                      >
-                                                                                                    </mat-form-field>
+                                                                                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="action.application" required [disabled]="!action.enabled" [name]="'actionApplication' + action.id" appResizeInput [resizeOnString]="action.application" placeholder="Name" class="cpbx-input">
+</label>
+                                                                                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Data</span>
+<input name="data" [(ngModel)]="action.data" required [disabled]="!action.enabled" [name]="'actionData' + action.id" appResizeInput [resizeOnString]="action.data" placeholder="Data" class="cpbx-input">
+</label>
                                                                                                     @if (inlineActions[action.application]) {
-                                                                                                      <mat-form-field hideRequiredMarker class="inline-action">
-                                                                                                        <mat-label>Inline</mat-label>
-                                                                                                        <input matInput name="inline" [(ngModel)]="action.inline" required
-                                                                                                          [disabled]="!action.enabled"
-                                                                                                          [name]="'actionInline' + action.id">
-                                                                                                        </mat-form-field>
+                                                                                                      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Inline</span>
+<input name="inline" [(ngModel)]="action.inline" required [disabled]="!action.enabled" [name]="'actionInline' + action.id" placeholder="Inline" class="cpbx-input">
+</label>
                                                                                                       }
-                                                                                                      <button mat-button color="accent" class="but-spacer-left"
+                                                                                                      <button mat-flat-button color="primary" class="but-spacer-left"
                                                                                                         [disabled]="!isReadyToSendAction(details.controls['actionApplication' + action.id], details.controls['actionData' + action.id], details.controls['actionInline' + action.id])"
                                                                                                         (click)="updateAction(action)">
                                                                                                         Update
                                                                                                       </button>
                                                                                                       @if (action.enabled) {
-                                                                                                        <button mat-raised-button color="accent"
+                                                                                                        <button mat-flat-button color="accent"
                                                                                                           class="but-spacer-left switch-button"
                                                                                                           (click)="switchAction(action)">
                                                                                                           Disable
                                                                                                         </button>
                                                                                                       }
                                                                                                       @if (!action.enabled) {
-                                                                                                        <button mat-raised-button color="primary"
+                                                                                                        <button mat-flat-button color="primary"
                                                                                                           class="but-spacer-left switch-button"
                                                                                                           (click)="switchAction(action)">
                                                                                                           Enable
                                                                                                         </button>
                                                                                                       }
-                                                                                                      <button mat-raised-button color="warn" class="but-spacer-left"
+                                                                                                      <button mat-flat-button color="warn" class="but-spacer-left"
                                                                                                         (click)="deleteAction(action)">
                                                                                                         Delete
                                                                                                       </button>
@@ -393,35 +335,26 @@
                                                                                                 <div>
                                                                                                   @if (newAction) {
                                                                                                     <div class="spacer">
-                                                                                                      <mat-form-field hideRequiredMarker>
-                                                                                                        <mat-label>Name</mat-label>
-                                                                                                        <input matInput name="name" [(ngModel)]="newAction.application" required
-                                                                                                          [name]="'newActionApplication' + i"
-                                                                                                          appResizeInput
-                                                                                                          [resizeOnString]="newAction.application"
-                                                                                                          >
-                                                                                                        </mat-form-field>
-                                                                                                        <mat-form-field hideRequiredMarker>
-                                                                                                          <mat-label>Data</mat-label>
-                                                                                                          <input matInput name="data" [(ngModel)]="newAction.data" required
-                                                                                                            [name]="'newActionData' + i"
-                                                                                                            appResizeInput
-                                                                                                            [resizeOnString]="newAction.data"
-                                                                                                            >
-                                                                                                          </mat-form-field>
+                                                                                                      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="newAction.application" required [name]="'newActionApplication' + i" appResizeInput [resizeOnString]="newAction.application" placeholder="Name" class="cpbx-input">
+</label>
+                                                                                                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Data</span>
+<input name="data" [(ngModel)]="newAction.data" required [name]="'newActionData' + i" appResizeInput [resizeOnString]="newAction.data" placeholder="Data" class="cpbx-input">
+</label>
                                                                                                           @if (inlineActions[newAction.application]) {
-                                                                                                            <mat-form-field hideRequiredMarker class="inline-action">
-                                                                                                              <mat-label>Inline</mat-label>
-                                                                                                              <input matInput name="inline" [(ngModel)]="newAction.inline" required
-                                                                                                                [name]="'newActionData' + i">
-                                                                                                              </mat-form-field>
+                                                                                                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Inline</span>
+<input name="inline" [(ngModel)]="newAction.inline" required [name]="'newActionData' + i" placeholder="Inline" class="cpbx-input">
+</label>
                                                                                                             }
-                                                                                                            <button mat-button color="accent" class="but-spacer-left"
+                                                                                                            <button mat-flat-button color="primary" class="but-spacer-left"
                                                                                                               [disabled]="!isReadyToSend(details.controls['newActionApplication' + i], details.controls['newActionData' + i])"
                                                                                                               (click)="addAction(context.id, extension.id, condition.id, i, newAction)">
                                                                                                               Update
                                                                                                             </button>
-                                                                                                            <button mat-button color="warn" class="but-spacer-left"
+                                                                                                            <button mat-stroked-button color="warn" class="but-spacer-left"
                                                                                                               (click)="delNewAction(i, context.id, extension.id, condition.id)">
                                                                                                               Delete
                                                                                                             </button>
@@ -429,7 +362,7 @@
                                                                                                         }
                                                                                                       </div>
                                                                                                     }
-                                                                                                    <button mat-raised-button color="accent"
+                                                                                                    <button mat-flat-button color="accent"
                                                                                                       (click)="addNewAction(context.id, extension.id, condition.id)">
                                                                                                       Add
                                                                                                     </button>
@@ -443,44 +376,34 @@
                                                                                                         @if (antiaction) {
                                                                                                           <div>
                                                                                                             <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
-                                                                                                            <mat-form-field hideRequiredMarker>
-                                                                                                              <mat-label>Name</mat-label>
-                                                                                                              <input matInput name="name" [(ngModel)]="antiaction.application" required
-                                                                                                                [disabled]="!antiaction.enabled"
-                                                                                                                [name]="'antiactionApplication' + antiaction.id"
-                                                                                                                appResizeInput
-                                                                                                                [resizeOnString]="antiaction.application"
-                                                                                                                >
-                                                                                                              </mat-form-field>
-                                                                                                              <mat-form-field hideRequiredMarker>
-                                                                                                                <mat-label>Data</mat-label>
-                                                                                                                <input matInput name="data" [(ngModel)]="antiaction.data" required
-                                                                                                                  [disabled]="!antiaction.enabled"
-                                                                                                                  [name]="'antiactionData' + antiaction.id"
-                                                                                                                  appResizeInput
-                                                                                                                  [resizeOnString]="antiaction.data"
-                                                                                                                  >
-                                                                                                                </mat-form-field>
-                                                                                                                <button mat-button color="accent" class="but-spacer-left"
+                                                                                                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="antiaction.application" required [disabled]="!antiaction.enabled" [name]="'antiactionApplication' + antiaction.id" appResizeInput [resizeOnString]="antiaction.application" placeholder="Name" class="cpbx-input">
+</label>
+                                                                                                              <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Data</span>
+<input name="data" [(ngModel)]="antiaction.data" required [disabled]="!antiaction.enabled" [name]="'antiactionData' + antiaction.id" appResizeInput [resizeOnString]="antiaction.data" placeholder="Data" class="cpbx-input">
+</label>
+                                                                                                                <button mat-flat-button color="primary" class="but-spacer-left"
                                                                                                                   [disabled]="!isReadyToSend(details.controls['antiactionApplication' + antiaction.id], details.controls['antiactionData' + antiaction.id])"
                                                                                                                   (click)="updateAntiaction(antiaction)">
                                                                                                                   Update
                                                                                                                 </button>
                                                                                                                 @if (antiaction.enabled) {
-                                                                                                                  <button mat-raised-button color="accent"
+                                                                                                                  <button mat-flat-button color="accent"
                                                                                                                     class="but-spacer-left switch-button"
                                                                                                                     (click)="switchAntiaction(antiaction)">
                                                                                                                     Disable
                                                                                                                   </button>
                                                                                                                 }
                                                                                                                 @if (!antiaction.enabled) {
-                                                                                                                  <button mat-raised-button color="primary"
+                                                                                                                  <button mat-flat-button color="primary"
                                                                                                                     class="but-spacer-left switch-button"
                                                                                                                     (click)="switchAntiaction(antiaction)">
                                                                                                                     Enable
                                                                                                                   </button>
                                                                                                                 }
-                                                                                                                <button mat-raised-button color="warn" class="but-spacer-left"
+                                                                                                                <button mat-flat-button color="warn" class="but-spacer-left"
                                                                                                                   (click)="deleteAntiaction(antiaction)">
                                                                                                                   Delete
                                                                                                                 </button>
@@ -493,28 +416,20 @@
                                                                                                             >
                                                                                                             @if (newAntiaction) {
                                                                                                               <div class="spacer">
-                                                                                                                <mat-form-field hideRequiredMarker>
-                                                                                                                  <mat-label>Name</mat-label>
-                                                                                                                  <input matInput name="name" [(ngModel)]="newAntiaction.application" required
-                                                                                                                    [name]="'newAntiactionApplication' + i"
-                                                                                                                    appResizeInput
-                                                                                                                    [resizeOnString]="newAntiaction.application"
-                                                                                                                    >
-                                                                                                                  </mat-form-field>
-                                                                                                                  <mat-form-field hideRequiredMarker>
-                                                                                                                    <mat-label>Data</mat-label>
-                                                                                                                    <input matInput name="data" [(ngModel)]="newAntiaction.data" required
-                                                                                                                      [name]="'newAntiactionData' + i"
-                                                                                                                      appResizeInput
-                                                                                                                      [resizeOnString]="newAntiaction.data"
-                                                                                                                      >
-                                                                                                                    </mat-form-field>
-                                                                                                                    <button mat-button color="accent" class="but-spacer-left"
+                                                                                                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="newAntiaction.application" required [name]="'newAntiactionApplication' + i" appResizeInput [resizeOnString]="newAntiaction.application" placeholder="Name" class="cpbx-input">
+</label>
+                                                                                                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Data</span>
+<input name="data" [(ngModel)]="newAntiaction.data" required [name]="'newAntiactionData' + i" appResizeInput [resizeOnString]="newAntiaction.data" placeholder="Data" class="cpbx-input">
+</label>
+                                                                                                                    <button mat-flat-button color="primary" class="but-spacer-left"
                                                                                                                       [disabled]="!isReadyToSend(details.controls['newAntiactionApplication' + i], details.controls['newAntiactionData' + i])"
                                                                                                                       (click)="addAntiaction(context.id, extension.id, condition.id, i, newAntiaction)">
                                                                                                                       Update
                                                                                                                     </button>
-                                                                                                                    <button mat-button color="warn" class="but-spacer-left"
+                                                                                                                    <button mat-stroked-button color="warn" class="but-spacer-left"
                                                                                                                       (click)="delNewAntiaction(i, context.id, extension.id, condition.id)">
                                                                                                                       Delete
                                                                                                                     </button>
@@ -522,7 +437,7 @@
                                                                                                                 }
                                                                                                               </div>
                                                                                                             }
-                                                                                                            <button mat-raised-button color="accent"
+                                                                                                            <button mat-flat-button color="accent"
                                                                                                               (click)="addNewAntiaction(context.id, extension.id, condition.id)">
                                                                                                               Add
                                                                                                             </button>
@@ -547,80 +462,82 @@
                                                                       }
                                                                     </mat-tab>
                                                                     <mat-tab label="Add">
-                                                                      <form class="spacer spacerb" (ngSubmit)="onContextSubmit()">
-                                                                        <mat-form-field hideRequiredMarker>
-                                                                          <mat-label>Name</mat-label>
-                                                                          <input matInput placeholder="New context name" required name="name" [(ngModel)]="newContextName">
-                                                                        </mat-form-field>
-                                                                        <button mat-raised-button color="primary" type="submit">Submit</button>
+                                                                      <form class="cpbx-form-panel" (ngSubmit)="onContextSubmit()">
+                                                                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New context name" required name="name" [(ngModel)]="newContextName" class="cpbx-input">
+</label>
+                                                                        <button mat-flat-button color="primary" type="submit">Submit</button>
                                                                       </form>
-                                                                      <form class="spacer spacerb" (ngSubmit)="onExtensionSubmit()">
-                                                                        <mat-form-field hideRequiredMarker>
-                                                                          <mat-label>Context</mat-label>
-                                                                          <mat-select required name="context" [(ngModel)]="newContextId" disableOptionCentering>
+                                                                      <form class="cpbx-form-panel" (ngSubmit)="onExtensionSubmit()">
+                                                                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Context</span>
+<select class="cpbx-select" required name="context" [(ngModel)]="newContextId">
+<option [ngValue]="null" disabled hidden>Context</option>
                                                                             @for (context of onlyValues(list()); track trackByFn($index, context)) {
-                                                                              <mat-option [value]="context.id">
+                                                                              <option [ngValue]="context.id">
                                                                                 @if (context) {
                                                                                   <span>
                                                                                     {{context.name}}
                                                                                   </span>
                                                                                 }
-                                                                              </mat-option>
+                                                                              </option>
                                                                             }
-                                                                          </mat-select>
-                                                                        </mat-form-field>
-                                                                        <mat-form-field hideRequiredMarker>
-                                                                          <mat-label>Name</mat-label>
-                                                                          <input matInput placeholder="New extension name" required name="name" [(ngModel)]="newExtensionName">
-                                                                        </mat-form-field>
-                                                                        <button mat-raised-button color="primary" type="submit">Submit</button>
+                                                                          </select>
+</label>
+                                                                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New extension name" required name="name" [(ngModel)]="newExtensionName" class="cpbx-input">
+</label>
+                                                                        <button mat-flat-button color="primary" type="submit">Submit</button>
                                                                       </form>
                                                                     </mat-tab>
                                                                     <mat-tab label="Rename/Delete">
-                                                                      <form class="spacer spacerb" #deleteForm="ngForm">
-                                                                        <mat-form-field hideRequiredMarker>
-                                                                          <mat-label>Context</mat-label>
-                                                                          <mat-select required name="context" [(ngModel)]="contextId" (selectionChange)="selectContext($event)" disableOptionCentering>
+                                                                      <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
+                                                                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Context</span>
+<select class="cpbx-select" required name="context" [(ngModel)]="contextId" (selectionChange)="selectContext($event)">
+<option [ngValue]="null" disabled hidden>Context</option>
                                                                             @for (context of onlyValues(list()); track trackByFn($index, context)) {
-                                                                              <mat-option [value]="context.id">
+                                                                              <option [ngValue]="context.id">
                                                                                 @if (context) {
                                                                                   <span>
                                                                                     {{context.name}}
                                                                                   </span>
                                                                                 }
-                                                                              </mat-option>
+                                                                              </option>
                                                                             }
-                                                                          </mat-select>
-                                                                        </mat-form-field>
+                                                                          </select>
+</label>
                                                                         @if (list() && list()[contextId]) {
-                                                                          <div>
-                                                                            <h3>Context:</h3>
-                                                                            <mat-form-field hideRequiredMarker>
-                                                                              <mat-label>Context name</mat-label>
-                                                                              <input matInput name="Context name" required [ngModel]="list()[contextId].name"
-                                                                                [name]="'context::' + contextId">
-                                                                              </mat-form-field>
-                                                                              <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['context::' + contextId])"
+                                                                          <div class="cpbx-form-panel cpbx-form-panel--stack">
+                                                                            <h3 class="cpbx-form-title">Context</h3>
+                                                                            <div class="cpbx-edit-row">
+                                                                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Context name</span>
+<input name="Context name" required [ngModel]="list()[contextId].name" [name]="'context::' + contextId" placeholder="Context name" class="cpbx-input">
+</label>
+                                                                              <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['context::' + contextId])"
                                                                                 (click)="openBottomSheetContext(contextId, deleteForm.controls['context::' + contextId].value, list()[contextId].name, 'rename')">
                                                                                 Update
                                                                               </button>
-                                                                              <button mat-raised-button color="warn"
+                                                                              <button mat-stroked-button color="warn" type="button"
                                                                                 (click)="openBottomSheetContext(contextId, deleteForm.controls['context::' + contextId].value, list()[contextId].name, 'delete')">
                                                                                 Delete
                                                                               </button>
-                                                                              <h3>Extensions:</h3>
+                                                                              </div>
+                                                                              <h3 class="cpbx-form-title">Extensions</h3>
                                                                               @for (extension of list()[contextId].extensions; track extension) {
-                                                                                <div class="panel-wrapper">
-                                                                                  <mat-form-field hideRequiredMarker>
-                                                                                    <mat-label>Extension name</mat-label>
-                                                                                    <input matInput name="Extension name" required [ngModel]="extension.name"
-                                                                                      [name]="'extension::' + extension.id">
-                                                                                    </mat-form-field>
-                                                                                    <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['extension::' + extension.id])"
+                                                                                <div class="cpbx-edit-row">
+                                                                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Extension name</span>
+<input name="Extension name" required [ngModel]="extension.name" [name]="'extension::' + extension.id" placeholder="Extension name" class="cpbx-input">
+</label>
+                                                                                    <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['extension::' + extension.id])"
                                                                                       (click)="openBottomSheetExtension(extension.id, deleteForm.controls['extension::' + extension.id].value, extension.name, 'rename')">
                                                                                       Update
                                                                                     </button>
-                                                                                    <button mat-raised-button color="warn"
+                                                                                    <button mat-stroked-button color="warn" type="button"
                                                                                       (click)="openBottomSheetExtension(extension.id, deleteForm.controls['extension::' + extension.id].value, extension.name, 'delete')">
                                                                                       Delete
                                                                                     </button>
@@ -631,37 +548,37 @@
                                                                           </form>
                                                                         </mat-tab>
                                                                         <mat-tab label="Dialplan Settings">
-                                                                          <div class="spacer spacerv">
+                                                                          <div class="cpbx-form-panel cpbx-form-panel--stack">
                                                                             <h3>Settings</h3>
                                                                             @if (!staticDialplan()) {
-                                                                              <button mat-raised-button color="basic"
+                                                                              <button mat-stroked-button color="basic" type="button"
                                                                                 (click)="switchNoProceed()">
                                                                                 Enable static dialplan
                                                                               </button>
                                                                             }
                                                                             @if (staticDialplan()) {
-                                                                              <button mat-raised-button color="primary"
+                                                                              <button mat-stroked-button color="primary" type="button"
                                                                                 (click)="switchNoProceed()">
                                                                                 Disable static dialplan
                                                                               </button>
                                                                             }
                                                                           </div>
-                                                                          <mat-divider class="spacer spacerv"></mat-divider>
-                                                                          <div class="spacer spacerv">
+                                                                          <mat-divider></mat-divider>
+                                                                          <div class="cpbx-form-panel cpbx-form-panel--stack">
                                                                             <h3>Dialplan Debug</h3>
                                                                             @if (!debug().enabled) {
-                                                                              <button mat-raised-button color="basic"
+                                                                              <button mat-stroked-button color="basic" type="button"
                                                                                 (click)="switchDebug()">
                                                                                 Enable collecting
                                                                               </button>
                                                                             }
                                                                             @if (debug().enabled) {
-                                                                              <button mat-raised-button color="primary"
+                                                                              <button mat-stroked-button color="primary" type="button"
                                                                                 (click)="switchDebug()">
                                                                                 Disable collecting
                                                                               </button>
                                                                             }
-                                                                            <button mat-raised-button color="basic" class="but-spacer-left"
+                                                                            <button mat-stroked-button color="basic" type="button"
                                                                               (click)="clearDebug()">
                                                                               Clear
                                                                             </button>

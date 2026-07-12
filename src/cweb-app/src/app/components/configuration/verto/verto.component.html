@@ -1,7 +1,7 @@
 <app-inner-header name="Verto" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
+  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
     >
     <mat-tab label="List">
       <mat-card>
@@ -48,7 +48,7 @@
                   </mat-panel-description>
                 </mat-expansion-panel-header>
                 @if (list().profiles[item.id] && (list().profiles[item.id].parameters)) {
-                  <button mat-raised-button color="basic" (click)="copyProfile(item.id)"
+                  <button mat-stroked-button color="basic" class="config-copy-button" (click)="copyProfile(item.id)"
                     >Copy
                   </button>
                 }
@@ -69,29 +69,28 @@
       </mat-card>
     </mat-tab>
     <mat-tab label="Add">
-      <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
-        <mat-form-field hideRequiredMarker>
-          <mat-label>Name</mat-label>
-          <input matInput placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
-        </mat-form-field>
-        <button mat-raised-button color="primary" type="submit">Submit</button>
+      <form class="cpbx-form-panel" (ngSubmit)="onProfileSubmit()">
+        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New profile name" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
+</label>
+        <button mat-flat-button color="primary" type="submit">Submit</button>
       </form>
     </mat-tab>
     <mat-tab label="Delete/Rename">
-      <form class="spacer spacerb" #deleteForm="ngForm">
-        <h3>Profiles:</h3>
+      <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
+        <h3 class="cpbx-form-title">Profiles</h3>
         @for (profile of onlyValues(list().profiles); track profile.id) {
-          <div>
-            <mat-form-field hideRequiredMarker>
-              <mat-label>Profile name</mat-label>
-              <input matInput name="Profile name" required [ngModel]="profile.name"
-                [name]="'profile::' + profile.id">
-              </mat-form-field>
-              <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
+          <div class="cpbx-edit-row">
+            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Profile name</span>
+<input name="Profile name" required [ngModel]="profile.name" [name]="'profile::' + profile.id" placeholder="Profile name" class="cpbx-input">
+</label>
+              <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
                 (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'rename')">
                 Update
               </button>
-              <button mat-raised-button color="warn"
+              <button mat-stroked-button color="warn" type="button"
                 (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'delete')">
                 Delete
               </button>

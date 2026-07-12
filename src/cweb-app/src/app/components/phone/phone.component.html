@@ -22,9 +22,9 @@
   </mat-toolbar>
   @if (authorizationUsername()) {
     <section id="main-content" class="animated fadeInUp">
-      <mat-form-field class="number-field">
-        <mat-label>Number</mat-label>
-        <input matInput [ngModel]="number()" (ngModelChange)="number.set($event)" name="Number" name="number">
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Number</span>
+<input [ngModel]="number()" (ngModelChange)="number.set($event)" name="Number" name="number" placeholder="Number" class="cpbx-input">
         @if (number()) {
           <button mat-icon-button matSuffix aria-label="Delete" (click)="removeLastDigit()" class="dialpad-button-remove">
             <mat-icon>chevron_left</mat-icon>
@@ -33,7 +33,7 @@
         <button mat-icon-button matSuffix (click)="switchHideButtonsPad()" title="dialpad" aria-label="dialpad">
           <mat-icon>dialpad</mat-icon>
         </button>
-      </mat-form-field>
+</label>
       <h3 class="timer mat-headline-3">{{totalTime() | formatTimer}}</h3>
       @if (showButtonsPad) {
         <div class="buttons-pad">

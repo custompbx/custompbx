@@ -3,7 +3,7 @@
   <button mat-stroked-button type="button" (click)="collapseAllPanels()">Collapse all</button>
 </app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
- <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list() && list().exists !== false">
+ <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list() && list().exists !== false">
   <mat-tab label="List">
     <mat-card>
       <mat-card-header>
@@ -50,21 +50,20 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
             <h3>Importance:</h3>
-            <div *ngIf="item.id" class="spacer">
+            <div *ngIf="item.id" class="cpbx-edit-row">
               <form #details="ngForm">
-                <mat-form-field hideRequiredMarker>
-        <mat-label>Importance</mat-label>
-        <input matInput name="importance" [ngModel]="item.importance" required
-                         [name]="'importance' + item.id">
-                </mat-form-field>
-                <button mat-button color="accent"
+                <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Importance</span>
+<input name="importance" [ngModel]="item.importance" required [name]="'importance' + item.id" placeholder="Importance" class="cpbx-input">
+</label>
+                <button mat-flat-button color="primary" type="button"
                         [disabled]="!isvalueReadyToSend(details.controls['importance' + item.id])"
                         (click)="updateImportance(item.id, details.controls['importance' + item.id])">
                   Update
                 </button>
               </form>
             </div>
-            <button mat-raised-button color="basic" (click)="copyFifo(item.id)"
+            <button mat-stroked-button color="basic" class="config-copy-button" (click)="copyFifo(item.id)"
                     *ngIf="list().fifos[item.id] && (list().fifos[item.id].members)">Copy
             </button>
             <h3>Members:</h3>
@@ -87,29 +86,28 @@
   </mat-tab>
 
   <mat-tab label="Add">
-    <form class="spacer spacerb" (ngSubmit)="onFifoSubmit()">
-      <mat-form-field hideRequiredMarker>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="New fifo name" required name="name" [(ngModel)]="newFifoName">
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
+    <form class="cpbx-form-panel" (ngSubmit)="onFifoSubmit()">
+      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New fifo name" required name="name" [(ngModel)]="newFifoName" class="cpbx-input">
+</label>
+      <button mat-flat-button color="primary" type="submit">Submit</button>
     </form>
   </mat-tab>
 
   <mat-tab label="Delete/Rename">
-    <form class="spacer spacerb" #deleteForm="ngForm">
-      <h3>Fifo:</h3>
-      <div *ngFor="let fifo of onlyValues(list().fifos); trackBy: trackByFn">
-        <mat-form-field hideRequiredMarker>
-        <mat-label>Fifo name</mat-label>
-        <input matInput name="Fifo name" required [ngModel]="fifo.name"
-                 [name]="'fifo::' + fifo.id">
-        </mat-form-field>
-        <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['fifo::' + fifo.id])"
+    <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
+      <h3 class="cpbx-form-title">Fifo</h3>
+      <div class="cpbx-edit-row" *ngFor="let fifo of onlyValues(list().fifos); trackBy: trackByFn">
+        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Fifo name</span>
+<input name="Fifo name" required [ngModel]="fifo.name" [name]="'fifo::' + fifo.id" placeholder="Fifo name" class="cpbx-input">
+</label>
+        <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['fifo::' + fifo.id])"
                 (click)="openBottomSheetFifo(fifo.id, deleteForm.controls['fifo::' + fifo.id].value, fifo.name, 'rename')">
           Update
         </button>
-        <button mat-raised-button color="warn"
+        <button mat-stroked-button color="warn" type="button"
                 (click)="openBottomSheetFifo(fifo.id, deleteForm.controls['fifo::' + fifo.id].value, fifo.name, 'delete')">
           Delete
         </button>

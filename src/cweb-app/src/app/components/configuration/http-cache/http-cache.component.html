@@ -4,7 +4,7 @@
 </app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
+  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
     >
     <mat-tab label="List">
       @if (list() && list().exists !== false) {
@@ -45,69 +45,39 @@
                 </mat-expansion-panel-header>
                 @if (!firstElement(item.azure).secret_access_key) {
                   <h3>AWS:</h3>
-                  <mat-form-field hideRequiredMarker>
-                    <mat-label>access_key_id</mat-label>
-                    <input matInput [placeholder]="access_key_id"
-                      [(ngModel)]="firstElement(item.aws_s3).access_key_id" required
-                      [name]="'access_key_id' + firstElement(item.aws_s3).id"
-                      appResizeInput
-                      [resizeOnString]="firstElement(item.aws_s3).access_key_id"
-                      >
-                    </mat-form-field>
-                    <mat-form-field hideRequiredMarker>
-                      <mat-label>secret_access_key</mat-label>
-                      <input matInput [placeholder]="secret_access_key"
-                        [(ngModel)]="firstElement(item.aws_s3).secret_access_key" required
-                        [name]="'secret_access_key' + firstElement(item.aws_s3).id"
-                        appResizeInput
-                        [resizeOnString]="firstElement(item.aws_s3).secret_access_key"
-                        >
-                      </mat-form-field>
-                      <mat-form-field hideRequiredMarker>
-                        <mat-label>base_domain</mat-label>
-                        <input matInput [placeholder]="base_domain"
-                          [(ngModel)]="firstElement(item.aws_s3).base_domain" required
-                          [name]="'base_domain' + firstElement(item.aws_s3).id"
-                          appResizeInput
-                          [resizeOnString]="firstElement(item.aws_s3).base_domain"
-                          >
-                        </mat-form-field>
-                        <mat-form-field hideRequiredMarker>
-                          <mat-label>region</mat-label>
-                          <input matInput [placeholder]="region"
-                            [(ngModel)]="firstElement(item.aws_s3).region" required
-                            [name]="'region' + firstElement(item.aws_s3).id"
-                            appResizeInput
-                            [resizeOnString]="firstElement(item.aws_s3).region"
-                            >
-                          </mat-form-field>
-                          <mat-form-field hideRequiredMarker>
-                            <mat-label>expires</mat-label>
-                            <input matInput [placeholder]="expires"
-                              [(ngModel)]="firstElement(item.aws_s3).expires" required
-                              [name]="'expires' + firstElement(item.aws_s3).id"
-                              appResizeInput
-                              [resizeOnString]="firstElement(item.aws_s3).expires"
-                              >
-                            </mat-form-field>
+                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">access_key_id</span>
+<input [placeholder]="access_key_id" [(ngModel)]="firstElement(item.aws_s3).access_key_id" required [name]="'access_key_id' + firstElement(item.aws_s3).id" appResizeInput [resizeOnString]="firstElement(item.aws_s3).access_key_id" placeholder="access_key_id" class="cpbx-input">
+</label>
+                    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">secret_access_key</span>
+<input [placeholder]="secret_access_key" [(ngModel)]="firstElement(item.aws_s3).secret_access_key" required [name]="'secret_access_key' + firstElement(item.aws_s3).id" appResizeInput [resizeOnString]="firstElement(item.aws_s3).secret_access_key" placeholder="secret_access_key" class="cpbx-input">
+</label>
+                      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">base_domain</span>
+<input [placeholder]="base_domain" [(ngModel)]="firstElement(item.aws_s3).base_domain" required [name]="'base_domain' + firstElement(item.aws_s3).id" appResizeInput [resizeOnString]="firstElement(item.aws_s3).base_domain" placeholder="base_domain" class="cpbx-input">
+</label>
+                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">region</span>
+<input [placeholder]="region" [(ngModel)]="firstElement(item.aws_s3).region" required [name]="'region' + firstElement(item.aws_s3).id" appResizeInput [resizeOnString]="firstElement(item.aws_s3).region" placeholder="region" class="cpbx-input">
+</label>
+                          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">expires</span>
+<input [placeholder]="expires" [(ngModel)]="firstElement(item.aws_s3).expires" required [name]="'expires' + firstElement(item.aws_s3).id" appResizeInput [resizeOnString]="firstElement(item.aws_s3).expires" placeholder="expires" class="cpbx-input">
+</label>
                             <!-- [disabled]="!(form.controls['access_key_id' + onlyValues(item.aws_s3)[0].id].dirty || form.controls['secret_access_key' + item.id].dirty || form.controls['base_domain' + item.id].dirty || form.controls['region' + item.id].dirty || form.controls['expires' + item.id].dirty)" -->
-                            <button mat-button color="accent" class="but-spacer-left"
+                            <button mat-flat-button color="primary" class="but-spacer-left"
                               (click)="updateItemAws(firstElement(item.aws_s3))">
                               Update
                             </button>
                           }
                           @if (!firstElement(item.aws_s3).secret_access_key) {
                             <h3>AZURE:</h3>
-                            <mat-form-field hideRequiredMarker>
-                              <mat-label>secret_access_key</mat-label>
-                              <input matInput [placeholder]="secret_access_key"
-                                [(ngModel)]="firstElement(item.azure).secret_access_key" required
-                                [name]="'secret_access_key' + firstElement(item.azure).id"
-                                appResizeInput
-                                [resizeOnString]="firstElement(item.azure).secret_access_key"
-                                >
-                              </mat-form-field>
-                              <button mat-button color="accent" class="but-spacer-left"
+                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">secret_access_key</span>
+<input [placeholder]="secret_access_key" [(ngModel)]="firstElement(item.azure).secret_access_key" required [name]="'secret_access_key' + firstElement(item.azure).id" appResizeInput [resizeOnString]="firstElement(item.azure).secret_access_key" placeholder="secret_access_key" class="cpbx-input">
+</label>
+                              <button mat-flat-button color="primary" class="but-spacer-left"
                                 (click)="updateItemAzure(firstElement(item.azure))">
                                 Update
                               </button>
@@ -131,11 +101,11 @@
                 </mat-tab>
                 <mat-tab label="Add">
                   <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
-                    <mat-form-field hideRequiredMarker>
-                      <mat-label>Name</mat-label>
-                      <input matInput placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
-                    </mat-form-field>
-                    <button mat-raised-button color="primary" type="submit">Submit</button>
+                    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New profile name" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
+</label>
+                    <button mat-flat-button color="primary" type="submit">Submit</button>
                   </form>
                 </mat-tab>
                 <mat-tab label="Delete/Rename">
@@ -143,16 +113,15 @@
                     <h3>Profiles:</h3>
                     @for (profile of onlyValues(list().profiles); track trackByFn($index, profile)) {
                       <div>
-                        <mat-form-field hideRequiredMarker>
-                          <mat-label>Profile name</mat-label>
-                          <input matInput name="Profile name" required [ngModel]="profile.name"
-                            [name]="'profile::' + profile.id">
-                          </mat-form-field>
-                          <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
+                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Profile name</span>
+<input name="Profile name" required [ngModel]="profile.name" [name]="'profile::' + profile.id" placeholder="Profile name" class="cpbx-input">
+</label>
+                          <button mat-flat-button color="primary" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
                             (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'rename')">
                             Update
                           </button>
-                          <button mat-raised-button color="warn"
+                          <button mat-flat-button color="warn"
                             (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'delete')">
                             Delete
                           </button>

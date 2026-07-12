@@ -1,4 +1,4 @@
-<mat-toolbar color="primary" class="app-toolbar" role="banner">
+<mat-toolbar class="app-toolbar" role="banner">
   <button mat-icon-button (click)="toggleMenu.emit()" matTooltip="Toggle navigation" aria-label="Toggle navigation">
     <mat-icon>menu</mat-icon>
   </button>
@@ -7,33 +7,33 @@
     <span class="brand-name">CustomPBX</span>
   </a>
   <span class="example-spacer"></span>
-  <button mat-icon-button (click)="showHideConversations()" matTooltip="Conversations" aria-label="Open conversations">
-    <mat-icon>question_answer</mat-icon>
-  </button>
-  <button mat-icon-button (click)="showHidePhone()" matTooltip="Phone" aria-label="Toggle phone">
-    <mat-icon>phone</mat-icon>
-  </button>
-  <button mat-icon-button (click)="cloneComponent()" [disabled]="!currentComponent"
-    matTooltip="Duplicate current view" aria-label="Duplicate current view">
-    <mat-icon>filter_2</mat-icon>
-  </button>
-  @if (user?.group_id === 1) {
-    <button mat-icon-button [routerLink]="['/settings']" matTooltip="Settings" aria-label="Open settings">
-      <mat-icon>settings</mat-icon>
+  <div class="header-actions" aria-label="Application actions">
+    <button mat-icon-button class="header-icon-button" (click)="showHideConversations()" matTooltip="Conversations" aria-label="Open conversations">
+      <mat-icon>question_answer</mat-icon>
     </button>
-  }
-  <div class="user-block">
-    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Open user menu">
-      @if (!user.avatar_format) {
+    <button mat-icon-button class="header-icon-button" (click)="showHidePhone()" matTooltip="Phone" aria-label="Toggle phone">
+      <mat-icon>phone</mat-icon>
+    </button>
+    <button mat-icon-button class="header-icon-button" (click)="cloneComponent()" [disabled]="!currentComponent"
+      matTooltip="Duplicate current view" aria-label="Duplicate current view">
+      <mat-icon>filter_2</mat-icon>
+    </button>
+    @if (user?.group_id === 1) {
+      <button mat-icon-button class="header-icon-button" [routerLink]="['/settings']" matTooltip="Settings" aria-label="Open settings">
+        <mat-icon>settings</mat-icon>
+      </button>
+    }
+  </div>
+  <button type="button" class="user-block" [matMenuTriggerFor]="menu" aria-label="Open user menu">
+      @if (!user?.avatar_format) {
         <mat-icon>face</mat-icon>
       }
-      @if (user.avatar_format) {
+      @if (user?.avatar_format) {
         <img class="avatar-img"
           [src]="'./assets/img/avatar/' + user.id + '.' + user.avatar_format" alt="">
         }
-      </button>
-      <span class="user-name">{{user.login}}</span>
-    </div>
+      <span class="user-name">{{user?.login}}</span>
+    </button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item>
         <mat-icon>account_circle</mat-icon>

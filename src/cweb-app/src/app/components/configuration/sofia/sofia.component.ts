@@ -69,10 +69,11 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
+import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, CpbxSelectDirective],
   selector: 'app-sofia',
   templateUrl: './sofia.component.html',
   styleUrls: ['./sofia.component.css']

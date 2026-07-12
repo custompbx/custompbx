@@ -12,6 +12,7 @@ import {MaterialModule} from "../../../material-module";
 import {ResizeInputDirective} from "../../directives/resize-input.directive";
 import {FormsModule} from "@angular/forms";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
+import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
 
 export interface IfilterField {
   field: string|null;
@@ -26,7 +27,7 @@ export interface IsortField {
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective],
+  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective],
   selector: 'app-cdr',
   templateUrl: './cdr.component.html',
   styleUrls: ['./cdr.component.css']

@@ -23,11 +23,12 @@ import {CommonModule} from "@angular/common";
 import {MaterialModule} from "../../../material-module";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {ResizeInputDirective} from "../../directives/resize-input.directive";
+import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
 
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective],
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective],
   selector: 'app-global-variables',
   templateUrl: './global-variables.component.html',
   styleUrls: ['./global-variables.component.css'],

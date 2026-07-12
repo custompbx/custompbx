@@ -1,7 +1,7 @@
 <app-inner-header name="Sofia" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"
+  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"
     >
     <mat-tab label="list">
       <mat-card>
@@ -33,7 +33,7 @@
       <mat-card>
         <mat-card-content>
           @if (list() && list().profiles) {
-            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedIndexChange)="tabChanged($event)">
+            <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" (selectedIndexChange)="tabChanged($event)">
               <mat-tab label="Profiles parameters">
                 @for (item of onlyValues(list().profiles); track item.id) {
                   <div class="panel-wrapper">
@@ -48,7 +48,7 @@
                         </mat-panel-description>
                       </mat-expansion-panel-header>
                       @if (list().profiles[item.id] && (list().profiles[item.id].parameters)) {
-                        <button mat-raised-button color="basic" (click)="copyProfile(item.id)">Copy</button>
+                        <button mat-stroked-button color="basic" class="config-copy-button" type="button" (click)="copyProfile(item.id)">Copy</button>
                       }
                       <h3>Params:</h3>
                       <app-key-value-pad-2 [exist]="item.parameters"
@@ -85,7 +85,7 @@
                               </mat-expansion-panel-header>
                               <form #details="ngForm">
                                 @if (profile.gateways[item.id] && (profile.gateways[item.id].parameters || profile.gateways[item.id].variables)) {
-                                  <button mat-raised-button color="basic" (click)="copyGateway(profile.id, item.id)">Copy</button>
+                                  <button mat-stroked-button color="basic" class="config-copy-button" type="button" (click)="copyGateway(profile.id, item.id)">Copy</button>
                                 }
                                 <h3>Params:</h3>
                                 <app-key-value-pad-2 [exist]="item.parameters"
@@ -110,49 +110,34 @@
                               <!--<div *ngIf="item.variables">
                               <div class="spacer" *ngFor="let variable of item.variables | keyvalue; trackBy: trackByFnId">
                                 <div *ngIf="variable.key && !isArray(variable.value)">
-                                  <mat-form-field hideRequiredMarker>
-                                    <mat-label>Name</mat-label>
-                                    <input matInput name="name" [(ngModel)]="variable.value.name" required
-                                      [disabled]="!variable.value.enabled"
-                                      [name]="'variableName' + variable.key"
-                                      appResizeInput
-                                      [resizeOnString]="variable.value.name"
-                                      >
-                                    </mat-form-field>
-                                    <mat-form-field hideRequiredMarker>
-                                      <mat-label>Value</mat-label>
-                                      <input matInput name="value" [(ngModel)]="variable.value.value" required
-                                        [disabled]="!variable.value.enabled"
-                                        [name]="'variableValue' + variable.key"
-                                        appResizeInput
-                                        [resizeOnString]="variable.value.value"
-                                        >
-                                      </mat-form-field>
-                                      <mat-form-field hideRequiredMarker>
-                                        <mat-label>Direction</mat-label>
-                                        <input matInput name="direction" [(ngModel)]="variable.value.direction"
-                                          [disabled]="!variable.value.enabled"
-                                          [name]="'variableDirection' + variable.key"
-                                          appResizeInput
-                                          [resizeOnString]="variable.value.direction"
-                                          >
-                                        </mat-form-field>
-                                        <button mat-button color="accent" class="but-spacer-left"
+                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="variable.value.name" required [disabled]="!variable.value.enabled" [name]="'variableName' + variable.key" appResizeInput [resizeOnString]="variable.value.name" placeholder="Name" class="cpbx-input">
+</label>
+                                    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Value</span>
+<input name="value" [(ngModel)]="variable.value.value" required [disabled]="!variable.value.enabled" [name]="'variableValue' + variable.key" appResizeInput [resizeOnString]="variable.value.value" placeholder="Value" class="cpbx-input">
+</label>
+                                      <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Direction</span>
+<input name="direction" [(ngModel)]="variable.value.direction" [disabled]="!variable.value.enabled" [name]="'variableDirection' + variable.key" appResizeInput [resizeOnString]="variable.value.direction" placeholder="Direction" class="cpbx-input">
+</label>
+                                        <button mat-flat-button color="primary" class="but-spacer-left"
                                           [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.key], details.controls['variableValue' + variable.key], details.controls['variableDirection' + variable.key])"
                                           (click)="updateProfileGatewayVar(variable.value); details.controls['variableName' + param.key].markAsPristine(); details.controls['variableValue' + param.key].markAsPristine(); details.controls['variableDirection' + variable.key].markAsPristine()">
                                           Update
                                         </button>
-                                        <button *ngIf="variable.value.enabled" mat-raised-button color="accent"
+                                        <button *ngIf="variable.value.enabled" mat-flat-button color="accent"
                                           class="but-spacer-left switch-button"
                                           (click)="switchProfileGatewayVar(variable.value)">
                                           Disable
                                         </button>
-                                        <button *ngIf="!variable.value.enabled" mat-raised-button color="primary"
+                                        <button *ngIf="!variable.value.enabled" mat-flat-button color="primary"
                                           class="but-spacer-left switch-button"
                                           (click)="switchProfileGatewayVar(variable.value)">
                                           Enable
                                         </button>
-                                        <button mat-raised-button color="warn" class="but-spacer-left"
+                                        <button mat-flat-button color="warn" class="but-spacer-left"
                                           (click)="deleteProfileGatewayVar(variable.value)">
                                           Delete
                                         </button>
@@ -162,36 +147,24 @@
                                       <div class="spacer"
                                         *ngFor="let variable of item.variables.new; trackBy: trackByFn; let i = index;">
                                         <div *ngIf="variable">
-                                          <mat-form-field hideRequiredMarker>
-                                            <mat-label>Name</mat-label>
-                                            <input matInput name="name" [(ngModel)]="variable.name" required
-                                              [name]="'newVarName' + i"
-                                              appResizeInput
-                                              [resizeOnString]="variable.name"
-                                              >
-                                            </mat-form-field>
-                                            <mat-form-field hideRequiredMarker>
-                                              <mat-label>Value</mat-label>
-                                              <input matInput name="value" [(ngModel)]="variable.value" required
-                                                [name]="'newVarValue' + i"
-                                                appResizeInput
-                                                [resizeOnString]="variable.value"
-                                                >
-                                              </mat-form-field>
-                                              <mat-form-field hideRequiredMarker>
-                                                <mat-label>Direction</mat-label>
-                                                <input matInput name="direction" [(ngModel)]="variable.direction"
-                                                  [name]="'newVarDirection' + i"
-                                                  appResizeInput
-                                                  [resizeOnString]="variable.direction"
-                                                  >
-                                                </mat-form-field>
-                                                <button mat-button color="accent" class="but-spacer-left"
+                                          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="variable.name" required [name]="'newVarName' + i" appResizeInput [resizeOnString]="variable.name" placeholder="Name" class="cpbx-input">
+</label>
+                                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Value</span>
+<input name="value" [(ngModel)]="variable.value" required [name]="'newVarValue' + i" appResizeInput [resizeOnString]="variable.value" placeholder="Value" class="cpbx-input">
+</label>
+                                              <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Direction</span>
+<input name="direction" [(ngModel)]="variable.direction" [name]="'newVarDirection' + i" appResizeInput [resizeOnString]="variable.direction" placeholder="Direction" class="cpbx-input">
+</label>
+                                                <button mat-flat-button color="primary" class="but-spacer-left"
                                                   [disabled]="!isNewReadyToSend(details.controls['newVarName' + i], details.controls['newVarValue' + i])"
                                                   (click)="newProfileGatewayVar(item.id, i, details.controls['newVarName' + i].value, details.controls['newVarValue' + i].value, details.controls['newVarDirection' + i].value)">
                                                   Update
                                                 </button>
-                                                <button mat-button color="warn"
+                                                <button mat-stroked-button color="warn"
                                                   (click)="dropNewProfileGatewayVar(profile.id, item.id, i)"
                                                   class="but-spacer-left">
                                                   Delete
@@ -200,11 +173,11 @@
                                             </div>
                                           </div>
                                         </div>
-                                        <button mat-raised-button color="accent"
+                                        <button mat-flat-button color="accent"
                                           (click)="addNewProfileGatewayVar(profile.id, item.id)">
                                           Add
                                         </button>
-                                        <button mat-raised-button color="primary" class="but-spacer-left" (click)="pasteGatewayVars(item.id,profile.id)" *ngIf="toCopyGateway && toCopyGateway != item.id">
+                                        <button mat-flat-button color="primary" class="but-spacer-left" (click)="pasteGatewayVars(item.id,profile.id)" *ngIf="toCopyGateway && toCopyGateway != item.id">
                                           Paste
                                         </button>-->
                                       </form>
@@ -242,45 +215,39 @@
                                 @if (item.domains) {
                                   <div>
                                     @for (domain of onlyValues(item.domains); track domain.id) {
-                                      <div class="spacer">
+                                      <div class="cpbx-edit-row">
                                         @if (domain.id && !isArray(domain)) {
-                                          <div>
-                                            <mat-form-field hideRequiredMarker>
-                                              <mat-label>Name</mat-label>
-                                              <input matInput name="name" [(ngModel)]="domain.name" required
-                                                [disabled]="!domain.enabled"
-                                                [name]="'domainName' + domain.id">
-                                              </mat-form-field>
-                                              <mat-form-field hideRequiredMarker>
-                                                <mat-label>Alias</mat-label>
-                                                <input matInput name="alias" [(ngModel)]="domain.alias" required
-                                                  [disabled]="!domain.enabled"
-                                                  [name]="'domainAlias' + domain.id">
-                                                </mat-form-field>
-                                                <mat-form-field hideRequiredMarker>
-                                                  <mat-label>Parse</mat-label>
-                                                  <input matInput name="parse" [(ngModel)]="domain.parse" required
-                                                    [disabled]="!domain.enabled"
-                                                    [name]="'domainParse' + domain.id">
-                                                  </mat-form-field>
-                                                  <button mat-button color="accent" class="but-spacer-left"
+                                          <div class="cpbx-edit-row">
+                                            <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="domain.name" required [disabled]="!domain.enabled" [name]="'domainName' + domain.id" placeholder="Name" class="cpbx-input">
+</label>
+                                              <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Alias</span>
+<input name="alias" [(ngModel)]="domain.alias" required [disabled]="!domain.enabled" [name]="'domainAlias' + domain.id" placeholder="Alias" class="cpbx-input">
+</label>
+                                                <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Parse</span>
+<input name="parse" [(ngModel)]="domain.parse" required [disabled]="!domain.enabled" [name]="'domainParse' + domain.id" placeholder="Parse" class="cpbx-input">
+</label>
+                                                  <button mat-flat-button color="primary" type="button"
                                                     [disabled]="!isReadyToSendThree(details.controls['domainName' + domain.id], details.controls['domainAlias' + domain.id], details.controls['domainParse' + domain.id])"
                                                     (click)="updateProfileDomain(domain); details.controls['domainName' + domain.id].markAsPristine(); details.controls['domainAlias' + domain.id].markAsPristine(); details.controls['domainParse' + domain.id].markAsPristine();">
                                                     Update
                                                   </button>
                                                   @if (domain.enabled) {
-                                                    <button mat-raised-button color="accent"
-                                                      class="but-spacer-left switch-button" (click)="switchProfileDomain(domain)">
+                                                    <button mat-stroked-button color="basic" type="button"
+                                                      class="switch-button" (click)="switchProfileDomain(domain)">
                                                       Disable
                                                     </button>
                                                   }
                                                   @if (!domain.enabled) {
-                                                    <button mat-raised-button color="primary"
-                                                      class="but-spacer-left switch-button" (click)="switchProfileDomain(domain)">
+                                                    <button mat-stroked-button color="primary" type="button"
+                                                      class="switch-button" (click)="switchProfileDomain(domain)">
                                                       Enable
                                                     </button>
                                                   }
-                                                  <button mat-raised-button color="warn" class="but-spacer-left"
+                                                  <button mat-stroked-button color="warn" type="button"
                                                     (click)="deleteProfileDomain(domain)">
                                                     Delete
                                                   </button>
@@ -293,31 +260,27 @@
                                       @if (item.domains) {
                                         <div>
                                           @for (domain of item.domains.new; track $index; let i = $index) {
-                                            <div class="spacer">
+                                            <div class="cpbx-edit-row">
                                               @if (domain) {
-                                                <div>
-                                                  <mat-form-field hideRequiredMarker>
-                                                    <mat-label>Name</mat-label>
-                                                    <input matInput name="name" [(ngModel)]="domain.name" required
-                                                      [name]="'newDomainName' + i">
-                                                    </mat-form-field>
-                                                    <mat-form-field hideRequiredMarker>
-                                                      <mat-label>Alias</mat-label>
-                                                      <input matInput name="alias" [(ngModel)]="domain.alias" required
-                                                        [name]="'newDomainAlias' + i">
-                                                      </mat-form-field>
-                                                      <mat-form-field hideRequiredMarker>
-                                                        <mat-label>Parse</mat-label>
-                                                        <input matInput name="parse" [(ngModel)]="domain.parse" required
-                                                          [name]="'newDomainParse' + i">
-                                                        </mat-form-field>
-                                                        <button mat-button color="accent" class="but-spacer-left"
+                                                <div class="cpbx-edit-row">
+                                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="domain.name" required [name]="'newDomainName' + i" placeholder="Name" class="cpbx-input">
+</label>
+                                                    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Alias</span>
+<input name="alias" [(ngModel)]="domain.alias" required [name]="'newDomainAlias' + i" placeholder="Alias" class="cpbx-input">
+</label>
+                                                      <label class="cpbx-field cpbx-field--sm">
+<span class="cpbx-label">Parse</span>
+<input name="parse" [(ngModel)]="domain.parse" required [name]="'newDomainParse' + i" placeholder="Parse" class="cpbx-input">
+</label>
+                                                        <button mat-flat-button color="primary" type="button"
                                                           [disabled]="!isReadyToSendThree(details.controls['newDomainName' + i], details.controls['newDomainAlias' + i], details.controls['newDomainParse' + i])"
                                                           (click)="newProfileDomain(item.id, i, details.controls['newDomainName' + i].value, details.controls['newDomainAlias' + i].value, details.controls['newDomainParse' + i].value)">
                                                           Update
                                                         </button>
-                                                        <button mat-button color="warn" (click)="dropNewProfileDomain(item.id, i)"
-                                                          class="but-spacer-left">
+                                                        <button mat-stroked-button color="warn" type="button" (click)="dropNewProfileDomain(item.id, i)">
                                                           Delete
                                                         </button>
                                                       </div>
@@ -326,7 +289,7 @@
                                                 }
                                               </div>
                                             }
-                                            <button mat-raised-button color="accent" class="spacer" (click)="addNewProfileDomain(item.id)">
+                                            <button mat-flat-button color="primary" type="button" (click)="addNewProfileDomain(item.id)">
                                               Add
                                             </button>
                                           </form>
@@ -352,33 +315,31 @@
                                             @if (item.aliases) {
                                               <div>
                                                 @for (alias of onlyValues(item.aliases); track alias.id) {
-                                                  <div class="spacer">
+                                                  <div class="cpbx-edit-row">
                                                     @if (alias.id && !isArray(alias)) {
-                                                      <div>
-                                                        <mat-form-field hideRequiredMarker>
-                                                          <mat-label>Name</mat-label>
-                                                          <input matInput name="name" [(ngModel)]="alias.name" required
-                                                            [disabled]="!alias.enabled"
-                                                            [name]="'aliasName' + alias.id">
-                                                          </mat-form-field>
-                                                          <button mat-button color="accent" class="but-spacer-left"
+                                                      <div class="cpbx-edit-row">
+                                                        <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="alias.name" required [disabled]="!alias.enabled" [name]="'aliasName' + alias.id" placeholder="Name" class="cpbx-input">
+</label>
+                                                          <button mat-flat-button color="primary" type="button"
                                                             [disabled]="!isvalueReadyToSend(details.controls['aliasName' + alias.id])"
                                                             (click)="updateProfileAlias(alias)">
                                                             Update
                                                           </button>
                                                           @if (alias.enabled) {
-                                                            <button mat-raised-button color="accent"
-                                                              class="but-spacer-left switch-button" (click)="switchProfileAlias(alias)">
+                                                            <button mat-stroked-button color="basic" type="button"
+                                                              class="switch-button" (click)="switchProfileAlias(alias)">
                                                               Disable
                                                             </button>
                                                           }
                                                           @if (!alias.enabled) {
-                                                            <button mat-raised-button color="primary"
-                                                              class="but-spacer-left switch-button" (click)="switchProfileAlias(alias)">
+                                                            <button mat-stroked-button color="primary" type="button"
+                                                              class="switch-button" (click)="switchProfileAlias(alias)">
                                                               Enable
                                                             </button>
                                                           }
-                                                          <button mat-raised-button color="warn" class="but-spacer-left"
+                                                          <button mat-stroked-button color="warn" type="button"
                                                             (click)="deleteProfileAlias(alias)">
                                                             Delete
                                                           </button>
@@ -391,21 +352,19 @@
                                               @if (item.aliases) {
                                                 <div>
                                                   @for (alias of item.aliases.new; track $index; let i = $index) {
-                                                    <div class="spacer">
+                                                    <div class="cpbx-edit-row">
                                                       @if (alias) {
-                                                        <div>
-                                                          <mat-form-field hideRequiredMarker>
-                                                            <mat-label>Name</mat-label>
-                                                            <input matInput name="name" [(ngModel)]="alias.name" required
-                                                              [name]="'newAliasName' + i">
-                                                            </mat-form-field>
-                                                            <button mat-button color="accent" class="but-spacer-left"
+                                                        <div class="cpbx-edit-row">
+                                                          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input name="name" [(ngModel)]="alias.name" required [name]="'newAliasName' + i" placeholder="Name" class="cpbx-input">
+</label>
+                                                            <button mat-flat-button color="primary" type="button"
                                                               [disabled]="!isvalueReadyToSend(details.controls['newAliasName' + i])"
                                                               (click)="newProfileAlias(item.id, i, details.controls['newAliasName' + i].value)">
                                                               Update
                                                             </button>
-                                                            <button mat-button color="warn" (click)="dropNewProfileAlias(item.id, i)"
-                                                              class="but-spacer-left">
+                                                            <button mat-stroked-button color="warn" type="button" (click)="dropNewProfileAlias(item.id, i)">
                                                               Delete
                                                             </button>
                                                           </div>
@@ -414,7 +373,7 @@
                                                     }
                                                   </div>
                                                 }
-                                                <button mat-raised-button color="accent" class="spacer" (click)="addNewProfileAlias(item.id)">
+                                                <button mat-flat-button color="primary" type="button" (click)="addNewProfileAlias(item.id)">
                                                   Add
                                                 </button>
                                               </form>
@@ -432,14 +391,14 @@
                                                   <span  class=" grid-inner-title">{{item.name}}</span>
                                                 </section>
                                                 <section>
-                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                                  <button mat-stroked-button color="basic" class="switch-button grid-inner"
                                                     [disabled]="item.started"
                                                     (click)="profileComand(item.id, 0, 'start')">
                                                     Start
                                                   </button>
                                                 </section>
                                                 <section>
-                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                                  <button mat-stroked-button color="basic" class="switch-button grid-inner"
                                                     [disabled]="!item.started"
                                                     (click)="profileComand(item.id, 0, 'stop')">
                                                     Stop
@@ -447,7 +406,7 @@
                                                 </section>
                                                 @if (item) {
                                                   <section>
-                                                    <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                                    <button mat-stroked-button color="basic" class="switch-button grid-inner"
                                                       [disabled]="!item.started"
                                                       (click)="profileComand(item.id, 0, 'restart')">
                                                       Restart
@@ -455,41 +414,42 @@
                                                   </section>
                                                 }
                                                 <section>
-                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button grid-inner"
+                                                  <button mat-stroked-button color="basic" class="switch-button grid-inner"
                                                     [disabled]="!item.started"
                                                     (click)="profileComand(item.id, 0, 'rescan')">
                                                     Rescan
                                                   </button>
                                                 </section>
                                                 <section>
-                                                  <mat-form-field hideRequiredMarker>
-                                                    <mat-label>Gateway</mat-label>
-                                                    <mat-select required name="gateway" [disabled]="!item.gateways"  [(ngModel)]="choosedGateway[item.id]" disableOptionCentering>
+                                                  <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Gateway</span>
+<select class="cpbx-select" required name="gateway" [disabled]="!item.gateways" [(ngModel)]="choosedGateway[item.id]">
+<option [ngValue]="null" disabled hidden>Gateway</option>
                                                       @for (val of onlyValues(item.gateways); track val.id) {
-                                                        <mat-option [value]="val.id">
+                                                        <option [ngValue]="val.id">
                                                           {{val.name}}
-                                                        </mat-option>
+                                                        </option>
                                                       }
-                                                    </mat-select>
-                                                  </mat-form-field>
-                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                                                    </select>
+</label>
+                                                  <button mat-stroked-button color="basic" class="switch-button"
                                                     [disabled]="!item.gateways || !choosedGateway[item.id] || !item.started || !item.gateways[choosedGateway[item.id]].started" (click)="profileComand(item.id, choosedGateway[item.id], 'killgw')">
                                                     Killgw
                                                   </button>
-                                                  <button mat-raised-button color="basic" class="but-spacer-left switch-button"
+                                                  <button mat-stroked-button color="basic" class="switch-button"
                                                     [disabled]="!item.gateways || !choosedGateway[item.id] || !item.started || item.gateways[choosedGateway[item.id]].started" (click)="profileComand(item.id, choosedGateway[item.id], 'startgw')">
                                                     Startgw
                                                   </button>
                                                 </section>
                                                 <section>
                                                   @if (item.enabled) {
-                                                    <button mat-raised-button color="accent" class="but-spacer-left switch-button grid-inner"
+                                                    <button mat-stroked-button color="basic" class="switch-button grid-inner"
                                                       (click)="switchProfile(item)">
                                                       Disable
                                                     </button>
                                                   }
                                                   @if (!item.enabled) {
-                                                    <button mat-raised-button color="primary" class="but-spacer-left switch-button grid-inner"
+                                                    <button mat-stroked-button color="primary" class="switch-button grid-inner"
                                                       (click)="switchProfile(item)">
                                                       Enable
                                                     </button>
@@ -506,72 +466,74 @@
                               </mat-card>
                             </mat-tab>
                             <mat-tab label="Add">
-                              <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
-                                <mat-form-field hideRequiredMarker>
-                                  <mat-label>Name</mat-label>
-                                  <input matInput placeholder="New profile name" required name="name" [(ngModel)]="newProfileName">
-                                </mat-form-field>
-                                <button mat-raised-button color="primary" type="submit">Submit</button>
+                              <form class="cpbx-form-panel" (ngSubmit)="onProfileSubmit()">
+                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New profile name" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
+</label>
+                                <button mat-flat-button color="primary" type="submit">Submit</button>
                               </form>
-                              <form class="spacer spacerb" (ngSubmit)="onGatewaySubmit()">
-                                <mat-form-field hideRequiredMarker>
-                                  <mat-label>Profile</mat-label>
-                                  <mat-select required name="profile" [(ngModel)]="profileId" disableOptionCentering>
+                              <form class="cpbx-form-panel" (ngSubmit)="onGatewaySubmit()">
+                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Profile</span>
+<select class="cpbx-select" required name="profile" [(ngModel)]="profileId">
+<option [ngValue]="null" disabled hidden>Profile</option>
                                     @for (val of onlyValues(list().profiles); track val.id) {
-                                      <mat-option [value]="val.id">
+                                      <option [ngValue]="val.id">
                                         {{val.name}}
-                                      </mat-option>
+                                      </option>
                                     }
-                                  </mat-select>
-                                </mat-form-field>
-                                <mat-form-field hideRequiredMarker>
-                                  <mat-label>Name</mat-label>
-                                  <input matInput placeholder="New gateway name" required name="name" [(ngModel)]="newGatewayName">
-                                </mat-form-field>
-                                <button mat-raised-button color="primary" type="submit">Submit</button>
+                                  </select>
+</label>
+                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Name</span>
+<input placeholder="New gateway name" required name="name" [(ngModel)]="newGatewayName" class="cpbx-input">
+</label>
+                                <button mat-flat-button color="primary" type="submit">Submit</button>
                               </form>
                             </mat-tab>
                             <mat-tab label="Delete/Rename">
-                              <form class="spacer spacerb" #deleteForm="ngForm">
-                                <mat-form-field hideRequiredMarker>
-                                  <mat-label>Profile</mat-label>
-                                  <mat-select required name="profile" [(ngModel)]="profileId" disableOptionCentering>
+                              <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
+                                <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Profile</span>
+<select class="cpbx-select" required name="profile" [(ngModel)]="profileId">
+<option [ngValue]="null" disabled hidden>Profile</option>
                                     @for (val of onlyValues(list().profiles); track val.id) {
-                                      <mat-option [value]="val.id">
+                                      <option [ngValue]="val.id">
                                         {{val.name}}
-                                      </mat-option>
+                                      </option>
                                     }
-                                  </mat-select>
-                                </mat-form-field>
+                                  </select>
+</label>
                                 @if (list().profiles && list().profiles[profileId]) {
-                                  <div>
-                                    <h3>Profile:</h3>
-                                    <mat-form-field hideRequiredMarker>
-                                      <mat-label>Profile name</mat-label>
-                                      <input matInput name="Profile name" required [ngModel]="list().profiles[profileId].name"
-                                        [name]="'profile::' + profileId">
-                                      </mat-form-field>
-                                      <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['profile::' + profileId])"
+                                  <div class="cpbx-form-panel cpbx-form-panel--stack">
+                                    <h3 class="cpbx-form-title">Profile</h3>
+                                    <div class="cpbx-edit-row">
+                                    <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Profile name</span>
+<input name="Profile name" required [ngModel]="list().profiles[profileId].name" [name]="'profile::' + profileId" placeholder="Profile name" class="cpbx-input">
+</label>
+                                      <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['profile::' + profileId])"
                                         (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'rename')">
                                         Update
                                       </button>
-                                      <button mat-raised-button color="warn"
+                                      <button mat-stroked-button color="warn" type="button"
                                         (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'delete')">
                                         Delete
                                       </button>
-                                      <h3>Gateways:</h3>
+                                      </div>
+                                      <h3 class="cpbx-form-title">Gateways</h3>
                                       @for (item of onlyValues(list().profiles[profileId].gateways); track item.id) {
-                                        <div class="panel-wrapper">
-                                          <mat-form-field hideRequiredMarker>
-                                            <mat-label>Gateway name</mat-label>
-                                            <input matInput name="Gateway name" required [ngModel]="item.name"
-                                              [name]="'gateway::' + item.id">
-                                            </mat-form-field>
-                                            <button mat-button color="accent" [disabled]="checkDirty(deleteForm.controls['gateway::' + item.id])"
+                                        <div class="cpbx-edit-row">
+                                          <label class="cpbx-field cpbx-field--md">
+<span class="cpbx-label">Gateway name</span>
+<input name="Gateway name" required [ngModel]="item.name" [name]="'gateway::' + item.id" placeholder="Gateway name" class="cpbx-input">
+</label>
+                                            <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['gateway::' + item.id])"
                                               (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'rename')">
                                               Update
                                             </button>
-                                            <button mat-raised-button color="warn"
+                                            <button mat-stroked-button color="warn" type="button"
                                               (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'delete')">
                                               Delete
                                             </button>

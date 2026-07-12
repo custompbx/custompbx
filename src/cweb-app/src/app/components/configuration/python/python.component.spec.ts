@@ -8,7 +8,7 @@ describe('SofiaComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PythonComponent ]
+      imports: [ PythonComponent ],
     })
     .compileComponents();
   }));

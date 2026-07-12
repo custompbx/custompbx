@@ -92,7 +92,7 @@ export class CdrPgCsvComponent implements OnInit, OnDestroy {
       updateItem: this.updateField.bind(this),
       pasteItems: null,
     };
-    this.schemaFieldMask = {name: {name: 'var'}, value: {name: 'column'}, extraField1: {name: 'quote', style: {'max-width': '71px'}}};
+    this.schemaFieldMask = {name: {name: 'var'}, value: {name: 'column'}, extraField1: {name: 'quote', size: 'sm'}};
   }
 
   ngOnDestroy() {

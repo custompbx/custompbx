@@ -8,7 +8,7 @@ describe('SvgSeqDiagramComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SvgSeqDiagramComponent ]
+      imports: [ SvgSeqDiagramComponent ],
     })
     .compileComponents();
   }));

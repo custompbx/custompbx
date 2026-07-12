@@ -11,6 +11,7 @@ import {State} from '../../store/logs/logs.reducers';
 import {GetLogs} from '../../store/logs/logs.actions';
 import {FormsModule} from "@angular/forms";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
+import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
 
 export interface IfilterField {
   field: string|null;
@@ -25,7 +26,7 @@ export interface IsortField {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent],
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, CpbxSelectDirective],
   selector: 'app-logs',
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.css'],

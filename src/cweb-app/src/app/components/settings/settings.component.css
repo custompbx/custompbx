@@ -1,14 +1,3 @@
-.full-form {
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: repeat(2, 330px);
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-
-.full-form + * {
-  display: grid;
-}
-
 .setting-title {
   text-align: center;
 }
@@ -35,42 +24,6 @@ mat-toolbar-row {
   grid-column: 1 / -1;
 }
 
-button {
-  margin: 5px;
-}
-
-.mat-expansion-panel {
-  border-radius: 0;
-}
-
-.mat-expansion-panel-header {
-  border-radius: 0;
-}
-
-.switch-button {
-  min-width: 78px;
-}
-
-.but-spacer-left {
-  margin-left: 5px;
-}
-
-.tabbed-panel {
-  margin: 0 3px;
-}
-
-.tabbed-panel:last-child {
-  margin-bottom: 3px;
-}
-
-mat-form-field {
-  padding: 0 5px;
-}
-
-.spacerb {
-  margin-top: 15px;
-}
-
 .switch-button {
   min-width: 78px;
 }
@@ -93,8 +46,7 @@ mat-form-field {
 }
 
 .upload-image {
-  position: relative;
-  top: -15px;
+  align-self: flex-start;
 }
 
 .mat-tab-body-active {

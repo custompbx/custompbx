@@ -75,10 +75,11 @@ import {
 import { InnerHeaderComponent } from "../../inner-header/inner-header.component";
 import { ModuleNotExistsBannerComponent } from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
+import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, CpbxSelectDirective],
   selector: 'app-conference',
   templateUrl: './conference.component.html',
   styleUrls: ['./conference.component.css']
@@ -212,15 +213,15 @@ export class ConferenceComponent implements OnInit, OnDestroy {
     this.chatPermissionMask = {name: {name: 'name'}, value: {name: 'commands'}};
     this.controlMask = {name: {name: 'action'}, value: {name: 'digits'}};
     this.layoutImageMask = {
-      name: {name: 'x'},
-      value: {name: 'y'},
-      extraField1: {name: 'scale'},
-      extraField2: {name: 'hscale'},
-      extraField3: {name: 'zoom'},
-      extraField4: {name: 'floor'},
-      extraField5: {name: 'floor_only'},
-      extraField6: {name: 'overlap'},
-      extraField7: {name: 'reservation_id'},
+      name: {name: 'x', size: 'sm'},
+      value: {name: 'y', size: 'sm'},
+      extraField1: {name: 'scale', size: 'sm'},
+      extraField2: {name: 'hscale', size: 'sm'},
+      extraField3: {name: 'zoom', size: 'sm'},
+      extraField4: {name: 'floor', size: 'sm'},
+      extraField5: {name: 'floor_only', size: 'sm', options: ['', 'true', 'false']},
+      extraField6: {name: 'overlap', size: 'sm', options: ['', 'true', 'false']},
+      extraField7: {name: 'reservation_id', size: 'md'},
     };
     this.layoutGroupMask = {name: {name: 'body'}};
   }

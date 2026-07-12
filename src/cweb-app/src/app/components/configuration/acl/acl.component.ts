@@ -28,10 +28,11 @@ import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {ResizeInputDirective} from "../../../directives/resize-input.directive";
+import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, ResizeInputDirective],
+  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, ResizeInputDirective, CpbxSelectDirective],
   selector: 'app-acl',
   templateUrl: './acl.component.html',
   styleUrls: ['./acl.component.css']
