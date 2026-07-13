@@ -110,5 +110,5 @@ func GetChannelsCache() *mainStruct.Channels {
 }
 
 func GetChannelsCounter() (int, int) {
-	return channels.Total, channels.Answered
+	return channels.Counters()
 }

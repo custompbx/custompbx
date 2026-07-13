@@ -91,6 +91,11 @@ func Migrate(switchName string) (bool, error) {
 	var err error
 	updated := false
 	instanceId := getInstanceId(switchName)
+	vertoUpdated, err := migrateVertoProfileParameterSecureUniqueness()
+	if err != nil {
+		return false, err
+	}
+	updated = updated || vertoUpdated
 	switch GetVersion(instanceId) {
 	case "":
 		//return updated, nil
@@ -119,6 +124,78 @@ func Migrate(switchName string) (bool, error) {
 
 	err = UpdateVersion(instanceId)
 	return updated, err
+}
+
+func migrateVertoProfileParameterSecureUniqueness() (bool, error) {
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return false, err
+	}
+	var tableExists bool
+	err = tx.QueryRowContext(ctx, `
+SELECT EXISTS (
+    SELECT 1
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+      AND table_name = 'config_verto_profile_parameters'
+)`).Scan(&tableExists)
+	if err != nil {
+		tx.Rollback()
+		return false, err
+	}
+	if !tableExists {
+		if err = tx.Commit(); err != nil {
+			return false, err
+		}
+		return false, nil
+	}
+
+	statements := []string{
+		"ALTER TABLE IF EXISTS config_verto_profile_parameters ADD COLUMN IF NOT EXISTS secure VARCHAR",
+		"ALTER TABLE IF EXISTS config_verto_profile_parameters ALTER COLUMN secure SET DEFAULT ''",
+		"UPDATE config_verto_profile_parameters SET secure = '' WHERE secure IS NULL",
+		"ALTER TABLE IF EXISTS config_verto_profile_parameters ALTER COLUMN secure SET NOT NULL",
+		`
+DO $$
+DECLARE
+    old_constraint text;
+BEGIN
+    FOR old_constraint IN
+        SELECT tc.constraint_name
+        FROM information_schema.table_constraints tc
+        JOIN information_schema.key_column_usage kcu
+          ON tc.constraint_schema = kcu.constraint_schema
+         AND tc.constraint_name = kcu.constraint_name
+         AND tc.table_name = kcu.table_name
+        WHERE tc.table_schema = 'public'
+          AND tc.table_name = 'config_verto_profile_parameters'
+          AND tc.constraint_type = 'UNIQUE'
+        GROUP BY tc.constraint_name
+        HAVING array_agg(kcu.column_name::text ORDER BY kcu.column_name::text) = ARRAY['param_name', 'parent_id']
+    LOOP
+        EXECUTE format('ALTER TABLE config_verto_profile_parameters DROP CONSTRAINT %I', old_constraint);
+    END LOOP;
+END $$;
+`,
+		`
+CREATE UNIQUE INDEX IF NOT EXISTS config_verto_profile_parameters_param_parent_secure_uq
+    ON config_verto_profile_parameters(param_name, parent_id, secure)
+`,
+	}
+
+	for _, statement := range statements {
+		if _, err = tx.ExecContext(ctx, statement); err != nil {
+			tx.Rollback()
+			return false, err
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return false, err
+	}
+
+	return false, nil
 }
 
 func GetWebSettings(settings *mainStruct.WebSettings, instanceId int64) {

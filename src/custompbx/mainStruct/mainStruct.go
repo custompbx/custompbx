@@ -364,6 +364,7 @@ type Call struct {
 }
 
 type Channel struct {
+	DirectoryUserID int64  `json:"-"`
 	Uuid            string `json:"uuid"`
 	Direction       string `json:"direction"`
 	Created         string `json:"created"`
@@ -411,9 +412,13 @@ func NewChannelsCache() *Channels {
 }
 
 func (c *Channels) Set(value *Channel) {
+	if value == nil || value.Uuid == "" {
+		return
+	}
 	c.mx.Lock()
 	defer c.mx.Unlock()
 	c.byUuid[value.Uuid] = value
+	c.refreshCountersLocked()
 }
 
 func (c *Channels) GetByUuid(key string) *Channel {
@@ -424,9 +429,73 @@ func (c *Channels) GetByUuid(key string) *Channel {
 }
 
 func (c *Channels) Remove(key *Channel) {
+	if key == nil {
+		return
+	}
 	c.mx.Lock()
 	defer c.mx.Unlock()
 	delete(c.byUuid, key.Uuid)
+	c.refreshCountersLocked()
+}
+
+func (c *Channels) MarkAnswered(uuid string) *Channel {
+	c.mx.Lock()
+	defer c.mx.Unlock()
+	channel := c.byUuid[uuid]
+	if channel == nil {
+		return nil
+	}
+	channel.Callstate = "ACTIVE"
+	c.refreshCountersLocked()
+	copy := *channel
+	return &copy
+}
+
+func (c *Channels) RemoveByUUID(uuid, otherLegUUID string) *Channel {
+	c.mx.Lock()
+	defer c.mx.Unlock()
+	channel := c.byUuid[uuid]
+	if channel == nil && otherLegUUID != "" {
+		channel = c.byUuid[otherLegUUID]
+	}
+	if channel == nil {
+		return nil
+	}
+	delete(c.byUuid, channel.Uuid)
+	c.refreshCountersLocked()
+	copy := *channel
+	return &copy
+}
+
+func (c *Channels) Replace(values []Channel) {
+	c.mx.Lock()
+	defer c.mx.Unlock()
+	next := make(map[string]*Channel, len(values))
+	for i := range values {
+		if values[i].Uuid == "" {
+			continue
+		}
+		channel := values[i]
+		next[channel.Uuid] = &channel
+	}
+	c.byUuid = next
+	c.refreshCountersLocked()
+}
+
+func (c *Channels) Counters() (int, int) {
+	c.mx.RLock()
+	defer c.mx.RUnlock()
+	return c.Total, c.Answered
+}
+
+func (c *Channels) refreshCountersLocked() {
+	c.Total = len(c.byUuid)
+	c.Answered = 0
+	for _, channel := range c.byUuid {
+		if channel.Callstate == "ACTIVE" {
+			c.Answered++
+		}
+	}
 }
 
 func (c *Channels) GetLength() (int, int) {

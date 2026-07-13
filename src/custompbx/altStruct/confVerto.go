@@ -33,7 +33,7 @@ type ConfigVertoProfileParameter struct {
 	Enabled     bool                `xml:"-" json:"enabled" customsql:"enabled;default=TRUE"`
 	Name        string              `xml:"name,attr" json:"name" customsql:"param_name;unique_1;check(param_name <> '')"`
 	Value       string              `xml:"value,attr" json:"value" customsql:"param_value"`
-	Secure      string              `xml:"secure,attr" json:"secure" customsql:"secure"`
+	Secure      string              `xml:"secure,attr" json:"secure" customsql:"secure;unique_1;default=''"`
 	Description string              `xml:"-" json:"description" customsql:"description"`
 	Parent      *ConfigVertoProfile `xml:"-" json:"parent" customsql:"fkey:parent_id;unique_1;check(parent_id <> 0)"`
 }

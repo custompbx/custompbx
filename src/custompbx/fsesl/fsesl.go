@@ -26,10 +26,14 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
 var esl *fsock.FSock
+var channelStateMu sync.Mutex
+var freeSwitchClockOffsetSeconds int64
+var clockSyncRequests = make(chan struct{}, 1)
 
 type regsAsJson struct {
 	Registrations []Regs `json:"rows"`
@@ -201,12 +205,12 @@ const (
 	CCMemberStateAbandoned = "abandoned"
 )
 
-func CollectAndSetESLDataESLData() {
+func CollectAndSetESLDataESLData(eventChannels ...chan interface{}) {
 	if esl == nil || !esl.Connected() {
 		return
 	}
 	GetDirectorySipRegs()
-	GetChannels()
+	GetChannels(eventChannels...)
 	//GetSofiaStatuses()
 	GetVertoStatuses()
 	GetLoadedModules()
@@ -445,14 +449,18 @@ func FirstConnectData() {
 
 func ESLConnectKeeper(eventChannel chan interface{}, logsChannel chan mainStruct.LogType) {
 	log.Println("Connection to ESL")
-	tenSecondsTick := time.Tick(10 * time.Second)
+	tenSecondsTick := time.NewTicker(10 * time.Second)
+	reconcileTick := time.NewTicker(30 * time.Second)
+	defer tenSecondsTick.Stop()
+	defer reconcileTick.Stop()
 	Connect(eventChannel, logsChannel)
 	go StartListenFSEvents()
-	CollectAndSetESLDataESLData()
+	requestFreeSwitchClockSync()
+	CollectAndSetESLDataESLData(eventChannel)
 
 	for {
 		select {
-		case <-tenSecondsTick:
+		case <-tenSecondsTick.C:
 			if esl != nil && esl.Connected() {
 				daemonCache.State.ESLConnection = true
 				continue
@@ -469,7 +477,14 @@ func ESLConnectKeeper(eventChannel chan interface{}, logsChannel chan mainStruct
 				continue
 			}
 			go StartListenFSEvents()
-			CollectAndSetESLDataESLData()
+			requestFreeSwitchClockSync()
+			CollectAndSetESLDataESLData(eventChannel)
+		case <-reconcileTick.C:
+			if esl != nil && esl.Connected() {
+				GetChannels(eventChannel)
+			}
+		case <-clockSyncRequests:
+			requestFreeSwitchClockSync()
 		}
 	}
 }
@@ -631,8 +646,11 @@ func getUserByPresence(presense string) *altStruct.DirectoryDomainUser {
 }
 
 func channelCreateHandler(event string, id int, eventChannel chan interface{}) {
+	channelStateMu.Lock()
+	defer channelStateMu.Unlock()
 	var filterHeaders []string
 	eventMap := fsock.FSEventStrToMap(event, filterHeaders)
+	logDelayedChannelEvent(eventMap)
 	cCache := pbxcache.GetChannelsCache()
 
 	channel := &mainStruct.Channel{
@@ -678,53 +696,37 @@ func channelCreateHandler(event string, id int, eventChannel chan interface{}) {
 
 	}
 
-	cCache.Set(channel)
-	cCache.Total++
-	eventChannel <- &mainStruct.Dashboard{FSMetrics: &mainStruct.FSMetrics{CallsCounter: map[string]int{"total": cCache.Total, "answered": cCache.Answered}}}
-
 	possibleUserName := channel.PresenceId
 	if possibleUserName == "" {
 		possibleUserName = channel.Name
 	}
 	user := getUserByPresence(possibleUserName)
 	if user == nil {
+		cCache.Set(channel)
+		publishChannelCounters(eventChannel, cCache)
 		return
 	}
-
+	channel.DirectoryUserID = user.Id
+	cCache.Set(channel)
+	publishChannelCounters(eventChannel, cCache)
 	directoryCache := cache.GetDirectoryCache()
-	cUser := directoryCache.UserCache.GetById(user.Id)
-	if cUser == nil {
-		cUser = directoryCache.UserCache.SetByData(user.Id, user.Name, false)
-	}
-	cUser.InCall = true
-	cUser.CallDirection = channel.Direction
-	intDate, err := strconv.ParseInt(channel.CreatedEpoch, 10, 64)
-	if err == nil {
-		cUser.CallDate = intDate / 1000000
-	}
-	if channel.Callstate == ValueChannelStateActive {
-		cUser.LastUuid = channel.Uuid
-		cUser.Talking = true
-	}
-	cUser.UpdateUser(user)
+	directoryCache.UserCache.SetCall(user, callStateFromChannel(channel), true)
 	eventChannel <- user
 }
 
 func channelAnswerHandler(event string, id int, eventChannel chan interface{}) {
+	channelStateMu.Lock()
+	defer channelStateMu.Unlock()
 	var filterHeaders []string
 	eventMap := fsock.FSEventStrToMap(event, filterHeaders)
+	logDelayedChannelEvent(eventMap)
 
 	cCache := pbxcache.GetChannelsCache()
-	channel := cCache.GetByUuid(eventMap[NameChannelUuid])
-	if channel == nil {
-		// channel = cache.GetByUuid(eventMap[NameChannelOtherLegUuid])
-	}
+	channel := cCache.MarkAnswered(eventMap[NameChannelUuid])
 	if channel == nil {
 		return
 	}
-	channel.Callstate = ValueChannelStateActive
-	cCache.Answered++
-	eventChannel <- &mainStruct.Dashboard{FSMetrics: &mainStruct.FSMetrics{CallsCounter: map[string]int{"total": cCache.Total, "answered": cCache.Answered}}}
+	publishChannelCounters(eventChannel, cCache)
 
 	possibleUserName := channel.PresenceId
 	if possibleUserName == "" {
@@ -735,59 +737,124 @@ func channelAnswerHandler(event string, id int, eventChannel chan interface{}) {
 		return
 	}
 	directoryCache := cache.GetDirectoryCache()
-	cUser := directoryCache.UserCache.GetById(user.Id)
-	if cUser == nil {
-		cUser = directoryCache.UserCache.SetByData(user.Id, user.Name, false)
-	}
-	cUser.Talking = true
-	cUser.CallDirection = channel.Direction
-	cUser.LastUuid = channel.Uuid
-	cUser.CallDate = time.Now().Unix()
-	cUser.UpdateUser(user)
+	channel.DirectoryUserID = user.Id
+	directoryCache.UserCache.SetCall(user, callStateFromChannel(channel), true)
 	eventChannel <- user
 }
 
 func channelDestroyHandler(event string, id int, eventChannel chan interface{}) {
+	channelStateMu.Lock()
+	defer channelStateMu.Unlock()
 	var filterHeaders []string
 	eventMap := fsock.FSEventStrToMap(event, filterHeaders)
+	logDelayedChannelEvent(eventMap)
 
 	cCache := pbxcache.GetChannelsCache()
-	channel := cCache.GetByUuid(eventMap[NameChannelUuid])
+	channel := cCache.RemoveByUUID(eventMap[NameChannelUuid], eventMap[NameChannelOtherLegUuid])
 	if channel == nil {
-		channel = cCache.GetByUuid(eventMap[NameChannelOtherLegUuid])
-	}
-	if channel == nil {
+		cleanupUnknownDestroyedChannel(eventMap, eventChannel)
 		return
-	}
-
-	// if eventMap[NameCallerChannelAnswerTIme] != "0"{
-	if channel.Callstate == ValueChannelStateActive {
-		cCache.Answered--
 	}
 	possibleUserName := channel.PresenceId
 	if possibleUserName == "" {
 		possibleUserName = channel.Name
 	}
-	cCache.Total--
-	cCache.Remove(channel)
-
-	eventChannel <- &mainStruct.Dashboard{FSMetrics: &mainStruct.FSMetrics{CallsCounter: map[string]int{"total": cCache.Total, "answered": cCache.Answered}}}
+	publishChannelCounters(eventChannel, cCache)
 
 	user := getUserByPresence(possibleUserName)
 	if user == nil {
 		return
 	}
 	directoryCache := cache.GetDirectoryCache()
-	cUser := directoryCache.UserCache.GetById(user.Id)
-	if cUser == nil {
-		cUser = directoryCache.UserCache.SetByData(user.Id, user.Name, false)
+	directoryCache.UserCache.SetCall(user, cache.UserCallState{UUID: channel.Uuid}, false)
+	eventChannel <- user
+}
+
+func callStateFromChannel(channel *mainStruct.Channel) cache.UserCallState {
+	if channel == nil {
+		return cache.UserCallState{}
 	}
-	cUser.InCall = false
-	cUser.Talking = false
-	cUser.LastUuid = ""
-	cUser.CallDirection = ""
-	cUser.CallDate = time.Now().Unix()
-	cUser.UpdateUser(user)
+	return cache.UserCallState{
+		UUID:      channel.Uuid,
+		CreatedAt: normalizedFreeSWITCHEpoch(channel.CreatedEpoch),
+		Direction: channel.Direction,
+		Talking:   channel.Callstate == ValueChannelStateActive,
+	}
+}
+
+func parseFreeSWITCHEpoch(value string) int64 {
+	epoch, err := strconv.ParseInt(value, 10, 64)
+	if err != nil || epoch <= 0 {
+		return 0
+	}
+	if epoch > 1000000000000 {
+		return epoch / 1000000
+	}
+	return epoch
+}
+
+func normalizedFreeSWITCHEpoch(value string) int64 {
+	epoch := parseFreeSWITCHEpoch(value)
+	if epoch == 0 {
+		return 0
+	}
+	return epoch + freeSwitchClockOffsetSeconds
+}
+
+func logDelayedChannelEvent(eventMap map[string]string) {
+	eventAt := parseFreeSWITCHEpoch(eventMap[NameEventDateTimestamp])
+	if eventAt == 0 {
+		return
+	}
+	delay := time.Now().Unix() - eventAt
+	if eventMap[EventName] == NameChannelCreate {
+		if delay > 60 || delay < -60 {
+			freeSwitchClockOffsetSeconds = delay
+			select {
+			case clockSyncRequests <- struct{}{}:
+			default:
+			}
+		} else {
+			freeSwitchClockOffsetSeconds = 0
+		}
+	}
+	if delay < 60 && delay > -60 {
+		return
+	}
+	log.Printf("delayed FreeSWITCH event event=%s uuid=%s delay_seconds=%d", eventMap[EventName], eventMap[NameChannelUuid], delay)
+}
+
+func requestFreeSwitchClockSync() {
+	if esl == nil || !esl.Connected() {
+		return
+	}
+	response, err := SendBgapiCmd("fsctl sync_clock_when_idle")
+	if err != nil {
+		log.Printf("FreeSWITCH clock synchronization failed: %v", err)
+		return
+	}
+	log.Printf("FreeSWITCH clock synchronization requested: %s", strings.TrimSpace(response))
+}
+
+func publishChannelCounters(eventChannel chan interface{}, channels *mainStruct.Channels) {
+	total, answered := channels.Counters()
+	eventChannel <- &mainStruct.Dashboard{FSMetrics: &mainStruct.FSMetrics{CallsCounter: map[string]int{"total": total, "answered": answered}}}
+}
+
+func cleanupUnknownDestroyedChannel(eventMap map[string]string, eventChannel chan interface{}) {
+	possibleUserName := eventMap[NameChannelPresenceId]
+	if possibleUserName == "" {
+		possibleUserName = eventMap[NameChannelName]
+	}
+	user := getUserByPresence(possibleUserName)
+	if user == nil {
+		return
+	}
+	uuid := eventMap[NameChannelUuid]
+	if uuid == "" {
+		uuid = eventMap[NameChannelOtherLegUuid]
+	}
+	cache.GetDirectoryCache().UserCache.SetCall(user, cache.UserCallState{UUID: uuid}, false)
 	eventChannel <- user
 }
 
@@ -1131,7 +1198,9 @@ func GetDirectorySipRegs() {
 	}
 }
 
-func GetChannels() {
+func GetChannels(eventChannels ...chan interface{}) {
+	channelStateMu.Lock()
+	defer channelStateMu.Unlock()
 	if esl == nil || !esl.Connected() {
 		return
 	}
@@ -1147,10 +1216,12 @@ func GetChannels() {
 		return
 	}
 	cCache := pbxcache.GetChannelsCache()
-	for _, mChannel := range channels.Channels {
-		channel := mChannel
-		cCache.Set(&channel)
-
+	directoryCache := cache.GetDirectoryCache()
+	previousUserIDs := directoryCache.UserCache.ActiveCallUserIDs()
+	callsByUser := make(map[int64][]cache.UserCallState)
+	usersByID := make(map[int64]*altStruct.DirectoryDomainUser)
+	for i := range channels.Channels {
+		channel := &channels.Channels[i]
 		possibleUserName := channel.PresenceId
 		if possibleUserName == "" {
 			possibleUserName = channel.Name
@@ -1159,23 +1230,31 @@ func GetChannels() {
 		if user == nil {
 			continue
 		}
-		directoryCache := cache.GetDirectoryCache()
-		cUser := directoryCache.UserCache.GetById(user.Id)
-		if cUser == nil {
-			cUser = directoryCache.UserCache.SetByData(user.Id, user.Name, false)
+		channel.DirectoryUserID = user.Id
+		usersByID[user.Id] = user
+		callsByUser[user.Id] = append(callsByUser[user.Id], callStateFromChannel(channel))
+	}
+	for _, userID := range previousUserIDs {
+		if usersByID[userID] != nil {
+			continue
 		}
-
-		cUser.InCall = true
-		intDate, err := strconv.ParseInt(channel.CreatedEpoch, 10, 64)
-		if err == nil {
-			cUser.CallDate = intDate
+		userI, getErr := intermediateDB.GetByIdFromDB(&altStruct.DirectoryDomainUser{Id: userID})
+		if getErr != nil {
+			continue
 		}
-		if channel.Callstate == ValueChannelStateActive {
-			cUser.LastUuid = channel.Uuid
-			cUser.Talking = true
+		user, ok := userI.(altStruct.DirectoryDomainUser)
+		if ok {
+			usersByID[userID] = &user
 		}
 	}
-	cCache.Total, cCache.Answered = cCache.GetLength()
+	cCache.Replace(channels.Channels)
+	directoryCache.UserCache.ReplaceCalls(callsByUser, usersByID)
+	if len(eventChannels) > 0 && eventChannels[0] != nil {
+		publishChannelCounters(eventChannels[0], cCache)
+		for _, user := range usersByID {
+			eventChannels[0] <- user
+		}
+	}
 }
 
 func GetXMLSofia() *XmlSofia {

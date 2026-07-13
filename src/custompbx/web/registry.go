@@ -412,11 +412,7 @@ func getDirectoryUsers(data *webStruct.MessageData) webStruct.UserResponse {
 		if !ok || user.Id == 0 {
 			continue
 		}
-		cUser := directoryCache.UserCache.GetById(user.Id)
-		if cUser == nil {
-			continue
-		}
-		cUser.UpdateUser(&user)
+		directoryCache.UserCache.ApplyToUser(&user)
 		users[k] = user
 	}
 

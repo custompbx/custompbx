@@ -48,6 +48,14 @@ type userCacheStruct struct {
 	SipRegister   bool
 	VertoRegister bool
 	CCAgent       int64
+	activeCalls   map[string]UserCallState
+}
+
+type UserCallState struct {
+	UUID      string
+	CreatedAt int64
+	Direction string
+	Talking   bool
 }
 
 func GetDomainSipRegsCounter() map[string]int {
@@ -128,6 +136,118 @@ func (u *userCacheStruct) UpdateUser(user *altStruct.DirectoryDomainUser) {
 	user.LastUuid = u.LastUuid
 }
 
+func (f *userCache) SetCall(user *altStruct.DirectoryDomainUser, call UserCallState, active bool) {
+	if user == nil || user.Id == 0 || call.UUID == "" {
+		return
+	}
+	f.mx.Lock()
+	defer f.mx.Unlock()
+	cached := f.byId[user.Id]
+	if cached == nil {
+		cached = &userCacheStruct{Id: user.Id, Name: user.Name, activeCalls: make(map[string]UserCallState)}
+		f.byId[user.Id] = cached
+	}
+	if cached.activeCalls == nil {
+		cached.activeCalls = make(map[string]UserCallState)
+	}
+	if active {
+		cached.activeCalls[call.UUID] = call
+	} else {
+		delete(cached.activeCalls, call.UUID)
+	}
+	cached.refreshCallStateLocked()
+	cached.updateUserLocked(user)
+}
+
+func (f *userCache) ActiveCallUserIDs() []int64 {
+	f.mx.RLock()
+	defer f.mx.RUnlock()
+	ids := make([]int64, 0)
+	for id, user := range f.byId {
+		if len(user.activeCalls) > 0 {
+			ids = append(ids, id)
+		}
+	}
+	return ids
+}
+
+func (f *userCache) ReplaceCalls(calls map[int64][]UserCallState, users map[int64]*altStruct.DirectoryDomainUser) {
+	f.mx.Lock()
+	defer f.mx.Unlock()
+	for _, cached := range f.byId {
+		cached.activeCalls = make(map[string]UserCallState)
+		cached.refreshCallStateLocked()
+	}
+	for id, userCalls := range calls {
+		cached := f.byId[id]
+		if cached == nil {
+			name := ""
+			if users[id] != nil {
+				name = users[id].Name
+			}
+			cached = &userCacheStruct{Id: id, Name: name, activeCalls: make(map[string]UserCallState)}
+			f.byId[id] = cached
+		}
+		for _, call := range userCalls {
+			if call.UUID != "" {
+				cached.activeCalls[call.UUID] = call
+			}
+		}
+		cached.refreshCallStateLocked()
+	}
+	for id, user := range users {
+		if cached := f.byId[id]; cached != nil {
+			cached.updateUserLocked(user)
+		}
+	}
+}
+
+func (f *userCache) ApplyToUser(user *altStruct.DirectoryDomainUser) {
+	if user == nil {
+		return
+	}
+	f.mx.RLock()
+	defer f.mx.RUnlock()
+	if cached := f.byId[user.Id]; cached != nil {
+		cached.updateUserLocked(user)
+	}
+}
+
+func (u *userCacheStruct) refreshCallStateLocked() {
+	u.InCall = len(u.activeCalls) > 0
+	u.Talking = false
+	u.CallDate = 0
+	u.LastUuid = ""
+	u.CallDirection = ""
+	var selectedTalkingAt int64
+	for _, call := range u.activeCalls {
+		if u.CallDate == 0 || (call.CreatedAt > 0 && call.CreatedAt < u.CallDate) {
+			u.CallDate = call.CreatedAt
+			u.CallDirection = call.Direction
+			if !u.Talking {
+				u.LastUuid = call.UUID
+			}
+		}
+		if call.Talking && (!u.Talking || selectedTalkingAt == 0 || (call.CreatedAt > 0 && call.CreatedAt < selectedTalkingAt)) {
+			u.Talking = true
+			u.LastUuid = call.UUID
+			u.CallDirection = call.Direction
+			selectedTalkingAt = call.CreatedAt
+		}
+	}
+}
+
+func (u *userCacheStruct) updateUserLocked(user *altStruct.DirectoryDomainUser) {
+	user.SipRegister = u.SipRegister
+	user.VertoRegister = u.VertoRegister
+	user.CallDate = u.CallDate
+	user.CCAgent = u.CCAgent
+	user.Talking = u.Talking
+	user.InCall = u.InCall
+	user.CallDirection = u.CallDirection
+	user.LastUuid = u.LastUuid
+}
+
 /*
 func (f *userCache) GetByName(key string) *userCacheStruct {
 	f.mx.RLock()
@@ -138,7 +258,7 @@ func (f *userCache) GetByName(key string) *userCacheStruct {
 */
 
 func (f *userCache) SetByData(id int64, name string, reg bool) *userCacheStruct {
-	var value = &userCacheStruct{Id: id, Name: name, SipRegister: reg}
+	var value = &userCacheStruct{Id: id, Name: name, SipRegister: reg, activeCalls: make(map[string]UserCallState)}
 	f.mx.Lock()
 	defer f.mx.Unlock()
 	//f.byName[value.Name] = value
