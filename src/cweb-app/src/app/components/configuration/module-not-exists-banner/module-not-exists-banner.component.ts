@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 import {MaterialModule} from "../../../../material-module";
 import {RouterLink} from "@angular/router";
@@ -9,13 +9,9 @@ standalone: true,
     selector: 'app-module-not-exists-banner',
     templateUrl: './module-not-exists-banner.component.html'
 })
-export class ModuleNotExistsBannerComponent implements OnInit {
+export class ModuleNotExistsBannerComponent {
 
   @Input() list: {exists: boolean};
-
-  constructor() { }
-
-  ngOnInit() {}
 
 }
 

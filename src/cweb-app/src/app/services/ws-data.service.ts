@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { WebsocketService } from './websocket';
@@ -15,17 +16,19 @@ export interface IMessage {
 })
 
 export class WsDataService {
-  public websocketService: WebsocketService;
-  public isConnected: boolean;
+  public readonly websocketService: WebsocketService;
+  private readonly connected;
+
+  public get isConnected(): boolean {
+    return this.connected();
+  }
 
   constructor(
     private wsService: WebsocketService,
     private cookie: CookiesStorageService
   ) {
     this.websocketService = this.wsService;
-    this.websocketService.status.subscribe(connected => {
-      this.isConnected = connected;
-    });
+    this.connected = toSignal(this.websocketService.status, {initialValue: false});
   }
 
   logIn(login: string, password: string): Observable<any> {

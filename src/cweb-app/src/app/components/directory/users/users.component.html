@@ -49,39 +49,49 @@
                       Click to get details
                     </mat-panel-description>
                   </mat-expansion-panel-header>
-                  <form #details="ngForm" class="cpbx-detail-grid">
+                  <form #details="ngForm" class="directory-user-details">
                     @if (user.parameters || user.variables) {
-                      <button mat-stroked-button color="basic" class="switch-button" type="button" (click)="copy(user.id)">
-                        Copy
-                      </button>
+                      <div class="directory-user-actions">
+                        <button mat-stroked-button color="basic" class="switch-button" type="button" (click)="copy(user.id)">
+                          Copy parameters / variables
+                        </button>
+                      </div>
                     }
-                    <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Cache</span>
-<input placeholder="Cache" [ngModel]="user.cache" required [name]="'cache' + user.id" class="cpbx-input">
-</label>
-                    <button mat-flat-button color="primary" type="button"
-                      [disabled]="!isvalueReadyToSend(details.controls['cache' + user.id])"
-                      (click)="updateCache(user.id, details.controls['cache' + user.id])">
-                      Update
-                    </button>
-                    <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Number Alias</span>
-<input placeholder="Number Alias" [ngModel]="user.number_alias" [name]="'number_alias' + user.id" class="cpbx-input">
-</label>
-                    <button mat-flat-button color="primary" type="button"
-                      [disabled]="!isvalueReadyToSend(details.controls['number_alias' + user.id])"
-                      (click)="updateNumberAlias(user.id, details.controls['number_alias' + user.id])">
-                      Update
-                    </button>
-                    <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Cidr</span>
-<input placeholder="Cidr" [ngModel]="user.cidr" [name]="'cidr' + user.id" class="cpbx-input">
-</label>
-                    <button mat-flat-button color="primary" type="button"
-                      [disabled]="!isvalueReadyToSend(details.controls['cidr' + user.id])"
-                      (click)="updateCidr(user.id, details.controls['cidr' + user.id])">
-                      Update
-                    </button>
+                    <div class="directory-user-settings">
+                      <div class="directory-user-setting">
+                        <label class="cpbx-field cpbx-field--md">
+                          <span class="cpbx-label">Cache</span>
+                          <input placeholder="Cache" [ngModel]="user.cache" required [name]="'cache' + user.id" class="cpbx-input">
+                        </label>
+                        <button mat-flat-button color="primary" type="button"
+                          [disabled]="!isvalueReadyToSend(details.controls['cache' + user.id])"
+                          (click)="updateCache(user.id, details.controls['cache' + user.id])">
+                          Update
+                        </button>
+                      </div>
+                      <div class="directory-user-setting">
+                        <label class="cpbx-field cpbx-field--md">
+                          <span class="cpbx-label">Number Alias</span>
+                          <input placeholder="Number Alias" [ngModel]="user.number_alias" [name]="'number_alias' + user.id" class="cpbx-input">
+                        </label>
+                        <button mat-flat-button color="primary" type="button"
+                          [disabled]="!isvalueReadyToSend(details.controls['number_alias' + user.id])"
+                          (click)="updateNumberAlias(user.id, details.controls['number_alias' + user.id])">
+                          Update
+                        </button>
+                      </div>
+                      <div class="directory-user-setting">
+                        <label class="cpbx-field cpbx-field--md">
+                          <span class="cpbx-label">Cidr</span>
+                          <input placeholder="Cidr" [ngModel]="user.cidr" [name]="'cidr' + user.id" class="cpbx-input">
+                        </label>
+                        <button mat-flat-button color="primary" type="button"
+                          [disabled]="!isvalueReadyToSend(details.controls['cidr' + user.id])"
+                          (click)="updateCidr(user.id, details.controls['cidr' + user.id])">
+                          Update
+                        </button>
+                      </div>
+                    </div>
                   </form>
                         <h3>Parameters:</h3>
                         @if (user) {

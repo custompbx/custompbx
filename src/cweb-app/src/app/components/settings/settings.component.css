@@ -1,12 +1,63 @@
+:host {
+  display: block;
+}
+
+.full-form {
+  align-items: stretch !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.5rem !important;
+  margin: 0 !important;
+}
+
+.setting {
+  align-items: stretch !important;
+  display: block !important;
+  padding-block: .25rem;
+  width: 100%;
+}
+
+.setting + .setting {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.25rem;
+}
+
 .setting-title {
-  text-align: center;
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem .75rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.setting-title h3 {
+  color: #0f172a;
+  flex: 0 0 auto !important;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 !important;
 }
 
 .setting-title > div {
-  color: #9b9b9b;
-  position: relative;
-  top: -20px;
-  font-size: 14px;
+  color: #64748b;
+  font-size: .875rem;
+  line-height: 1.35;
+  position: static;
+}
+
+.setting > div:not(.setting-title) {
+  align-items: flex-start !important;
+  display: grid !important;
+  gap: 1rem 1.25rem;
+  grid-template-columns: repeat(2, minmax(0, 26rem));
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.setting .cpbx-field {
+  width: 100% !important;
 }
 
 .settings-full-width {
@@ -19,9 +70,11 @@ mat-toolbar-row {
 }
 
 .content-center {
-  text-align: -webkit-center;
-  place-content: center;
-  grid-column: 1 / -1;
+  align-items: center;
+  display: flex !important;
+  gap: .75rem;
+  justify-content: flex-start;
+  text-align: left;
 }
 
 .switch-button {
@@ -66,6 +119,149 @@ mat-toolbar-row {
 .extra-space {
   margin-bottom: 10px;
 }
-.token-table {
+
+.cpbx-edit-row {
+  align-items: center !important;
+  gap: .75rem 1rem !important;
+}
+
+.tabbed-panel form > div:has(> .cpbx-edit-row) {
+  align-items: start !important;
+  display: grid !important;
+  gap: 1rem 1.25rem !important;
+  grid-template-columns: minmax(0, 42rem);
+  justify-content: flex-start !important;
   width: 100%;
+}
+
+.tabbed-panel form > div:has(> .cpbx-edit-row) > .cpbx-edit-row {
+  align-items: center !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 26rem) auto;
+  margin: 0 !important;
+  min-width: 0;
+}
+
+.tabbed-panel form > div:has(> .cpbx-edit-row) > .cpbx-edit-row.extra-space,
+.tabbed-panel form > div:has(> .cpbx-edit-row) > .cpbx-edit-row:has(.avatar-ico),
+.tabbed-panel form > div:has(> .cpbx-edit-row) > .cpbx-edit-row:has(.avatar-img) {
+  grid-template-columns: minmax(0, 26rem) auto;
+}
+
+.tabbed-panel form > div:has(> .cpbx-edit-row) > .cpbx-edit-row .cpbx-field {
+  width: 100% !important;
+}
+
+.cpbx-edit-row form,
+.cpbx-edit-row > form {
+  align-items: center !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: .75rem !important;
+}
+
+.cpbx-form-panel--stack {
+  gap: 1rem !important;
+}
+
+.cpbx-form-panel--stack > h3 {
+  margin-bottom: .25rem !important;
+}
+
+.tabbed-panel .mat-expansion-panel-body {
+  overflow-x: hidden;
+}
+
+.token-table {
+  border: 1px solid var(--cpbx-border);
+  border-collapse: separate;
+  border-radius: .75rem;
+  border-spacing: 0;
+  margin: 1rem 0 1.25rem;
+  overflow: hidden;
+  width: min(100%, 58rem);
+}
+
+.web-user-details {
+  align-items: stretch !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: .875rem !important;
+  max-width: 40rem;
+  width: 100%;
+}
+
+.web-user-details > .cpbx-edit-row {
+  align-items: center !important;
+  display: grid !important;
+  gap: .75rem !important;
+  grid-template-columns: minmax(0, 26rem) auto !important;
+  justify-content: flex-start !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.web-user-details > .cpbx-edit-row.extra-space {
+  grid-template-columns: minmax(0, 26rem) !important;
+}
+
+.web-user-details > .cpbx-edit-row .cpbx-field {
+  width: 100% !important;
+}
+
+.web-user-avatar-row {
+  align-items: center !important;
+  grid-template-columns: auto auto auto !important;
+}
+
+.web-user-avatar-row .upload-image {
+  max-width: max-content;
+  min-width: 6rem;
+  width: auto !important;
+}
+
+.web-user-avatar-row button[mat-stroked-button].upload-image {
+  min-width: 5.25rem;
+}
+
+.token-table .mat-mdc-header-cell,
+.token-table .mat-mdc-cell {
+  padding: .75rem 1rem;
+}
+
+.token-table .mat-mdc-header-cell {
+  background: var(--cpbx-page-bg);
+  color: var(--cpbx-text-muted);
+  font-size: .8125rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.token-table .mat-mdc-row {
+  height: 3.25rem;
+}
+
+.token-table button {
+  min-width: 5.25rem;
+  width: auto !important;
+}
+
+.token-table .mat-column-token {
+  width: 10rem;
+}
+
+.token-table .mat-column-created {
+  width: 16rem;
+}
+
+.token-table .mat-column-purpose {
+  width: 12rem;
+}
+
+@media (max-width: 1100px) {
+  .setting > div:not(.setting-title),
+  .tabbed-panel form > div:has(> .cpbx-edit-row) {
+    grid-template-columns: 1fr;
+  }
 }

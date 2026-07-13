@@ -1,115 +1,160 @@
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav mode="side" opened [fixedInViewport]="true" [fixedTopGap]="fixedTopGapScrolled" class="contact-list">
-    <div class="users-nav-list">
-      <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">User name</span>
-<input [(ngModel)]="searchUser" placeholder="User name" class="cpbx-input">
-</label>
+<div class="chat-overlay" role="presentation" (click)="closeConversations.emit()"></div>
+
+<section class="chat-drawer" role="dialog" aria-modal="true" aria-label="Conversations">
+  @if (loadCounter() > 0) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  <aside class="chat-sidebar">
+    <div class="chat-sidebar-header">
+      <div>
+        <h2>Conversations</h2>
+        <p>{{ getLogins('').length }} users</p>
+      </div>
+      <button type="button" class="chat-icon-button" (click)="closeConversations.emit()" aria-label="Close conversations">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <label class="chat-search">
+      <mat-icon>search</mat-icon>
+      <input [(ngModel)]="searchUser" placeholder="Search users" autocomplete="off">
+    </label>
+
+    <div class="chat-contact-list">
       @for (webUser of getLogins(searchUser); track webUser.id) {
-        <div [class]="{'chat-contact': true, 'chat-contact-active': currentChat() === webUser.id}"
-             (click)="enterChat(webUser)">
-          <div class="list-avatar">
+        <button type="button"
+          [class]="{'chat-contact': true, 'chat-contact-active': currentChat() === webUser.id}"
+          (click)="enterChat(webUser)">
+          <span class="list-avatar">
             @if (!webUser.avatar_format) {
               <mat-icon class="avatar-image">face</mat-icon>
             } @else {
-              <img class="avatar-image" [src]="'./assets/img/avatar/' + webUser.id + '.' + webUser.avatar_format">
+              <img class="avatar-image" [src]="'./assets/img/avatar/' + webUser.id + '.' + webUser.avatar_format" alt="">
             }
-          </div>
-          <div class="contact-user">{{ webUser.login }}</div>
-        </div>
+          </span>
+          <span class="contact-body">
+            <span class="contact-user">{{ webUser.login }}</span>
+            <span class="contact-meta">Private chat</span>
+          </span>
+        </button>
       }
     </div>
-  </mat-sidenav>
-  <mat-sidenav-content style="margin-left: 237px"> <!-- sidenav do not pushing content on opened on start-->
+  </aside>
+
+  <main class="chat-main">
     @if (userList()[currentChat()]) {
-      @if (loadCounter() > 0) {
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      }
-      <mat-toolbar color="basic">
-        <span>{{ 'Conversation with ' + userList()[currentChat()].login }}</span>
-        @if (userList()[currentChat()].sip_id?.Valid) {
-          <button mat-icon-button color="primary" aria-label="Example icon button with a menu icon"
-                  [disabled]="!user()?.sip_id?.Valid" (click)="voiceCall()">
-            <mat-icon>keyboard_voice</mat-icon>
+      <header class="chat-header">
+        <div class="chat-peer">
+          <span class="chat-peer-avatar">
+            @if (!userList()[currentChat()].avatar_format) {
+              <mat-icon>face</mat-icon>
+            } @else {
+              <img [src]="'./assets/img/avatar/' + userList()[currentChat()].id + '.' + userList()[currentChat()].avatar_format" alt="">
+            }
+          </span>
+          <div>
+            <h3>{{ userList()[currentChat()].login }}</h3>
+            <p>Private conversation</p>
+          </div>
+        </div>
+
+        <div class="chat-header-actions">
+          @if (userList()[currentChat()].sip_id?.Valid) {
+            <button type="button" class="chat-icon-button chat-icon-button-primary"
+              [disabled]="!user()?.sip_id?.Valid"
+              (click)="voiceCall()"
+              aria-label="Start voice call">
+              <mat-icon>call</mat-icon>
+            </button>
+          }
+          <button type="button" class="chat-icon-button" (click)="closeConversations.emit()" aria-label="Close conversations">
+            <mat-icon>close</mat-icon>
           </button>
-        }
-      </mat-toolbar>
+        </div>
+      </header>
     } @else {
-      <app-inner-header name="Conversations" [loadCounter]="loadCounter()"></app-inner-header>
+      <header class="chat-header">
+        <div class="chat-peer">
+          <span class="chat-peer-avatar chat-peer-avatar-muted">
+            <mat-icon>forum</mat-icon>
+          </span>
+          <div>
+            <h3>Select a conversation</h3>
+            <p>Choose a user to open messages</p>
+          </div>
+        </div>
+        <button type="button" class="chat-icon-button" (click)="closeConversations.emit()" aria-label="Close conversations">
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
     }
+
     @if (!currentChat()) {
-      <div class="msg-placeholder">
-        <mat-icon class="centered-child">question_answer</mat-icon>
+      <div class="chat-empty">
+        <mat-icon>question_answer</mat-icon>
+        <h3>No conversation selected</h3>
+        <p>Pick a user from the list to view messages and calls.</p>
       </div>
     } @else if (currentVoice() === currentChat() && toChat()) {
-      <div class="msg-placeholder">
-        <div class="centred">
+      <div class="chat-call">
+        <div class="call-avatar">
           @if (!userList()[currentVoice()].avatar_format) {
-            <mat-icon class="centered-child">account_circle</mat-icon>
+            <mat-icon>account_circle</mat-icon>
           } @else {
-            <img class="centered-child awa"
-                 [src]="'./assets/img/avatar/' + userList()[currentVoice()].id + '.' + user().avatar_format">
+            <img [src]="'./assets/img/avatar/' + userList()[currentVoice()].id + '.' + userList()[currentVoice()].avatar_format" alt="">
           }
-          <div>
-            <h3>{{ totalTime() | formatTimer }}</h3>
-          </div>
-          <div>
-            <button class="margin-fab" mat-fab
-                    [color]="inConversationsCall ? 'warn' : inCall() ? '' : 'green'"
-                    [disabled]="(inCall() && !inConversationsCall) || (isInbound && !isRinging())"
-                    (click)="connectToUser()"
-                    aria-label="icon button">
-              <mat-icon>phone</mat-icon>
+        </div>
+        <h3>{{ userList()[currentVoice()].login }}</h3>
+        <p>{{ totalTime() | formatTimer }}</p>
+        <div class="call-actions">
+          <button type="button" class="call-button call-button-primary"
+            [disabled]="(inCall() && !inConversationsCall) || (isInbound && !isRinging())"
+            (click)="connectToUser()"
+            aria-label="Connect call">
+            <mat-icon>phone</mat-icon>
+          </button>
+          @if (isInbound) {
+            <button type="button" class="call-button call-button-danger"
+              [disabled]="!isRinging() && !inCall()"
+              (click)="hangup()"
+              aria-label="Hang up">
+              <mat-icon>phone_disabled</mat-icon>
             </button>
-            @if (isInbound) {
-              <button class="margin-fab" mat-fab
-                      color="warn"
-                      [disabled]="!isRinging() && !inCall()"
-                      (click)="hangup()"
-                      aria-label="icon button">
-                <mat-icon>phone_disabled</mat-icon>
-              </button>
-            }
-            <button class="margin-fab" mat-fab color="basic" aria-label="icon button" (click)="backToChat()">
-              <mat-icon>chat</mat-icon>
-            </button>
-          </div>
+          }
+          <button type="button" class="call-button" aria-label="Back to chat" (click)="backToChat()">
+            <mat-icon>chat</mat-icon>
+          </button>
         </div>
       </div>
     } @else {
-      <div class="msg-chat">
-        <div class="msg-view" #scrollContainer>
-          <mat-card-content class="chat-content">
-            @for (message of showItems()[currentChat()]; track message.id) {
-              <mat-card [attr.data-index]="message.id"
-                        [class]="{'msg-call': message.duration === 0 || message.duration,'msg-in': message.receiver_id.id == user().id,'msg-out': message.receiver_id.id != user().id}">
-                {{ message.text }}
-                @if (message.duration === 0 || message.duration) {
-                  <div style="display: flex;align-items: center;">
-                    @if (message.receiver_id.id == user().id) {
-                      <span>Incoming call</span>
-                    } @else {
-                      <span>Outgoing call</span>
-                    }
-                    <mat-icon>phone</mat-icon>
-                  </div>
-                }
-                <mat-card-footer
-                  [class]="{'footer-msg-in': message.receiver_id.id == user().id,'footer-msg-out': message.receiver_id.id != user().id}">
-                  {{ convertDate(message.created_at) }}
-                </mat-card-footer>
-              </mat-card>
-            }
-          </mat-card-content>
-        </div>
-        <div class="msg-input">
-          <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Text</span>
-<input [(ngModel)]="newMsg" (keydown.enter)="sendMsg()" placeholder="Text" class="cpbx-input">
-            <mat-icon matSuffix color="primary" class="send-btn" (click)="sendMsg()">send</mat-icon>
-</label>
+      <div class="msg-view" #scrollContainer>
+        <div class="chat-content">
+          @for (message of showItems()[currentChat()]; track message.id) {
+            <article [attr.data-index]="message.id"
+              [class]="{'message-bubble': true, 'msg-call': message.duration === 0 || message.duration, 'msg-in': message.receiver_id.id == user().id, 'msg-out': message.receiver_id.id != user().id}">
+              @if (message.duration === 0 || message.duration) {
+                <div class="call-message">
+                  <mat-icon>phone</mat-icon>
+                  <span>{{ message.receiver_id.id == user().id ? 'Incoming call' : 'Outgoing call' }}</span>
+                </div>
+              } @else {
+                <div class="message-text">{{ message.text }}</div>
+              }
+              <time>{{ convertDate(message.created_at) }}</time>
+            </article>
+          }
         </div>
       </div>
+
+      <footer class="msg-input">
+        <label class="chat-compose">
+          <input [(ngModel)]="newMsg" (keydown.enter)="sendMsg()" placeholder="Write a message..." autocomplete="off">
+          <button type="button" (click)="sendMsg()" [disabled]="!newMsg" aria-label="Send message">
+            <mat-icon>send</mat-icon>
+          </button>
+        </label>
+      </footer>
     }
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </main>
+</section>

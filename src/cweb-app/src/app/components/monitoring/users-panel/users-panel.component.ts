@@ -221,7 +221,7 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
       case user['talking']:
         return 'warn';
       case user['in_call']:
-        return 'accent';
+        return 'yellow';
       case !user['enabled']:
         return 'basic';
       case user['sip_register']:

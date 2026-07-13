@@ -185,7 +185,6 @@ export function reducer(state = initialState, action: All | SettingsAll): State 
     }
 
     case DirectoryActionTypes.StoreDirectoryError: {
-      console.log(action);
       return {
         ...state,
         errorMessage: action.payload.error,

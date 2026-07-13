@@ -176,7 +176,7 @@
                                       </mat-expansion-panel-header>
                                       <form #userDetails="ngForm">
                                         @if (user.value) {
-                                          <div>
+                                          <div class="web-user-details">
                                             <div class="cpbx-edit-row">
                                               <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">User group</span>
@@ -228,8 +228,7 @@
                                                 <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Directory user</span>
 <select class="cpbx-select" required name="sipUser" [(ngModel)]="user.value.sip_id.Int64">
-<option [ngValue]="null" disabled hidden>Directory user</option>
-                                                    <option>-- None --</option>
+                                                    <option [ngValue]="0">-- None --</option>
                                                     @for (domain of directoryDomains() | keyvalue; track domain.key) {
                                                       <optgroup [label]="domain.value.name"
                                                         [disabled]="domain.disabled">
@@ -302,7 +301,7 @@
                                                   Update
                                                 </button>
                                               </div>
-                                              <div class="cpbx-edit-row">
+                                              <div class="cpbx-edit-row web-user-avatar-row">
                                                 @if (!user.value.avatar_format) {
                                                   <div class="avatar-ico">
                                                     <mat-icon>face</mat-icon>

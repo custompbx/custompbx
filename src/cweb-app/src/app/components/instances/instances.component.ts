@@ -1,14 +1,14 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, computed, effect} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {MaterialModule} from "../../../material-module";
-import {Observable, Subscription} from 'rxjs';
-import {select, Store} from '@ngrx/store';
+import {Store} from '@ngrx/store';
 import {AppState, selectInstancesState} from '../../store/app.states';
+import {initialState, Iinstances} from '../../store/instances/instances.reducers';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {WsDataService} from '../../services/ws-data.service';
-import {GetInstances, UpdateInstanceDescription} from '../../store/instances/instances.actions';
+import {UpdateInstanceDescription} from '../../store/instances/instances.actions';
 import {AbstractControl, FormsModule} from '@angular/forms';
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
+import {toSignal} from '@angular/core/rxjs-interop';
 
 
 @Component({
@@ -18,32 +18,23 @@ standalone: true,
     templateUrl: './instances.component.html',
     styleUrls: ['./instances.component.css']
 })
-export class InstancesComponent implements OnInit, OnDestroy {
+export class InstancesComponent {
 
-  public instances: Observable<any>;
-  public instances$: Subscription;
-  public list: any;
-  private lastErrorMessage: string;
-  public loadCounter: number;
-  public currentInstanceId: number;
+  private readonly state = toSignal(this.store.select(selectInstancesState), {initialValue: initialState});
+  public readonly list = computed(() => this.state().instances as Iinstances);
+  public readonly loadCounter = computed(() => this.state().loadCounter);
+  public readonly currentInstanceId = computed(() => this.state().currentInstanceId);
+  private lastShownError: string | null = null;
 
   constructor(
     private store: Store<AppState>,
     private _snackBar: MatSnackBar,
-    private ws: WsDataService,
   ) {
-    this.instances = this.store.pipe(select(selectInstancesState));
-  }
-
-  ngOnInit() {
-    this.instances$ = this.instances.subscribe((instances) => {
-      this.loadCounter = instances.loadCounter;
-      this.lastErrorMessage = instances.errorMessage;
-      this.list = instances.instances;
-      this.currentInstanceId = instances.currentInstanceId;
-      if (!this.lastErrorMessage) {
-      } else {
-        this._snackBar.open('Error: ' + this.lastErrorMessage + '!', null, {
+    effect(() => {
+      const error = this.state().errorMessage;
+      if (error && error !== this.lastShownError) {
+        this.lastShownError = error;
+        this._snackBar.open('Error: ' + error + '!', undefined, {
           duration: 3000,
           panelClass: ['error-snack'],
         });
@@ -51,24 +42,20 @@ export class InstancesComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.instances$.unsubscribe();
-  }
-
-  trackByFnId(index, item) {
+  trackByFnId(_index: number, item: {value: {id: number}}): number {
     return item.value.id;
   }
 
-  switchInstance(id) {
-    if (!this.list[id]) {
-      this._snackBar.open('Error:  Wrong instance id!', null, {
+  switchInstance(id: number): void {
+    const instance = this.list()[id];
+    if (!instance) {
+      this._snackBar.open('Error: Wrong instance id!', undefined, {
         duration: 3000,
         panelClass: ['error-snack'],
       });
       return;
     }
-    window.open('https://' + this.list[id].host + ':' + String(this.list[id].port) + '/cweb', '_blank').focus();
-    return;
+    window.open(`https://${instance.host}:${instance.port}/cweb`, '_blank', 'noopener,noreferrer');
   }
 
   checkDirty(condition: AbstractControl): boolean {
@@ -79,9 +66,8 @@ export class InstancesComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateDescription(instance, description) {
+  updateDescription(instance: {id: number}, description: string): void {
     const data = {id: instance.id, value: description};
-    console.log(data);
     this.store.dispatch(new UpdateInstanceDescription(data));
   }
 }

@@ -1,9 +1,9 @@
-<app-inner-header name="Instances" [loadCounter]="loadCounter"></app-inner-header>
+<app-inner-header name="Instances" [loadCounter]="loadCounter()"></app-inner-header>
 <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start">
   <mat-tab label="List">
 
     <div class="instances-pad">
-      @for (instance of list | keyvalue; track trackByFnId($index, instance)) {
+      @for (instance of list() | keyvalue; track trackByFnId($index, instance)) {
         <mat-card class="instances-cards">
           <mat-card-header>
             <div mat-card-avatar>
@@ -16,10 +16,10 @@
             </mat-icon>-->
           </mat-card-title>
           <span class="card-header-spacer"></span>
-          @if (instance.value.id !== currentInstanceId) {
+          @if (instance.value.id !== currentInstanceId()) {
             <button (click)="switchInstance(instance.value.id)" mat-stroked-button color="primary" class="instance-switch-button">Open</button>
           }
-          @if (instance.value.id == currentInstanceId) {
+          @if (instance.value.id === currentInstanceId()) {
             <div class="current-instance-check" title="Current Instance"><span>Active</span></div>
           }
           <mat-card-subtitle class="subtitle">{{instance.value.description || 'Description'}}</mat-card-subtitle>
@@ -35,7 +35,7 @@
 </mat-tab>
 <mat-tab label="Edit">
   <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
-    @for (instance of list | keyvalue; track trackByFnId($index, instance)) {
+    @for (instance of list() | keyvalue; track trackByFnId($index, instance)) {
       <div class="cpbx-edit-row">
         <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Instance name</span>

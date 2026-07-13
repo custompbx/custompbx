@@ -32,6 +32,25 @@
   --cpbx-space-4: 16px;
   --cpbx-space-5: 24px;
   --cpbx-space-6: 32px;
+  --cpbx-page-gutter: 1.5rem;
+  --cpbx-control-height: 2.75rem;
+  --cpbx-control-width: 17.5rem;
+  --cpbx-control-width-sm: 7.5rem;
+  --cpbx-control-width-wide: 32rem;
+  --cpbx-control-radius: 0.625rem;
+  --cpbx-control-border: #cbd5e1;
+  --cpbx-control-border-hover: #94a3b8;
+  --cpbx-control-focus: #4f46e5;
+  --cpbx-control-ring: 0 0 0 4px rgb(224 231 255);
+  --cpbx-control-bg: #ffffff;
+  --cpbx-control-text: #0f172a;
+  --cpbx-control-muted: #64748b;
+  --cpbx-control-placeholder: #94a3b8;
+  --cpbx-control-disabled-bg: #f8fafc;
+  --cpbx-control-disabled-text: #94a3b8;
+  --cpbx-button-height: 2.75rem;
+  --cpbx-button-min-width: 6rem;
+  --cpbx-panel-radius: 0.875rem;
 }
 
 * { box-sizing: border-box; }
@@ -1128,28 +1147,6 @@ span {
  * component template.
  */
 @layer components {
-  :root {
-    --cpbx-page-gutter: 1.5rem;
-    --cpbx-control-height: 2.75rem;
-    --cpbx-control-width: 17.5rem;
-    --cpbx-control-width-sm: 7.5rem;
-    --cpbx-control-width-wide: 32rem;
-    --cpbx-control-radius: 0.625rem;
-    --cpbx-control-border: #cbd5e1;
-    --cpbx-control-border-hover: #94a3b8;
-    --cpbx-control-focus: #4f46e5;
-    --cpbx-control-ring: 0 0 0 4px rgb(224 231 255);
-    --cpbx-control-bg: #ffffff;
-    --cpbx-control-text: #0f172a;
-    --cpbx-control-muted: #64748b;
-    --cpbx-control-placeholder: #94a3b8;
-    --cpbx-control-disabled-bg: #f8fafc;
-    --cpbx-control-disabled-text: #94a3b8;
-    --cpbx-button-height: 2.75rem;
-    --cpbx-button-min-width: 6rem;
-    --cpbx-panel-radius: 0.875rem;
-  }
-
   app-inner-header + mat-tab-group:not(.legacy-tabs),
   mat-tab-group.cpbx-tabs,
   mat-tab-group:not(.legacy-tabs) {

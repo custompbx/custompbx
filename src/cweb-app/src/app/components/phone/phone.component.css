@@ -1,42 +1,127 @@
 .main-content-wrapper {
-  width: 250px;
+  width: 300px;
   position: fixed;
-  top: 127px;
+  top: 92px;
   z-index: 35000;
-  right: 100px;
-  background-color: #ffffff;
-  border: 1px solid #cccccc;
-  -webkit-box-shadow: 0px 5px 26px -8px rgba(158,158,158,1);
-  -moz-box-shadow: 0px 5px 26px -8px rgba(158,158,158,1);
-  box-shadow: 0px 5px 26px -8px rgba(158,158,158,1);
+  right: 24px;
+  background: var(--cpbx-surface);
+  border: 1px solid var(--cpbx-border);
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(30, 41, 59, .18);
+  overflow: hidden;
+}
+
+.phone-header {
+  background: #3548ad;
+  color: #fff;
+  cursor: move;
+  min-height: 64px;
+  padding: 0 10px 0 18px;
+}
+
+.phone-header--ringing {
+  background: var(--cpbx-warning);
+}
+
+.phone-header--in-call {
+  background: #334155;
+}
+
+.phone-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.phone-title strong {
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.phone-title small {
+  align-items: center;
+  color: rgba(255, 255, 255, .72);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 500;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.phone-status-dot {
+  background: #cbd5e1;
+  border-radius: 999px;
+  height: 7px;
+  width: 7px;
+}
+
+.phone-status--online .phone-status-dot {
+  background: #4ade80;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, .18);
+}
+
+.offline-icon {
+  color: #fecaca;
+  margin-right: 4px;
+}
+
+.phone-header-action {
+  color: #fff;
+}
+
+#main-content {
+  padding: 16px;
+}
+
+.dial-input-row {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+.phone-number-field {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dial-input-action {
+  color: #64748b;
+  flex: 0 0 auto;
 }
 
 .buttons-pad {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  width: 225px;
-  margin: 0 auto 10px;
+  gap: 8px;
+  margin: 0 auto 14px;
+  width: 100%;
 }
 
 .actions-buttons-pad {
   display: grid;
-  margin: auto;
+  gap: 8px;
 }
 
 .phone-digit-button {
-  border: 1px solid #dedede;
-  font-size: 25px;
-  color: #333333;
-  margin: 1px;
+  border: 1px solid var(--cpbx-border);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--cpbx-text);
   box-shadow: none;
-  background-color: white;
-  border-radius: 0px;
-  min-height: 40px;
+  background: #f8fafc;
+  border-radius: 10px;
+  min-height: 48px;
   outline: none;
+  transition: background-color .14s ease, border-color .14s ease, transform .08s ease;
 }
 
 .phone-digit-button:hover {
-  background-color: #e7e7e7;
+  background: var(--cpbx-primary-soft);
+  border-color: #c7d2fe;
+}
+
+.phone-digit-button:active {
+  transform: scale(.96);
 }
 
 .no-shadow {
@@ -44,11 +129,19 @@
 }
 
 .phone-action-button {
-  border-radius: 0;
+  border-radius: 10px;
+  min-height: 46px;
+  width: 100%;
 }
 
 .timer {
-  margin: -10px auto 5px;
+  color: var(--cpbx-text);
+  font-size: 36px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 450;
+  letter-spacing: .02em;
+  line-height: 1;
+  margin: 20px auto 18px;
   text-align: center;
 }
 
@@ -68,13 +161,33 @@ input[type=number]::-webkit-outer-spin-button {
   flex: 1 1 auto;
 }
 
-.dialpad-button-remove {
-  position: absolute;
-  right: 30px;
+.reg-button {
+  --mat-fab-small-container-color: rgba(255, 255, 255, .14);
+  --mat-fab-small-foreground-color: #fff;
+  height: 38px;
+  width: 38px;
+  box-shadow: none;
 }
 
-.reg-button {
-  height: 35px;
-  width: 35px;
-  box-shadow: none;
+.reg-button--registered {
+  --mat-fab-small-container-color: #22c55e;
+  --mat-fab-small-foreground-color: #fff;
+  background-color: #22c55e;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, .2);
+}
+
+.reg-button--registered:hover,
+.reg-button--registered:focus-visible {
+  --mat-fab-small-container-color: #16a34a;
+  background-color: #16a34a;
+}
+
+@media (max-width: 600px) {
+  .main-content-wrapper {
+    left: 12px;
+    right: 12px;
+    top: 76px;
+    width: auto;
+  }
 }

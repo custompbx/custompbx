@@ -21,6 +21,39 @@
   margin-bottom: 1rem;
 }
 
+.directory-user-details {
+  display: flex;
+  flex-direction: column;
+  gap: .875rem;
+  padding: .75rem 0 1.25rem;
+}
+
+.directory-user-actions {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.directory-user-settings {
+  align-items: start;
+  display: grid;
+  gap: .75rem;
+  grid-template-columns: minmax(0, 38rem);
+  justify-content: flex-start;
+}
+
+.directory-user-setting {
+  align-items: center;
+  display: grid;
+  gap: .75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 0;
+}
+
+.directory-user-setting .cpbx-field {
+  width: 100%;
+}
+
 .xml-area {
   width: 100%;
   overflow: hidden;
@@ -49,4 +82,10 @@
   transition: opacity 250ms linear;
   width: 100%;
   z-index: 1000;
+}
+
+@media (max-width: 900px) {
+  .directory-user-settings {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

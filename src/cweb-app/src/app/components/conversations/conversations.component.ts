@@ -1,10 +1,10 @@
 import {
   Component, effect,
-  ElementRef, HostListener, inject,
+  ElementRef, EventEmitter, HostListener, inject, Output,
   ViewChild, signal, computed, DestroyRef, Signal
 } from '@angular/core';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
-import {debounceTime, filter, map, Subject, Subscription} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter, map, Subject, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {
   AppState,
@@ -34,7 +34,6 @@ import {GetDirectoryUsers} from '../../store/directory/directory.actions';
 import {CommonModule} from "@angular/common";
 import {MaterialModule} from "../../../material-module";
 import {FormsModule} from "@angular/forms";
-import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {IwebUser} from "../../store/settings/settings.reducers";
 import {FormatTimerPipe} from "../../pipes/format-timer.pipe";
 
@@ -42,7 +41,7 @@ const scrollTop = 64;
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, FormatTimerPipe],
+  imports: [CommonModule, MaterialModule, FormsModule, FormatTimerPipe],
   selector: 'app-conversations',
   templateUrl: './conversations.component.html',
   styleUrls: ['./conversations.component.css']
@@ -50,6 +49,7 @@ const scrollTop = 64;
 export class ConversationsComponent {
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef<HTMLElement>;
+  @Output() closeConversations = new EventEmitter<void>();
 
   // Injectable services
   private userService = inject(UserService);
@@ -264,15 +264,11 @@ export class ConversationsComponent {
       }
     };
 
-    if (this.ws.isConnected) {
-      initializeData();
-    }
-
     this.ws.websocketService.status.pipe(
-      filter(connected => connected)
-    ).subscribe(connected => {
-      initializeData();
-    });
+      distinctUntilChanged(),
+      filter(connected => connected),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => initializeData());
   }
 
   @HostListener('wheel', ['$event'])

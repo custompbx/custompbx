@@ -4,6 +4,7 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetCdrMongodb} from '../../store/config/cdr_mongodb/config.actions.cdr_mongodb';
 import {WsDataService} from '../ws-data.service';
+import {dispatchWhenConnected} from './dispatch-when-connected';
 import {UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 
 @Injectable({
@@ -17,16 +18,9 @@ export class GetConfigCdrMongodbDataService  {
     ) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {
-    if (this.ws.isConnected) {
+    return dispatchWhenConnected(this.ws, () => {
       this.store.dispatch(new UnSubscribe(null));
       this.store.dispatch(new GetCdrMongodb(null));
-    }
-
-    return this.ws.websocketService.status.subscribe(connected => {
-      if (connected) {
-        this.store.dispatch(new UnSubscribe(null));
-        this.store.dispatch(new GetCdrMongodb(null));
-      }
     });
   }
 }

@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, DestroyRef, inject} from '@angular/core';
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {BreakpointObserver} from '@angular/cdk/layout';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {map} from 'rxjs/operators';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import {filter, map} from 'rxjs/operators';
 import {UserService} from './services/user.service';
-import {filter} from 'rxjs/operators';
 import {MaterialModule} from "../material-module";
 
 import {SidenavComponent} from "./components/sidenav/sidenav.component";
@@ -19,13 +18,18 @@ import {ConversationsComponent} from "./components/conversations/conversations.c
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 
   login = true;
-  public currentComponent;
+  public currentComponent: unknown;
   public showRightNav = false;
   public menuOpen = true;
-  public compact = toSignal(this.breakpointObserver.observe('(max-width: 1023px)').pipe(map(result => result.matches)), {initialValue: false});
+  public readonly compact = toSignal(
+    this.breakpointObserver.observe('(max-width: 1023px)').pipe(map(result => result.matches)),
+    {initialValue: false}
+  );
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private router: Router,
@@ -33,26 +37,33 @@ export class AppComponent implements OnInit {
     private breakpointObserver: BreakpointObserver,
   ) {
     router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(event => {
           this.login = event.urlAfterRedirects.startsWith('/login');
           this.showRightNav = false;
           if (this.compact()) this.menuOpen = false;
       });
   }
 
-  ngOnInit() {
-  }
-
-  onRouterOutletActivate(event: any) {
+  onRouterOutletActivate(event: unknown): void {
     this.currentComponent = event;
   }
 
-  toggleRightSideNav($event) {
+  toggleRightSideNav(): void {
     this.showRightNav = !this.showRightNav;
   }
 
-  toggleNavigation() {
+  toggleNavigation(): void {
     this.menuOpen = !this.menuOpen;
+  }
+
+  onNavigationOpenedChange(opened: boolean): void {
+    // Desktop keeps the drawer mounted and only changes its width. Updating the
+    // collapsed state from a desktop close event (including the login screen)
+    // made the first authenticated view start collapsed unexpectedly.
+    if (this.compact()) this.menuOpen = opened;
   }
 }

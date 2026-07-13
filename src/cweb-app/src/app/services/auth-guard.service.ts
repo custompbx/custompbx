@@ -1,47 +1,32 @@
 import {Injectable} from '@angular/core';
-import { Router } from '@angular/router';
-import {Store} from '@ngrx/store';
-import { AppState } from '../store/app.states';
+import {Router, UrlTree} from '@angular/router';
 import {WsDataService} from './ws-data.service';
 import { RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import {CookiesStorageService} from './cookies-storage.service';
+import {Observable} from 'rxjs';
+import {filter, map, take} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuardService  {
 
-  isAuthenticated: false;
-  noConnect = false;
-
   constructor(
     public router: Router,
-    private store: Store<AppState>,
     private ws: WsDataService,
     private cookie: CookiesStorageService,
-  ) {
-    this.ws.websocketService.status
-      .subscribe((isConnected) => {
-        if (typeof(isConnected) !== 'boolean') {
-          return;
-        }
-        this.noConnect = !isConnected;
-      });
-  }
+  ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    const notLogin = state.url !== 'login' && state.url !== '' && state.url !== '/login' && state.url !== '/';
-    if (notLogin && this.noConnect) {
-      this.router.navigateByUrl('/login');
-      return false;
-    }
+  canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> {
+    const isPublicRoute = state.url === '' || state.url === '/' || state.url === '/login';
+    if (isPublicRoute) return true;
+    if (!this.cookie.getToken()) return this.router.createUrlTree(['/login']);
 
-    if (!this.cookie.getToken() && notLogin) {
-      this.router.navigateByUrl('/login');
-      return false;
-    }
-
-    return true;
+    return this.ws.websocketService.status.pipe(
+      filter((connected): connected is boolean => typeof connected === 'boolean'),
+      take(1),
+      map(connected => connected || this.router.createUrlTree(['/login']))
+    );
   }
 
 }

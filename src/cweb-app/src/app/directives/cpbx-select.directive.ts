@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Directive,
+  DoCheck,
   ElementRef,
   HostListener,
   NgZone,
@@ -12,7 +13,7 @@ import {
   selector: 'select.cpbx-select',
   standalone: true,
 })
-export class CpbxSelectDirective implements AfterViewInit, OnDestroy {
+export class CpbxSelectDirective implements AfterViewInit, DoCheck, OnDestroy {
   private wrapper?: HTMLElement;
   private button?: HTMLButtonElement;
   private menu?: HTMLElement;
@@ -20,6 +21,7 @@ export class CpbxSelectDirective implements AfterViewInit, OnDestroy {
   private removeDocumentClick?: () => void;
   private removeSelectChange?: () => void;
   private open = false;
+  private renderedState = '';
 
   constructor(
     private readonly elementRef: ElementRef<HTMLSelectElement>,
@@ -63,11 +65,21 @@ export class CpbxSelectDirective implements AfterViewInit, OnDestroy {
       this.removeDocumentClick = this.renderer.listen('document', 'click', (event: MouseEvent) => {
         if (!this.wrapper?.contains(event.target as Node)) this.setOpen(false);
       });
-      this.observer = new MutationObserver(() => this.refresh());
+      this.observer = new MutationObserver(() => {
+        // Angular can register async options before its value accessor updates
+        // their selected state. Refresh after the current render turn.
+        queueMicrotask(() => this.refresh());
+      });
       this.observer.observe(select, { childList: true, subtree: true, attributes: true });
     });
 
     this.refresh();
+  }
+
+  ngDoCheck(): void {
+    if (!this.button || !this.menu) return;
+    const state = this.currentState();
+    if (state !== this.renderedState) this.refresh();
   }
 
   ngOnDestroy(): void {
@@ -85,6 +97,18 @@ export class CpbxSelectDirective implements AfterViewInit, OnDestroy {
     this.button.setAttribute('aria-expanded', String(this.open));
     this.button.setAttribute('aria-haspopup', 'listbox');
     this.renderOptions();
+    this.renderedState = this.currentState();
+  }
+
+  private currentState(): string {
+    const select = this.select;
+    return JSON.stringify({
+      disabled: select.disabled,
+      optionCount: select.options.length,
+      selected: Array.from(select.options)
+        .filter((option) => option.selected)
+        .map((option) => option.value),
+    });
   }
 
   private get select(): HTMLSelectElement {

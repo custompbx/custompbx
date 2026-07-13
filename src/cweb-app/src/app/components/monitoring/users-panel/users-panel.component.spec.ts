@@ -22,4 +22,8 @@ describe('UsersPanelComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('uses the prominent warning status for a ringing user', () => {
+    expect(component.getUserCardColor({in_call: true})).toBe('yellow');
+  });
 });

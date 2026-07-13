@@ -1,4 +1,4 @@
-import {Component, effect, inject, OnInit} from '@angular/core';
+import {Component, effect, inject, Input, OnInit} from '@angular/core';
 
 import {MaterialModule} from "../../../material-module";
 import {Iuser} from '../../store/auth/auth.reducers';
@@ -16,6 +16,8 @@ import {AppState} from "../../store/app.states";
     styleUrls: ['./sidenav.component.css']
 })
 export class SidenavComponent {
+
+  @Input() collapsed = false;
 
   public menuItems = Array<IMenuItemExpand>();
   public user: Iuser;

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { HeaderComponent } from './header.component';
+import { Store } from '@ngrx/store';
+import { StartPhone, ToggleShowPhone } from '../../store/header/header.actions';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -35,8 +37,17 @@ describe('HeaderComponent', () => {
   });
 
   it('does not require a loaded user before first render', () => {
-    component.user = null;
-
     expect(() => fixture.detectChanges()).not.toThrow();
+  });
+
+  it('starts and shows the phone on the first click', () => {
+    const store = TestBed.inject(Store);
+    const dispatch = spyOn(store, 'dispatch');
+
+    component.showHidePhone();
+
+    const dispatchedTypes = dispatch.calls.allArgs()
+      .map(([action]) => (action as unknown as {type: string}).type);
+    expect(dispatchedTypes).toEqual([StartPhone.type, ToggleShowPhone.type]);
   });
 });

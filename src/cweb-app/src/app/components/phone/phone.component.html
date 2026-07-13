@@ -1,13 +1,25 @@
 <!--section class="main-content-wrapper" cdkDrag cdkDragBoundary="body"-->
 <section class="main-content-wrapper" cdkDrag>
-  <mat-toolbar [color]="headerColor()" role="heading" class="header" cdkDragHandle>
-    Phone
+  <mat-toolbar role="heading" class="header phone-header" cdkDragHandle
+    [class.phone-header--ringing]="ringing()"
+    [class.phone-header--in-call]="inCall() || answered()">
+    <span class="phone-title">
+      <strong>Phone</strong>
+      <small [class.phone-status--online]="isClientConnected()">
+        <span class="phone-status-dot"></span>
+        {{ registered() && libName === sipjsLib ? 'Registered' : (isClientConnected() ? 'Connected' : 'Offline') }}
+      </small>
+    </span>
     <span class="example-spacer"></span>
     @if (!isClientConnected()) {
-      <mat-icon color="warn">wifi_off</mat-icon>
+      <mat-icon class="offline-icon" aria-label="Phone offline">wifi_off</mat-icon>
     }
     @if (isSipJsTransportConnected()) {
-      <button class="reg-button" mat-mini-fab [color]="!registered() && libName === sipjsLib ? 'warn' : 'green'" [title]="!registered() && libName === sipjsLib ? 'enter calls' : 'leave calls'" aria-label="register" (click)="register()" [disabled]="!isSipJsTransportConnected()">
+      <button class="reg-button" mat-mini-fab
+        [class.reg-button--registered]="registered() && libName === sipjsLib"
+        [title]="!registered() && libName === sipjsLib ? 'Register for calls' : 'Unregister from calls'"
+        [attr.aria-label]="!registered() && libName === sipjsLib ? 'Register for calls' : 'Unregister from calls'"
+        (click)="register()" [disabled]="!isSipJsTransportConnected()">
         @if (!registered() && libName === sipjsLib) {
           <mat-icon>phone_callback</mat-icon>
         }
@@ -16,24 +28,29 @@
         }
       </button>
     }
-    <button mat-icon-button (click)="restartUS()" title="restart phone">
+    <button mat-icon-button class="phone-header-action" (click)="restartUS()" title="Restart phone" aria-label="Restart phone">
       <mat-icon>autorenew</mat-icon>
     </button>
   </mat-toolbar>
   @if (authorizationUsername()) {
     <section id="main-content" class="animated fadeInUp">
-      <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Number</span>
-<input [ngModel]="number()" (ngModelChange)="number.set($event)" name="Number" name="number" placeholder="Number" class="cpbx-input">
+      <div class="dial-input-row">
+        <label class="cpbx-field phone-number-field">
+          <span class="cpbx-label">Number</span>
+          <input [ngModel]="number()" (ngModelChange)="number.set($event)" name="number"
+            placeholder="Enter number" class="cpbx-input">
+        </label>
         @if (number()) {
-          <button mat-icon-button matSuffix aria-label="Delete" (click)="removeLastDigit()" class="dialpad-button-remove">
-            <mat-icon>chevron_left</mat-icon>
+          <button mat-icon-button aria-label="Delete last digit" title="Delete last digit"
+            (click)="removeLastDigit()" class="dial-input-action">
+            <mat-icon>backspace</mat-icon>
           </button>
         }
-        <button mat-icon-button matSuffix (click)="switchHideButtonsPad()" title="dialpad" aria-label="dialpad">
+        <button mat-icon-button (click)="switchHideButtonsPad()" title="Toggle dialpad"
+          aria-label="Toggle dialpad" class="dial-input-action">
           <mat-icon>dialpad</mat-icon>
         </button>
-</label>
+      </div>
       <h3 class="timer mat-headline-3">{{totalTime() | formatTimer}}</h3>
       @if (showButtonsPad) {
         <div class="buttons-pad">

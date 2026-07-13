@@ -1,8 +1,7 @@
-import {Injectable, OnDestroy, Inject} from '@angular/core';
-import {Observable, SubscriptionLike, Subject, Observer, interval} from 'rxjs';
-import {filter, map, tap} from 'rxjs/operators';
+import {Inject, Injectable, OnDestroy} from '@angular/core';
+import {EMPTY, Observable, ReplaySubject, Subject, Subscription, interval} from 'rxjs';
+import {distinctUntilChanged, filter, map, shareReplay, takeWhile} from 'rxjs/operators';
 import {WebSocketSubject, WebSocketSubjectConfig} from 'rxjs/webSocket';
-import {share, distinctUntilChanged, takeWhile} from 'rxjs/operators';
 import {IWebsocketService, IWsMessage, WebSocketConfig} from './websocket.interfaces';
 import {config} from './websocket.config';
 
@@ -13,18 +12,23 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
 
   readonly config: WebSocketSubjectConfig<IWsMessage<any>>;
 
-  private websocketSub: SubscriptionLike;
-  private statusSub: SubscriptionLike;
+  private websocketSub = new Subscription();
+  private socketSub = new Subscription();
+  private reconnectSub = new Subscription();
 
   private reconnection$: Observable<number>;
   private websocket$: WebSocketSubject<IWsMessage<any>>;
-  private connection$: Observer<boolean>;
   private wsMessages$: Subject<IWsMessage<any>>;
+  private readonly connectionStatus = new ReplaySubject<boolean>(1);
   private reconnectInterval: number;
   private reconnectAttempts: number;
-  private isConnected: boolean;
+  private isConnected = false;
+  private destroyed = false;
 
-  public status: Observable<boolean>;
+  public readonly status = this.connectionStatus.asObservable().pipe(
+    distinctUntilChanged(),
+    shareReplay({bufferSize: 1, refCount: true})
+  );
 
   constructor(@Inject(config) private wsConfig: WebSocketConfig) {
     this.wsMessages$ = new Subject<IWsMessage<any>>();
@@ -46,23 +50,7 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
       }
     };
 
-    // connection status
-    this.status = new Observable<boolean>((observer) => {
-      this.connection$ = observer;
-    }).pipe(share(), distinctUntilChanged());
-
-    // run reconnect if not connection
-    this.statusSub = this.status
-      .subscribe((isConnected) => {
-        this.isConnected = isConnected;
-
-        if (!this.reconnection$ && typeof (isConnected) === 'boolean' && !isConnected) {
-          this.reconnect();
-        }
-      });
-
     this.websocketSub = this.wsMessages$.subscribe({
-      next: null,
       error: (error: ErrorEvent) => console.error('WebSocket error!', error)
     });
 
@@ -70,24 +58,20 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.websocketSub.unsubscribe();
-    this.statusSub.unsubscribe();
+    this.close();
   }
 
   /*
   * connect to WebSocked
   * */
   private connect(): void {
-    this.websocket$ = new WebSocketSubject(this.config);
+    if (this.destroyed || this.websocket$) return;
 
-    this.websocket$.subscribe({
+    this.websocket$ = new WebSocketSubject(this.config);
+    this.socketSub.unsubscribe();
+    this.socketSub = this.websocket$.subscribe({
         next: (message) => this.emitMessage(message),
-        error: (error: Event) => {
-          if (!this.websocket$) {
-            // run reconnect if errors
-            this.reconnect();
-          }
-        }
+        error: () => this.emitConnectionStatus(false)
       }
     );
   }
@@ -96,19 +80,20 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
   * reconnect if not connecting or errors
   * */
   private reconnect(): void {
+    if (this.destroyed || this.reconnection$) return;
+
     this.reconnection$ = interval(this.reconnectInterval)
       .pipe(takeWhile((v, index) => index < this.reconnectAttempts && !this.websocket$));
 
-    this.reconnection$.subscribe({
+    this.reconnectSub.unsubscribe();
+    this.reconnectSub = this.reconnection$.subscribe({
       next: () => this.connect(),
-      error: null,
       complete: () => {
-        // Subject complete if reconnect attemts ending
         this.reconnection$ = null;
 
-        if (!this.websocket$) {
+        if (!this.websocket$ && !this.destroyed) {
           this.wsMessages$.complete();
-          this.connection$.complete();
+          this.connectionStatus.complete();
         }
       }
     });
@@ -118,34 +103,40 @@ export class WebsocketService implements IWebsocketService, OnDestroy {
   * on message event
   * */
   public on<T>(event: string): Observable<IWsMessage<T>> {
-    if (event) {
-      return this.wsMessages$.pipe(
-        filter((message: IWsMessage<T>) => message.MessageType === event),
-        map((message: IWsMessage<T>) => message)
-      );
-    }
+    if (!event) return EMPTY;
+    return this.wsMessages$.pipe(
+      filter((message: IWsMessage<T>) => message.MessageType === event),
+      map((message: IWsMessage<T>) => message)
+    );
   }
 
   public send(event: string, data: any = {}): void {
     if (event && this.isConnected) {
-      // remote party waits for a string
-      this.websocket$.next(<any>JSON.constructor({event, data}));
+      this.websocket$.next({event, data} as any);
     } else {
       console.error('Send error!');
     }
   }
 
   public close(): void {
+    if (this.destroyed) return;
+    this.destroyed = true;
+    this.isConnected = false;
+    this.reconnectSub.unsubscribe();
+    this.socketSub.unsubscribe();
+    this.websocketSub.unsubscribe();
+    this.websocket$?.complete();
     this.wsMessages$.complete();
-    this.connection$.complete();
-    this.wsMessages$.unsubscribe();
-    this.websocket$.complete();
-    this.statusSub.unsubscribe();
-    this.websocket$.unsubscribe();
+    this.connectionStatus.complete();
   }
 
   private emitConnectionStatus(isConnected: boolean): void {
-    this.connection$.next(isConnected);
+    this.isConnected = isConnected;
+    this.connectionStatus.next(isConnected);
+    if (!isConnected) {
+      this.websocket$ = null;
+      this.reconnect();
+    }
   }
 
   private emitMessage(message: IWsMessage<any>): void {

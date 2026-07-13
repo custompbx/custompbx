@@ -1,21 +1,21 @@
 import {
   Component,
-  ComponentRef, effect, EventEmitter, inject,
+  ComponentRef, computed, EventEmitter, inject,
   Input,
-  OnDestroy,
-  OnInit, Output,
+  OnDestroy, Output,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
 import {UserService} from '../../services/user.service';
 import {Iuser} from '../../store/auth/auth.reducers';
-import {Observable, Subscription} from 'rxjs';
-import {select, Store} from '@ngrx/store';
+import {Store} from '@ngrx/store';
 import {AppState, selectHeader} from '../../store/app.states';
 import {StartPhone, ToggleShowPhone} from '../../store/header/header.actions';
+import {initialState as initialHeaderState} from '../../store/header/header.reducer';
 import {MaterialModule} from "../../../material-module";
 import {PhoneComponent} from "../phone/phone.component";
 import {RouterLink} from "@angular/router";
+import {toSignal} from '@angular/core/rxjs-interop';
 
 
 @Component({
@@ -25,14 +25,10 @@ import {RouterLink} from "@angular/router";
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent implements OnDestroy {
 
-  public user: Iuser;
-  public startPhone: boolean;
-  public hidePhone = true;
+  public readonly user = computed<Iuser | null>(() => this.userService.userSignal());
   public clone = true;
-  public phoneState: Observable<any>;
-  public phoneState$: Subscription;
 
   @Input() currentComponent;
   @Output() showRightSideNav = new EventEmitter<boolean>();
@@ -43,28 +39,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private resolver = inject(ViewContainerRef);
   private store = inject(Store<AppState>);
-
-  private menuUpdateEffect = effect(() => {
-    this.user = this.userService.userSignal();
-  });
-
-  constructor(
-  ) {
-    this.phoneState = this.store.pipe(select(selectHeader));
-  }
-
-  ngOnInit() {
-    this.phoneState$ = this.phoneState.subscribe((phone) => {
-      this.startPhone = phone.phone.started;
-      this.hidePhone = !phone.phone.shown;
-    });
-  }
+  private readonly phoneState = toSignal(this.store.select(selectHeader), {initialValue: initialHeaderState});
+  public readonly startPhone = computed(() => this.phoneState().phone.started);
+  public readonly hidePhone = computed(() => !this.phoneState().phone.shown);
 
   ngOnDestroy() {
-    this.phoneState$.unsubscribe();
-    if (this.componentRef) {
-      this.componentRef.destroy();
-    }
+    this.componentRef?.destroy();
   }
 
   logOut(): void {
@@ -72,7 +52,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   showHidePhone() {
-    if (!this.startPhone) {
+    if (!this.startPhone()) {
       this.store.dispatch(StartPhone(null));
     }
     this.store.dispatch(ToggleShowPhone(null));
@@ -88,7 +68,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
     this.clone = !this.clone;
     if (this.clone) {
-      this.componentRef.destroy();
+      this.componentRef?.destroy();
       this.container.clear();
       return;
     }

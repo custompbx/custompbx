@@ -4,6 +4,7 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../../store/app.states';
 import {GetSofiaProfiles} from '../../store/config/sofia/config.actions.sofia';
 import {WsDataService} from '../ws-data.service';
+import {dispatchWhenConnected} from './dispatch-when-connected';
 import {SubscriptionList, UnSubscribe} from '../../store/dataFlow/dataFlow.actions';
 
 @Injectable({
@@ -17,16 +18,9 @@ export class GetConfigSofiaDataService  {
     ) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {
-    if (this.ws.isConnected) {
+    return dispatchWhenConnected(this.ws, () => {
       this.store.dispatch(new SubscriptionList({values: [new GetSofiaProfiles(null).type]}));
       this.store.dispatch(new GetSofiaProfiles(null));
-    }
-
-    return this.ws.websocketService.status.subscribe(connected => {
-      if (connected) {
-        this.store.dispatch(new SubscriptionList({values: [new GetSofiaProfiles(null).type]}));
-        this.store.dispatch(new GetSofiaProfiles(null));
-      }
     });
   }
 }

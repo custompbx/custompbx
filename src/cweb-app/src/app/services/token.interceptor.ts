@@ -12,13 +12,12 @@ export class ErrorInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
     return next.handle(request).pipe(
-      catchError((response: any) => {
+      catchError((response: unknown) => {
         if (response instanceof HttpErrorResponse && response.status === 401) {
-          console.log(response);
           this.cookiesStorageService.delToken();
-          this.router.navigateByUrl('/login');
+          void this.router.navigateByUrl('/login');
         }
-        return throwError(response);
+        return throwError(() => response);
       })
   );
   }

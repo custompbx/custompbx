@@ -52,7 +52,7 @@ export interface IwebUser {
   webrtc_lib: string;
   ws: string;
   group_id: number;
-  sip_id: any;
+  sip_id: {Int64: number; Valid: boolean};
 }
 
 export function reducer(state = initialState, action: All): State {
@@ -171,7 +171,7 @@ export function reducer(state = initialState, action: All): State {
           break;
         }
         case SettingsActionTypes.STORE_UPDATE_WEB_USER_SIP_USER: {
-          newState = {...newState, webUsers: {...newState.webUsers, [id]: {...newState.webUsers[id], sip_user: data[id].sip_user}}};
+          newState = {...newState, webUsers: {...newState.webUsers, [id]: {...newState.webUsers[id], sip_id: data[id].sip_id}}};
           break;
         }
         case SettingsActionTypes.STORE_UPDATE_WEB_USER_WS: {

@@ -170,7 +170,7 @@ export class SettingsComponent {
     this.store.dispatch(new UpdateWebUserGroup({group_id: pass, id: id}));
   }
 
-  updateSipUser(id: number, pass: string) {
+  updateSipUser(id: number, pass: number) {
     this.store.dispatch(new UpdateWebUserSipUser({param_id: pass, id: id}));
   }
 

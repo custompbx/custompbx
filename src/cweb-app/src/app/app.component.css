@@ -17,9 +17,18 @@ mat-sidenav {
   width: 264px;
   border-right: 1px solid var(--cpbx-border);
   background: var(--cpbx-surface);
+  transition: width .18s ease;
+}
+
+mat-sidenav.sidenav-collapsed {
+  width: 72px;
 }
 .menu-sidenav {
   padding: 12px 10px 24px;
+}
+
+.sidenav-collapsed .menu-sidenav {
+  padding-inline: 8px;
 }
 .app-main {
   display: block;

@@ -18,28 +18,28 @@
       matTooltip="Duplicate current view" aria-label="Duplicate current view">
       <mat-icon>filter_2</mat-icon>
     </button>
-    @if (user?.group_id === 1) {
+    @if (user()?.group_id === 1) {
       <button mat-icon-button class="header-icon-button" [routerLink]="['/settings']" matTooltip="Settings" aria-label="Open settings">
         <mat-icon>settings</mat-icon>
       </button>
     }
   </div>
   <button type="button" class="user-block" [matMenuTriggerFor]="menu" aria-label="Open user menu">
-      @if (!user?.avatar_format) {
+      @if (!user()?.avatar_format) {
         <mat-icon>face</mat-icon>
       }
-      @if (user?.avatar_format) {
+      @if (user()?.avatar_format) {
         <img class="avatar-img"
-          [src]="'./assets/img/avatar/' + user.id + '.' + user.avatar_format" alt="">
+          [src]="'./assets/img/avatar/' + user().id + '.' + user().avatar_format" alt="">
         }
-      <span class="user-name">{{user?.login}}</span>
+      <span class="user-name">{{user()?.login}}</span>
     </button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item>
         <mat-icon>account_circle</mat-icon>
         <span>Profile</span>
       </button>
-      @if (user?.group_id === 1) {
+      @if (user()?.group_id === 1) {
         <button mat-menu-item [routerLink]="['/settings']">
           <mat-icon>settings</mat-icon>
           <span>Settings</span>
@@ -51,8 +51,8 @@
       </button>
     </mat-menu>
   </mat-toolbar>
-  <div [hidden]="hidePhone">
-    @if (startPhone) {
+  <div [hidden]="hidePhone()">
+    @if (startPhone()) {
       <app-phone></app-phone>
     }
   </div>

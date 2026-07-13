@@ -1,101 +1,169 @@
-.menu-item {
-  color: #444444;
-  font-size: 14px;
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 11px 14px;
-  border-radius: 8px;
-  transition: background-color .15s ease, color .15s ease;
+:host {
+  --nav-active: #eef2ff;
+  --nav-hover: #f4f6ff;
+  --nav-icon-size: 1.25rem;
+  --nav-item-radius: .5rem;
+  --nav-parent-height: 2.75rem;
+  --nav-sub-height: 2.25rem;
+  --nav-text: #334155;
+  --nav-text-active: var(--cpbx-primary-strong);
+  display: block;
 }
 
-.menu-item:hover {
-  background-color: var(--cpbx-surface-muted);
+.menu-item,
+.menu-sub-item,
+.menu-rail-item {
+  align-items: center;
+  border-radius: var(--nav-item-radius);
+  box-sizing: border-box;
+  color: var(--nav-text);
+  display: flex;
+  text-decoration: none;
+  transition: background-color .16s ease, color .16s ease;
+  width: 100%;
+}
+
+.menu-item {
+  gap: .625rem;
+  min-height: var(--nav-parent-height);
+  padding: .375rem .75rem;
+  font-size: .9rem;
+  font-weight: 500;
 }
 
 .menu-sub-item {
-  color: #444444;
-  display: flex;
-  text-decoration: none;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px 14px 10px 40px;
-  border-radius: 8px;
-  font-size: 13px;
-  transition: background-color .15s ease, color .15s ease;
+  margin: .125rem 0;
+  min-height: var(--nav-sub-height);
+  padding: .375rem .75rem .375rem 3rem;
+  font-size: .875rem;
+  font-weight: 450;
 }
 
-.menu-sub-item:hover {
-  background-color: var(--cpbx-surface-muted);
-}
-
-.icon-spacer {
-  margin-right: 15px;
-}
-
-.menu-name {
-  line-height: 25px;
-  font-size: 0.9em;
-}
-
-.mep-header {
-  padding: 0 14px;
-  border-radius: 8px;
-}
-
-mat-panel-title:active, mat-panel-title:focus {
-  outline: 0;
-  border: none;
-  -moz-outline-style: none;
-}
-
-.menu-name-1 {
-  display: inline-block;
-  position: relative;
-  top: 5px;
-}
-
-.menu-name-2 {
-  /*  margin-top: 5px;*/
-  color: inherit;
-}
-
-.menu-sub-name-2 {
-  color: inherit;
-}
-
-.menu-sub-icon-2 {
-  color: inherit;
-  font-size: 1.4em;
-}
-
-mat-panel-title {
-  display: inline-block;
-}
-
-.menu-panel {
-  border-radius: 0;
-}
-.menu-title {
-  margin-bottom: 8px;
-  color: var(--cpbx-text);
+.menu-item:hover,
+.menu-sub-item:hover,
+.menu-rail-item:hover {
+  background: var(--nav-hover);
+  color: var(--cpbx-primary);
 }
 
 .menu-item-active {
-  background-color: var(--cpbx-primary-soft);
-  color: #444444;
-  font-weight: 400;
+  background: var(--nav-active);
+  color: var(--nav-text-active);
+  font-weight: 550;
 }
+
+.menu-sub-item.menu-item-active {
+  background: #eef2ff;
+  box-shadow: none;
+}
+
 .menu-item-active:hover {
-  background-color: var(--cpbx-primary-hover);
+  background: var(--nav-active);
+  color: var(--nav-text-active);
+}
+
+.menu-section-active .mep-header {
+  color: var(--nav-text-active);
+}
+
+.icon-spacer {
+  color: inherit;
+  flex: 0 0 auto;
+  font-size: var(--nav-icon-size);
+  height: var(--nav-icon-size);
+  margin: 0;
+  width: var(--nav-icon-size);
+}
+
+.menu-title {
+  align-items: center;
+  color: inherit;
+  display: inline-flex;
+  gap: .625rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.menu-name-1 {
+  position: static;
+}
+
+.menu-name-2,
+.menu-sub-name-2 {
+  color: inherit;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-panel {
+  background: transparent;
+  border: 0;
+  border-radius: var(--nav-item-radius) !important;
+  box-shadow: none !important;
+  margin: 0 0 .5rem;
+  overflow: hidden;
+}
+
+.mep-header {
+  border-radius: var(--nav-item-radius) !important;
+  color: var(--nav-text);
+  min-height: var(--nav-parent-height);
+  padding: 0 .75rem !important;
+  transition: background-color .16s ease, color .16s ease;
+}
+
+.mep-header:hover {
+  background: var(--nav-hover) !important;
+  color: var(--cpbx-primary);
+}
+
+.menu-panel.mat-expanded .mep-header {
+  background: transparent;
+  border-bottom: 0;
 }
 
 .menu-panel + .menu-panel,
 .menu-panel + .menu-item,
 .menu-item + .menu-item,
-.menu-item + .menu-panel {
-  margin-top: 2px;
+.menu-item + .menu-panel,
+.menu-rail-item + .menu-rail-item {
+  margin-top: .125rem;
+}
+
+.menu-rail-item {
+  height: 2.75rem;
+  justify-content: center;
+  padding: 0;
+}
+
+.menu-rail-item mat-icon {
+  color: inherit;
+  font-size: 1.45rem;
+  height: 1.45rem;
+  width: 1.45rem;
+}
+
+mat-panel-title:active,
+mat-panel-title:focus {
+  border: none;
+  outline: 0;
+}
+
+mat-panel-title {
+  display: flex;
+}
+
+:host ::ng-deep .menu-panel .mat-expansion-panel-body {
+  padding: .25rem 0 0 !important;
+}
+
+:host ::ng-deep .menu-panel.mat-expanded .mat-expansion-panel-header {
+  background: transparent !important;
+  border-bottom: 0 !important;
+}
+
+:host ::ng-deep .menu-panel .mat-expansion-indicator {
+  color: #64748b;
 }
