@@ -47,15 +47,17 @@
                               <span disclosureDescription>
                                   Click to get details
                               </span>
-                              <label class="cpbx-checkbox continue-box">
-                                <input class="cpbx-checkbox__input" type="checkbox"
-                                  [checked]="extension.continue === 'true'" (change)="switchContinue(extension)">
-                                <span>Continue</span>
-                              </label>
-                              <button class="cpbx-button cpbx-button--primary" type="button"
-                                (click)="addCondition(extension.id)">
-                                Add Condition
-                              </button>
+                              <div class="condition-toolbar">
+                                <label class="cpbx-checkbox continue-box">
+                                  <input class="cpbx-checkbox__input" type="checkbox"
+                                    [checked]="extension.continue === 'true'" (change)="switchContinue(extension)">
+                                  <span>Continue</span>
+                                </label>
+                                <button class="cpbx-button cpbx-button--primary" type="button"
+                                  (click)="addCondition(extension.id)">
+                                  Add Condition
+                                </button>
+                              </div>
                               <div cdkDropList class="example-list"
                                 (cdkDropListDropped)="dropCondition($event, extension.conditions)">
                                 @for (condition of extension.conditions; track condition.id) {
@@ -176,9 +178,15 @@
 <input name="regex" [(ngModel)]="condition.regex" required [disabled]="!condition.enabled" [name]="'conditionRegex' + condition.id" placeholder="Regex" class="cpbx-input">
 </label>
                                                                                 }
-                                                                                <label class="cpbx-field cpbx-field--md">
+<label class="cpbx-field condition-break-field">
 <span class="cpbx-label">Break</span>
-<input name="break" [(ngModel)]="condition.break" required [disabled]="!condition.enabled" [name]="'conditionBreak' + condition.id" placeholder="Break" class="cpbx-input">
+<select cpbxSelect name="break" [(ngModel)]="condition.break" [disabled]="!condition.enabled" [name]="'conditionBreak' + condition.id" class="cpbx-select">
+<option value="">Default (on-false)</option>
+<option value="on-true">on-true</option>
+<option value="on-false">on-false</option>
+<option value="always">always</option>
+<option value="never">never</option>
+</select>
 </label>
                                                                                   <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                                                                     (click)="updateCondition(condition)">
@@ -298,9 +306,12 @@
 <input name="data" [(ngModel)]="action.data" required [disabled]="!action.enabled" [name]="'actionData' + action.id" appResizeInput [resizeOnString]="action.data" placeholder="Data" class="cpbx-input">
 </label>
                                                                                                     @if (inlineActions[action.application]) {
-                                                                                                      <label class="cpbx-field cpbx-field--md">
+                                                                                                      <label class="cpbx-field cpbx-field--sm inline-action">
 <span class="cpbx-label">Inline</span>
-<input name="inline" [(ngModel)]="action.inline" required [disabled]="!action.enabled" [name]="'actionInline' + action.id" placeholder="Inline" class="cpbx-input">
+<select [(ngModel)]="action.inline" required [disabled]="!action.enabled" [name]="'actionInline' + action.id" class="cpbx-select">
+  <option [ngValue]="false">False</option>
+  <option [ngValue]="true">True</option>
+</select>
 </label>
                                                                                                       }
                                                                                                       <button class="but-spacer-left cpbx-button cpbx-button--primary"
@@ -343,9 +354,12 @@
 <input name="data" [(ngModel)]="newAction.data" required [name]="'newActionData' + i" appResizeInput [resizeOnString]="newAction.data" placeholder="Data" class="cpbx-input">
 </label>
                                                                                                           @if (inlineActions[newAction.application]) {
-                                                                                                            <label class="cpbx-field cpbx-field--md">
+                                                                                                            <label class="cpbx-field cpbx-field--sm inline-action">
 <span class="cpbx-label">Inline</span>
-<input name="inline" [(ngModel)]="newAction.inline" required [name]="'newActionData' + i" placeholder="Inline" class="cpbx-input">
+<select [(ngModel)]="newAction.inline" required [name]="'newActionInline' + i" class="cpbx-select">
+  <option [ngValue]="false">False</option>
+  <option [ngValue]="true">True</option>
+</select>
 </label>
                                                                                                             }
                                                                                                             <button class="but-spacer-left cpbx-button cpbx-button--primary"

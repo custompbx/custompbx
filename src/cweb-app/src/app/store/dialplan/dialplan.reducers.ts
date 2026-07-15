@@ -47,6 +47,9 @@ export interface Iconditions {
   new: Array<object>;
 }
 
+export const DIALPLAN_BREAK_VALUES = ['on-true', 'on-false', 'always', 'never'] as const;
+export type DialplanBreak = typeof DIALPLAN_BREAK_VALUES[number];
+
 export interface Icondition {
   id: number;
   position: number;
@@ -58,6 +61,7 @@ export interface Icondition {
   newActions: Array<Iaction>;
   newAntiactions: Array<Iantiaction>;
   new: Array<object>;
+  break?: DialplanBreak;
 }
 
 export interface Iactions {
@@ -71,7 +75,7 @@ export interface Iaction {
   position: number;
   application: string;
   data: string;
-  inline: string;
+  inline: boolean;
   enabled: boolean;
 }
 
@@ -335,7 +339,8 @@ export function reducer(state = initialState, action: All): State {
         };
       }
 
-      const conditions = [...data[id]].sort(function (a, b) {
+      const conditions = (<Array<Icondition>>[...data[id]])
+        .sort(function (a, b) {
         if (a.position > b.position) {
           return 1;
         }
@@ -343,7 +348,7 @@ export function reducer(state = initialState, action: All): State {
           return -1;
         }
         return 0;
-      });
+        });
 
       const extensions = <Array<Iextension>>state.contexts[contextId].extensions.map(exten => {
         return exten.id === Number(id) ? {...exten, conditions} : exten;
@@ -390,7 +395,13 @@ export function reducer(state = initialState, action: All): State {
 
       const extensions = <Array<Iextension>>state.contexts[contextId].extensions.map(exten => {
         return exten.id === Number(id)
-          ? {...exten, conditions: [...(exten.conditions || []), ...<Array<Icondition>>data[id]]}
+          ? {
+            ...exten,
+            conditions: [
+              ...(exten.conditions || []),
+              ...<Array<Icondition>>data[id],
+            ],
+          }
           : exten;
       });
 
@@ -645,7 +656,7 @@ export function reducer(state = initialState, action: All): State {
           ...exten,
           conditions: <Array<Icondition>>exten.conditions.map(cond =>
             cond.id === Number(action.payload.conditionId)
-              ? {...cond, newActions: [...(cond.newActions || []), <Iaction>{}]}
+              ? {...cond, newActions: [...(cond.newActions || []), <Iaction>{inline: false}]}
               : cond
           ),
         } : exten;

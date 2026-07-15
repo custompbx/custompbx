@@ -276,9 +276,7 @@ export class ContextsComponent { // Removed OnDestroy
   }
 
   updateAction(object: Iaction) {
-    // Convert 'inline' binding from string/boolean to true boolean
-    const inlineValue = typeof object.inline === 'string' ? object.inline.toLowerCase() === 'true' : !!object.inline;
-    this.store.dispatch(new UpdateAction({action: {...object, inline: inlineValue}}));
+    this.store.dispatch(new UpdateAction({action: {...object, inline: !!object.inline}}));
   }
 
   switchAction(object: Iaction) {
@@ -290,10 +288,8 @@ export class ContextsComponent { // Removed OnDestroy
   }
 
   addAction(contextId: number, extensionId: number, conditionId: number, index: number, object: Iaction) {
-    // Convert 'inline' binding from string/boolean to true boolean
-    const inlineValue = typeof object.inline === 'string' ? object.inline.toLowerCase() === 'true' : !!object.inline;
     this.store.dispatch(new AddAction(
-      {id: conditionId, index: index, action: {...object, inline: inlineValue},
+      {id: conditionId, index: index, action: {...object, inline: !!object.inline},
         contextId: contextId, extensionId: extensionId}));
   }
 

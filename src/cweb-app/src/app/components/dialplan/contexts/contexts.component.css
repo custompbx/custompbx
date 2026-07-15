@@ -1,33 +1,43 @@
-.grid-inner {
-  display: inline-block;
-  margin-top: 8px;
-}
-
+.grid-inner,
 .grid-inner-title {
-  display: inline-block;
-  margin-top: 15px;
+  display: block;
+  margin-top: var(--cpbx-space-3);
+  width: 100%;
 }
 
 .continue-label {
-  display: inline-block;
-  margin-left: 10px;
-  background-color: #e9e9e9;
-  padding: 0 7px;
-  border-radius: 20px;
-  line-height: 23px;
+  background: var(--cpbx-surface-muted);
+  border: 1px solid var(--cpbx-border);
+  border-radius: 999px;
+  color: var(--cpbx-text-muted);
+  display: inline-flex;
+  font-size: .75rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  margin-inline-start: var(--cpbx-space-2);
+  padding: 0 .5rem;
 }
 
 .continue-box {
-  margin: 0 6px 15px;
-  display: inline-block;
+  margin: 0;
 }
 
-.inline-action{
-  max-width: 70px;
+.inline-action {
+  flex-basis: 7rem !important;
+  max-width: 7rem;
+  min-width: 7rem !important;
+  width: 7rem !important;
 }
 
 .expanded {
   width: 100%;
+}
+
+.condition-break-field {
+  flex-basis: 11rem !important;
+  max-width: 11rem;
+  min-width: 9rem !important;
+  width: 11rem !important;
 }
 
 :host,
@@ -59,5 +69,130 @@ app-disclosure,
   align-items: center;
   display: inline-flex;
   gap: .5rem;
-  margin: 0 0 .75rem;
+}
+
+.condition-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cpbx-space-3);
+  padding: var(--cpbx-space-4) var(--cpbx-space-5) var(--cpbx-space-3);
+}
+
+/* Keep the deeply nested dialplan editor on the same shared visual rhythm as
+   the reusable key/value and configuration editors. */
+app-disclosure form {
+  box-sizing: border-box;
+  padding: var(--cpbx-space-5);
+  width: 100%;
+}
+
+app-disclosure form h3 {
+  color: var(--cpbx-text);
+  font-size: .875rem;
+  font-weight: 650;
+  margin: var(--cpbx-space-5) 0 var(--cpbx-space-3);
+}
+
+app-disclosure form h3:first-child {
+  margin-top: 0;
+}
+
+app-disclosure form .spacer,
+app-disclosure form .spacer > div,
+app-disclosure form .example-list > div > div {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cpbx-space-3);
+  min-width: 0;
+}
+
+app-disclosure form .spacer {
+  flex-direction: row;
+}
+
+app-disclosure form > h3 + .spacer {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+app-disclosure form .spacer > div,
+app-disclosure form .example-list > div > div {
+  margin: 0 0 var(--cpbx-space-3);
+  width: 100%;
+}
+
+app-disclosure form .example-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cpbx-space-2);
+  width: 100%;
+}
+
+app-disclosure form .example-list > div {
+  min-width: 0;
+  width: 100%;
+}
+
+app-disclosure form .cpbx-field {
+  flex: 0 1 var(--cpbx-control-width);
+  margin: 0;
+  min-width: min(100%, 14rem);
+}
+
+app-disclosure form .cpbx-field--md {
+  width: var(--cpbx-control-width);
+}
+
+app-disclosure form .cpbx-button {
+  flex: 0 0 auto;
+  margin: 0;
+  max-width: max-content;
+  width: auto !important;
+}
+
+app-disclosure form .switch-button.cpbx-button {
+  background: var(--cpbx-surface-muted);
+  border: 1px solid var(--cpbx-border);
+  box-shadow: none;
+  color: var(--cpbx-text);
+}
+
+app-disclosure form .switch-button.cpbx-button:hover:not(:disabled) {
+  background: var(--cpbx-primary-soft);
+  border-color: var(--cpbx-border-strong);
+  color: var(--cpbx-primary-strong);
+}
+
+app-disclosure form .cpbx-button--danger {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--cpbx-danger) 25%, transparent);
+  box-shadow: none;
+  color: var(--cpbx-danger);
+}
+
+app-disclosure form .cpbx-button--danger:hover:not(:disabled) {
+  background: var(--cpbx-danger-soft);
+}
+
+app-disclosure form > .example-list + .cpbx-button,
+app-disclosure form h3 + .example-list + .cpbx-button {
+  margin-top: var(--cpbx-space-2);
+}
+
+.panel-wrapper > app-disclosure > .cpbx-checkbox + .cpbx-button {
+  margin-inline-start: var(--cpbx-space-2);
+}
+
+@media (max-width: 767px) {
+  app-disclosure form {
+    padding: var(--cpbx-space-4);
+  }
+
+  app-disclosure form .cpbx-field,
+  app-disclosure form .cpbx-field--md {
+    flex-basis: 100%;
+    width: 100%;
+  }
 }
