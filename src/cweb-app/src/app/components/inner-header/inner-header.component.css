@@ -1,4 +1,8 @@
-.mat-progress-bar {
+.cpbx-loading-bar {
+  animation: cpbx-loading-slide 1.15s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, var(--cpbx-primary), transparent);
+  background-repeat: no-repeat;
+  background-size: 45% 100%;
   display: block;
   height: 2px;
   top: 0;
@@ -9,6 +13,7 @@
   width: 100%;
   z-index: 1000;
 }
+@keyframes cpbx-loading-slide { from { background-position: -80% 0; } to { background-position: 180% 0; } }
 .page-header { min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 24px; background: var(--cpbx-surface); border-bottom: 1px solid var(--cpbx-border); }
 .page-heading { min-width: 0; }
 .title-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }

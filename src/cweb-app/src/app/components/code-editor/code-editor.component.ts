@@ -5,15 +5,15 @@ import 'ace-builds/src-noconflict/mode-xml';
 // import 'ace-builds/src-noconflict/worker-xml';
 import 'ace-builds/src-noconflict/theme-dracula';
 import 'ace-builds/src-noconflict/ext-beautify';
+import 'ace-builds/src-noconflict/ext-language_tools';
 
-import {MaterialModule} from "../../../material-module";
 
 const THEME = 'ace/theme/dracula';
 const LANG = 'ace/mode/xml';
 
 @Component({
 standalone: true,
-    imports: [MaterialModule],
+    imports: [],
     selector: 'app-code-editor',
     templateUrl: './code-editor.component.html',
     styleUrls: ['./code-editor.component.css']
@@ -53,7 +53,7 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
     return editor;
   }
 
-  // missing propery on EditorOptions 'enableBasicAutocompletion' so this is a wolkaround still using ts
+  // Ace's type definition omits the autocomplete extension option.
   private getEditorOptions(): Partial<Ace.EditorOptions> & { enableBasicAutocompletion?: boolean; } {
     const basicEditorOptions: Partial<Ace.EditorOptions> = {
       highlightActiveLine: true,

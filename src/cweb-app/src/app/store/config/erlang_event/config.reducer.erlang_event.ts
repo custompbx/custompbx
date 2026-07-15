@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.erlang_event) {
-        state.erlang_event = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, erlang_event: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

@@ -101,14 +101,14 @@ export function reducer(state = initialState, action): State {
       if (!data.id) {
         return {...state, loadCounter: Math.max(0, state.loadCounter - 1)};
       }
-      if (state.acl.lists[data.id]) {
-        data.nodes = state.acl.lists[data.id].nodes;
-      }
+      const list = state.acl.lists[data.id]
+        ? {...data, nodes: state.acl.lists[data.id].nodes}
+        : data;
 
       return {
         ...state,
         acl: {
-          ...state.acl, lists: {...state.acl.lists, [data.id]: data},
+          ...state.acl, lists: {...state.acl.lists, [data.id]: list},
           errorMessage: error || null,
         },
         loadCounter: Math.max(0, state.loadCounter - 1),
@@ -205,19 +205,17 @@ export function reducer(state = initialState, action): State {
 
     case StoreNewAclNode.type: {
       const { id } = action.payload;
-      if (!state.acl.lists[id].nodes) {
-        state.acl.lists[id].nodes = {new: []}
-      }
+      const nodes = state.acl.lists[id].nodes || <Inodes>{new: []};
 
       const rest = [
-        ...state.acl.lists[id].nodes?.new || [],
+        ...(nodes.new || []),
         <Inode>{}
       ];
       return {
         ...state,
         acl: {
           ...state.acl,
-          lists: {...state.acl.lists, [id]: {...state.acl.lists[id], nodes: {...state.acl.lists[id].nodes, new: rest}}},
+          lists: {...state.acl.lists, [id]: {...state.acl.lists[id], nodes: {...nodes, new: rest}}},
           errorMessage: null
         },
         loadCounter: Math.max(0, state.loadCounter - 1),

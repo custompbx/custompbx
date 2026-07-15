@@ -34,6 +34,12 @@ var esl *fsock.FSock
 var channelStateMu sync.Mutex
 var freeSwitchClockOffsetSeconds int64
 var clockSyncRequests = make(chan struct{}, 1)
+var demoCDRReloadRequests = make(chan struct{}, 1)
+
+const (
+	demoCDRBootstrapEnv = "CUSTOMPBX_DEMO_CDR_BOOTSTRAP"
+	legacyDemoCDRDBInfo = "host=localhost dbname=cdr connect_timeout=10"
+)
 
 type regsAsJson struct {
 	Registrations []Regs `json:"rows"`
@@ -485,6 +491,8 @@ func ESLConnectKeeper(eventChannel chan interface{}, logsChannel chan mainStruct
 			}
 		case <-clockSyncRequests:
 			requestFreeSwitchClockSync()
+		case <-demoCDRReloadRequests:
+			reloadDemoCDRModule()
 		}
 	}
 }
@@ -2450,11 +2458,18 @@ func setConfigCdrPgCsv(conf *xmlStruct.Configuration) error {
 	}
 
 	if conf.Settings != nil {
+		bootstrapChanged := false
 		for _, param := range conf.Settings.Param {
+			originalValue := param.Attrvalue
+			param.Attrvalue = demoCDRBootstrapValue(param.Attrname, param.Attrvalue)
+			bootstrapChanged = bootstrapChanged || param.Attrvalue != originalValue
 			_, err := altData.SetConfCdrPgCsvSetting(mod, param.Attrname, param.Attrvalue)
 			if err != nil {
 				continue
 			}
+		}
+		if bootstrapChanged {
+			requestDemoCDRReload()
 		}
 	}
 
@@ -2467,6 +2482,83 @@ func setConfigCdrPgCsv(conf *xmlStruct.Configuration) error {
 		}
 	}
 	return nil
+}
+
+// ApplyDemoCDRBootstrap upgrades only the non-working FreeSWITCH sample DSN
+// used by the Docker quick-start. Any value configured by an operator is left
+// unchanged. Fresh imports are handled by setConfigCdrPgCsv above; this handles
+// an existing demo database created by an older image.
+func ApplyDemoCDRBootstrap() (bool, error) {
+	if !demoCDRBootstrapEnabled() {
+		return false, nil
+	}
+
+	mod, err := altData.GetModuleByName(mainStruct.ModCdrPgCsv)
+	if err != nil || mod == nil {
+		// A fresh installation may not have imported this module yet. The import
+		// path applies the same bootstrap once the configuration exists.
+		return false, nil
+	}
+	settings, err := intermediateDB.GetByValue(
+		&altStruct.ConfigCdrPgCsvSetting{Parent: mod, Enabled: true, Name: "db-info"},
+		map[string]bool{"Parent": true, "Enabled": true, "Name": true},
+	)
+	if err != nil {
+		return false, err
+	}
+	for _, item := range settings {
+		setting, ok := item.(altStruct.ConfigCdrPgCsvSetting)
+		if !ok || strings.TrimSpace(setting.Value) != legacyDemoCDRDBInfo {
+			continue
+		}
+		setting.Value = configuredCDRDBInfo()
+		if err := intermediateDB.UpdateByIdByValuesMap(&setting, map[string]bool{"Value": true}); err != nil {
+			return false, err
+		}
+		requestDemoCDRReload()
+		return true, nil
+	}
+	return false, nil
+}
+
+func demoCDRBootstrapValue(name, value string) string {
+	if name == "db-info" && demoCDRBootstrapEnabled() && strings.TrimSpace(value) == legacyDemoCDRDBInfo {
+		return configuredCDRDBInfo()
+	}
+	return value
+}
+
+func demoCDRBootstrapEnabled() bool {
+	enabled, err := strconv.ParseBool(strings.TrimSpace(os.Getenv(demoCDRBootstrapEnv)))
+	return err == nil && enabled
+}
+
+func configuredCDRDBInfo() string {
+	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s connect_timeout=10",
+		cfg.CustomPbx.Db.Host, cfg.CustomPbx.Db.Port, cfg.CustomPbx.Db.Name, cfg.CustomPbx.Db.User, cfg.CustomPbx.Db.Pass)
+}
+
+func requestDemoCDRReload() {
+	select {
+	case demoCDRReloadRequests <- struct{}{}:
+	default:
+	}
+}
+
+func reloadDemoCDRModule() {
+	if esl == nil || !esl.Connected() {
+		return
+	}
+	response, err := SendBgapiCmd("reload " + mainStruct.ModCdrPgCsv)
+	if err != nil {
+		log.Printf("Docker demo CDR module reload failed: %v", err)
+		return
+	}
+	if strings.Contains(response, "-ERR") {
+		log.Printf("Docker demo CDR module reload failed: %s", strings.TrimSpace(response))
+		return
+	}
+	log.Println("Docker demo CDR module reloaded")
 }
 
 func setConfigOdbcCdr(conf *xmlStruct.Configuration) error {

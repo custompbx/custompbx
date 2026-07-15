@@ -1,13 +1,11 @@
 import {Component, DestroyRef, inject, computed, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
 import {Iitem, IpostLoadModules, State} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../../services/toast.service';
 import {
   DelPostLoadModule,
   AddPostLoadModule,
@@ -21,7 +19,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, KeyValuePad2Component],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, KeyValuePad2Component],
   selector: 'app-post-load-modules',
   templateUrl: './post-load-modules.component.html',
   styleUrls: ['./post-load-modules.component.css']
@@ -29,8 +27,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
 export class PostLoadModulesComponent {
 
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
 
   public globalSettingsMask: object = {};
 

@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.opus) {
-        state.opus = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, opus: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

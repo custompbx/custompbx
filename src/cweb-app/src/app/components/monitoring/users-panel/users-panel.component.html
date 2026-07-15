@@ -1,8 +1,8 @@
 <app-inner-header name="Users Panel" [loadCounter]="loadCounter()"></app-inner-header>
 
-<mat-tab-group class="cpbx-tabs users-panel-tabs" mat-stretch-tabs="false" mat-align-tabs="start"
-  (selectedIndexChange)="mainTabChanged($event)">
-  <mat-tab label="Directory">
+<app-tab-nav ariaLabel="Users panel sections" [tabs]="['Directory', 'Callcenter']"
+  [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
     <div class="filter-container users-panel-filters">
       <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Domain</span>
@@ -22,33 +22,35 @@
         </select>
 </label>
 
-      <mat-checkbox [(ngModel)]="agentsListEnabled" class="users-panel-checkbox"
-        (change)="agentsListChange()">
-        Callcenter Statuses
-      </mat-checkbox>
+      <label class="cpbx-checkbox users-panel-checkbox">
+        <input class="cpbx-checkbox__input" type="checkbox" [(ngModel)]="agentsListEnabled"
+          (change)="agentsListChange()">
+        <span>Callcenter Statuses</span>
+      </label>
 
       @if (agentsListEnabled) {
-        <mat-checkbox [(ngModel)]="agentsListOnly" class="users-panel-checkbox">
-          Show only with agents
-        </mat-checkbox>
+        <label class="cpbx-checkbox users-panel-checkbox">
+          <input class="cpbx-checkbox__input" type="checkbox" [(ngModel)]="agentsListOnly">
+          <span>Show only with agents</span>
+        </label>
       }
     </div>
 
     <div class="users-panel-sections">
       @for (domain of domainFilter() | keyvalue; track trackByFnId($index, domain)) {
-        <mat-card class="users-section-card">
-          <mat-card-header class="users-section-header">
-            <mat-card-subtitle>Domain</mat-card-subtitle>
-            <mat-card-title>{{ domain.value.name }}</mat-card-title>
-          </mat-card-header>
+        <section class="cpbx-card users-section-card">
+          <header class="cpbx-card__header users-section-header">
+            <p class="cpbx-card__subtitle">Domain</p>
+            <h3 class="cpbx-card__title">{{ domain.value.name }}</h3>
+          </header>
 
-          <mat-card-content class="domain-users">
-            @for (user of usersFilter(onlyValuesByParent(userListWithTimers(), Number(domain.key))); track user) {
-              <mat-card class="user-card">
-                <mat-card-header class="card-header">
-                  <div mat-card-avatar class="avatar-shell">
+          <div class="cpbx-card__content domain-users">
+            @for (user of usersFilter(onlyValuesByParent(userList(), Number(domain.key))); track user.id) {
+              <section class="cpbx-card user-card">
+                <header class="cpbx-card__header card-header">
+                  <div class="cpbx-card__avatar avatar-shell">
                     @if (!additionalData()[user.id]?.avatar_format) {
-                      <mat-icon class="header-image">face</mat-icon>
+                      <app-icon class="header-image" name="face"></app-icon>
                     }
                     @if (additionalData()[user.id]?.avatar_format) {
                       <img class="avatar-img header-image"
@@ -56,17 +58,17 @@
                         alt="">
                     }
                   </div>
-                  <mat-card-title>{{ user.name }}</mat-card-title>
-                  <mat-card-subtitle class="subtitle">{{ additionalData()[user.id]?.login || 'No login' }}</mat-card-subtitle>
-                </mat-card-header>
+                  <h3 class="cpbx-card__title">{{ user.name }}</h3>
+                  <p class="cpbx-card__subtitle subtitle">{{ additionalData()[user.id]?.login || 'No login' }}</p>
+                </header>
 
                 <div class="status-bar" [ngClass]="'status-bar--' + getUserCardColor(user)">
                   <span>{{ getUserStatus(user) }}</span>
                   <span class="example-spacer"></span>
                   @if (user['call_direction'] != '') {
-                    <mat-icon [ngClass]="{'up-side-down': user['call_direction'] === 'inbound'}">get_app</mat-icon>
+                    <app-icon name="get_app" [ngClass]="{'up-side-down': user['call_direction'] === 'inbound'}"></app-icon>
                   }
-                  <span>{{ user.actionTimer | formatTimer }}</span>
+                  <span>{{ userActionTimer(user) | formatTimer }}</span>
                 </div>
 
                 @if (getAgentState(user); as agent;) {
@@ -77,22 +79,22 @@
                   </div>
                 }
 
-                <mat-card-actions class="action-pad">
-                  <button mat-stroked-button class="connect-button"
+                <footer class="cpbx-card__actions action-pad">
+                  <button class="connect-button cpbx-button cpbx-button--secondary"
                     [disabled]="!user['talking'] && !user['in_call'] && !(user['sip_register'] || user['verto_register']) || !phoneStatus() || phoneUser() === user.name"
                     (click)="connectToUser(user, domain.value.name)">
                     Connect
                   </button>
-                </mat-card-actions>
-              </mat-card>
+                </footer>
+              </section>
             }
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </section>
       }
     </div>
-  </mat-tab>
+  </div>
 
-  <mat-tab label="Callcenter">
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
     <div class="filter-container users-panel-filters">
       <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Queue</span>
@@ -115,27 +117,27 @@
 
     <div class="users-panel-sections">
       @for (queue of queueFilter() | keyvalue; track trackByFnId($index, queue)) {
-        <mat-card class="users-section-card">
-          <mat-card-header class="users-section-header">
-            <mat-card-subtitle>Queue</mat-card-subtitle>
-            <mat-card-title>{{ queue.value.name }}</mat-card-title>
-          </mat-card-header>
+        <section class="cpbx-card users-section-card">
+          <header class="cpbx-card__header users-section-header">
+            <p class="cpbx-card__subtitle">Queue</p>
+            <h3 class="cpbx-card__title">{{ queue.value.name }}</h3>
+          </header>
 
-          <mat-card-content class="domain-users">
-            @for (agent of agentsFilter(queue.value.name); track agent) {
-              <mat-card class="user-card">
-                <mat-card-header class="card-header">
-                  <div mat-card-avatar class="avatar-shell">
-                    <mat-icon class="header-image">account_circle</mat-icon>
+          <div class="cpbx-card__content domain-users">
+            @for (agent of agentsFilter(queue.value.name); track agent.id) {
+              <section class="cpbx-card user-card">
+                <header class="cpbx-card__header card-header">
+                  <div class="cpbx-card__avatar avatar-shell">
+                    <app-icon class="header-image" name="account_circle"></app-icon>
                   </div>
-                  <mat-card-title>{{ cutNameAndDomain(agent.name)[0] }}</mat-card-title>
-                  <mat-card-subtitle class="subtitle">{{ cutNameAndDomain(agent.name)[1] }}</mat-card-subtitle>
-                </mat-card-header>
+                  <h3 class="cpbx-card__title">{{ cutNameAndDomain(agent.name)[0] }}</h3>
+                  <p class="cpbx-card__subtitle subtitle">{{ cutNameAndDomain(agent.name)[1] }}</p>
+                </header>
 
                 <div class="status-bar" [ngClass]="'status-bar--' + getAgentCardColor(agent)">
                   <span>{{ getAgentStatus(agent) }}</span>
                   <span class="example-spacer"></span>
-                  <span>{{ agent.actionTimer | formatTimer }}</span>
+                  <span>{{ agentActionTimer(agent) | formatTimer }}</span>
                 </div>
 
                 @if (getUserForAgent(agent.id); as user;) {
@@ -145,16 +147,15 @@
                   </div>
                 }
 
-                <mat-card-actions class="action-pad">
-                  <button mat-stroked-button class="connect-button">
+                <footer class="cpbx-card__actions action-pad">
+                  <button class="connect-button cpbx-button cpbx-button--secondary">
                     Connect
                   </button>
-                </mat-card-actions>
-              </mat-card>
+                </footer>
+              </section>
             }
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </section>
       }
     </div>
-  </mat-tab>
-</mat-tab-group>
+  </div>

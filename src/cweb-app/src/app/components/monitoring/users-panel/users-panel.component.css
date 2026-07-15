@@ -39,7 +39,7 @@
   padding: 14px 18px 12px;
 }
 
-.users-section-header mat-card-subtitle {
+.users-section-header .cpbx-card__subtitle {
   color: var(--cpbx-text-muted);
   font-size: 12px;
   font-weight: 600;
@@ -48,7 +48,7 @@
   text-transform: uppercase;
 }
 
-.users-section-header mat-card-title {
+.users-section-header .cpbx-card__title {
   color: var(--cpbx-text);
   font-size: 18px;
   font-weight: 600;
@@ -65,7 +65,7 @@
   padding: 16px 18px 18px;
 }
 
-.domain-users .mat-mdc-card + .mat-mdc-card {
+.domain-users .cpbx-card + .cpbx-card {
   margin-top: 0;
 }
 
@@ -95,13 +95,15 @@
   grid-template-rows: auto auto;
   min-height: 72px;
   padding: 11px 16px 9px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
-.card-header .mat-mdc-card-header-text {
+.card-header .cpbx-card__header-text {
   min-width: 0;
 }
 
-.card-header mat-card-title {
+.card-header .cpbx-card__title {
   color: var(--cpbx-text);
   font-size: 16px;
   font-weight: 650;
@@ -160,6 +162,8 @@
   gap: 8px;
   min-height: 46px;
   padding: 10px 16px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .cc-bar {
@@ -168,7 +172,7 @@
   padding-block: 6px;
 }
 
-.status-bar mat-icon {
+.status-bar app-icon {
   font-size: 18px;
   height: 18px;
   width: 18px;

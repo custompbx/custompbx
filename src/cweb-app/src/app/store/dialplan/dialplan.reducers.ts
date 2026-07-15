@@ -216,7 +216,7 @@ export function reducer(state = initialState, action: All): State {
         };
       }
 
-      data.sort(function (a, b) {
+      const extensions = [...data].sort(function (a, b) {
         if (a.position > b.position) {
           return 1;
         }
@@ -229,7 +229,7 @@ export function reducer(state = initialState, action: All): State {
       return {
         ...state,
         contexts: {
-          ...state.contexts, [id]: {...state.contexts[id], extensions: data},
+          ...state.contexts, [id]: {...state.contexts[id], extensions},
         },
         errorMessage: action.payload.response.error || null,
         loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
@@ -335,7 +335,7 @@ export function reducer(state = initialState, action: All): State {
         };
       }
 
-      data[id].sort(function (a, b) {
+      const conditions = [...data[id]].sort(function (a, b) {
         if (a.position > b.position) {
           return 1;
         }
@@ -346,10 +346,7 @@ export function reducer(state = initialState, action: All): State {
       });
 
       const extensions = <Array<Iextension>>state.contexts[contextId].extensions.map(exten => {
-        if (exten.id === Number(id)) {
-          exten.conditions = data[id];
-        }
-        return exten;
+        return exten.id === Number(id) ? {...exten, conditions} : exten;
       });
 
       return {
@@ -392,13 +389,9 @@ export function reducer(state = initialState, action: All): State {
       }
 
       const extensions = <Array<Iextension>>state.contexts[contextId].extensions.map(exten => {
-        if (exten.id === Number(id)) {
-          if (!exten.conditions) {
-            exten.conditions = [];
-          }
-          exten.conditions = [...exten.conditions, ...<Array<Icondition>>data[id]];
-        }
-        return exten;
+        return exten.id === Number(id)
+          ? {...exten, conditions: [...(exten.conditions || []), ...<Array<Icondition>>data[id]]}
+          : exten;
       });
 
       return {
@@ -443,15 +436,12 @@ export function reducer(state = initialState, action: All): State {
       }
 
       const extensions = <Array<Iextension>>state.contexts[contextId].extensions.map(exten => {
-        if (exten.id === Number(id)) {
-          exten.conditions = exten.conditions.map(cond => {
-            if (cond.id === data[id][0].id) {
-              cond = {...cond, ...data[id][0]};
-            }
-            return cond;
-          });
-        }
-        return exten;
+        return exten.id === Number(id) ? {
+          ...exten,
+          conditions: exten.conditions.map(cond =>
+            cond.id === data[id][0].id ? {...cond, ...data[id][0]} : cond
+          ),
+        } : exten;
       });
 
       return {
@@ -492,10 +482,9 @@ export function reducer(state = initialState, action: All): State {
         };
       }
       const extensions = <Array<Iextension>>state.contexts[contextId].extensions.map(exten => {
-        if (exten.id === Number(id)) {
-          exten.conditions = exten.conditions.filter(cond => cond.id !== data[id][0].id);
-        }
-        return exten;
+        return exten.id === Number(id)
+          ? {...exten, conditions: exten.conditions.filter(cond => cond.id !== data[id][0].id)}
+          : exten;
       });
 
       return {
@@ -550,19 +539,14 @@ export function reducer(state = initialState, action: All): State {
         };
       }
       const id = ids[0];
-      if (
-        !state.contexts[contextId] &&
-        !Array.isArray(state.contexts[contextId].extensions)
-        // !extensions[0].conditions[id]
-      ) {
+      if (!state.contexts[contextId] || !Array.isArray(state.contexts[contextId].extensions)) {
         return {
           ...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
           errorMessage: action.payload.response.error || null,
         };
       }
 
-      if (data[id].actions) {
-        data[id].actions.sort(function (a, b) {
+      const actions = data[id].actions ? [...data[id].actions].sort(function (a, b) {
           if (a.position > b.position) {
             return 1;
           }
@@ -570,11 +554,9 @@ export function reducer(state = initialState, action: All): State {
             return -1;
           }
           return 0;
-        });
-      }
+        }) : undefined;
 
-      if (data[id].antiactions) {
-        data[id].antiactions.sort(function (a, b) {
+      const antiactions = data[id].antiactions ? [...data[id].antiactions].sort(function (a, b) {
           if (a.position > b.position) {
             return 1;
           }
@@ -582,21 +564,18 @@ export function reducer(state = initialState, action: All): State {
             return -1;
           }
           return 0;
-        });
-      }
+        }) : undefined;
 
       const extensions = <Array<Iextension>>state.contexts[contextId].extensions.map(exten => {
-        if (exten.id === Number(extenId)) {
-          exten.conditions = <Array<Icondition>>exten.conditions.map(cond => {
-            if (cond.id === Number(id)) {
-              cond.regexes = data[id].regexes ? data[id].regexes : cond.regexes;
-              cond.actions = data[id].actions ? data[id].actions : cond.actions;
-              cond.antiactions = data[id].antiactions ? data[id].antiactions : cond.antiactions;
-            }
-            return cond;
-          });
-        }
-        return exten;
+        return exten.id === Number(extenId) ? {
+          ...exten,
+          conditions: <Array<Icondition>>exten.conditions.map(cond => cond.id === Number(id) ? {
+            ...cond,
+            regexes: data[id].regexes || cond.regexes,
+            actions: actions || cond.actions,
+            antiactions: antiactions || cond.antiactions,
+          } : cond),
+        } : exten;
       });
 
       return {
@@ -615,18 +594,14 @@ export function reducer(state = initialState, action: All): State {
 
     case DialplanActionTypes.ADD_NEW_REGEX: {
       const extensions = <Array<Iextension>>state.contexts[action.payload.contextId].extensions.map(exten => {
-        if (exten.id === Number(action.payload.extensionId)) {
-          exten.conditions = <Array<Icondition>>exten.conditions.map(cond => {
-            if (cond.id === Number(action.payload.conditionId)) {
-              cond.newRegexes = [
-                ...cond.newRegexes || [],
-                <Iregex>{}
-              ];
-            }
-            return cond;
-          });
-        }
-        return exten;
+        return exten.id === Number(action.payload.extensionId) ? {
+          ...exten,
+          conditions: <Array<Icondition>>exten.conditions.map(cond =>
+            cond.id === Number(action.payload.conditionId)
+              ? {...cond, newRegexes: [...(cond.newRegexes || []), <Iregex>{}]}
+              : cond
+          ),
+        } : exten;
       });
 
       return {
@@ -640,19 +615,19 @@ export function reducer(state = initialState, action: All): State {
 
     case DialplanActionTypes.DELETE_NEW_REGEX: {
       const extensions = <Array<Iextension>>state.contexts[action.payload.contextId].extensions.map(exten => {
-        if (exten.id === Number(action.payload.extensionId)) {
-          exten.conditions = <Array<Icondition>>exten.conditions.map(cond => {
-            if (cond.id === Number(action.payload.conditionId)) {
-              cond.newRegexes = [
-                ...cond.newRegexes.slice(0, action.payload.index),
+        return exten.id === Number(action.payload.extensionId) ? {
+          ...exten,
+          conditions: <Array<Icondition>>exten.conditions.map(cond =>
+            cond.id === Number(action.payload.conditionId) ? {
+              ...cond,
+              newRegexes: [
+                ...(cond.newRegexes || []).slice(0, action.payload.index),
                 null,
-                ...cond.newRegexes.slice(action.payload.index + 1)
-              ];
-            }
-            return cond;
-          });
-        }
-        return exten;
+                ...(cond.newRegexes || []).slice(action.payload.index + 1),
+              ],
+            } : cond
+          ),
+        } : exten;
       });
 
       return {
@@ -666,18 +641,14 @@ export function reducer(state = initialState, action: All): State {
 
     case DialplanActionTypes.ADD_NEW_ACTION: {
       const extensions = <Array<Iextension>>state.contexts[action.payload.contextId].extensions.map(exten => {
-        if (exten.id === Number(action.payload.extensionId)) {
-          exten.conditions = <Array<Icondition>>exten.conditions.map(cond => {
-            if (cond.id === Number(action.payload.conditionId)) {
-              cond.newActions = [
-                ...cond.newActions || [],
-                <Iaction>{}
-              ];
-            }
-            return cond;
-          });
-        }
-        return exten;
+        return exten.id === Number(action.payload.extensionId) ? {
+          ...exten,
+          conditions: <Array<Icondition>>exten.conditions.map(cond =>
+            cond.id === Number(action.payload.conditionId)
+              ? {...cond, newActions: [...(cond.newActions || []), <Iaction>{}]}
+              : cond
+          ),
+        } : exten;
       });
 
       return {
@@ -691,19 +662,19 @@ export function reducer(state = initialState, action: All): State {
 
     case DialplanActionTypes.DELETE_NEW_ACTION: {
       const extensions = <Array<Iextension>>state.contexts[action.payload.contextId].extensions.map(exten => {
-        if (exten.id === Number(action.payload.extensionId)) {
-          exten.conditions = <Array<Icondition>>exten.conditions.map(cond => {
-            if (cond.id === Number(action.payload.conditionId)) {
-              cond.newActions = [
-                ...cond.newActions.slice(0, action.payload.index),
+        return exten.id === Number(action.payload.extensionId) ? {
+          ...exten,
+          conditions: <Array<Icondition>>exten.conditions.map(cond =>
+            cond.id === Number(action.payload.conditionId) ? {
+              ...cond,
+              newActions: [
+                ...(cond.newActions || []).slice(0, action.payload.index),
                 null,
-                ...cond.newActions.slice(action.payload.index + 1)
-              ];
-            }
-            return cond;
-          });
-        }
-        return exten;
+                ...(cond.newActions || []).slice(action.payload.index + 1),
+              ],
+            } : cond
+          ),
+        } : exten;
       });
 
       return {
@@ -717,18 +688,14 @@ export function reducer(state = initialState, action: All): State {
 
     case DialplanActionTypes.ADD_NEW_ANTIACTION: {
       const extensions = <Array<Iextension>>state.contexts[action.payload.contextId].extensions.map(exten => {
-        if (exten.id === Number(action.payload.extensionId)) {
-          exten.conditions = <Array<Icondition>>exten.conditions.map(cond => {
-            if (cond.id === Number(action.payload.conditionId)) {
-              cond.newAntiactions = [
-                ...cond.newAntiactions || [],
-                <Iantiaction>{}
-              ];
-            }
-            return cond;
-          });
-        }
-        return exten;
+        return exten.id === Number(action.payload.extensionId) ? {
+          ...exten,
+          conditions: <Array<Icondition>>exten.conditions.map(cond =>
+            cond.id === Number(action.payload.conditionId)
+              ? {...cond, newAntiactions: [...(cond.newAntiactions || []), <Iantiaction>{}]}
+              : cond
+          ),
+        } : exten;
       });
 
       return {
@@ -742,19 +709,19 @@ export function reducer(state = initialState, action: All): State {
 
     case DialplanActionTypes.DELETE_NEW_ANTIACTION: {
       const extensions = <Array<Iextension>>state.contexts[action.payload.contextId].extensions.map(exten => {
-        if (exten.id === Number(action.payload.extensionId)) {
-          exten.conditions = <Array<Icondition>>exten.conditions.map(cond => {
-            if (cond.id === Number(action.payload.conditionId)) {
-              cond.newAntiactions = [
-                ...cond.newAntiactions.slice(0, action.payload.index),
+        return exten.id === Number(action.payload.extensionId) ? {
+          ...exten,
+          conditions: <Array<Icondition>>exten.conditions.map(cond =>
+            cond.id === Number(action.payload.conditionId) ? {
+              ...cond,
+              newAntiactions: [
+                ...(cond.newAntiactions || []).slice(0, action.payload.index),
                 null,
-                ...cond.newAntiactions.slice(action.payload.index + 1)
-              ];
-            }
-            return cond;
-          });
-        }
-        return exten;
+                ...(cond.newAntiactions || []).slice(action.payload.index + 1),
+              ],
+            } : cond
+          ),
+        } : exten;
       });
 
       return {
@@ -770,16 +737,11 @@ export function reducer(state = initialState, action: All): State {
     case DialplanActionTypes.STORE_DIALPLAN_DEBUG: {
       const enabled = action.payload.response.enabled;
       const log = action.payload.response['dialplan_debug'];
-      const data = state.debug;
-      if (typeof enabled === 'boolean') {
-        data.enabled = enabled;
-      }
-      if (log) {
-        if (!data.log) {
-          data.log = [];
-        }
-        data.log.push(log);
-      }
+      const data = {
+        ...state.debug,
+        ...(typeof enabled === 'boolean' ? {enabled} : {}),
+        log: log ? [...(state.debug.log || []), log] : state.debug.log,
+      };
 
       return {
         ...state,

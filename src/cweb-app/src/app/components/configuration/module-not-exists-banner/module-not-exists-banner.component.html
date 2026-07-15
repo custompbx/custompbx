@@ -1,11 +1,11 @@
 @if (list && list.exists === false) {
-  <mat-card>
-    <mat-card-content>
+  <section class="cpbx-card">
+    <div class="cpbx-card__content">
       This config is not serving now. Go to Modules page to manage the configs.
-      <button mat-flat-button color="basic" class="but-spacer-left switch-button"
+      <button class="but-spacer-left switch-button cpbx-button cpbx-button--secondary"
         routerLink="/configuration/modules">
         Modules
       </button>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 }

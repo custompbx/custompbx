@@ -1,7 +1,6 @@
 import {Component, DestroyRef, inject, computed, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
 import {
   Ialias, IdirectionItem, Idomain, Idomains, Iitem, Iprofile, Isofia, State
 } from '../../../store/config/config.state.struct';
@@ -63,17 +62,18 @@ import {
   UpdateSofiaProfileGatewayVar,
   UpdateSofiaProfileParam
 } from '../../../store/config/sofia/config.actions.sofia';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, CpbxSelectDirective],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, CpbxSelectDirective, TabNavComponent, DisclosureComponent],
   selector: 'app-sofia',
   templateUrl: './sofia.component.html',
   styleUrls: ['./sofia.component.css']
@@ -81,8 +81,8 @@ import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 export class SofiaComponent {
 
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
 
   private configsObservable = this.store.pipe(select(selectConfigurationState));
   private configsSignal = toSignal(this.configsObservable, { initialValue: {} as State });
@@ -94,6 +94,7 @@ export class SofiaComponent {
   public newProfileName: string = '';
   public newGatewayName: string = '';
   public selectedIndex: number = 0;
+  public detailTabIndex: number = 0;
   public profileId: number = 0;
   public panelCloser = {};
   public choosedGateway = [];
@@ -519,7 +520,7 @@ export class SofiaComponent {
           case2Text: 'Are you sure you want to rename profile "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -543,7 +544,7 @@ export class SofiaComponent {
           case2Text: 'Are you sure you want to rename gateway "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

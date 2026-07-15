@@ -40,8 +40,7 @@ export function reducer(state = initialState, action: (All | StoreAutoloadModule
       }
 
       if (!state.post_load_modules) {
-        state.post_load_modules = <IpostLoadModules>{};
-        state.loadCounter = 0;
+        state = {...state, post_load_modules: <IpostLoadModules>{}, loadCounter: 0};
       }
 
       return {

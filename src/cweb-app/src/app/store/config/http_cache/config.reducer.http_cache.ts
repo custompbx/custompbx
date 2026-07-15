@@ -55,16 +55,13 @@ export function reducer(state = initialState, action: All): State {
           decreaseStateLoadField(state));
       }
 
-      if (!state.http_cache) {
-        state.http_cache = <Ihttpcache>{};
-        state.loadCounter = 0;
-      }
+      const httpCache = state.http_cache || <Ihttpcache>{};
 
       return updateStateItem(
         'http_cache',
         {
-          settings: {...state.http_cache.settings, ...settings},
-          profiles: {...state.http_cache.profiles, ...profiles},
+          settings: {...httpCache.settings, ...settings},
+          profiles: {...httpCache.profiles, ...profiles},
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
@@ -164,16 +161,13 @@ export function reducer(state = initialState, action: All): State {
         return decreaseStateLoadField(state);
       }
 
-      if (!state.http_cache) {
-        state.http_cache = <Ihttpcache>{};
-        state.loadCounter = 0;
-      }
+      const httpCache = state.http_cache || <Ihttpcache>{};
 
       return updateStateItem(
         'http_cache',
         {
-          settings: state.http_cache.settings,
-          profiles: {...state.http_cache.profiles, [data.id]: data},
+          settings: httpCache.settings,
+          profiles: {...httpCache.profiles, [data.id]: data},
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },

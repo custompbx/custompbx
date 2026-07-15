@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, take, timeout } from 'rxjs/operators';
 import { WebsocketService } from './websocket';
 import { WS } from './websocket.events';
 import {CookiesStorageService} from './cookies-storage.service';
@@ -53,7 +53,10 @@ export class WsDataService {
 
   universalSender(method: string, data: any): Observable<any> {
     this.websocketService.send(method, {token: this.cookie.getToken(), ...data});
-    return this.websocketService.on<IMessage>(method);
+    return this.websocketService.on<IMessage>(method).pipe(
+      take(1),
+      timeout(15000)
+    );
   }
 
   proceedMessageType(method: string): Observable<any> {

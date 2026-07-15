@@ -1,6 +1,6 @@
 <!--section class="main-content-wrapper" cdkDrag cdkDragBoundary="body"-->
 <section class="main-content-wrapper" cdkDrag>
-  <mat-toolbar role="heading" class="header phone-header" cdkDragHandle
+  <header class="header phone-header" cdkDragHandle
     [class.phone-header--ringing]="ringing()"
     [class.phone-header--in-call]="inCall() || answered()">
     <span class="phone-title">
@@ -12,26 +12,26 @@
     </span>
     <span class="example-spacer"></span>
     @if (!isClientConnected()) {
-      <mat-icon class="offline-icon" aria-label="Phone offline">wifi_off</mat-icon>
+      <app-icon class="offline-icon" name="wifi_off" label="Phone offline"></app-icon>
     }
     @if (isSipJsTransportConnected()) {
-      <button class="reg-button" mat-mini-fab
+      <button class="reg-button" type="button"
         [class.reg-button--registered]="registered() && libName === sipjsLib"
         [title]="!registered() && libName === sipjsLib ? 'Register for calls' : 'Unregister from calls'"
         [attr.aria-label]="!registered() && libName === sipjsLib ? 'Register for calls' : 'Unregister from calls'"
         (click)="register()" [disabled]="!isSipJsTransportConnected()">
         @if (!registered() && libName === sipjsLib) {
-          <mat-icon>phone_callback</mat-icon>
+          <app-icon name="phone_callback"></app-icon>
         }
         @if (registered() && libName === sipjsLib) {
-          <mat-icon>phone_disabled</mat-icon>
+          <app-icon name="phone"></app-icon>
         }
       </button>
     }
-    <button mat-icon-button class="phone-header-action" (click)="restartUS()" title="Restart phone" aria-label="Restart phone">
-      <mat-icon>autorenew</mat-icon>
+    <button class="phone-header-action cpbx-button cpbx-button--icon" (click)="restartUS()" title="Restart phone" aria-label="Restart phone">
+      <app-icon name="autorenew"></app-icon>
     </button>
-  </mat-toolbar>
+  </header>
   @if (authorizationUsername()) {
     <section id="main-content" class="animated fadeInUp">
       <div class="dial-input-row">
@@ -41,17 +41,17 @@
             placeholder="Enter number" class="cpbx-input">
         </label>
         @if (number()) {
-          <button mat-icon-button aria-label="Delete last digit" title="Delete last digit"
-            (click)="removeLastDigit()" class="dial-input-action">
-            <mat-icon>backspace</mat-icon>
+          <button aria-label="Delete last digit" title="Delete last digit"
+            (click)="removeLastDigit()" class="dial-input-action cpbx-button cpbx-button--icon">
+            <app-icon name="backspace"></app-icon>
           </button>
         }
-        <button mat-icon-button (click)="switchHideButtonsPad()" title="Toggle dialpad"
-          aria-label="Toggle dialpad" class="dial-input-action">
-          <mat-icon>dialpad</mat-icon>
+        <button (click)="switchHideButtonsPad()" title="Toggle dialpad"
+          aria-label="Toggle dialpad" class="dial-input-action cpbx-button cpbx-button--icon">
+          <app-icon name="dialpad"></app-icon>
         </button>
       </div>
-      <h3 class="timer mat-headline-3">{{totalTime() | formatTimer}}</h3>
+      <h3 class="timer">{{totalTime() | formatTimer}}</h3>
       @if (showButtonsPad) {
         <div class="buttons-pad">
           @for (but of padButtons; track but) {
@@ -61,44 +61,41 @@
       }
       <div class="actions-buttons-pad">
         @if (!(inCall() || ringing() || answered())) {
-          <button mat-flat-button (click)="call()"
-            color="primary" title="call"
-            class="phone-action-button"
+          <button (click)="call()" title="call"
+            class="phone-action-button cpbx-button cpbx-button--primary"
             [disabled]="!isClientConnected() || !number()"
             >
-            <mat-icon>phone</mat-icon><span>Call</span>
+            <app-icon name="phone"></app-icon><span>Call</span>
           </button>
         }
         @if (ringing()) {
-          <button mat-flat-button (click)="answer()"
-            color="green" title="answer" class="phone-action-button"
+          <button (click)="answer()" title="answer" class="phone-action-button cpbx-button cpbx-button--success"
             [disabled]="!isClientConnected()"
             >
             <span>Answer: </span><span style="font-size: 20px">{{ data.session?.request?.from?.uri?.user }}</span>
           </button>
         }
         @if (inCall() || ringing() || answered()) {
-          <button mat-flat-button (click)="hangup()"
-            color="warn" class="phone-action-button"
+          <button (click)="hangup()" class="phone-action-button cpbx-button cpbx-button--danger"
             [disabled]="!isClientConnected()"
             >
-            <mat-icon>call_end</mat-icon><span>Hangup</span>
+            <app-icon name="call_end"></app-icon><span>Hangup</span>
           </button>
         }
         @if (answered() && !onHold()) {
-          <button mat-flat-button (click)="hold()"
-            title="hold" class="phone-action-button mat-blue"
+          <button (click)="hold()"
+            title="hold" class="phone-action-button phone-action-button--active cpbx-button cpbx-button--secondary"
             [disabled]="!isClientConnected()"
             >
-            <mat-icon>phone_paused</mat-icon><span>Hold</span>
+            <app-icon name="phone_paused"></app-icon><span>Hold</span>
           </button>
         }
         @if (answered() && onHold()) {
-          <button mat-flat-button (click)="unhold()"
-            title="unhold" class="phone-action-button mat-blue"
+          <button (click)="unhold()"
+            title="unhold" class="phone-action-button phone-action-button--active cpbx-button cpbx-button--secondary"
             [disabled]="!isClientConnected()"
             >
-            <mat-icon>play_arrow</mat-icon><span>Unhold</span>
+            <app-icon name="play_arrow"></app-icon><span>Unhold</span>
           </button>
         }
       </div>
@@ -106,7 +103,7 @@
   }
   @if (!authorizationUsername()) {
     <section>
-      <mat-toolbar color="warn" role="heading" class="header">No creds</mat-toolbar>
+      <div role="status" class="header phone-no-credentials">No credentials configured</div>
     </section>
   }
   <div id="mediaTags" #mediaTags>

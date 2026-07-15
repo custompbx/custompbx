@@ -1,4 +1,4 @@
-.but-spacer-left {
+﻿.but-spacer-left {
   margin-left: 5px;
 }
 
@@ -29,10 +29,6 @@ article {
   grid-template-columns: 1fr auto auto auto auto auto auto;
 }
 
-section {
-  margin-left: 10px;
-}
-
 .grid-inner {
   display: inline-block;
   margin-top: 8px;
@@ -43,11 +39,4 @@ section {
   margin-top: 15px;
 }
 
-.mat-expansion-panel {
-  border-radius: 0;
-}
-
-.mat-expansion-panel-header {
-  border-radius: 0;
-}
 

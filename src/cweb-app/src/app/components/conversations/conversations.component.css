@@ -1,6 +1,5 @@
 :host {
   display: block;
-  position: relative;
   z-index: 70;
 }
 
@@ -27,7 +26,8 @@
   z-index: 71;
 }
 
-.chat-drawer mat-progress-bar {
+.chat-drawer app-loading-bar {
+  display: block;
   left: 0;
   position: absolute;
   right: 0;
@@ -122,11 +122,9 @@
   padding: 0 .8rem;
 }
 
-.chat-search mat-icon {
+.chat-search app-icon {
   flex: 0 0 auto;
   font-size: 1.2rem;
-  height: 1.2rem;
-  width: 1.2rem;
 }
 
 .chat-search input,
@@ -196,12 +194,6 @@
 .list-avatar {
   height: 2.25rem;
   width: 2.25rem;
-}
-
-.avatar-image,
-.chat-peer-avatar mat-icon,
-.call-avatar mat-icon {
-  color: inherit;
 }
 
 .avatar-image {
@@ -280,7 +272,7 @@ img.avatar-image, .chat-peer-avatar img, .call-avatar img {
   text-align: center;
 }
 
-.chat-empty mat-icon {
+.chat-empty app-icon {
   background: #e0e7ff;
   border-radius: 999px;
   color: var(--cpbx-primary);
@@ -297,7 +289,7 @@ img.avatar-image, .chat-peer-avatar img, .call-avatar img {
   width: 6rem;
 }
 
-.call-avatar mat-icon {
+.call-avatar app-icon {
   font-size: 5rem;
   height: 5rem;
   width: 5rem;
@@ -398,7 +390,7 @@ img.avatar-image, .chat-peer-avatar img, .call-avatar img {
   font-weight: 700;
 }
 
-.call-message mat-icon {
+.call-message app-icon {
   font-size: 1.05rem;
   height: 1.05rem;
   width: 1.05rem;

@@ -26,10 +26,6 @@ export const initialState: State = {
 };
 
 export function reducer(state: State = initialState, action): State {
-  // TODO: fix this
-  if (state === null) {
-    state = initialState;
-  }
   switch (action.type) {
     case StartPhone.type: {
       return {
@@ -42,10 +38,8 @@ export function reducer(state: State = initialState, action): State {
     }
 
     case ToggleShowPhone.type: {
-      let show = !state.phone.shown;
-      if (action.payload) {
-        show = action.payload.show;
-      }
+      const requested = action.payload?.show;
+      const show = typeof requested === 'boolean' ? requested : !state.phone.shown;
       return {
         ...state,
         phone: {

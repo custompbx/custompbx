@@ -1,24 +1,23 @@
 <app-inner-header name="ACL" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
-    <mat-tab label="List">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Lists</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
+  <app-tab-nav ariaLabel="ACL sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+      <section class="cpbx-card">
+        <header class="cpbx-card__header">
+          <p class="cpbx-card__subtitle">Lists</p>
+        </header>
+        <div class="cpbx-card__content">
           @for (item of onlyValues(list().lists); track $index) {
             <div>
-              <mat-expansion-panel (opened)="getDetails(item.id)" (closed)="clearDetails(item.id)">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
+              <app-disclosure (opened)="getDetails(item.id)" (closed)="clearDetails(item.id)">
+                  <span disclosureTitle>
                     {{item.name}}
-                  </mat-panel-title>
-                  <mat-panel-description>
+                  </span>
+                  <span disclosureDescription>
                     Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
+                  </span>
                 <form #details="ngForm">
                   <h3>Default:</h3>
                   @if (item.id) {
@@ -32,7 +31,7 @@
                             }
                           </select>
 </label>
-                        <button mat-flat-button color="primary"
+                        <button class="cpbx-button cpbx-button--primary"
                           [disabled]="!isvalueReadyToSend(details.controls['default' + item.id])"
                           (click)="updateDefault(item.id, details.controls['default' + item.id])">
                           Update
@@ -47,7 +46,7 @@
                           <div class="cpbx-edit-row" cdkDrag>
                             @if (node.id && !isArray(node)) {
                               <ng-container>
-                                <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                                <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move item">::</button>
                                 <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Cidr</span>
 <input name="cidr" [(ngModel)]="node.cidr" required [disabled]="!node.enabled || node.domain != ''" [name]="'nodeCidr' + node.id" appResizeInput [resizeOnString]="node.cidr" placeholder="Cidr" class="cpbx-input">
@@ -65,23 +64,23 @@
                                         }
                                       </select>
 </label>
-                                      <button mat-flat-button color="primary"
+                                      <button class="cpbx-button cpbx-button--primary"
                                         [disabled]="!isReadyToSendThree(details.controls['nodeType' + node.id], details.controls['nodeCidr' + node.id], details.controls['nodeDomain' + node.id])"
                                         (click)="updateNode(node)">
                                         Update
                                       </button>
                                       @if (node.enabled) {
-                                        <button mat-stroked-button color="basic"
-                                          class="switch-button" (click)="switchNode(node)">
+                                        <button
+                                          class="switch-button cpbx-button cpbx-button--secondary" (click)="switchNode(node)">
                                           Disable
                                         </button>
                                       } @else {
-                                        <button mat-stroked-button color="primary"
-                                          class="switch-button" (click)="switchNode(node)">
+                                        <button
+                                          class="switch-button cpbx-button cpbx-button--primary-outline" (click)="switchNode(node)">
                                           Enable
                                         </button>
                                       }
-                                      <button mat-stroked-button color="warn" (click)="deleteNode(node)">
+                                      <button class="cpbx-button cpbx-button--danger-outline" (click)="deleteNode(node)">
                                         Delete
                                       </button>
                                     </ng-container>
@@ -89,9 +88,10 @@
                                 </div>
                               }
                               @if (item && item.nodes) {
-                                <div>
+                                <div class="acl-draft-list">
+                                  @if (item.nodes.new?.length) { <div class="acl-draft-title">Draft items</div> }
                                   @for (node of item.nodes.new; track node; let i = $index) {
-                                    <div class="cpbx-edit-row">
+                                    <div class="cpbx-edit-row acl-draft-row">
                                       @if (node) {
                                         <ng-container>
                                           <label class="cpbx-field cpbx-field--md">
@@ -111,12 +111,12 @@
                                                   }
                                                 </select>
 </label>
-                                                <button mat-flat-button color="primary"
+                                                <button class="cpbx-button cpbx-button--primary"
                                                   [disabled]="!isReadyToSendThree(details.controls['newNodeType' + i], details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])"
                                                   (click)="newNode(item.id, i, details.controls['newNodeType' + i].value, details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])">
                                                   Update
                                                 </button>
-                                                <button mat-stroked-button color="warn" (click)="dropNewNode(item.id, i)">
+                                                <button class="cpbx-button cpbx-button--danger-outline" (click)="dropNewNode(item.id, i)">
                                                   Delete
                                                 </button>
                                               </ng-container>
@@ -127,17 +127,17 @@
                                     }
                                   </div>
                                 }
-                                <button mat-flat-button color="primary" type="button" (click)="addAclNodeField(item.id)">
-                                  Add
+                                <button class="cpbx-button cpbx-button--primary" type="button" (click)="addAclNodeField(item.id)">
+                                  + Add item
                                 </button>
                               </form>
-                            </mat-expansion-panel>
+                            </app-disclosure>
                           </div>
                         }
-                      </mat-card-content>
-                    </mat-card>
-                  </mat-tab>
-                  <mat-tab label="Add">
+                      </div>
+                    </section>
+                  </div>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
                     @if (list()) {
                       <form class="cpbx-form-panel" (ngSubmit)="onAclListSubmit()">
                         <label class="cpbx-field cpbx-field--md">
@@ -153,11 +153,11 @@
                             }
                           </select>
 </label>
-                        <button mat-flat-button color="primary" type="submit">Submit</button>
+                        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
                       </form>
                     }
-                  </mat-tab>
-                  <mat-tab label="Delete/Rename">
+                  </div>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
                     @if (list()) {
                       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm" >
                         @for (item of onlyValues(list().lists); track item.id) {
@@ -166,11 +166,11 @@
 <span class="cpbx-label">ACL list name</span>
 <input name="ACL list name" required [ngModel]="item.name" [name]="'list::' + item.id" placeholder="ACL list name" class="cpbx-input">
 </label>
-                            <button mat-flat-button color="primary" [disabled]="checkDirty(deleteForm.controls['list::' + item.id])"
+                            <button class="cpbx-button cpbx-button--primary" [disabled]="checkDirty(deleteForm.controls['list::' + item.id])"
                               (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'rename')">
                               Update
                             </button>
-                            <button mat-stroked-button color="warn"
+                            <button class="cpbx-button cpbx-button--danger-outline"
                               (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'delete')">
                               Delete
                             </button>
@@ -178,6 +178,5 @@
                         }
                       </form>
                     }
-                  </mat-tab>
-                </mat-tab-group>
+                  </div>
               }

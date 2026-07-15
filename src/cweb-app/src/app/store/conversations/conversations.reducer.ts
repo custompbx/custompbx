@@ -8,7 +8,6 @@ import {
   GetConversationPrivateCalls,
 } from './conversations.actions';
 
-import {isArray} from 'chart.js/helpers';
 import {Iuser} from '../auth/auth.reducers';
 
 export interface State {
@@ -21,7 +20,7 @@ export interface State {
   event: {
     type: 'new-call' | null;
     data: any;
-  };
+  } | null;
 }
 
 export interface Messages {
@@ -54,14 +53,9 @@ export const initialState: State = {
 const nullEvent = {type: null, data: null};
 
 export function reducer(state: State = initialState, action): State {
-  // TODO: fix this
-  if (state === null) {
-    state = initialState;
-  }
   switch (action.type) {
     case GetConversationPrivateMessages.type:
-    case GetConversationPrivateCalls.type:
-    case GetConversationPrivateMessages.type: {
+    case GetConversationPrivateCalls.type: {
       return {
         ...state,
         errorMessage: null,
@@ -94,7 +88,7 @@ export function reducer(state: State = initialState, action): State {
       const {response, payload} = action.payload;
       const {id} = payload;
       let {data, error} = response;
-      if (!isArray(data)) {
+      if (!Array.isArray(data)) {
         data = [];
       }
       const lastMes = state.conversations[id] || [];
@@ -119,7 +113,7 @@ export function reducer(state: State = initialState, action): State {
       const {response, payload} = action.payload;
       const {id} = payload;
       let {data, error} = response;
-      if (!isArray(data)) {
+      if (!Array.isArray(data)) {
         data = [];
       }
       const lastMes = state.calls[id] || [];
@@ -163,20 +157,16 @@ export function reducer(state: State = initialState, action): State {
       if (state.user?.id === sid) {
           id = rid;
       }
-      const conversations = {...state.conversations};
-      const calls = {...state.calls};
-      if (!conversations[id]) {
-        conversations[id] = [];
-      }
-      if (!calls[id]) {
-        calls[id] = [];
-      }
+      if (!id) return {...state, errorMessage: null, loadCounter: 0};
+
+      let conversations = state.conversations;
+      let calls = state.calls;
       let event = nullEvent;
       if (data.duration === 0 || data.duration) {
-        calls[id].push(data);
+        calls = {...calls, [id]: [...(calls[id] || []), data]};
         event = {type: 'new-call', data: {sid, rid}};
       } else {
-        conversations[id].push(data);
+        conversations = {...conversations, [id]: [...(conversations[id] || []), data]};
       }
 
       return {

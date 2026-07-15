@@ -1,14 +1,12 @@
 import {Component, inject, computed, effect, DestroyRef} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
 import {Ivoicemail, Iitem, State} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import {
   AddVoicemailProfile,
   AddVoicemailProfileParameter,
@@ -29,12 +27,14 @@ import {
   UpdateVoicemailSetting, GetVoicemailSettings,
 } from '../../../store/config/voicemail/config.actions.voicemail';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent],
   selector: 'app-voicemail',
   templateUrl: './voicemail.component.html',
   styleUrls: ['./voicemail.component.css']
@@ -42,8 +42,8 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
 export class VoicemailComponent {
 
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
 
   private configsObservable = this.store.pipe(select(selectConfigurationState));
   // Assuming a structure similar to the previous component's state
@@ -229,7 +229,7 @@ export class VoicemailComponent {
           case2Text: 'Are you sure you want to rename profile "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

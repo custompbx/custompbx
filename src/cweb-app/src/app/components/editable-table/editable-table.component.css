@@ -1,0 +1,193 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.cpbx-data-grid {
+  width: 100%;
+  overflow: auto;
+  border: 1px solid var(--cpbx-border);
+  border-radius: var(--cpbx-radius);
+  background: var(--cpbx-surface);
+  outline: none;
+}
+
+.cpbx-data-grid:focus-visible {
+  box-shadow: var(--cpbx-control-ring);
+}
+
+.cpbx-data-grid__table {
+  width: 100%;
+  min-width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--cpbx-text);
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0;
+  border-bottom: 1px solid var(--cpbx-border);
+  background: var(--cpbx-surface-subtle);
+  text-align: left;
+}
+
+.cpbx-data-grid__heading {
+  width: 100%;
+  min-width: 9rem;
+  padding: .7rem .8rem;
+  border: 0;
+  background: transparent;
+  color: var(--cpbx-text-muted);
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 650;
+  letter-spacing: .025em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cpbx-data-grid__heading:hover {
+  color: var(--cpbx-text);
+  background: var(--cpbx-primary-soft);
+}
+
+td {
+  position: relative;
+  height: 3rem;
+  min-width: 9rem;
+  max-width: 24rem;
+  padding: .65rem .8rem;
+  border-bottom: 1px solid var(--cpbx-border);
+  background: var(--cpbx-surface);
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover td {
+  background: var(--cpbx-surface-muted);
+}
+
+.cpbx-data-grid__cell--editable {
+  cursor: text;
+}
+
+.cpbx-data-grid__cell--editable:hover {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cpbx-primary) 35%, transparent);
+}
+
+.cpbx-data-grid__cell--editing {
+  z-index: 1;
+  padding: .3rem .45rem 1rem;
+  background: color-mix(in srgb, var(--cpbx-primary) 7%, var(--cpbx-surface)) !important;
+  box-shadow: inset 0 0 0 2px var(--cpbx-primary);
+}
+
+.cpbx-data-grid__cell--changed:not(.cpbx-data-grid__cell--editing) {
+  background: var(--cpbx-warning-soft);
+}
+
+.cpbx-data-grid__unsaved {
+  position: absolute;
+  right: .5rem;
+  bottom: .12rem;
+  color: var(--cpbx-warning);
+  font-size: .6rem;
+  font-weight: 650;
+  line-height: .8rem;
+  pointer-events: none;
+}
+
+.cpbx-data-grid__cell--warning {
+  color: var(--cpbx-danger);
+  background: var(--cpbx-danger-soft);
+}
+
+.cpbx-data-grid__value {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cpbx-data-grid__input {
+  width: 100%;
+  min-width: 8rem;
+  padding: .42rem .5rem;
+  border: 1px solid var(--cpbx-primary);
+  border-radius: .35rem;
+  outline: none;
+  background: var(--cpbx-surface);
+  color: var(--cpbx-text);
+  font: inherit;
+  box-shadow: var(--cpbx-control-ring);
+}
+
+.cpbx-data-grid__edit-hint {
+  position: absolute;
+  right: .55rem;
+  bottom: .08rem;
+  color: var(--cpbx-text-muted);
+  font-size: .62rem;
+  line-height: .85rem;
+  white-space: nowrap;
+}
+
+.cpbx-data-grid__edit-icon {
+  position: absolute;
+  top: 50%;
+  right: .45rem;
+  opacity: 0;
+  color: var(--cpbx-text-muted);
+  font-size: 1rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity .12s ease;
+}
+
+td:hover .cpbx-data-grid__edit-icon {
+  opacity: .65;
+}
+
+.cpbx-data-grid__delete {
+  position: absolute;
+  top: 50%;
+  left: .35rem;
+  display: grid;
+  width: 1.9rem;
+  height: 1.9rem;
+  place-items: center;
+  border: 0;
+  border-radius: .4rem;
+  opacity: 0;
+  background: var(--cpbx-danger-soft);
+  color: var(--cpbx-danger);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity .12s ease, background-color .12s ease;
+}
+
+tr:hover .cpbx-data-grid__delete,
+.cpbx-data-grid__delete:focus-visible {
+  opacity: 1;
+}
+
+.cpbx-data-grid__delete:hover {
+  background: color-mix(in srgb, var(--cpbx-danger) 18%, transparent);
+}
+
+.cpbx-data-grid__delete + .cpbx-data-grid__value {
+  padding-left: 1.8rem;
+}
+
+.cpbx-data-grid__empty {
+  padding: 2rem;
+  color: var(--cpbx-text-muted);
+  text-align: center;
+}

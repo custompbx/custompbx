@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../material-module";
 
 export interface IseqDiagram {
   [addr: string]: {
@@ -32,7 +31,7 @@ export interface IdataItem {
 
 @Component({
 standalone: true,
-    imports: [CommonModule, MaterialModule],
+    imports: [CommonModule],
     selector: 'app-svg-seq-diagram',
     templateUrl: './svg-seq-diagram.component.svg',
     styleUrls: ['./svg-seq-diagram.component.css']

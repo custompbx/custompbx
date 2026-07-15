@@ -105,6 +105,11 @@ func main() {
 		webcache.InitUsersCache(cache.GetCurrentInstanceId())
 		webcache.InitWebSettings(cache.GetCurrentInstanceId())
 		webcache.InitWebData()
+		if updated, err := fsesl.ApplyDemoCDRBootstrap(); err != nil {
+			log.Printf("Docker demo CDR bootstrap failed: %v", err)
+		} else if updated {
+			log.Println("Docker demo CDR database connection configured")
+		}
 
 		log.Println("ESL Connection and handlers")
 		go fsesl.ESLConnectKeeper(eventChannel, logsChannel)

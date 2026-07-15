@@ -29,9 +29,9 @@
 }
 
 .group-user-grid {
-  display: grid;
+  display: grid !important;
   align-items: stretch;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)) !important;
   gap: .5rem;
   margin-top: .625rem;
 }
@@ -48,6 +48,7 @@
   background: #fff;
   overflow: hidden;
   padding: .375rem .375rem .375rem .625rem;
+  width: auto !important;
 }
 
 .group-user-card--available {
@@ -112,16 +113,4 @@
 
 .icon-spacer {
   margin-right: .35rem;
-}
-
-.mat-progress-bar {
-  display: block;
-  height: 2px;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  position: fixed;
-  transition: opacity 250ms linear;
-  width: 100%;
-  z-index: 1000;
 }

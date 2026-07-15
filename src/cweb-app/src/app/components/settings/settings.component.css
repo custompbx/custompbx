@@ -65,10 +65,6 @@
   width: 100%;
 }
 
-mat-toolbar-row {
-  justify-content: space-between;
-}
-
 .content-center {
   align-items: center;
   display: flex !important;
@@ -86,7 +82,7 @@ mat-toolbar-row {
   min-width: 45px;
 }
 
-.avatar-ico > mat-icon {
+.avatar-ico > app-icon {
   font-size: 45px;
 }
 
@@ -100,14 +96,6 @@ mat-toolbar-row {
 
 .upload-image {
   align-self: flex-start;
-}
-
-.mat-tab-body-active {
-  position: relative;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  z-index: 1;
-  flex-grow: 1;
 }
 
 .list-wrap {
@@ -168,8 +156,11 @@ mat-toolbar-row {
   margin-bottom: .25rem !important;
 }
 
-.tabbed-panel .mat-expansion-panel-body {
-  overflow-x: hidden;
+.token-table-wrap {
+  margin: 1rem 0 1.25rem;
+  max-width: 100%;
+  overflow-x: auto;
+  width: min(100%, 58rem);
 }
 
 .token-table {
@@ -177,9 +168,8 @@ mat-toolbar-row {
   border-collapse: separate;
   border-radius: .75rem;
   border-spacing: 0;
-  margin: 1rem 0 1.25rem;
   overflow: hidden;
-  width: min(100%, 58rem);
+  width: 100%;
 }
 
 .web-user-details {
@@ -220,16 +210,14 @@ mat-toolbar-row {
   width: auto !important;
 }
 
-.web-user-avatar-row button[mat-stroked-button].upload-image {
-  min-width: 5.25rem;
-}
-
-.token-table .mat-mdc-header-cell,
-.token-table .mat-mdc-cell {
+.token-table th,
+.token-table td {
+  border-bottom: 1px solid var(--cpbx-border);
+  text-align: left;
   padding: .75rem 1rem;
 }
 
-.token-table .mat-mdc-header-cell {
+.token-table th {
   background: var(--cpbx-page-bg);
   color: var(--cpbx-text-muted);
   font-size: .8125rem;
@@ -238,25 +226,31 @@ mat-toolbar-row {
   text-transform: uppercase;
 }
 
-.token-table .mat-mdc-row {
-  height: 3.25rem;
+.token-table th:first-child {
+  align-items: center;
+  display: flex;
+  gap: .75rem;
 }
 
-.token-table button {
-  min-width: 5.25rem;
-  width: auto !important;
+.token-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
-.token-table .mat-column-token {
-  width: 10rem;
+.token-table td:first-child {
+  max-width: 14rem;
+  overflow-wrap: anywhere;
 }
 
-.token-table .mat-column-created {
-  width: 16rem;
+.token-table__actions {
+  text-align: right !important;
+  width: 1%;
+  white-space: nowrap;
 }
 
-.token-table .mat-column-purpose {
-  width: 12rem;
+.token-table__empty {
+  color: var(--cpbx-text-muted);
+  padding: 1.5rem !important;
+  text-align: center !important;
 }
 
 @media (max-width: 1100px) {

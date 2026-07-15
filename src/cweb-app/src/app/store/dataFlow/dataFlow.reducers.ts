@@ -82,45 +82,44 @@ export function reducer(state = initialState, action: All): State {
     }
 
     case DataFlowActionTypes.STORE_GET_DASHBOARD: {
-      const data = <Idashboard>action.payload.response['dashboard_data'];
+      const responseData = <Idashboard>action.payload.response['dashboard_data'];
       const profiles = state.dashboardData.sofia_profiles || [];
       const gateways = state.dashboardData.sofia_gateways || [];
-      if (data && data.sofia_profiles && Array.isArray(data.sofia_profiles) && data.sofia_profiles.length > 0) {
+      let sofiaProfiles = responseData?.sofia_profiles;
+      let sofiaGateways = responseData?.sofia_gateways;
+      if (Array.isArray(sofiaProfiles) && sofiaProfiles.length > 0) {
         let found = false;
         const newProfiles = profiles.map(profile => {
-            if (profile.id === data.sofia_profiles[0].id) {
-              profile = data.sofia_profiles[0];
+            if (profile.id === sofiaProfiles[0].id) {
+              profile = sofiaProfiles[0];
               found = true;
             }
             return profile;
           }
         );
-        if (found) {
-          data.sofia_profiles = newProfiles;
-        } else {
-          // data.sofia_profiles = [...profiles, ...data.sofia_profiles];
-        }
+        if (found) sofiaProfiles = newProfiles;
       }
-      if (data && data.sofia_gateways && Array.isArray(data.sofia_gateways) && data.sofia_gateways.length > 0) {
+      if (Array.isArray(sofiaGateways) && sofiaGateways.length > 0) {
         let found = false;
         const newGateways = gateways.map(gateway => {
-            if (gateway.id === data.sofia_gateways[0].id) {
-              gateway = data.sofia_gateways[0];
+            if (gateway.id === sofiaGateways[0].id) {
+              gateway = sofiaGateways[0];
               found = true;
             }
             return gateway;
           }
         );
-        if (found) {
-          data.sofia_gateways = newGateways || [];
-        } else {
-          data.sofia_gateways = [...gateways, ...data.sofia_gateways];
-        }
+        sofiaGateways = found ? newGateways : [...gateways, ...sofiaGateways];
       }
 
-      if (data && data.domain_sip_regs) {
-        data.domain_sip_regs = {...state.dashboardData.domain_sip_regs, ...data.domain_sip_regs};
-      }
+      const data = responseData ? {
+        ...responseData,
+        ...(sofiaProfiles ? {sofia_profiles: sofiaProfiles} : {}),
+        ...(sofiaGateways ? {sofia_gateways: sofiaGateways} : {}),
+        ...(responseData.domain_sip_regs ? {
+          domain_sip_regs: {...state.dashboardData.domain_sip_regs, ...responseData.domain_sip_regs},
+        } : {}),
+      } : {};
 
       return {
         ...state,

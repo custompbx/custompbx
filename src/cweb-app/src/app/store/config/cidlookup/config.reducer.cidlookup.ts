@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.cidlookup) {
-        state.cidlookup = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, cidlookup: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

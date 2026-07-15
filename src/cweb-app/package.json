@@ -12,16 +12,14 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "21.2.17",
     "@angular/cdk": "21.2.14",
-    "@angular/common": "21.2.17",
-    "@angular/compiler": "21.2.17",
-    "@angular/core": "21.2.17",
-    "@angular/forms": "21.2.17",
-    "@angular/material": "21.2.14",
-    "@angular/platform-browser": "21.2.17",
-    "@angular/platform-browser-dynamic": "21.2.17",
-    "@angular/router": "21.2.17",
+    "@angular/common": "21.2.18",
+    "@angular/compiler": "21.2.18",
+    "@angular/core": "21.2.18",
+    "@angular/forms": "21.2.18",
+    "@angular/platform-browser": "21.2.18",
+    "@angular/platform-browser-dynamic": "21.2.18",
+    "@angular/router": "21.2.18",
     "@ngrx/effects": "21.1.1",
     "@ngrx/entity": "21.1.1",
     "@ngrx/operators": "21.1.1",
@@ -37,14 +35,13 @@
     "sip.js": "^0.19.0",
     "symbols": "^0.0.6",
     "tslib": "^2.6.2",
-    "vertojs": "^0.0.5",
-    "zone.js": "^0.15.1"
+    "vertojs": "^0.0.5"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "21.2.18",
     "@angular/cli": "21.2.18",
-    "@angular/compiler-cli": "21.2.17",
-    "@angular/language-service": "21.2.17",
+    "@angular/compiler-cli": "21.2.18",
+    "@angular/language-service": "21.2.18",
     "@tailwindcss/postcss": "^4.3.2",
     "@types/jasmine": "~3.6.0",
     "@types/node": "^26.1.1",
@@ -57,7 +54,8 @@
     "postcss": "^8.5.16",
     "tailwindcss": "^4.3.2",
     "ts-node": "~10.9.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "zone.js": "^0.15.1"
   },
   "overrides": {
     "http-proxy-middleware": "3.0.7"

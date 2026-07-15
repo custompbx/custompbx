@@ -1,7 +1,7 @@
-import { Component, inject, DestroyRef, effect, computed, signal } from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, HostListener, computed, effect, inject, signal} from '@angular/core';
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { select, Store } from '@ngrx/store';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {ToastService} from '../../services/toast.service';
 
 import { AppState, selectAuthState, selectDaemonState } from '../../store/app.states';
 import { Status } from '../../store/daemon/daemon.actions';
@@ -9,15 +9,16 @@ import { ReLogIn } from '../../store/auth/auth.actions';
 import { CookiesStorageService } from '../../services/cookies-storage.service';
 import { UserService } from '../../services/user.service';
 import { WsDataService } from '../../services/ws-data.service';
-import { MaterialModule } from "../../../material-module";
 import { filter } from 'rxjs';
+import {IconComponent} from '../icon/icon.component';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule],
+  imports: [IconComponent],
   selector: 'app-service-status',
   templateUrl: './service-status.component.html',
-  styleUrls: ['./service-status.component.css']
+  styleUrls: ['./service-status.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceStatusComponent {
 
@@ -25,7 +26,7 @@ export class ServiceStatusComponent {
   private ws = inject(WsDataService);
   private store = inject(Store<AppState>);
   private cookie = inject(CookiesStorageService);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
   public userService = inject(UserService);
   private destroyRef = inject(DestroyRef);
 
@@ -41,10 +42,40 @@ export class ServiceStatusComponent {
 
   // Component State Signals
   public isAuthenticated = computed(() => this.authState().isAuthenticated || false);
-  public noConnect = computed(() => !this.isConnected());
-  public noESL = computed(() => !this.daemonState().eslConnection);
-  public noDB = computed(() => !this.daemonState().dbConnection);
+  public noConnect = computed(() => this.isConnected() === false);
+  public noESL = computed(() => this.daemonStatusReceived() && !this.daemonState().eslConnection);
+  public noDB = computed(() => this.daemonStatusReceived() && !this.daemonState().dbConnection);
   public tokenFailed = signal(false);
+  public detailsOpen = signal(false);
+  public daemonStatusReceived = signal(false);
+  private hasConnectedOnce = false;
+  private lastServiceWarning = '';
+
+  public connectionState = computed<'connecting' | 'checking' | 'online' | 'degraded' | 'offline'>(() => {
+    if (this.isConnected() === null) return 'connecting';
+    if (this.isConnected() === false) return 'offline';
+    if (!this.daemonStatusReceived()) return 'checking';
+    if (this.noESL() || this.noDB()) return 'degraded';
+    return 'online';
+  });
+
+  public statusSummary = computed(() => {
+    switch (this.connectionState()) {
+      case 'online': return 'All services online';
+      case 'degraded': return 'Service connection issue';
+      case 'offline': return 'Web app disconnected';
+      case 'checking': return 'Checking services';
+      default: return 'Connecting';
+    }
+  });
+
+  public websocketLabel = computed(() => {
+    if (this.isConnected() === null) return 'Connecting';
+    return this.isConnected() ? 'Connected' : 'Disconnected';
+  });
+
+  public eslLabel = computed(() => this.serviceLabel(this.daemonState().eslConnection));
+  public databaseLabel = computed(() => this.serviceLabel(this.daemonState().dbConnection));
 
   // Flag to ensure we only subscribe to daemon data once
   private dDataSubscribed: boolean = false;
@@ -55,6 +86,7 @@ export class ServiceStatusComponent {
       const connected = this.isConnected();
 
       if (connected) {
+        this.hasConnectedOnce = true;
         this.trackDaemonState();
         if (this.cookie.getToken() && !this.isAuthenticated()) {
           const payload = {
@@ -63,8 +95,13 @@ export class ServiceStatusComponent {
           this.store.dispatch(new ReLogIn(payload));
         }
       } else {
-        if (connected === false) {
-          this._snackBar.open('No connection!', null, { duration: 5000 });
+        this.daemonStatusReceived.set(false);
+        this.lastServiceWarning = '';
+        if (this.hasConnectedOnce && connected === false) {
+          this._snackBar.open('WebSocket connection lost. Reconnecting...', null, {
+            duration: 7000,
+            tone: 'error',
+          });
         }
       }
     });
@@ -77,11 +114,14 @@ export class ServiceStatusComponent {
 
       // SnackBar for FreeSwitch/DB connection issues
       if (this.noESL() || this.noDB()) {
-        this._snackBar.open(
-          'No connection to FreeSwitch! DB: ' + (data.dbConnection ? 'OK' : 'FAIL') +
-          '. ESL: ' + (data.eslConnection ? 'OK' : 'FAIL') + '.',
-          null, { duration: 10000 }
-        );
+        const warning = 'Backend service issue. Database: ' + (data.dbConnection ? 'connected' : 'unavailable') +
+          '. FreeSWITCH ESL: ' + (data.eslConnection ? 'connected' : 'unavailable') + '.';
+        if (warning !== this.lastServiceWarning) {
+          this.lastServiceWarning = warning;
+          this._snackBar.open(warning, null, { duration: 10000, tone: 'warning' });
+        }
+      } else {
+        this.lastServiceWarning = '';
       }
 
       // Token failed logic
@@ -103,13 +143,29 @@ export class ServiceStatusComponent {
    */
   trackDaemonState() {
     if (this.dDataSubscribed) {
+      this.ws.websocketService.send('get_status', {});
       return;
     }
     this.ws.waitDaemonData().pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(payload => {
+      this.daemonStatusReceived.set(true);
       this.store.dispatch(new Status(payload));
     });
     this.dDataSubscribed = true;
+  }
+
+  toggleDetails(): void {
+    this.detailsOpen.update(open => !open);
+  }
+
+  @HostListener('document:keydown.escape')
+  closeDetails(): void {
+    this.detailsOpen.set(false);
+  }
+
+  private serviceLabel(available: boolean): string {
+    if (!this.isConnected() || !this.daemonStatusReceived()) return 'Unknown';
+    return available ? 'Connected' : 'Unavailable';
   }
 }

@@ -2,11 +2,10 @@ import {Component, OnDestroy, OnInit, inject, signal, computed, effect} from '@a
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectLogsState} from '../../store/app.states';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {PageEvent} from '@angular/material/paginator';
+import {ToastService} from '../../services/toast.service';
+import {CpbxPageEvent as PageEvent, PaginatorComponent} from '../paginator/paginator.component';
 import {State} from '../../store/logs/logs.reducers';
 import {GetLogs} from '../../store/logs/logs.actions';
 import {FormsModule} from "@angular/forms";
@@ -26,7 +25,7 @@ export interface IsortField {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, CpbxSelectDirective],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, CpbxSelectDirective, PaginatorComponent],
   selector: 'app-logs',
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.css'],
@@ -35,7 +34,7 @@ export class LogsComponent {
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
 
   // --- Reactive State from NgRx using toSignal ---
   private logsState = toSignal(

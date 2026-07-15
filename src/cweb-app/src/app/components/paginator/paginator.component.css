@@ -1,0 +1,10 @@
+:host { display: block; }
+.cpbx-paginator { align-items: center; border-top: 1px solid var(--cpbx-border); color: var(--cpbx-text-muted); display: flex; flex-wrap: wrap; gap: .75rem; justify-content: flex-end; min-height: 3.5rem; padding: .625rem .75rem; }
+.cpbx-paginator__summary { margin-right: auto; }
+.cpbx-paginator__size, .cpbx-paginator__actions { align-items: center; display: flex; gap: .5rem; }
+.cpbx-select--compact { min-height: 2.25rem; padding: .25rem 2rem .25rem .625rem; width: auto; }
+.cpbx-paginator__page { color: var(--cpbx-text); min-width: 4.5rem; text-align: center; }
+.cpbx-icon-button { align-items: center; background: transparent; border: 0; border-radius: .5rem; color: var(--cpbx-text); cursor: pointer; display: inline-flex; font-size: 1.35rem; height: 2.25rem; justify-content: center; width: 2.25rem; }
+.cpbx-icon-button:hover:not(:disabled) { background: var(--cpbx-surface-muted); }
+.cpbx-icon-button:focus-visible { outline: 2px solid var(--cpbx-control-focus); outline-offset: 2px; }
+.cpbx-icon-button:disabled { color: var(--cpbx-control-disabled-text); cursor: default; }

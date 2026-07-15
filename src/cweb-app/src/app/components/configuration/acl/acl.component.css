@@ -1,8 +1,35 @@
-.dragHandler {
-  cursor: grab;
-  color: var(--cpbx-muted);
+/* ACL nodes are independent editable rows. Keep their vertical rhythm when
+ * controls wrap at narrower widths. */
+.cdk-drop-list,
+.cpbx-disclosure__content form > div {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
 }
 
-.dragHandler:active {
-  cursor: grabbing;
+.cpbx-edit-row {
+  width: 100%;
+}
+
+.acl-draft-list {
+  display: grid !important;
+  gap: .75rem;
+  width: 100%;
+}
+
+.acl-draft-title {
+  color: var(--cpbx-text-muted);
+  font-size: .75rem;
+  font-weight: 650;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.acl-draft-row {
+  align-items: center;
+  background: var(--cpbx-surface-subtle);
+  border-radius: .875rem;
+  box-sizing: border-box;
+  gap: .75rem;
+  padding: 1rem;
 }

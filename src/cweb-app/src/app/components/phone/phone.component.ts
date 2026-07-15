@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject, effect, signal, computed, ChangeDetectionStrategy } from '@angular/core';
-import { MaterialModule } from "../../../material-module";
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import * as SIP from 'sip.js';
 // Assuming 'vertojs/dist' is correctly aliased in the build config or path is correct
 import { Verto } from 'vertojs/dist';
@@ -12,10 +12,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import {State} from "../../store/phone/phone.reducers";
 import {FormatTimerPipe} from "../../pipes/format-timer.pipe";
 import {FormsModule} from "@angular/forms";
+import {IconComponent} from '../icon/icon.component';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormatTimerPipe, FormsModule],
+  imports: [DragDropModule, FormatTimerPipe, FormsModule, IconComponent],
   selector: 'app-phone',
   templateUrl: './phone.component.html',
   styleUrls: ['./phone.component.css'],

@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.dialplan_directory) {
-        state.dialplan_directory = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, dialplan_directory: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.nibblebill) {
-        state.nibblebill = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, nibblebill: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

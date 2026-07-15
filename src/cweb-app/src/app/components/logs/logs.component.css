@@ -20,10 +20,6 @@ td {
 
 }
 
-th.mat-header-cell {
-  padding-right: 20px;
-}
-
 .log-container {
   overflow: auto;
   background-color: black;

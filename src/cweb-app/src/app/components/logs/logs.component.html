@@ -1,7 +1,7 @@
 <app-inner-header name="Logs" [loadCounter]="loadCounter()"></app-inner-header>
 <div class="logs-card">
   <div class="cpbx-form-panel">
-    <button mat-stroked-button color="basic" class="switch-button"
+    <button class="switch-button cpbx-button cpbx-button--secondary"
             (click)="getRecords()">
       Get Records
     </button>
@@ -39,13 +39,13 @@
 <input name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required placeholder="Value" class="cpbx-input">
 </label>
     @if (!filters()[toEditFilter()]) {
-      <button mat-stroked-button color="basic" class="switch-button"
+      <button class="switch-button cpbx-button cpbx-button--secondary"
               [disabled]="!filter().field_value || !filter().operand || !filter().field"
               (click)="addFilter()">
         Add filter
       </button>
     } @else {
-      <button mat-flat-button color="primary" class="switch-button"
+      <button class="switch-button cpbx-button cpbx-button--primary"
               [disabled]="!filter().field_value || !filter().operand || !filter().field"
               (click)="saveFilter()">
         Edit filter
@@ -63,34 +63,27 @@
         </option>
       </select>
 </label>
-    <mat-checkbox [(ngModel)]="sortObject().desc" class="checkbox-spacer-left"
-                  [disabled]="sortObject().fields.length == 0 && !sortColumns">DESC
-    </mat-checkbox>
-    <button mat-stroked-button color="basic" class="switch-button"
+    <label class="cpbx-checkbox checkbox-spacer-left">
+      <input class="cpbx-checkbox__input" type="checkbox" [(ngModel)]="sortObject().desc"
+        [disabled]="sortObject().fields.length == 0 && !sortColumns">
+      <span>DESC</span>
+    </label>
+    <button class="switch-button cpbx-button cpbx-button--secondary"
             [disabled]="!sortColumns"
             (click)="addSorter()">
       Add sorting
     </button>
   </div>
   <div class="chips-pad">
-    <mat-chip-listbox aria-label="Filter selection">
+    <div class="cpbx-chip-list" aria-label="Filter selection">
       @for (filterItem of filters(); track $index; let i = $index) {
-        <mat-chip color="green"
-                  (click)="editFilter(i)"
-                  [selectable]="true"
-                  [removable]="true"
-                  (removed)="removeFilter(filterItem)"
-                  selected>
-          {{ filterItem.field }} {{ filterItem.operand }} {{ filterItem.field_value }}
-          <mat-icon matChipRemove>cancel</mat-icon>
-        </mat-chip>
+        <span class="cpbx-chip">
+          <button type="button" class="cpbx-chip__label" (click)="editFilter(i)">{{ filterItem.field }} {{ filterItem.operand }} {{ filterItem.field_value }}</button>
+          <button type="button" class="cpbx-chip__remove" (click)="removeFilter(filterItem)" aria-label="Remove filter">×</button>
+        </span>
       }
       @if (sortObject().fields.length > 0) {
-        <mat-chip color="primary"
-                  [selectable]="true"
-                  [removable]="true"
-                  (removed)="clearSorting()"
-                  selected>
+        <span class="cpbx-chip cpbx-chip--sort">
           <span>ORDER BY </span>
           @for (sort of sortObject().fields; track $index; let i = $index) {
             <span>
@@ -105,10 +98,10 @@
           } @else {
             <span>ASC</span>
           }
-          <mat-icon matChipRemove>cancel</mat-icon>
-        </mat-chip>
+          <button type="button" class="cpbx-chip__remove" (click)="clearSorting()" aria-label="Clear sorting">×</button>
+        </span>
       }
-    </mat-chip-listbox>
+    </div>
   </div>
   @if (list().logsData && list().logsData.length > 0) {
     <div>
@@ -123,14 +116,13 @@
     </div>
   }
   @if (pageTotal() > 0) {
-    <mat-paginator
+    <app-paginator
       [length]="pageTotal()"
       [pageIndex]="pageEvent().pageIndex"
       [pageSize]="pageEvent().pageSize"
       [pageSizeOptions]="paginationScale"
       (page)="pageEvent.set($event)"
-      [showFirstLastButtons]="true"
-    >
-    </mat-paginator>
+      [showFirstLastButtons]="true">
+    </app-paginator>
   }
 </div>

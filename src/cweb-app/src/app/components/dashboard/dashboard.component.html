@@ -8,14 +8,14 @@
     </div>
   </div>
   <div class="main-panel">
-    @for (card of cards | async; track trackByFn(i, card); let i = $index) {
+    @for (card of cards; track trackByFn(i, card); let i = $index) {
       @if (showCard(card?.moduleName)) {
         <div [class]="card?.class">
-          <mat-card class="dashboard-card page-section">
-            <mat-card-header>
-              <mat-card-title>{{card.title}}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content class="dashboard-card-content">
+          <section class="dashboard-card page-section cpbx-card">
+            <header class="cpbx-card__header">
+              <h3 class="cpbx-card__title">{{card.title}}</h3>
+            </header>
+          <div class="dashboard-card-content cpbx-card__content">
             @if (list() && list().dynamic_metrics && (list().dynamic_metrics[card.field] || list()[card.field] || list()[card.field] == 0 || card.type == 'table')) {
               @switch (card.type) {
                 @case ('pie') {
@@ -67,47 +67,30 @@
                 }
                 @case ('table') {
                   <div class="responsive-table dashboard-table">
-                    <table mat-table [dataSource]="list()[card.field]">
-                      <ng-container matColumnDef="id">
-                        <th mat-header-cell *matHeaderCellDef> ID</th>
-                        <td mat-cell *matCellDef="let element"> {{element.id}}</td>
-                      </ng-container>
-                      <ng-container matColumnDef="name">
-                        <th mat-header-cell *matHeaderCellDef> Name</th>
-                        <td mat-cell *matCellDef="let element"> {{element.name}}</td>
-                      </ng-container>
-                      <ng-container matColumnDef="enabled">
-                        <th mat-header-cell *matHeaderCellDef> Enabled</th>
-                        <td mat-cell *matCellDef="let element">
-                          @if (!element.enabled) {
-                            <span class="status-badge danger">{{element.enabled}}</span>
-                          }
-                          @if (element.enabled) {
-                            <span class="status-badge success">{{element.enabled}}</span>
-                          }
-                        </td>
-                      </ng-container>
-                      <ng-container matColumnDef="uri">
-                        <th mat-header-cell *matHeaderCellDef> URI</th>
-                        <td mat-cell *matCellDef="let element"> {{element.uri}}</td>
-                      </ng-container>
-                      <ng-container matColumnDef="state">
-                        <th mat-header-cell *matHeaderCellDef> State</th>
-                        <td mat-cell *matCellDef="let element"> {{element.state}}</td>
-                      </ng-container>
-                      <ng-container matColumnDef="started">
-                        <th mat-header-cell *matHeaderCellDef> Started</th>
-                        <td mat-cell *matCellDef="let element"> {{element.started}}</td>
-                      </ng-container>
-                      <tr mat-header-row *matHeaderRowDef="card.tableFields"></tr>
-                      <tr mat-row *matRowDef="let row; columns: card.tableFields;"></tr>
+                    <table class="cpbx-data-table">
+                      <thead><tr>@for (field of card.tableFields; track field) { <th scope="col">{{field}}</th> }</tr></thead>
+                      <tbody>
+                        @for (element of list()[card.field]; track element.id || $index) {
+                          <tr>
+                            @for (field of card.tableFields; track field) {
+                              <td>
+                                @if (field === 'enabled') {
+                                  <span class="status-badge" [class.success]="element[field]" [class.danger]="!element[field]">{{element[field]}}</span>
+                                } @else {
+                                  {{element[field]}}
+                                }
+                              </td>
+                            }
+                          </tr>
+                        }
+                      </tbody>
                     </table>
                   </div>
                 }
               }
             }
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </section>
       </div>
     }
   }

@@ -1,0 +1,68 @@
+<div class="cpbx-data-grid" role="region" aria-label="Data table" tabindex="0">
+  <table class="cpbx-data-grid__table">
+    <thead>
+      <tr>
+        @for (column of columns(); track column) {
+          <th scope="col">
+            <button type="button" class="cpbx-data-grid__heading" (click)="columnSelected.emit(column)">
+              {{column}}
+            </button>
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track rowIdentity(row)) {
+        <tr>
+          @for (column of columns(); track column) {
+            <td
+              [class.cpbx-data-grid__cell--editable]="isCellEditable(column)"
+              [class.cpbx-data-grid__cell--editing]="isEditing(row, column)"
+              [class.cpbx-data-grid__cell--changed]="isChanged(row, column)"
+              [class.cpbx-data-grid__cell--warning]="isWarning(row, column)"
+              (click)="beginEdit(row, column)"
+            >
+              @if (deleteColumn() === column) {
+                <button
+                  type="button"
+                  class="cpbx-data-grid__delete"
+                  [attr.aria-label]="'Delete row ' + rowIdentity(row)"
+                  title="Delete row"
+                  (click)="deleteRow($event, row)"
+                >
+                  <app-icon name="delete_outline"></app-icon>
+                </button>
+              }
+
+              @if (isEditing(row, column)) {
+                <input
+                  class="cpbx-data-grid__input"
+                  [attr.aria-label]="'Edit ' + column"
+                  [ngModel]="row[column]"
+                  (ngModelChange)="valueChanged(row, column, $event)"
+                  (keydown.enter)="save(row, column)"
+                  (keydown.escape)="cancel(row, column)"
+                  (blur)="finishEdit(row, column)"
+                  appAutoFocus
+                >
+                <span class="cpbx-data-grid__edit-hint">Enter to save &middot; Esc to cancel</span>
+              } @else {
+                <span class="cpbx-data-grid__value">{{row[column]}}</span>
+                @if (isChanged(row, column)) {
+                  <span class="cpbx-data-grid__unsaved">Unsaved</span>
+                }
+                @if (isCellEditable(column)) {
+                  <app-icon class="cpbx-data-grid__edit-icon" name="edit"></app-icon>
+                }
+              }
+            </td>
+          }
+        </tr>
+      } @empty {
+        <tr>
+          <td class="cpbx-data-grid__empty" [attr.colspan]="columns().length || 1">No records found</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

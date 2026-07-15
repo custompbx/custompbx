@@ -1,11 +1,59 @@
-<div class="indicator">
-  @if (noDB()) {
-    <mat-icon color="accent" class="icon" matTooltip="Database">sync_disabled</mat-icon>
-  }
-  @if (noESL()) {
-    <mat-icon color="accent" class="icon" matTooltip="ESL">sync_problem</mat-icon>
-  }
-  @if (noConnect()) {
-    <mat-icon color="accent" class="icon" matTooltip="Websocket">wifi_off</mat-icon>
+@if (connectionState() !== 'online') {
+<div class="service-status" [attr.data-state]="connectionState()">
+  <button
+    type="button"
+    class="service-status__summary"
+    [attr.aria-expanded]="detailsOpen()"
+    aria-controls="service-status-details"
+    (click)="toggleDetails()"
+  >
+    <span class="service-status__pulse" aria-hidden="true"></span>
+    <span class="service-status__summary-text">{{statusSummary()}}</span>
+    <span class="service-status__chevron" [class.is-open]="detailsOpen()" aria-hidden="true"></span>
+  </button>
+
+  @if (detailsOpen()) {
+    <section id="service-status-details" class="service-status__panel" aria-label="Connection status" aria-live="polite">
+      <div class="service-status__heading">
+        <div>
+          <strong>Connection status</strong>
+          <span>Live service availability</span>
+        </div>
+        <button type="button" class="service-status__close" aria-label="Close connection status" (click)="closeDetails()">
+          <app-icon name="close"></app-icon>
+        </button>
+      </div>
+
+      <div class="service-status__list">
+        <div class="service-status__row">
+          <span class="service-status__service">
+            <span class="service-status__dot" [class.is-ok]="isConnected() === true" [class.is-error]="isConnected() === false"></span>
+            Web application
+          </span>
+          <span class="service-status__value">{{websocketLabel()}}</span>
+        </div>
+        <div class="service-status__row">
+          <span class="service-status__service">
+            <span class="service-status__dot" [class.is-ok]="daemonStatusReceived() && !noESL()" [class.is-error]="noESL()"></span>
+            FreeSWITCH ESL
+          </span>
+          <span class="service-status__value">{{eslLabel()}}</span>
+        </div>
+        <div class="service-status__row">
+          <span class="service-status__service">
+            <span class="service-status__dot" [class.is-ok]="daemonStatusReceived() && !noDB()" [class.is-error]="noDB()"></span>
+            Database
+          </span>
+          <span class="service-status__value">{{databaseLabel()}}</span>
+        </div>
+      </div>
+
+      @if (connectionState() === 'offline') {
+        <p class="service-status__help">The app is reconnecting automatically. Changes cannot be sent until the connection returns.</p>
+      } @else if (connectionState() === 'degraded') {
+        <p class="service-status__help">The web app is connected, but one or more backend services need attention.</p>
+      }
+    </section>
   }
 </div>
+}

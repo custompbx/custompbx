@@ -1,13 +1,11 @@
 import {Component, DestroyRef, inject, computed, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {MaterialModule} from "../../../../material-module";
 import {Iitem, Iverto, IvertoParameterItem, State} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import {
   AddVertoProfile,
   AddVertoProfileParam,
@@ -23,10 +21,13 @@ import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {KeyValuePadPositionComponent} from "../../key-value-pad-position/key-value-pad-position.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {resolvePositionedReorder} from '../../../utils/reorder';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, KeyValuePadPositionComponent],
+  imports: [FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, KeyValuePadPositionComponent, TabNavComponent, DisclosureComponent],
   selector: 'app-verto',
   templateUrl: './verto.component.html',
   styleUrls: ['./verto.component.css']
@@ -34,8 +35,8 @@ import {KeyValuePadPositionComponent} from "../../key-value-pad-position/key-val
 export class VertoComponent {
 
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
 
   private configsObservable = this.store.pipe(select(selectConfigurationState));
   private configsSignal = toSignal(this.configsObservable, { initialValue: {} as State });
@@ -234,7 +235,7 @@ export class VertoComponent {
           case2Text: 'Are you sure you want to rename profile "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -255,13 +256,7 @@ export class VertoComponent {
   }
 
   dropAction(event: CdkDragDrop<string[]>, parent: Array<any>) {
-    if (parent[event.previousIndex].position === parent[event.currentIndex].position) {
-      return;
-    }
-    this.store.dispatch(new MoveVertoProfileParameter({
-      previous_index: parent[event.previousIndex].position,
-      current_index: parent[event.currentIndex].position,
-      id: parent[event.previousIndex].id
-    }));
+    const change = resolvePositionedReorder(parent, event.previousIndex, event.currentIndex);
+    if (change) this.store.dispatch(new MoveVertoProfileParameter(change.move));
   }
 }

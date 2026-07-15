@@ -1,9 +1,9 @@
 import {Component, inject, signal, computed, effect, OnInit, Pipe, PipeTransform} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectDialplanState} from '../../../store/app.states';
 import {Iaction, Iantiaction, Icondition, Icontexts, Idebug, Iextension, Iregex} from '../../../store/dialplan/dialplan.reducers';
@@ -49,11 +49,13 @@ import {
 } from '../../../store/dialplan/dialplan.actions';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {ActivatedRoute} from '@angular/router';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {ResizeInputDirective} from "../../../directives/resize-input.directive";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
+import {resolvePositionedReorder} from '../../../utils/reorder';
 
 @Pipe({
   name: 'objectDataToName',
@@ -79,7 +81,7 @@ export class ObjectToNamePipe implements PipeTransform {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ObjectToNamePipe, ResizeInputDirective, CpbxSelectDirective], // Include the new standalone pipe
+  imports: [CommonModule, DragDropModule, FormsModule, InnerHeaderComponent, ObjectToNamePipe, ResizeInputDirective, CpbxSelectDirective, TabNavComponent, DisclosureComponent], // Include the new standalone pipe
   selector: 'app-contexts',
   templateUrl: './contexts.component.html',
   styleUrls: ['./contexts.component.css']
@@ -88,8 +90,8 @@ export class ContextsComponent { // Removed OnDestroy
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   // --- Reactive State from NgRx using toSignal ---
@@ -158,60 +160,23 @@ export class ContextsComponent { // Removed OnDestroy
   });
 
   dropExtension(event: CdkDragDrop<string[]>, parent: Array<any>) {
-    const previousItem = parent[event.previousIndex];
-    const currentItem = parent[event.currentIndex];
-
-    if (!previousItem || !currentItem || previousItem.position === currentItem.position) {
-      return;
-    }
-
-    this.store.dispatch(new MoveExtension({
-      previous_index: previousItem.position,
-      current_index: currentItem.position,
-      id: previousItem.id
-    }));
+    const change = resolvePositionedReorder(parent, event.previousIndex, event.currentIndex);
+    if (change) this.store.dispatch(new MoveExtension(change.move));
   }
 
   dropCondition(event: CdkDragDrop<string[]>, parent: Array<any>) {
-    const previousItem = parent[event.previousIndex];
-    const currentItem = parent[event.currentIndex];
-
-    if (!previousItem || !currentItem || previousItem.position === currentItem.position) {
-      return;
-    }
-    this.store.dispatch(new MoveCondition({
-      previous_index: previousItem.position,
-      current_index: currentItem.position,
-      id: previousItem.id
-    }));
+    const change = resolvePositionedReorder(parent, event.previousIndex, event.currentIndex);
+    if (change) this.store.dispatch(new MoveCondition(change.move));
   }
 
   dropAction(event: CdkDragDrop<string[]>, parent: Array<any>) {
-    const previousItem = parent[event.previousIndex];
-    const currentItem = parent[event.currentIndex];
-
-    if (!previousItem || !currentItem || previousItem.position === currentItem.position) {
-      return;
-    }
-    this.store.dispatch(new MoveAction({
-      previous_index: previousItem.position,
-      current_index: currentItem.position,
-      id: previousItem.id
-    }));
+    const change = resolvePositionedReorder(parent, event.previousIndex, event.currentIndex);
+    if (change) this.store.dispatch(new MoveAction(change.move));
   }
 
   dropAntiaction(event: CdkDragDrop<string[]>, parent: Array<any>) {
-    const previousItem = parent[event.previousIndex];
-    const currentItem = parent[event.currentIndex];
-
-    if (!previousItem || !currentItem || previousItem.position === currentItem.position) {
-      return;
-    }
-    this.store.dispatch(new MoveAntiaction({
-      previous_index: previousItem.position,
-      current_index: currentItem.position,
-      id: previousItem.id
-    }));
+    const change = resolvePositionedReorder(parent, event.previousIndex, event.currentIndex);
+    if (change) this.store.dispatch(new MoveAntiaction(change.move));
   }
 
   mainTabChanged(event: number) {
@@ -412,7 +377,7 @@ export class ContextsComponent { // Removed OnDestroy
           case2Text: action === 'rename' ? 'Are you sure you want to rename context "' + oldName + '" to "' + newName + '"?' : null,
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -436,7 +401,7 @@ export class ContextsComponent { // Removed OnDestroy
           case2Text: action === 'rename' ? 'Are you sure you want to rename extension "' + oldName + '" to "' + newName + '"?' : null,
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -458,7 +423,7 @@ export class ContextsComponent { // Removed OnDestroy
           case1Text: `Are you sure you want to delete this ${type}?`,
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

@@ -1,57 +1,58 @@
 <app-inner-header name="Dialplan" [loadCounter]="loadCounter()"></app-inner-header>
 @if (list()) {
-  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [selectedIndex]="selectedIndex()" (selectedIndexChange)="mainTabChanged($event)">
-    <mat-tab label="List">
+  <app-tab-nav ariaLabel="Dialplan sections" [tabs]="['List', 'Add', 'Rename/Delete', 'Dialplan Settings']"
+    [selectedIndex]="selectedIndex()" (selectedIndexChange)="mainTabChanged($event)"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex() !== 0">
       @if (loadCounter() === 0 && !onlyValues(list())?.length) {
-        <mat-card>
-          <mat-card-content>
+        <section class="cpbx-card">
+          <div class="cpbx-card__content">
             Here no any contexts yet. You can start creating them or try to import from existing config.
-            <button mat-stroked-button color="basic" class="switch-button"
+            <button class="switch-button cpbx-button cpbx-button--secondary"
               (click)="importDialplan()">
               Import
             </button>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </section>
       }
       @if (onlyValues(list())?.length) {
-        <mat-card>
-          <mat-card-header>
-            <mat-card-subtitle>Contexts</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
+        <section class="cpbx-card">
+          <header class="cpbx-card__header">
+            <p class="cpbx-card__subtitle">Contexts</p>
+          </header>
+          <div class="cpbx-card__content">
             @for (context of onlyValues(list()); track $index) {
               <div class="panel-wrapper">
                 @if (context) {
-                  <mat-expansion-panel (opened)="getExtensions(context.id)">
-                    <mat-expansion-panel-header>
-                      <mat-panel-title>
+                  <app-disclosure (opened)="getExtensions(context.id)">
+                    <span disclosureTitle>
                         {{context.name}}
-                      </mat-panel-title>
-                      <mat-panel-description>
+                    </span>
+                    <span disclosureDescription>
                         Click to get details
-                      </mat-panel-description>
-                    </mat-expansion-panel-header>
+                    </span>
                     <div cdkDropList class="example-list"
                       (cdkDropListDropped)="dropExtension($event, context.extensions)">
                       @for (extension of context.extensions; track trackByFn($index, extension)) {
                         <div class="panel-wrapper"
                           cdkDrag>
                           @if (extension) {
-                            <mat-expansion-panel (opened)="getConditions(extension.id)">
-                              <mat-expansion-panel-header>
-                                <mat-panel-title>
-                                  <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                            <app-disclosure (opened)="getConditions(extension.id)">
+                              <span disclosureTitle>
+                                  <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move context">::</button>
                                   {{extension.name}}
                                   @if (extension.continue === 'true') {
                                     <span class="continue-label">Continue</span>
                                   }
-                                </mat-panel-title>
-                                <mat-panel-description>
+                              </span>
+                              <span disclosureDescription>
                                   Click to get details
-                                </mat-panel-description>
-                              </mat-expansion-panel-header>
-                              <mat-checkbox class="continue-box" [checked]="extension.continue === 'true'" (change)="switchContinue(extension)">Continue</mat-checkbox>
-                              <button mat-flat-button color="primary" type="button"
+                              </span>
+                              <label class="cpbx-checkbox continue-box">
+                                <input class="cpbx-checkbox__input" type="checkbox"
+                                  [checked]="extension.continue === 'true'" (change)="switchContinue(extension)">
+                                <span>Continue</span>
+                              </label>
+                              <button class="cpbx-button cpbx-button--primary" type="button"
                                 (click)="addCondition(extension.id)">
                                 Add Condition
                               </button>
@@ -61,16 +62,14 @@
                                   <div class="panel-wrapper"
                                     cdkDrag>
                                     @if (condition) {
-                                      <mat-expansion-panel (opened)="getActions(condition.id)">
-                                        <mat-expansion-panel-header>
-                                          <mat-panel-title>
-                                            <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                                      <app-disclosure (opened)="getActions(condition.id)">
+                                        <span disclosureTitle>
+                                            <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move extension">::</button>
                                             {{condition | objectDataToName}}
-                                          </mat-panel-title>
-                                          <mat-panel-description>
+                                        </span>
+                                        <span disclosureDescription>
                                             Click to get details
-                                          </mat-panel-description>
-                                        </mat-expansion-panel-header>
+                                        </span>
                                         <form #details="ngForm">
                                           <h3>Condition fields:</h3>
                                           <div class="spacer">
@@ -181,25 +180,25 @@
 <span class="cpbx-label">Break</span>
 <input name="break" [(ngModel)]="condition.break" required [disabled]="!condition.enabled" [name]="'conditionBreak' + condition.id" placeholder="Break" class="cpbx-input">
 </label>
-                                                                                  <button mat-flat-button color="primary" class="but-spacer-left"
+                                                                                  <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                                                                     (click)="updateCondition(condition)">
                                                                                     Update
                                                                                   </button>
                                                                                   @if (condition.enabled) {
-                                                                                    <button mat-flat-button color="accent"
-                                                                                      class="but-spacer-left switch-button"
+                                                                                    <button
+                                                                                      class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                                                                       (click)="switchCondition(condition)">
                                                                                       Disable
                                                                                     </button>
                                                                                   }
                                                                                   @if (!condition.enabled) {
-                                                                                    <button mat-flat-button color="primary"
-                                                                                      class="but-spacer-left switch-button"
+                                                                                    <button
+                                                                                      class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                                                                       (click)="switchCondition(condition)">
                                                                                       Enable
                                                                                     </button>
                                                                                   }
-                                                                                  <button mat-flat-button color="warn" class="but-spacer-left"
+                                                                                  <button class="but-spacer-left cpbx-button cpbx-button--danger"
                                                                                     (click)="openBottomSheetCondition(condition, 'condition')">
                                                                                     Delete
                                                                                   </button>
@@ -209,7 +208,7 @@
                                                                                 <h3>Regexes:</h3>
                                                                               }
                                                                               @if (condition.regex) {
-                                                                                <div cdkDropList class="example-list">
+                                                                                <div class="example-list">
                                                                                   @for (regex of condition.regexes; track trackById($index, regex)) {
                                                                                     <div>
                                                                                       @if (regex) {
@@ -222,26 +221,26 @@
 <span class="cpbx-label">Expression</span>
 <input name="expression" [(ngModel)]="regex.expression" required [disabled]="!regex.enabled" [name]="'regexExpression' + regex.id" placeholder="Expression" class="cpbx-input">
 </label>
-                                                                                              <button mat-flat-button color="primary" class="but-spacer-left"
+                                                                                              <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                                                                                 [disabled]="!isReadyToSend(details.controls['regexField' + regex.id], details.controls['regexExpression' + regex.id])"
                                                                                                 (click)="updateRegex(regex)">
                                                                                                 Update
                                                                                               </button>
                                                                                               @if (regex.enabled) {
-                                                                                                <button mat-flat-button color="accent"
-                                                                                                  class="but-spacer-left switch-button"
+                                                                                                <button
+                                                                                                  class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                                                                                   (click)="switchRegex(regex)">
                                                                                                   Disable
                                                                                                 </button>
                                                                                               }
                                                                                               @if (!regex.enabled) {
-                                                                                                <button mat-flat-button color="primary"
-                                                                                                  class="but-spacer-left switch-button"
+                                                                                                <button
+                                                                                                  class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                                                                                   (click)="switchRegex(regex)">
                                                                                                   Enable
                                                                                                 </button>
                                                                                               }
-                                                                                              <button mat-flat-button color="warn" class="but-spacer-left"
+                                                                                              <button class="but-spacer-left cpbx-button cpbx-button--danger"
                                                                                                 (click)="deleteRegex(regex)">
                                                                                                 Delete
                                                                                               </button>
@@ -249,7 +248,7 @@
                                                                                           }
                                                                                         </div>
                                                                                       }
-                                                                                      <div cdkDropList class="example-list">
+                                                                                      <div class="example-list">
                                                                                         @for (newRegex of condition.newRegexes; track trackByFn(i, newRegex); let i = $index) {
                                                                                           <div>
                                                                                             @if (newRegex) {
@@ -262,12 +261,12 @@
 <span class="cpbx-label">Expression</span>
 <input name="expression" [(ngModel)]="newRegex.expression" required [disabled]="!newRegex.enabled" [name]="'newRegexExpression' + i" placeholder="Expression" class="cpbx-input">
 </label>
-                                                                                                    <button mat-flat-button color="primary" class="but-spacer-left"
+                                                                                                    <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                                                                                       [disabled]="!isReadyToSend(details.controls['newRegexField' + i], details.controls['newRegexExpression' + i])"
                                                                                                       (click)="addRegex(context.id, extension.id, condition.id, i, newRegex)">
                                                                                                       Update
                                                                                                     </button>
-                                                                                                    <button mat-stroked-button color="warn" class="but-spacer-left"
+                                                                                                    <button class="but-spacer-left cpbx-button cpbx-button--danger-outline"
                                                                                                       (click)="delNewRegex(i, context.id, extension.id, condition.id)">
                                                                                                       Delete
                                                                                                     </button>
@@ -275,7 +274,7 @@
                                                                                                 }
                                                                                               </div>
                                                                                             }
-                                                                                            <button mat-flat-button color="accent"
+                                                                                            <button class="cpbx-button cpbx-button--primary"
                                                                                               (click)="addNewRegex(context.id, extension.id, condition.id)">
                                                                                               Add
                                                                                             </button>
@@ -289,7 +288,7 @@
                                                                                           <div cdkDrag>
                                                                                             @if (action) {
                                                                                               <div>
-                                                                                                <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                                                                                                <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move condition">::</button>
                                                                                                 <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Name</span>
 <input name="name" [(ngModel)]="action.application" required [disabled]="!action.enabled" [name]="'actionApplication' + action.id" appResizeInput [resizeOnString]="action.application" placeholder="Name" class="cpbx-input">
@@ -304,26 +303,26 @@
 <input name="inline" [(ngModel)]="action.inline" required [disabled]="!action.enabled" [name]="'actionInline' + action.id" placeholder="Inline" class="cpbx-input">
 </label>
                                                                                                       }
-                                                                                                      <button mat-flat-button color="primary" class="but-spacer-left"
+                                                                                                      <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                                                                                         [disabled]="!isReadyToSendAction(details.controls['actionApplication' + action.id], details.controls['actionData' + action.id], details.controls['actionInline' + action.id])"
                                                                                                         (click)="updateAction(action)">
                                                                                                         Update
                                                                                                       </button>
                                                                                                       @if (action.enabled) {
-                                                                                                        <button mat-flat-button color="accent"
-                                                                                                          class="but-spacer-left switch-button"
+                                                                                                        <button
+                                                                                                          class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                                                                                           (click)="switchAction(action)">
                                                                                                           Disable
                                                                                                         </button>
                                                                                                       }
                                                                                                       @if (!action.enabled) {
-                                                                                                        <button mat-flat-button color="primary"
-                                                                                                          class="but-spacer-left switch-button"
+                                                                                                        <button
+                                                                                                          class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                                                                                           (click)="switchAction(action)">
                                                                                                           Enable
                                                                                                         </button>
                                                                                                       }
-                                                                                                      <button mat-flat-button color="warn" class="but-spacer-left"
+                                                                                                      <button class="but-spacer-left cpbx-button cpbx-button--danger"
                                                                                                         (click)="deleteAction(action)">
                                                                                                         Delete
                                                                                                       </button>
@@ -349,12 +348,12 @@
 <input name="inline" [(ngModel)]="newAction.inline" required [name]="'newActionData' + i" placeholder="Inline" class="cpbx-input">
 </label>
                                                                                                             }
-                                                                                                            <button mat-flat-button color="primary" class="but-spacer-left"
+                                                                                                            <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                                                                                               [disabled]="!isReadyToSend(details.controls['newActionApplication' + i], details.controls['newActionData' + i])"
                                                                                                               (click)="addAction(context.id, extension.id, condition.id, i, newAction)">
                                                                                                               Update
                                                                                                             </button>
-                                                                                                            <button mat-stroked-button color="warn" class="but-spacer-left"
+                                                                                                            <button class="but-spacer-left cpbx-button cpbx-button--danger-outline"
                                                                                                               (click)="delNewAction(i, context.id, extension.id, condition.id)">
                                                                                                               Delete
                                                                                                             </button>
@@ -362,7 +361,7 @@
                                                                                                         }
                                                                                                       </div>
                                                                                                     }
-                                                                                                    <button mat-flat-button color="accent"
+                                                                                                    <button class="cpbx-button cpbx-button--primary"
                                                                                                       (click)="addNewAction(context.id, extension.id, condition.id)">
                                                                                                       Add
                                                                                                     </button>
@@ -375,7 +374,7 @@
                                                                                                         cdkDrag>
                                                                                                         @if (antiaction) {
                                                                                                           <div>
-                                                                                                            <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                                                                                                            <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move action">::</button>
                                                                                                             <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Name</span>
 <input name="name" [(ngModel)]="antiaction.application" required [disabled]="!antiaction.enabled" [name]="'antiactionApplication' + antiaction.id" appResizeInput [resizeOnString]="antiaction.application" placeholder="Name" class="cpbx-input">
@@ -384,26 +383,26 @@
 <span class="cpbx-label">Data</span>
 <input name="data" [(ngModel)]="antiaction.data" required [disabled]="!antiaction.enabled" [name]="'antiactionData' + antiaction.id" appResizeInput [resizeOnString]="antiaction.data" placeholder="Data" class="cpbx-input">
 </label>
-                                                                                                                <button mat-flat-button color="primary" class="but-spacer-left"
+                                                                                                                <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                                                                                                   [disabled]="!isReadyToSend(details.controls['antiactionApplication' + antiaction.id], details.controls['antiactionData' + antiaction.id])"
                                                                                                                   (click)="updateAntiaction(antiaction)">
                                                                                                                   Update
                                                                                                                 </button>
                                                                                                                 @if (antiaction.enabled) {
-                                                                                                                  <button mat-flat-button color="accent"
-                                                                                                                    class="but-spacer-left switch-button"
+                                                                                                                  <button
+                                                                                                                    class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                                                                                                     (click)="switchAntiaction(antiaction)">
                                                                                                                     Disable
                                                                                                                   </button>
                                                                                                                 }
                                                                                                                 @if (!antiaction.enabled) {
-                                                                                                                  <button mat-flat-button color="primary"
-                                                                                                                    class="but-spacer-left switch-button"
+                                                                                                                  <button
+                                                                                                                    class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                                                                                                     (click)="switchAntiaction(antiaction)">
                                                                                                                     Enable
                                                                                                                   </button>
                                                                                                                 }
-                                                                                                                <button mat-flat-button color="warn" class="but-spacer-left"
+                                                                                                                <button class="but-spacer-left cpbx-button cpbx-button--danger"
                                                                                                                   (click)="deleteAntiaction(antiaction)">
                                                                                                                   Delete
                                                                                                                 </button>
@@ -424,12 +423,12 @@
 <span class="cpbx-label">Data</span>
 <input name="data" [(ngModel)]="newAntiaction.data" required [name]="'newAntiactionData' + i" appResizeInput [resizeOnString]="newAntiaction.data" placeholder="Data" class="cpbx-input">
 </label>
-                                                                                                                    <button mat-flat-button color="primary" class="but-spacer-left"
+                                                                                                                    <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                                                                                                       [disabled]="!isReadyToSend(details.controls['newAntiactionApplication' + i], details.controls['newAntiactionData' + i])"
                                                                                                                       (click)="addAntiaction(context.id, extension.id, condition.id, i, newAntiaction)">
                                                                                                                       Update
                                                                                                                     </button>
-                                                                                                                    <button mat-stroked-button color="warn" class="but-spacer-left"
+                                                                                                                    <button class="but-spacer-left cpbx-button cpbx-button--danger-outline"
                                                                                                                       (click)="delNewAntiaction(i, context.id, extension.id, condition.id)">
                                                                                                                       Delete
                                                                                                                     </button>
@@ -437,37 +436,37 @@
                                                                                                                 }
                                                                                                               </div>
                                                                                                             }
-                                                                                                            <button mat-flat-button color="accent"
+                                                                                                            <button class="cpbx-button cpbx-button--primary"
                                                                                                               (click)="addNewAntiaction(context.id, extension.id, condition.id)">
                                                                                                               Add
                                                                                                             </button>
                                                                                                           </div>
                                                                                                         </form>
-                                                                                                      </mat-expansion-panel>
+                                                                                                      </app-disclosure>
                                                                                                     }
                                                                                                   </div>
                                                                                                 }
                                                                                               </div>
-                                                                                            </mat-expansion-panel>
+                                                                                            </app-disclosure>
                                                                                           }
                                                                                         </div>
                                                                                       }
                                                                                     </div>
-                                                                                  </mat-expansion-panel>
+                                                                                  </app-disclosure>
                                                                                 }
                                                                               </div>
                                                                             }
-                                                                          </mat-card-content>
-                                                                        </mat-card>
+                                                                          </div>
+                                                                        </section>
                                                                       }
-                                                                    </mat-tab>
-                                                                    <mat-tab label="Add">
+                                                                    </div>
+                                                                    <div class="cpbx-tab-panel" [hidden]="selectedIndex() !== 1">
                                                                       <form class="cpbx-form-panel" (ngSubmit)="onContextSubmit()">
                                                                         <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Name</span>
 <input placeholder="New context name" required name="name" [(ngModel)]="newContextName" class="cpbx-input">
 </label>
-                                                                        <button mat-flat-button color="primary" type="submit">Submit</button>
+                                                                        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
                                                                       </form>
                                                                       <form class="cpbx-form-panel" (ngSubmit)="onExtensionSubmit()">
                                                                         <label class="cpbx-field cpbx-field--md">
@@ -489,10 +488,10 @@
 <span class="cpbx-label">Name</span>
 <input placeholder="New extension name" required name="name" [(ngModel)]="newExtensionName" class="cpbx-input">
 </label>
-                                                                        <button mat-flat-button color="primary" type="submit">Submit</button>
+                                                                        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
                                                                       </form>
-                                                                    </mat-tab>
-                                                                    <mat-tab label="Rename/Delete">
+                                                                    </div>
+                                                                    <div class="cpbx-tab-panel" [hidden]="selectedIndex() !== 2">
                                                                       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
                                                                         <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Context</span>
@@ -517,11 +516,11 @@
 <span class="cpbx-label">Context name</span>
 <input name="Context name" required [ngModel]="list()[contextId].name" [name]="'context::' + contextId" placeholder="Context name" class="cpbx-input">
 </label>
-                                                                              <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['context::' + contextId])"
+                                                                              <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['context::' + contextId])"
                                                                                 (click)="openBottomSheetContext(contextId, deleteForm.controls['context::' + contextId].value, list()[contextId].name, 'rename')">
                                                                                 Update
                                                                               </button>
-                                                                              <button mat-stroked-button color="warn" type="button"
+                                                                              <button class="cpbx-button cpbx-button--danger-outline" type="button"
                                                                                 (click)="openBottomSheetContext(contextId, deleteForm.controls['context::' + contextId].value, list()[contextId].name, 'delete')">
                                                                                 Delete
                                                                               </button>
@@ -533,11 +532,11 @@
 <span class="cpbx-label">Extension name</span>
 <input name="Extension name" required [ngModel]="extension.name" [name]="'extension::' + extension.id" placeholder="Extension name" class="cpbx-input">
 </label>
-                                                                                    <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['extension::' + extension.id])"
+                                                                                    <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['extension::' + extension.id])"
                                                                                       (click)="openBottomSheetExtension(extension.id, deleteForm.controls['extension::' + extension.id].value, extension.name, 'rename')">
                                                                                       Update
                                                                                     </button>
-                                                                                    <button mat-stroked-button color="warn" type="button"
+                                                                                    <button class="cpbx-button cpbx-button--danger-outline" type="button"
                                                                                       (click)="openBottomSheetExtension(extension.id, deleteForm.controls['extension::' + extension.id].value, extension.name, 'delete')">
                                                                                       Delete
                                                                                     </button>
@@ -546,39 +545,39 @@
                                                                               </div>
                                                                             }
                                                                           </form>
-                                                                        </mat-tab>
-                                                                        <mat-tab label="Dialplan Settings">
+                                                                        </div>
+                                                                        <div class="cpbx-tab-panel" [hidden]="selectedIndex() !== 3">
                                                                           <div class="cpbx-form-panel cpbx-form-panel--stack">
                                                                             <h3>Settings</h3>
                                                                             @if (!staticDialplan()) {
-                                                                              <button mat-stroked-button color="basic" type="button"
+                                                                              <button class="cpbx-button cpbx-button--secondary" type="button"
                                                                                 (click)="switchNoProceed()">
                                                                                 Enable static dialplan
                                                                               </button>
                                                                             }
                                                                             @if (staticDialplan()) {
-                                                                              <button mat-stroked-button color="primary" type="button"
+                                                                              <button class="cpbx-button cpbx-button--primary-outline" type="button"
                                                                                 (click)="switchNoProceed()">
                                                                                 Disable static dialplan
                                                                               </button>
                                                                             }
                                                                           </div>
-                                                                          <mat-divider></mat-divider>
+                                                                          <div class="cpbx-divider" role="separator"></div>
                                                                           <div class="cpbx-form-panel cpbx-form-panel--stack">
                                                                             <h3>Dialplan Debug</h3>
                                                                             @if (!debug().enabled) {
-                                                                              <button mat-stroked-button color="basic" type="button"
+                                                                              <button class="cpbx-button cpbx-button--secondary" type="button"
                                                                                 (click)="switchDebug()">
                                                                                 Enable collecting
                                                                               </button>
                                                                             }
                                                                             @if (debug().enabled) {
-                                                                              <button mat-stroked-button color="primary" type="button"
+                                                                              <button class="cpbx-button cpbx-button--primary-outline" type="button"
                                                                                 (click)="switchDebug()">
                                                                                 Disable collecting
                                                                               </button>
                                                                             }
-                                                                            <button mat-stroked-button color="basic" type="button"
+                                                                            <button class="cpbx-button cpbx-button--secondary" type="button"
                                                                               (click)="clearDebug()">
                                                                               Clear
                                                                             </button>
@@ -592,10 +591,9 @@
                                                                                 @for (actions of log.actions; track trackByFn(i, actions); let i = $index) {
                                                                                   <p>application={{actions.application}} data={{actions.data}}</p>
                                                                                 }
-                                                                                <mat-divider></mat-divider>
+                                                                                <div class="cpbx-divider" role="separator"></div>
                                                                               </div>
                                                                             }
                                                                           </div>
-                                                                        </mat-tab>
-                                                                      </mat-tab-group>
+                                                                        </div>
                                                                     }

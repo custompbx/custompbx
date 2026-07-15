@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.cepstral) {
-        state.cepstral = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, cepstral: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

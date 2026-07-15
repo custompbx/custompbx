@@ -5,8 +5,7 @@ import {IglobalVariable, IglobalVariables} from '../../store/global-variables/gl
 import {select, Store} from '@ngrx/store';
 import {AppState, selectGlobalVariablesState} from '../../store/app.states';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../services/toast.service';
 import {ActivatedRoute} from '@angular/router';
 import {
   DelGlobalVariable,
@@ -18,17 +17,17 @@ import {
   ImportGlobalVariables,
   MoveGlobalVariable
 } from '../../store/global-variables/global-variables.actions';
-import {CdkDragDrop} from '@angular/cdk/drag-drop';
+import {CdkDragDrop, DragDropModule} from '@angular/cdk/drag-drop';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../material-module";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {ResizeInputDirective} from "../../directives/resize-input.directive";
 import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
+import {resolvePositionedReorder} from '../../utils/reorder';
 
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective],
+  imports: [CommonModule, DragDropModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective],
   selector: 'app-global-variables',
   templateUrl: './global-variables.component.html',
   styleUrls: ['./global-variables.component.css'],
@@ -38,8 +37,7 @@ export class GlobalVariablesComponent implements OnInit { // Removed OnDestroy
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   // --- Reactive State from NgRx using toSignal ---
@@ -194,20 +192,8 @@ export class GlobalVariablesComponent implements OnInit { // Removed OnDestroy
   }
 
   dropAction(event: CdkDragDrop<string[]>, parent: Array<any>) {
-    // Safely check if indices exist before accessing 'position'
-    if (parent[event.previousIndex] && parent[event.currentIndex] && parent[event.previousIndex].position === parent[event.currentIndex].position) {
-      return;
-    }
-
-    // Safely access properties for dispatch
-    const previousItem = parent[event.previousIndex];
-    if (previousItem) {
-      this.store.dispatch(new MoveGlobalVariable({
-        previous_index: previousItem.position,
-        current_index: parent[event.currentIndex].position,
-        id: previousItem.id
-      }));
-    }
+    const change = resolvePositionedReorder(parent, event.previousIndex, event.currentIndex);
+    if (change) this.store.dispatch(new MoveGlobalVariable(change.move));
   }
 
 }

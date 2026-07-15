@@ -48,8 +48,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.post_load_switch) {
-        state.post_load_switch = <IpostSwitcheModule>{};
-        state.loadCounter = 0;
+        state = {...state, post_load_switch: <IpostSwitcheModule>{}, loadCounter: 0};
       }
 
       return {

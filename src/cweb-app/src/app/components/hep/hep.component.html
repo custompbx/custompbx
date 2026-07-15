@@ -1,9 +1,11 @@
 <app-inner-header name="HEP" [loadCounter]="loadCounter()"></app-inner-header>
-<mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)">
-  <mat-tab label="Search">
+<app-tab-nav ariaLabel="HEP sections" [tabs]="['Search', 'Details', 'Settings']"
+  [disabled]="[false, selectedCallIds().length === 0, false]"
+  [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"></app-tab-nav>
+<div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
     <div>
       <div class="filter-container">
-        <button mat-stroked-button color="basic" class="switch-button"
+        <button class="switch-button cpbx-button cpbx-button--secondary"
           (click)="getRecords()">
           Get Records
         </button>
@@ -41,14 +43,14 @@
 <input name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required placeholder="Value" class="cpbx-input">
 </label>
         @if (!filters()[toEditFilter()]) {
-          <button mat-stroked-button color="basic" class="switch-button"
+          <button class="switch-button cpbx-button cpbx-button--secondary"
             [disabled]="!filter().field_value || !filter().operand || !filter().field"
             (click)="addFilter()">
             Add filter
           </button>
         }
         @if (filters()[toEditFilter()]) {
-          <button mat-flat-button color="primary" class="switch-button"
+          <button class="switch-button cpbx-button cpbx-button--primary"
             [disabled]="!filter().field_value || !filter().operand || !filter().field"
             (click)="saveFilter()">
             Edit filter
@@ -68,34 +70,27 @@
             }
           </select>
 </label>
-        <mat-checkbox [(ngModel)]="sortObject().desc" class="checkbox-spacer-left"
-          [disabled]="sortObject().fields.length == 0 && !sortColumns">DESC
-        </mat-checkbox>
-        <button mat-stroked-button color="basic" class="switch-button"
+        <label class="cpbx-checkbox checkbox-spacer-left">
+          <input class="cpbx-checkbox__input" type="checkbox" [(ngModel)]="sortObject().desc"
+            [disabled]="sortObject().fields.length == 0 && !sortColumns">
+          <span>DESC</span>
+        </label>
+        <button class="switch-button cpbx-button cpbx-button--secondary"
           [disabled]="!sortColumns"
           (click)="addSorter()">
           Add sorting
         </button>
       </div>
       <div class="chips-pad">
-        <mat-chip-listbox aria-label="Filter selection">
+        <div class="cpbx-chip-list" aria-label="Filter selection">
           @for (filterItem of filters(); track filterItem; let i = $index) {
-            <mat-chip color="green"
-              (click)="editFilter(i)"
-              [selectable]="true"
-              [removable]="true"
-              (removed)="removeFilter(filterItem)"
-              selected>
-              {{filterItem.field}} {{filterItem.operand}} {{filterItem.field_value}}
-              <mat-icon matChipRemove>cancel</mat-icon>
-            </mat-chip>
+            <span class="cpbx-chip">
+              <button type="button" class="cpbx-chip__label" (click)="editFilter(i)">{{filterItem.field}} {{filterItem.operand}} {{filterItem.field_value}}</button>
+              <button type="button" class="cpbx-chip__remove" (click)="removeFilter(filterItem)" aria-label="Remove filter">×</button>
+            </span>
           }
           @if (sortObject().fields.length > 0) {
-            <mat-chip color="primary"
-              [selectable]="true"
-              [removable]="true"
-              (removed)="clearSorting()"
-              selected>
+            <span class="cpbx-chip cpbx-chip--sort">
               <span>ORDER BY </span>
               @for (sort of sortObject().fields; track sort; let i = $index) {
                 <span>{{sort}}@if (i < sortObject().fields.length - 1) {
@@ -109,68 +104,53 @@
               @if (!sortObject().desc) {
                 <span>ASC</span>
               }
-              <mat-icon matChipRemove>cancel</mat-icon>
-            </mat-chip>
+              <button type="button" class="cpbx-chip__remove" (click)="clearSorting()" aria-label="Clear sorting">×</button>
+            </span>
           }
-        </mat-chip-listbox>
+        </div>
       </div>
 
       @if (list().hepData) {
         <div class="table-container">
-          <table mat-table class="full-width-table" [dataSource]="list().hepData">
-            @for (disCol of columns; track disCol; let colIndex = $index) {
-              <ng-container matColumnDef="{{disCol}}">
-                <th mat-header-cell *matHeaderCellDef (click)="filter().field = disCol">{{disCol}}</th>
-                <td mat-cell *matCellDef="let element" >
-                  <span>{{element[disCol]}}</span>
-                </td>
-              </ng-container>
-            }
-            <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: columns" (click)="chooseCallId(row)"
-            [ngClass]="{'chosen': toView()[row['sip_call_id']]}"></tr>
+          <table class="cpbx-data-table full-width-table">
+            <thead>
+              <tr>
+                @for (disCol of columns; track disCol) {
+                  <th scope="col" (click)="filter().field = disCol">{{disCol}}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of list().hepData; track $index) {
+                <tr (click)="chooseCallId(row)" [class.chosen]="toView()[row['sip_call_id']]">
+                  @for (disCol of columns; track disCol) {
+                    <td>{{row[disCol]}}</td>
+                  }
+                </tr>
+              }
+            </tbody>
           </table>
-          <!--
-          <mat-accordion displayMode="flat" multi class="mat-table full-width-table">
-            <section matSort class="mat-elevation-z2 mat-header-row">
-              <span
-                class="mat-header-cell"
-                *ngFor="let disCol of columns; let colIndex = index"
-                (click)="filter().field = disCol"
-              >{{disCol}}</span>
-            </section>
-            <mat-expansion-panel *ngFor="let item of list.hepData">
-              <mat-expansion-panel-header class="mat-row">
-                <span class="mat-cell" *ngFor="let disCol of columns">{{item[disCol]}}</span>
-              </mat-expansion-panel-header>
-              <div><pre>{{item | json}}</pre></div>
-            </mat-expansion-panel>
-          </mat-accordion>
-          -->
         </div>
       }
 
       @if (pageTotal() > 0) {
-        <mat-paginator
+        <app-paginator
           [length]="pageTotal()"
           [pageIndex]="pageEvent().pageIndex"
           [pageSize]="pageEvent().pageSize"
           [pageSizeOptions]="paginationScale"
-          (page)="pageEvent.set($event)"
-          >
-        </mat-paginator>
+          (page)="pageEvent.set($event)">
+        </app-paginator>
       }
     </div>
-  </mat-tab>
-  <mat-tab label="Details" [disabled]="selectedCallIds().length == 0">
-    <mat-card>
-      <mat-card-content>
+  </div>
+<div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
+    <section class="cpbx-card">
+      <div class="cpbx-card__content">
         <article>
           <section class="pad">
-            <button mat-stroked-button color="basic" class="switch-button"
-              (click)="openExportBottomSheet()">
-              Export
-            </button>
+            <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsPng()">Export PNG</button>
+            <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsText()">Export TXT</button>
           </section>
           <section class="flow">
             <app-svg-seq-diagram [inData]="list().hepDetails" (toView)="gotMsg($event)"></app-svg-seq-diagram>
@@ -180,13 +160,11 @@
           </section>
         </article>
       <!--pre>{{list.hepDetails | json}}</pre-->
-    </mat-card-content>
-  </mat-card>
-</mat-tab>
-<mat-tab label="Settings">
-  <mat-card>
-    <mat-card-content>
-    </mat-card-content>
-  </mat-card>
-</mat-tab>
-</mat-tab-group>
+      </div>
+    </section>
+</div>
+<div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
+  <section class="cpbx-card">
+    <div class="cpbx-card__content"></div>
+  </section>
+</div>

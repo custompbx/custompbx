@@ -1,8 +1,7 @@
-import {Component, Inject, OnDestroy, OnInit, inject, signal, computed, effect} from '@angular/core';
+import {Component, OnDestroy, inject, signal, computed, effect} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectDirectoryState} from '../../../store/app.states';
 import {
@@ -15,16 +14,19 @@ import {
   ImportDirectory
 } from '../../../store/directory/directory.actions';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../../services/toast.service';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {State} from "../../../store/directory/directory.reducers";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {IconComponent} from '../../icon/icon.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, RouterLink, CpbxSelectDirective],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, RouterLink, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent],
   selector: 'app-groups',
   templateUrl: './groups.component.html',
   styleUrls: ['./groups.component.css']
@@ -33,9 +35,9 @@ export class GroupsComponent implements OnDestroy {
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
+  private confirmation = inject(ConfirmationService);
   private route = inject(ActivatedRoute);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
 
   // --- Reactive State from NgRx using toSignal ---
   private directoryState = toSignal(
@@ -159,7 +161,11 @@ export class GroupsComponent implements OnDestroy {
   }
 
   openBottomSheet(id, newName, oldName, action): void {
-    const sheet = this.bottomSheet.open(GroupsBottomSheetComponent, {data: {newName: newName, oldName: oldName, action: action}});
+    const previousName = typeof oldName === 'string' ? oldName : oldName?.name;
+    const message = action === 'delete'
+      ? `Delete group "${previousName}"?`
+      : `Rename group "${previousName}" to "${newName}"?`;
+    const sheet = this.confirmation.open({data: {action, message}});
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -180,29 +186,4 @@ export class GroupsComponent implements OnDestroy {
   }
   */
   protected readonly Number = Number;
-}
-
-@Component({
-  standalone: true,
-  imports: [CommonModule, MaterialModule],
-  selector: 'app-bottom-sheet-sheet',
-  template: '<div [ngSwitch]="data.action">\n' +
-    '  <h3 *ngSwitchCase="\'delete\'">Are you sure you want to delete group "{{data.oldName}}"?</h3>\n' +
-    '  <h3 *ngSwitchCase="\'rename\'">Are you sure you want to rename group "{{data.oldName}}" to "{{data.newName}}"?</h3>\n' +
-    '</div>' +
-    '<mat-nav-list>\n' +
-    '  <a mat-list-item><button mat-button mat-line color="warn" (click)="confirmAction(true)">Confirm</button></a>\n' +
-    '  <a mat-list-item><button mat-button mat-line color="primary" (click)="confirmAction(false)">Cancel</button></a>\n' +
-    '</mat-nav-list>'
-})
-export class GroupsBottomSheetComponent {
-  // Use inject() for dependencies
-  private bottomSheetRef = inject(MatBottomSheetRef<GroupsBottomSheetComponent>);
-  public data = inject(MAT_BOTTOM_SHEET_DATA);
-
-  // Removed unnecessary constructor as dependencies are injected via inject()
-
-  confirmAction(event: boolean): void {
-    this.bottomSheetRef.dismiss(event);
-  }
 }

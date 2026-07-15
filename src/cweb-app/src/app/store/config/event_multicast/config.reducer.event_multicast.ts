@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.event_multicast) {
-        state.event_multicast = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, event_multicast: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

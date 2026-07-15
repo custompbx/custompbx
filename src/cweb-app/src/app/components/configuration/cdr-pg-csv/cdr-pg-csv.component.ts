@@ -1,12 +1,10 @@
 import { Component, OnDestroy, OnInit, inject, computed, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { MaterialModule } from "../../../../material-module";
 import { select, Store } from '@ngrx/store';
 import { AppState, selectConfigurationState } from '../../../store/app.states';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { AbstractControl, FormsModule } from '@angular/forms';
 import {IcdrPgCsv, Ifield, Iitem, State} from '../../../store/config/config.state.struct';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {ToastService} from '../../../services/toast.service';
 import {
   AddCdrPgCsvField,
   AddCdrPgCsvParam, DeleteCdrPgCsvField, DeleteCdrPgCsvParameter,
@@ -23,7 +21,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  imports: [FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-cdr-pg-csv',
   templateUrl: './cdr-pg-csv.component.html',
   styleUrls: ['./cdr-pg-csv.component.css']
@@ -32,8 +30,7 @@ export class CdrPgCsvComponent implements OnInit, OnDestroy {
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   // --- Reactive State from NgRx using toSignal ---

@@ -1,19 +1,23 @@
 import {Component, DestroyRef, inject} from '@angular/core';
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
-import {BreakpointObserver} from '@angular/cdk/layout';
-import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
-import {filter, map} from 'rxjs/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {filter} from 'rxjs/operators';
 import {UserService} from './services/user.service';
-import {MaterialModule} from "../material-module";
+import {ViewportService} from './services/viewport.service';
 
 import {SidenavComponent} from "./components/sidenav/sidenav.component";
 import {ServiceStatusComponent} from "./components/service-status/service-status.component";
 import {HeaderComponent} from "./components/header/header.component";
 import {ConversationsComponent} from "./components/conversations/conversations.component";
+import {ToastContainerComponent} from './components/toast-container/toast-container.component';
+import {ConfirmationDialogComponent} from './components/confirmation-dialog/confirmation-dialog.component';
+import {IconSpriteService} from './services/icon-sprite.service';
+import {WsDataService} from './services/ws-data.service';
+import {ToastService} from './services/toast.service';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, RouterOutlet, SidenavComponent, ServiceStatusComponent, HeaderComponent, ConversationsComponent],
+  imports: [RouterOutlet, SidenavComponent, ServiceStatusComponent, HeaderComponent, ConversationsComponent, ToastContainerComponent, ConfirmationDialogComponent],
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css']
@@ -24,18 +28,19 @@ export class AppComponent {
   public currentComponent: unknown;
   public showRightNav = false;
   public menuOpen = true;
-  public readonly compact = toSignal(
-    this.breakpointObserver.observe('(max-width: 1023px)').pipe(map(result => result.matches)),
-    {initialValue: false}
-  );
+  public readonly compact = this.viewport.compactNavigation;
 
   private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private router: Router,
     public userService: UserService,
-    private breakpointObserver: BreakpointObserver,
+    private viewport: ViewportService,
+    iconSprite: IconSpriteService,
+    wsData: WsDataService,
+    toast: ToastService,
   ) {
+    iconSprite.load();
     router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
@@ -46,6 +51,13 @@ export class AppComponent {
           this.showRightNav = false;
           if (this.compact()) this.menuOpen = false;
       });
+
+    wsData.proceedMessageType('none')
+      .pipe(
+        filter(message => typeof message?.error === 'string' && message.error.length > 0),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(message => toast.error(message.error));
   }
 
   onRouterOutletActivate(event: unknown): void {
@@ -60,10 +72,4 @@ export class AppComponent {
     this.menuOpen = !this.menuOpen;
   }
 
-  onNavigationOpenedChange(opened: boolean): void {
-    // Desktop keeps the drawer mounted and only changes its width. Updating the
-    // collapsed state from a desktop close event (including the login screen)
-    // made the first authenticated view start collapsed unexpectedly.
-    if (this.compact()) this.menuOpen = opened;
-  }
 }

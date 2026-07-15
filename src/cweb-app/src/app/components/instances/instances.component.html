@@ -1,39 +1,37 @@
 <app-inner-header name="Instances" [loadCounter]="loadCounter()"></app-inner-header>
-<mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start">
-  <mat-tab label="List">
+<app-tab-nav ariaLabel="Instance sections" [tabs]="['List', 'Edit', 'Dump']"
+  [(selectedIndex)]="selectedIndex"></app-tab-nav>
+<div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
 
     <div class="instances-pad">
       @for (instance of list() | keyvalue; track trackByFnId($index, instance)) {
-        <mat-card class="instances-cards">
-          <mat-card-header>
-            <div mat-card-avatar>
-              <mat-icon>multiple_stop</mat-icon>
+        <section class="cpbx-card instances-cards">
+          <header class="cpbx-card__header">
+            <div class="cpbx-card__avatar">
+              <app-icon name="multiple_stop"></app-icon>
             </div>
-            <mat-card-title>
+            <h3 class="cpbx-card__title">
               {{instance.value.name}}
-              <!--          <mat-icon class="current-instance-check" *ngIf="instance.value.id == currentInstanceId"
-              title="Current Instance">check_circle
-            </mat-icon>-->
-          </mat-card-title>
+          </h3>
           <span class="card-header-spacer"></span>
           @if (instance.value.id !== currentInstanceId()) {
-            <button (click)="switchInstance(instance.value.id)" mat-stroked-button color="primary" class="instance-switch-button">Open</button>
+            <button (click)="switchInstance(instance.value.id)" class="instance-switch-button cpbx-button cpbx-button--primary-outline">Open</button>
           }
           @if (instance.value.id === currentInstanceId()) {
             <div class="current-instance-check" title="Current Instance"><span>Active</span></div>
           }
-          <mat-card-subtitle class="subtitle">{{instance.value.description || 'Description'}}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content class="instances-content">
+          <p class="cpbx-card__subtitle subtitle">{{instance.value.description || 'Description'}}</p>
+        </header>
+        <div class="cpbx-card__content instances-content">
           <div>Host: {{instance.value.host}}</div>
           <div>Port: {{instance.value.port}}</div>
-        </mat-card-content>
-    </mat-card>
+        </div>
+    </section>
   }
 </div>
 
-</mat-tab>
-<mat-tab label="Edit">
+</div>
+<div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
   <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
     @for (instance of list() | keyvalue; track trackByFnId($index, instance)) {
       <div class="cpbx-edit-row">
@@ -45,13 +43,12 @@
 <span class="cpbx-label">Instance description</span>
 <input name="instance description" required [ngModel]="instance.value.description" [name]="'instance-description::' + instance.value.id" placeholder="Instance description" class="cpbx-input">
 </label>
-            <button mat-flat-button color="primary" [disabled]="checkDirty(deleteForm.controls['instance-description::' + instance.value.id])"
+            <button class="cpbx-button cpbx-button--primary" [disabled]="checkDirty(deleteForm.controls['instance-description::' + instance.value.id])"
               (click)="updateDescription(instance.value, deleteForm.controls['instance-description::' + instance.value.id].value)">
               Update
             </button>
           </div>
         }
       </form>
-    </mat-tab>
-    <mat-tab label="Dump"></mat-tab>
-  </mat-tab-group>
+    </div>
+<div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2"></div>

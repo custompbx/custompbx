@@ -1,23 +1,22 @@
 <app-inner-header name="Users" [loadCounter]="loadCounter()"></app-inner-header>
 @if (loadCounter() === 0 && !onlyValues(list())?.length) {
-  <mat-card>
-    <mat-card-content>
+  <section class="cpbx-card"><div class="cpbx-card__content">
       <div class="directory-empty">
         <div>
           <h3>No domains yet</h3>
           <p>Create or import a domain before adding users.</p>
         </div>
-      <button mat-stroked-button color="basic" class="switch-button"
+      <button class="switch-button cpbx-button cpbx-button--secondary"
         routerLink="/directory/domains">
         Go to domains
       </button>
       </div>
-    </mat-card-content>
-  </mat-card>
+  </div></section>
 }
 @if (onlyValues(list())?.length) {
-  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
-    <mat-tab label="List">
+  <app-tab-nav ariaLabel="User sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
       @if (list() && objectLenght(list()) > 1) {
         <div class="filter-container">
           <label class="cpbx-field cpbx-field--md">
@@ -32,27 +31,20 @@
       }
       @for (domain of onlyValues(domainFilter()); track trackByFnId($index, domain)) {
         <div class="directory-domain-section">
-          <mat-card>
-            <mat-card-header>
-              <mat-card-subtitle>Domain: <b>{{domain.name}}</b></mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
+          <section class="cpbx-card">
+            <header class="cpbx-card__header"><p class="cpbx-card__subtitle">Domain: <b>{{domain.name}}</b></p></header>
+            <div class="cpbx-card__content">
               @for (user of onlyValuesByParent(userList(), domain.id); track trackByFnId($index, user)) {
-                <mat-expansion-panel (opened)="getDetails(user.id)" (closed)="clearDetails(user.id)"
-                  >
-                  <mat-expansion-panel-header>
-                    <mat-panel-title class="vert-centered">
-                      <mat-icon class="icon-spacer">face</mat-icon>
-                      <span>{{user.name}}</span>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                      Click to get details
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
+                <app-disclosure (opened)="getDetails(user.id)" (closed)="clearDetails(user.id)">
+                  <span disclosureTitle class="vert-centered">
+                    <app-icon class="icon-spacer" name="face"></app-icon>
+                    <span>{{user.name}}</span>
+                  </span>
+                  <span disclosureDescription>Click to get details</span>
                   <form #details="ngForm" class="directory-user-details">
                     @if (user.parameters || user.variables) {
                       <div class="directory-user-actions">
-                        <button mat-stroked-button color="basic" class="switch-button" type="button" (click)="copy(user.id)">
+                        <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="copy(user.id)">
                           Copy parameters / variables
                         </button>
                       </div>
@@ -63,7 +55,7 @@
                           <span class="cpbx-label">Cache</span>
                           <input placeholder="Cache" [ngModel]="user.cache" required [name]="'cache' + user.id" class="cpbx-input">
                         </label>
-                        <button mat-flat-button color="primary" type="button"
+                        <button class="cpbx-button cpbx-button--primary" type="button"
                           [disabled]="!isvalueReadyToSend(details.controls['cache' + user.id])"
                           (click)="updateCache(user.id, details.controls['cache' + user.id])">
                           Update
@@ -74,7 +66,7 @@
                           <span class="cpbx-label">Number Alias</span>
                           <input placeholder="Number Alias" [ngModel]="user.number_alias" [name]="'number_alias' + user.id" class="cpbx-input">
                         </label>
-                        <button mat-flat-button color="primary" type="button"
+                        <button class="cpbx-button cpbx-button--primary" type="button"
                           [disabled]="!isvalueReadyToSend(details.controls['number_alias' + user.id])"
                           (click)="updateNumberAlias(user.id, details.controls['number_alias' + user.id])">
                           Update
@@ -85,7 +77,7 @@
                           <span class="cpbx-label">Cidr</span>
                           <input placeholder="Cidr" [ngModel]="user.cidr" [name]="'cidr' + user.id" class="cpbx-input">
                         </label>
-                        <button mat-flat-button color="primary" type="button"
+                        <button class="cpbx-button cpbx-button--primary" type="button"
                           [disabled]="!isvalueReadyToSend(details.controls['cidr' + user.id])"
                           (click)="updateCidr(user.id, details.controls['cidr' + user.id])">
                           Update
@@ -121,14 +113,14 @@
                             </app-key-value-pad>
                           </div>
                         }
-                      </mat-expansion-panel>
+                      </app-disclosure>
                     }
-                  </mat-card-content>
-                </mat-card>
+                  </div>
+                </section>
               </div>
             }
-          </mat-tab>
-          <mat-tab label="Add">
+          </div>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
             <form class="cpbx-form-panel" (ngSubmit)="onUserSubmit()">
               <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Domain</span>
@@ -138,7 +130,6 @@
                   @for (domain of onlyValues(list()); track domain) {
                     <option [ngValue]="domain.id">{{domain.name}}</option>
                   }
-                <!--mat-hint>{{selectdomain?.sound}}</mat-hint-->
               </select>
 </label>
             <label class="cpbx-field cpbx-field--md">
@@ -149,49 +140,32 @@
 <span class="cpbx-label">Bulk</span>
 <input type="number" max="100" placeholder="Bulk" required name="bulk" [(ngModel)]="bulkUsers" class="cpbx-input">
 </label>
-            <button mat-flat-button color="primary" type="submit">Submit</button>
+            <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
           </form>
-          <mat-card>
-            <mat-card-content>
-              <button mat-stroked-button color="basic" class="switch-button spacer-bottom"
+          <section class="cpbx-card"><div class="cpbx-card__content">
+              <button class="switch-button spacer-bottom cpbx-button cpbx-button--secondary"
                 [disabled]="!XMLBody || !domainId"
                 (click)="ImportXMLUser()"
                 >
                 Import
               </button>
-              <mat-expansion-panel (opened)="initEditor()">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    XML editor
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
+              <app-disclosure (opened)="initEditor()">
+                <span disclosureTitle>XML editor</span>
+                <span disclosureDescription>Click to get details</span>
                 @if (editorInited) {
                   <app-code-editor [(content)]="XMLBody"></app-code-editor>
                 }
-              </mat-expansion-panel>
-              <mat-expansion-panel (opened)="GetWebDirectoryUsersTemplatesList()">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    User Templates
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
-                <mat-card>
+              </app-disclosure>
+              <app-disclosure (opened)="GetWebDirectoryUsersTemplatesList()">
+                <span disclosureTitle>User Templates</span>
+                <span disclosureDescription>Click to get details</span>
+                <div class="cpbx-card cpbx-card__content">
                   @for (template of onlyValues(usersTemplates()); track trackById($index, template)) {
-                    <mat-expansion-panel
+                    <app-disclosure
                       class="tabbed-panel"
                       (opened)="GetWebDirectoryUsersTemplateForm(template.id)">
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>{{template.name}}</mat-panel-title>
-                        <mat-panel-description>
-                          Click to get details
-                        </mat-panel-description>
-                      </mat-expansion-panel-header>
+                      <span disclosureTitle>{{template.name}}</span>
+                      <span disclosureDescription>Click to get details</span>
                       <form class="cpbx-form-panel cpbx-form-panel--stack">
                         @if (templatesItems()[template.id]) {
                           <div>
@@ -204,7 +178,7 @@
                                   <label class="cpbx-field cpbx-field--md">
 <input [placeholder]="parameter.name" [(ngModel)]="parameter.value" [name]="parameter.name" [disabled]="parameter.disabled || !parameter.editable" class="cpbx-input">
 </label>
-                                    <mat-card class="description">{{parameter.description}}</mat-card>
+                                    <div class="description">{{parameter.description}}</div>
                                   </div>
                                 }
                                 @for (variable of templatesItems()[template.id].variables; track trackById($index, variable)) {
@@ -219,18 +193,18 @@
                                   }
                                 </div>
                               }
-                              <button mat-flat-button color="primary" type="submit"
+                              <button class="cpbx-button cpbx-button--primary" type="submit"
                                 (click)="onTemplateUserSubmit(templatesItems()[template.id])">Submit
                               </button>
                             </form>
-                          </mat-expansion-panel>
+                          </app-disclosure>
                         }
-                      </mat-card>
-                    </mat-expansion-panel>
-                  </mat-card-content>
-                </mat-card>
-              </mat-tab>
-              <mat-tab label="Delete/Rename">
+                      </div>
+                    </app-disclosure>
+                  </div>
+                </section>
+              </div>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
                 <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
                   <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Domain</span>
@@ -242,7 +216,6 @@
                           {{domain.name}}
                         </option>
                       }
-                    <!--mat-hint>{{selectdomain?.sound}}</mat-hint-->
                   </select>
 </label>
                 @for (user of onlyValuesByParent(userList(), domainId); track trackByFnId($index, user)) {
@@ -251,32 +224,31 @@
 <span class="cpbx-label">User name</span>
 <input name="user name" required [ngModel]="user.name" [name]="'user::' + user.id" placeholder="User name" class="cpbx-input">
 </label>
-                    <button mat-flat-button color="primary"
+                    <button class="cpbx-button cpbx-button--primary"
                       [disabled]="checkDirty(deleteForm.controls['user::' + user.id])"
                       (click)="openBottomSheet(user.id, deleteForm.controls['user::' + user.id].value, user.name, 'rename')">
                       Update
                     </button>
                     @if (user.enabled) {
-                      <button mat-stroked-button color="basic"
-                        class="switch-button"
+                      <button
+                        class="switch-button cpbx-button cpbx-button--secondary"
                         (click)="switchUser(user)">
                         Disable
                       </button>
                     }
                     @if (!user.enabled) {
-                      <button mat-flat-button color="primary"
-                        class="switch-button"
+                      <button
+                        class="switch-button cpbx-button cpbx-button--primary"
                         (click)="switchUser(user)">
                         Enable
                       </button>
                     }
-                    <button mat-stroked-button color="warn"
+                    <button class="cpbx-button cpbx-button--danger-outline"
                       (click)="openBottomSheet(user.id, deleteForm.controls['user::' + user.id].value, user.name, 'delete')">
                       Delete
                     </button>
                   </div>
                 }
               </form>
-            </mat-tab>
-          </mat-tab-group>
+            </div>
         }

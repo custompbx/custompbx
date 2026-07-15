@@ -1,22 +1,20 @@
 <app-inner-header name="Directory" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
- <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex"
-               *ngIf="list() && list().exists !== false">
-  <mat-tab label="List">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Settings</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-expansion-panel class="cpbx-expansion-panel">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
+ <div *ngIf="list() && list().exists !== false">
+  <app-tab-nav ariaLabel="Directory configuration sections" [tabs]="['List', 'Add', 'Delete/Rename']" [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+    <section class="cpbx-card">
+      <header class="cpbx-card__header">
+        <p class="cpbx-card__subtitle">Settings</p>
+      </header>
+      <div class="cpbx-card__content">
+        <app-disclosure>
+            <span disclosureTitle>
               Settings
-            </mat-panel-title>
-            <mat-panel-description>
+            </span>
+            <span disclosureDescription>
               Click to get details
-            </mat-panel-description>
-          </mat-expansion-panel-header>
+            </span>
           <h3>Params:</h3>
           <app-key-value-pad-2 [exist]="list().settings"
                                [items]="list().settings"
@@ -27,27 +25,25 @@
                                [pending]="loadCounter() > 0"
           >
           </app-key-value-pad-2>
-        </mat-expansion-panel>
-      </mat-card-content>
-    </mat-card>
+        </app-disclosure>
+      </div>
+    </section>
 
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Profiles</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
+    <section class="cpbx-card">
+      <header class="cpbx-card__header">
+        <p class="cpbx-card__subtitle">Profiles</p>
+      </header>
+      <div class="cpbx-card__content">
         <div *ngFor="let item of onlyValues(list().profiles); trackBy: trackByFn" class="panel-wrapper">
-          <mat-expansion-panel class="cpbx-expansion-panel" (opened)="getDirectoryProfilesParams(item.id)"
+          <app-disclosure (opened)="getDirectoryProfilesParams(item.id)"
                                [expanded]="panelCloser['profile' + item.id]">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
+              <span disclosureTitle>
                 {{item.name}}
-              </mat-panel-title>
-              <mat-panel-description>
+              </span>
+              <span disclosureDescription>
                 Click to get details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            <button mat-flat-button color="basic" (click)="copyProfile(item.id)"
+              </span>
+            <button class="cpbx-button cpbx-button--secondary" (click)="copyProfile(item.id)"
                     *ngIf="list().profiles[item.id] && (list().profiles[item.id].parameters)">Copy
             </button>
             <h3>Params:</h3>
@@ -62,13 +58,13 @@
               >
               </app-key-value-pad-2>
             </div>
-          </mat-expansion-panel>
+          </app-disclosure>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-tab>
+      </div>
+    </section>
+  </div>
 
-  <mat-tab label="Add">
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
     <form class="cpbx-form-panel" (ngSubmit)="onProfileSubmit()">
       <label class="kv-field">
         <span class="kv-label">Name</span>
@@ -76,9 +72,9 @@
       </label>
       <button class="kv-button kv-button--primary" type="submit">Submit</button>
     </form>
-  </mat-tab>
+  </div>
 
-  <mat-tab label="Delete/Rename">
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
     <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
       <h3 class="cpbx-form-title">Profile:</h3>
       <div class="cpbx-edit-row" *ngFor="let profile of onlyValues(list().profiles); trackBy: trackByFn">
@@ -100,6 +96,6 @@
         </div>
       </div>
     </form>
-  </mat-tab>
-</mat-tab-group>
+  </div>
+</div>
 

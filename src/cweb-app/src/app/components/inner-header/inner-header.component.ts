@@ -1,10 +1,10 @@
 import {Component, Input} from '@angular/core';
+import {IconComponent} from '../icon/icon.component';
 
-import {MaterialModule} from "../../../material-module";
 
 @Component({
   standalone: true,
-    imports: [MaterialModule],
+    imports: [IconComponent],
     selector: 'app-inner-header',
     templateUrl: './inner-header.component.html',
     styleUrls: ['./inner-header.component.css']

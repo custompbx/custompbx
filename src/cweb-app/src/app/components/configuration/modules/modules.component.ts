@@ -1,7 +1,6 @@
 import {Component, DestroyRef, inject, signal, computed, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
 import {State} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
@@ -13,26 +12,29 @@ import {
   SwitchModule, TruncateModuleConfig,
   UnloadModule
 } from '../../../store/config/config.actions';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import {RouterLink} from '@angular/router';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {FormsModule} from "@angular/forms";
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, RouterLink, CodeEditorComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, RouterLink, CodeEditorComponent, TabNavComponent, DisclosureComponent],
   selector: 'app-modules',
   templateUrl: './modules.component.html',
   styleUrls: ['./modules.component.css']
 })
 export class ModulesComponent {
 
+  readonly selectedTab = signal(0);
+
   private store = inject(Store<AppState>);
-  private _snackBar = inject(MatSnackBar);
-  private bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(ToastService);
+  private bottomSheet = inject(ConfirmationService);
 
   private configsObservable = this.store.pipe(select(selectConfigurationState));
   private configsSignal = toSignal(this.configsObservable, { initialValue: {} as State });
@@ -130,7 +132,7 @@ export class ModulesComponent {
           case1Text: 'Are you sure you want to delete config of module "' + name + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

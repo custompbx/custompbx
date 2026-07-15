@@ -128,8 +128,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.conference) {
-        state.conference = <Iconference>{};
-        state.loadCounter = 0;
+        state = {...state, conference: <Iconference>{}, loadCounter: 0};
       }
 
       return {
@@ -156,8 +155,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.conference) {
-        state.conference = <Iconference>{};
-        state.loadCounter = 0;
+        state = {...state, conference: <Iconference>{}, loadCounter: 0};
       }
 
       return {
@@ -179,8 +177,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.conference) {
-        state.conference = <Iconference>{};
-        state.loadCounter = 0;
+        state = {...state, conference: <Iconference>{}, loadCounter: 0};
       }
 
       return {
@@ -201,8 +198,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.conference) {
-        state.conference = <Iconference>{};
-        state.loadCounter = 0;
+        state = {...state, conference: <Iconference>{}, loadCounter: 0};
       }
 
       return {
@@ -951,8 +947,7 @@ export function reducer(state = initialState, action: All): State {
       const groups = action.payload.response.data['conference_layouts_groups'] || {};
 
       if (!state.conference) {
-        state.conference = <Iconference>{};
-        state.loadCounter = 0;
+        state = {...state, conference: <Iconference>{}, loadCounter: 0};
       }
 
       return {
@@ -1310,22 +1305,16 @@ export function reducer(state = initialState, action: All): State {
         return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
-      if (!state.conference) {
-        state.conference = <Iconference>{};
-        state.loadCounter = 0;
-      }
-      if (!state.conference.layouts) {
-        state.conference.layouts = <Ilayouts>{};
-        state.loadCounter = 0;
-      }
+      const conference = state.conference || <Iconference>{};
+      const layouts = conference.layouts || <Ilayouts>{};
 
       return {
         ...state,
         conference: {
-          ...state.conference,
-          layouts: {...state.conference.layouts, conference_layouts: {
-            ...state.conference.layouts.conference_layouts,
-            [data.id]: {...data, images: {...state.conference.layouts.conference_layouts[data.id]?.images}}}},
+          ...conference,
+          layouts: {...layouts, conference_layouts: {
+            ...layouts.conference_layouts,
+            [data.id]: {...data, images: {...layouts.conference_layouts?.[data.id]?.images}}}},
           errorMessage: action.payload.response.error || null,
         },
         loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
@@ -1339,22 +1328,16 @@ export function reducer(state = initialState, action: All): State {
         return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
-      if (!state.conference) {
-        state.conference = <Iconference>{};
-        state.loadCounter = 0;
-      }
-      if (!state.conference.layouts) {
-        state.conference.layouts = <Ilayouts>{};
-        state.loadCounter = 0;
-      }
+      const conference = state.conference || <Iconference>{};
+      const layouts = conference.layouts || <Ilayouts>{};
 
       return {
         ...state,
         conference: {
-          ...state.conference,
-          layouts: {...state.conference.layouts, conference_layouts_groups: {
-            ...state.conference.layouts.conference_layouts_groups,
-            [data.id]: {...data, layouts: {...state.conference.layouts.conference_layouts_groups[data.id]?.layouts}}}},
+          ...conference,
+          layouts: {...layouts, conference_layouts_groups: {
+            ...layouts.conference_layouts_groups,
+            [data.id]: {...data, layouts: {...layouts.conference_layouts_groups?.[data.id]?.layouts}}}},
           errorMessage: action.payload.response.error || null,
         },
         loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,

@@ -1,30 +1,30 @@
 <app-inner-header name="Global Variables" [loadCounter]="loadCounter()"></app-inner-header>
 @if (list() && ObjLength(list()) == 0) {
-  <mat-card>
-    <mat-card-content>
+  <section class="cpbx-card">
+    <div class="cpbx-card__content">
       No global variables set in database you can import them from freeswitch instance
-      <button mat-stroked-button color="basic" class="switch-button"
+      <button class="switch-button cpbx-button cpbx-button--secondary"
               (click)="ImportGlobalVariables()">
         Import
       </button>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 } @else {
-<mat-card>
-  <mat-card-content>
+<section class="cpbx-card">
+  <div class="cpbx-card__content">
     <h3>
       ⚠ Local vars.xml will be overwritten.
     </h3>
     <form #details="ngForm">
       <h3>Global Variables:</h3>
       @if (list()) {
-        <div cdkDropList
+        <div class="global-variable-list" cdkDropList
              (cdkDropListDropped)="dropAction($event, onlySortedValues(list()))">
           @for (variable of onlySortedValues(list()); track variable.id) {
             <div class="cpbx-edit-row" cdkDrag>
               @if (variable.id && !isArray(variable)) {
                 <ng-container>
-                  <mat-icon class="dragHandler" cdkDragHandle>unfold_more</mat-icon>
+                  <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move item">::</button>
                   <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Name</span>
 <input name="name" [(ngModel)]="variable.name" required [disabled]="!variable.enabled || variable.dynamic" [name]="'variableName' + variable.id" appResizeInput [resizeOnString]="variable.name" placeholder="Name" class="cpbx-input">
@@ -44,22 +44,22 @@
                       }
                     </select>
 </label>
-                  <button mat-flat-button color="primary" type="button"
+                  <button class="cpbx-button cpbx-button--primary" type="button"
                           [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.id], details.controls['variableValue' + variable.id], details.controls['variableType' + variable.id]) || variable.dynamic"
                           (click)="updateGlobalVariable(variable)">
                     Update
                   </button>
-                  <button *ngIf="variable.enabled" mat-stroked-button color="basic" type="button"
+                  <button *ngIf="variable.enabled" type="button"
                           [disabled]="variable.dynamic"
-                          class="switch-button" (click)="switchGlobalVariable(variable)">
+                          class="switch-button cpbx-button cpbx-button--secondary" (click)="switchGlobalVariable(variable)">
                     Disable
                   </button>
-                  <button *ngIf="!variable.enabled" mat-stroked-button color="primary" type="button"
+                  <button *ngIf="!variable.enabled" type="button"
                           [disabled]="variable.dynamic"
-                          class="switch-button" (click)="switchGlobalVariable(variable)">
+                          class="switch-button cpbx-button cpbx-button--primary-outline" (click)="switchGlobalVariable(variable)">
                     Enable
                   </button>
-                  <button mat-stroked-button color="warn" type="button" (click)="deleteGlobalVariable(variable)"
+                  <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="deleteGlobalVariable(variable)"
                           [disabled]="variable.dynamic">
                     Delete
                   </button>
@@ -68,7 +68,7 @@
             </div>
           }
           @if (list()) {
-            <div>
+            <div class="global-variable-drafts">
               @for (variable of newList(); track $index; let i = $index) {
                 <div class="cpbx-edit-row">
                   @if (variable) {
@@ -92,12 +92,12 @@
                           }
                         </select>
 </label>
-                      <button mat-flat-button color="primary" type="button"
-                              [disabled]="!isReadyToSendThree(details.controls['newValue' + i], details.controls['newName' + i], details.controls['newNodeDomain' + i])"
+                      <button class="cpbx-button cpbx-button--primary" type="button"
+                              [disabled]="!isReadyToSendThree(details.controls['newValue' + i], details.controls['newName' + i], details.controls['newType' + i])"
                               (click)="newGlobalVariable(i, details.controls['newName' + i].value, details.controls['newValue' + i].value, details.controls['newType' + i].value)">
                         Update
                       </button>
-                      <button mat-stroked-button color="warn" type="button" (click)="dropNewGlobalVariable(i)">
+                      <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="dropNewGlobalVariable(i)">
                         Delete
                       </button>
                     </ng-container>
@@ -108,12 +108,12 @@
           }
         </div>
       }
-      <button mat-flat-button color="primary" type="button" (click)="addNewGlobalVariable()">
+      <button class="cpbx-button cpbx-button--primary" type="button" (click)="addNewGlobalVariable()">
         Add
       </button>
     </form>
-  </mat-card-content>
-</mat-card>
+  </div>
+</section>
 }
 
 

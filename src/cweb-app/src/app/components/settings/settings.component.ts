@@ -1,7 +1,6 @@
 import { Component, inject, effect, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from "../../../material-module";
 import { select, Store } from '@ngrx/store';
 import { AppState, selectDirectoryState, selectSettingsState } from '../../store/app.states';
 import {
@@ -40,19 +39,21 @@ import {
   DelWebDirectoryUsersTemplateVariable,
   StoreNewWebDirectoryUsersTemplateVariable, UpdateWebDirectoryUsersTemplateVariable, AddWebDirectoryUsersTemplateVariable,
 } from '../../store/settings/settings.actions';
-import {ConfirmBottomSheetComponent} from '../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../services/confirmation.service';
+import {ToastService} from '../../services/toast.service';
 import { AbstractControl, FormsModule, UntypedFormGroup } from '@angular/forms';
 import { GetDirectoryDomains, GetDirectoryUsers } from '../../store/directory/directory.actions';
 import { Isettings, IwebUser } from '../../store/settings/settings.reducers';
 import { InnerHeaderComponent } from "../inner-header/inner-header.component";
+import {TabNavComponent} from '../tab-nav/tab-nav.component';
 import {ResizeInputDirective} from "../../directives/resize-input.directive";
 import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
+import {DisclosureComponent} from '../disclosure/disclosure.component';
+import {IconComponent} from '../icon/icon.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent],
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
@@ -60,10 +61,13 @@ import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
 // Removed OnInit and OnDestroy as toSignal handles subscriptions and cleanup
 export class SettingsComponent {
 
+  public webUsersTabIndex = 0;
+  public webUserTemplatesTabIndex = 0;
+
   // Injectable services
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
 
   // --- NgRx State converted to Signals (toSignal handles subscriptions automatically) ---
 
@@ -96,7 +100,6 @@ export class SettingsComponent {
   public password: string = '';
   public groupId: 0 = 0;
   public acceptFile: 'image/*' = 'image/*';
-  public columns: Array<string> = ['token', 'created', 'purpose'];
   public templateName: string = '';
   public domainId: number = 0;
   public newUserFormSent: UntypedFormGroup | null = null; // Stays as a mutable property
@@ -234,7 +237,7 @@ export class SettingsComponent {
           case2Text: 'Are you sure you want to rename user "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -277,7 +280,7 @@ export class SettingsComponent {
           case1Text: 'Are you sure you want to remove this token?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -324,7 +327,7 @@ export class SettingsComponent {
           case1Text: 'Are you sure you want to delete template "' + name + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

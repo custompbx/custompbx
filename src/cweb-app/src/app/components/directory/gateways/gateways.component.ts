@@ -1,7 +1,6 @@
 import {Component, OnDestroy, OnInit, inject, signal, computed, effect} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-import {MaterialModule} from "../../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectDirectoryState} from '../../../store/app.states';
 import {
@@ -28,18 +27,21 @@ import {
   SwitchDirectoryUserGatewayParameter,
 } from '../../../store/directory/directory.actions';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {ConfirmationService} from '../../../services/confirmation.service';
 import {Idetails, IdirectionItem} from '../../../store/directory/directory.reducers';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
+import {ToastService} from '../../../services/toast.service';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {KeyValuePadComponent} from "../../key-value-pad/key-value-pad.component";
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
+import {IconComponent} from '../../icon/icon.component';
+import {KeyValuePad2Component} from '../../key-value-pad-2/key-value-pad-2.component';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, RouterLink, KeyValuePadComponent, InnerHeaderComponent, CpbxSelectDirective],
+  imports: [FormsModule, RouterLink, KeyValuePadComponent, KeyValuePad2Component, InnerHeaderComponent, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent],
   selector: 'app-gateways',
   templateUrl: './gateways.component.html',
   styleUrls: ['./gateways.component.css']
@@ -48,8 +50,8 @@ export class GatewaysComponent implements OnInit, OnDestroy {
 
   // --- Dependency Injection using inject() ---
   protected store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   // --- Reactive State from NgRx using toSignal ---
@@ -88,6 +90,21 @@ export class GatewaysComponent implements OnInit, OnDestroy {
     deleteItem: DeleteDirectoryUserGatewayParameter,
     updateItem: UpdateDirectoryUserGatewayParameter,
     pasteItems: StorePasteDirectoryUserGatewayParameters,
+  };
+  public gatewayVariableMask = {
+    name: {name: 'name'},
+    value: {name: 'value'},
+    extraField1: {name: 'direction', size: 'sm' as const, options: ['', 'inbound', 'outbound']},
+  };
+  public gatewayVariableDispatchers = {
+    addNewItemField: (id: number) => this.addVarField(id),
+    switchItem: (variable: IdirectionItem) => this.switchVar(variable),
+    addItem: (id: number, index: number, name: string, value: string, direction: string) =>
+      this.newVar(id, index, name, value, direction),
+    dropNewItem: (id: number, index: number) => this.dropNewVar(id, index),
+    deleteItem: (variable: IdirectionItem) => this.deleteVar(variable),
+    updateItem: (variable: IdirectionItem) => this.updateVar(variable),
+    pasteItems: (id: number) => this.pasteVars(id),
   };
 
   private gatewayEffect = effect(() => {
@@ -229,7 +246,7 @@ export class GatewaysComponent implements OnInit, OnDestroy {
           case2Text: 'Are you sure you want to rename gateway "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

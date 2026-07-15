@@ -1,13 +1,14 @@
 <app-inner-header name="ODBC CDR" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start">
-    <mat-tab label="List">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Settings</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
+  <app-tab-nav ariaLabel="ODBC CDR sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+      <section class="cpbx-card">
+        <header class="cpbx-card__header">
+          <p class="cpbx-card__subtitle">Settings</p>
+        </header>
+        <div class="cpbx-card__content">
           <h3>Params:</h3>
           <app-key-value-pad-2 [exist]="list().settings"
             [items]="list().settings"
@@ -18,25 +19,23 @@
             [pending]="loadCounter() > 0"
             >
           </app-key-value-pad-2>
-        </mat-card-content>
-      </mat-card>
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Tables</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
+        </div>
+      </section>
+      <section class="cpbx-card">
+        <header class="cpbx-card__header">
+          <p class="cpbx-card__subtitle">Tables</p>
+        </header>
+        <div class="cpbx-card__content">
           @for (table of onlyValues(list().tables); track trackByFnId($index, table)) {
             <div>
-              <mat-expansion-panel (opened)="GetOdbcCdrField(table.id)"
+              <app-disclosure (opened)="GetOdbcCdrField(table.id)"
                 [expanded]="panelCloser['fifo' + table.id]">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
+                  <span disclosureTitle>
                     {{table.name}}
-                  </mat-panel-title>
-                  <mat-panel-description>
+                  </span>
+                  <span disclosureDescription>
                     Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
+                  </span>
                 <h3>Log Leg</h3>
                 @if (table.id) {
                   <div class="cpbx-edit-row">
@@ -45,7 +44,7 @@
 <span class="cpbx-label">Log-leg</span>
 <input name="log-leg" [(ngModel)]="table.log_leg" [disabled]="!table.enabled" [name]="'tableLogLeg' + table.id" placeholder="Log-leg" class="cpbx-input">
 </label>
-                        <button mat-flat-button color="primary" type="button"
+                        <button class="cpbx-button cpbx-button--primary" type="button"
                           [disabled]="!isReadyToSendOne(details.controls['tableLogLeg' + table.id])"
                           (click)="updateTable(table)">
                           Update
@@ -64,22 +63,22 @@
                     [pending]="loadCounter() > 0"
                     >
                   </app-key-value-pad-2>
-                </mat-expansion-panel>
+                </app-disclosure>
               </div>
             }
-          </mat-card-content>
-        </mat-card>
-      </mat-tab>
-      <mat-tab label="Add">
+          </div>
+        </section>
+      </div>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
         <form class="cpbx-form-panel" (ngSubmit)="onTableSubmit()">
           <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Name</span>
 <input placeholder="New table name" required name="name" [(ngModel)]="newTableName" class="cpbx-input">
 </label>
-          <button mat-flat-button color="primary" type="submit">Submit</button>
+          <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
         </form>
-      </mat-tab>
-      <mat-tab label="Delete/Rename">
+      </div>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
         <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
           @if (list().tables) {
             <div>
@@ -90,11 +89,11 @@
 <span class="cpbx-label">Table name</span>
 <input name="Table name" required [ngModel]="table.name" [name]="'Table::' + table.id" placeholder="Table name" class="cpbx-input">
 </label>
-                    <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['Table::' + table.id])"
+                    <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['Table::' + table.id])"
                       (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'rename')">
                       Update
                     </button>
-                    <button mat-stroked-button color="warn" type="button"
+                    <button class="cpbx-button cpbx-button--danger-outline" type="button"
                       (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'delete')">
                       Delete
                     </button>
@@ -103,6 +102,5 @@
               </div>
             }
           </form>
-        </mat-tab>
-      </mat-tab-group>
+        </div>
     }

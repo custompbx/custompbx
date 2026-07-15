@@ -1,18 +1,16 @@
 import {Component, OnDestroy, OnInit, inject, signal, computed, effect} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-import {MaterialModule} from "../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectHEPState} from '../../store/app.states';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {PageEvent} from '@angular/material/paginator';
+import {ToastService} from '../../services/toast.service';
+import {CpbxPageEvent as PageEvent, PaginatorComponent} from '../paginator/paginator.component';
 import {State} from '../../store/hep/hep.reducers';
 import {GetHEP, GetHEPDetails} from '../../store/hep/hep.actions';
-import {MAT_BOTTOM_SHEET_DATA, MatBottomSheet, MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {FormsModule} from "@angular/forms";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
+import {TabNavComponent} from '../tab-nav/tab-nav.component';
 import {SvgSeqDiagramComponent} from "../svg-seq-diagram/svg-seq-diagram.component";
-import {NgClass} from "@angular/common";
 import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
 
 export interface IfilterField {
@@ -95,70 +93,9 @@ function downloadSvgAsPng(svgElement: SVGSVGElement, filename: string, scale = 1
   });
 }
 
-// Defining the BottomSheetExportComponent here to ensure it's defined before it's used
 @Component({
   standalone: true,
-  imports: [MaterialModule],
-  selector: 'app-bottom-sheet-export',
-  template: `
-    <mat-nav-list>
-      <a mat-list-item (click)="saveTextAsPng()">
-        <span mat-line>PNG</span>
-        <span mat-line>Export as png picture</span>
-      </a>
-
-      <a mat-list-item (click)="saveTextAsFile()">
-        <span mat-line>TXT</span>
-        <span mat-line>Export as txt file</span>
-      </a>
-    </mat-nav-list>
-  `
-})
-export class BottomSheetExportComponent {
-  // Use inject for dependencies
-  private _bottomSheetRef = inject(MatBottomSheetRef<BottomSheetExportComponent>);
-  public data = inject(MAT_BOTTOM_SHEET_DATA); // Data is a plain value
-
-  saveTextAsFile() {
-    this._bottomSheetRef.dismiss();
-
-    let txt = '';
-    let filename = '';
-    const type = 'text/plain';
-
-    // Check if data is array and has elements
-    if (Array.isArray(this.data) && this.data.length > 0) {
-      filename = this.data[0].hep_timestamp + '.txt';
-      this.data.forEach((msg: any) => {
-        txt += '\n' + msg.hep_payload;
-      });
-    } else {
-      filename = 'empty.txt';
-    }
-
-    const url = URL.createObjectURL(
-      new Blob([txt], {
-        type: type
-      })
-    );
-    triggerDownload(url, filename);
-    URL.revokeObjectURL(url);
-  }
-
-  saveTextAsPng() {
-    this._bottomSheetRef.dismiss();
-    const svgElement = document.getElementById('idOfMySvgGraphic');
-    if (!(svgElement instanceof SVGSVGElement)) {
-      console.error('HEP callflow SVG was not found.');
-      return;
-    }
-    downloadSvgAsPng(svgElement, 'callflow.png').catch(error => console.error(error));
-  }
-}
-
-@Component({
-  standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, SvgSeqDiagramComponent, NgClass, CpbxSelectDirective],
+  imports: [FormsModule, InnerHeaderComponent, SvgSeqDiagramComponent, CpbxSelectDirective, TabNavComponent, PaginatorComponent],
   selector: 'app-hep',
   templateUrl: './hep.component.html',
   styleUrls: ['./hep.component.css']
@@ -167,8 +104,7 @@ export class HepComponent implements OnInit, OnDestroy {
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private _snackBar = inject(MatSnackBar);
-  private _bottomSheet = inject(MatBottomSheet);
+  private _snackBar = inject(ToastService);
 
   // --- Reactive State from NgRx using toSignal ---
   private hepState = toSignal(
@@ -384,10 +320,21 @@ export class HepComponent implements OnInit, OnDestroy {
     this.showMsg.set(msg);
   }
 
-  openExportBottomSheet(): void {
-    // Pass hepDetails from the computed list
-    this._bottomSheet.open(BottomSheetExportComponent, {
-      data: this.list().hepDetails,
-    });
+  exportAsText(): void {
+    const data = this.list().hepDetails;
+    const text = Array.isArray(data) ? data.map((message: any) => message.hep_payload).join('\n') : '';
+    const filename = Array.isArray(data) && data.length > 0 ? `${data[0].hep_timestamp}.txt` : 'empty.txt';
+    const url = URL.createObjectURL(new Blob([text], {type: 'text/plain'}));
+    triggerDownload(url, filename);
+    URL.revokeObjectURL(url);
+  }
+
+  exportAsPng(): void {
+    const svgElement = document.getElementById('idOfMySvgGraphic');
+    if (!(svgElement instanceof SVGSVGElement)) {
+      this._snackBar.error('HEP callflow is not available to export.');
+      return;
+    }
+    downloadSvgAsPng(svgElement, 'callflow.png').catch(() => this._snackBar.error('Unable to export HEP callflow.'));
   }
 }

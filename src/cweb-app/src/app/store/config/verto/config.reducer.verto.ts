@@ -49,8 +49,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.verto) {
-        state.verto = <Iverto>{};
-        state.loadCounter = 0;
+        state = {...state, verto: <Iverto>{}, loadCounter: 0};
       }
 
       return {
@@ -74,8 +73,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.verto) {
-        state.verto = <Iverto>{};
-        state.loadCounter = 0;
+        state = {...state, verto: <Iverto>{}, loadCounter: 0};
       }
 
       return {

@@ -48,7 +48,7 @@ export interface IwebUser {
   verto_ws: string;
   stun: string;
   avatar_format: string;
-  tokens: Array<{id: number}>;
+  tokens: Array<{id: number; token?: string; created?: string; purpose?: string}>;
   webrtc_lib: string;
   ws: string;
   group_id: number;
@@ -329,15 +329,20 @@ export function reducer(state = initialState, action: All): State {
     case SettingsActionTypes.StoreAddWebDirectoryUsersTemplateParameter:
     case SettingsActionTypes.StoreGetWebDirectoryUsersTemplateParameters: {
       let data = action.payload.response['data'] || {};
+      let newWUTPs = state.newWUTPs;
       if (data.id) {
         if (action.payload.index || action.payload.index === 0) {
           const params = state.newWUTPs[data.parent.id] || [];
-          params.splice(action.payload.index, 1);
+          newWUTPs = {
+            ...state.newWUTPs,
+            [data.parent.id]: params.filter((_, index) => index !== action.payload.index),
+          };
         }
         data = {[data.id]: data};
       }
       return {
         ...state,
+        newWUTPs,
         webUsersTemplateParameters: {...state.webUsersTemplateParameters, ...data},
         loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
@@ -357,10 +362,9 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.id;
       const index = action.payload.index;
       const params = state.newWUTPs[id] || [];
-      params.splice(index, 1);
       return {
         ...state,
-        newWUTPs: {...state.newWUTPs, [id]: [...params]},
+        newWUTPs: {...state.newWUTPs, [id]: params.filter((_, itemIndex) => itemIndex !== index)},
       };
     }
 
@@ -380,15 +384,20 @@ export function reducer(state = initialState, action: All): State {
     case SettingsActionTypes.StoreAddWebDirectoryUsersTemplateVariable:
     case SettingsActionTypes.StoreGetWebDirectoryUsersTemplateVariables: {
       let data = action.payload.response['data'] || {};
+      let newWUTVs = state.newWUTVs;
       if (data.id) {
         if (action.payload.index || action.payload.index === 0) {
           const params = state.newWUTVs[data.parent.id] || [];
-          params.splice(action.payload.index, 1);
+          newWUTVs = {
+            ...state.newWUTVs,
+            [data.parent.id]: params.filter((_, index) => index !== action.payload.index),
+          };
         }
         data = {[data.id]: data};
       }
       return {
         ...state,
+        newWUTVs,
         webUsersTemplateVariables: {...state.webUsersTemplateVariables, ...data},
         loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,
         errorMessage: action.payload.response.error,
@@ -408,10 +417,9 @@ export function reducer(state = initialState, action: All): State {
       const id = action.payload.id;
       const index = action.payload.index;
       const params = state.newWUTVs[id] || [];
-      params.splice(index, 1);
       return {
         ...state,
-        newWUTVs: {...state.newWUTVs, [id]: [...params]},
+        newWUTVs: {...state.newWUTVs, [id]: params.filter((_, itemIndex) => itemIndex !== index)},
       };
     }
 

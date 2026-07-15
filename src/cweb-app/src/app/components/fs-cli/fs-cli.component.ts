@@ -1,18 +1,18 @@
 import {Component, OnDestroy, OnInit, inject, signal, computed, effect} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-import {MaterialModule} from "../../../material-module";
 import {State} from '../../store/fscli/fscli.reducers';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectFSCLIState} from '../../store/app.states';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../services/toast.service';
 import {SendFSCLICommand} from '../../store/fscli/fscli.actions';
 import {FormsModule} from "@angular/forms";
 import {ResizeInputDirective} from "../../directives/resize-input.directive";
+import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, ResizeInputDirective],
+  imports: [FormsModule, ResizeInputDirective, InnerHeaderComponent],
   selector: 'app-fs-cli',
   templateUrl: './fs-cli.component.html',
   styleUrls: ['./fs-cli.component.css']
@@ -21,7 +21,7 @@ export class FsCliComponent implements OnInit, OnDestroy {
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
 
   // --- Reactive State from NgRx using toSignal ---
   private fscliState = toSignal(

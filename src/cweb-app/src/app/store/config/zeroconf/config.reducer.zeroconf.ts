@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.zeroconf) {
-        state.zeroconf = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, zeroconf: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

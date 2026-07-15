@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.xml_cdr) {
-        state.xml_cdr = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, xml_cdr: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

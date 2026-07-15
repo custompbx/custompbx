@@ -1,16 +1,16 @@
 import {Component, effect, inject, Input, OnInit} from '@angular/core';
 
-import {MaterialModule} from "../../../material-module";
 import {Iuser} from '../../store/auth/auth.reducers';
 import {UserService} from '../../services/user.service';
 import {Subscription} from 'rxjs';
 import {IsActiveMatchOptions, Router, RouterLink} from '@angular/router';
 import {Store} from "@ngrx/store";
 import {AppState} from "../../store/app.states";
+import {IconComponent} from '../icon/icon.component';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, RouterLink],
+  imports: [RouterLink, IconComponent],
     selector: 'app-sidenav',
     templateUrl: './sidenav.component.html',
     styleUrls: ['./sidenav.component.css']

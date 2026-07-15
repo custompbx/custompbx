@@ -1,4 +1,4 @@
-.but-spacer-left {
+﻿.but-spacer-left {
   margin-left: 5px;
 }
 
@@ -6,12 +6,5 @@
   margin-top: 15px;
 }
 
-.mat-expansion-panel {
-  border-radius: 0;
-}
-
-.mat-expansion-panel-header {
-  border-radius: 0;
-}
 
 

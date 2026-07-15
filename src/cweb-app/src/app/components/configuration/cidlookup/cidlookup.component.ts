@@ -1,12 +1,10 @@
 import {Component, inject, computed, OnInit, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../../services/toast.service';
 import {ActivatedRoute} from '@angular/router';
 import {
   DelCidlookupParameter,
@@ -23,7 +21,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-cidlookup', // Changed selector
   templateUrl: './cidlookup.component.html', // Kept original template reference
   styleUrls: ['./cidlookup.component.css']
@@ -32,8 +30,7 @@ export class CidlookupComponent implements OnInit { // Removed OnDestroy
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   // --- Reactive State from NgRx using toSignal ---

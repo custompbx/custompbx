@@ -1,4 +1,5 @@
 :host {
   display: block;
-  max-width: 72rem;
+  max-width: none;
+  width: 100%;
 }

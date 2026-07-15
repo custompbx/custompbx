@@ -1,7 +1,3 @@
-mat-form-field {
-  padding: 0 5px;
-}
-
 .grid-inner {
   display: inline-block;
   margin-top: 8px;
@@ -10,14 +6,6 @@ mat-form-field {
 .grid-inner-title {
   display: inline-block;
   margin-top: 15px;
-}
-
-.dragHandler {
-
-}
-
-.dragHandler {
-  cursor: move;
 }
 
 .continue-label {
@@ -39,17 +27,37 @@ mat-form-field {
 }
 
 .expanded {
-  width: 230px;
+  width: 100%;
 }
 
-.mat-progress-bar {
+:host,
+.cpbx-tab-panel,
+.panel-wrapper,
+app-disclosure,
+.cpbx-disclosure-host {
+  box-sizing: border-box;
   display: block;
-  height: 2px;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  position: fixed;
-  transition: opacity 250ms linear;
+  max-width: 100%;
   width: 100%;
-  z-index: 1000;
+}
+
+.panel-wrapper {
+  flex: 1 0 100%;
+  min-width: 0;
+}
+
+.cpbx-tab-panel app-disclosure,
+.cpbx-tab-panel .panel-wrapper,
+.cpbx-tab-panel .grid-inner,
+.cpbx-tab-panel .grid-inner-title {
+  box-sizing: border-box;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.continue-box {
+  align-items: center;
+  display: inline-flex;
+  gap: .5rem;
+  margin: 0 0 .75rem;
 }

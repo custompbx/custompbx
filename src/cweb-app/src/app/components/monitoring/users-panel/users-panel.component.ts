@@ -1,12 +1,10 @@
 import {Component, computed, effect, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
 import {Observable, Subscription} from 'rxjs';
 import {Idetails, Iusers, State as DirectoryState} from '../../../store/directory/directory.reducers';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState, selectDirectoryState, selectPhoneState} from '../../../store/app.states';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../../services/toast.service';
 import {ActivatedRoute} from '@angular/router';
 import {StoreCommand} from '../../../store/phone/phone.actions';
 import {
@@ -21,11 +19,13 @@ import {toSignal} from "@angular/core/rxjs-interop";
 import {State as PhoneState} from "../../../store/phone/phone.reducers";
 import {State as ConfigState} from "../../../store/config/config.state.struct";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {IconComponent} from '../../icon/icon.component';
 
 
 @Component({
 standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, FormatTimerPipe, CpbxSelectDirective],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, FormatTimerPipe, CpbxSelectDirective, TabNavComponent, IconComponent],
     selector: 'app-users-panel',
     templateUrl: './users-panel.component.html',
     styleUrls: ['./users-panel.component.css']
@@ -36,7 +36,7 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
   public users$: Subscription;
   public webUsers: Observable<any>;
   public webUsers$: Subscription;
-  public selectedIndex: number;
+  public selectedIndex = 0;
   private lastErrorMessage: string;
   public timersIntervalUpdater: any;
   public timersIntervalUpdaterTier: any;
@@ -64,8 +64,7 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
   public chosenAgentStatuses: Array<string> = [];
 
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   private directoryState = toSignal(
@@ -110,32 +109,18 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
   });
   // 1. Dedicated Signal to act as a change trigger
   private refreshTrigger = signal(0);
-  // 2. Computed Signal: Calculates timers based on the trigger
-  public userListWithTimers = computed(() => {
+  userActionTimer(user: Iusers): number {
     this.refreshTrigger();
+    const callDate = Number(user['call_date'] || 0);
+    return callDate ? Math.max(0, Math.floor(Date.now() / 1000) - callDate) : 0;
+  }
 
-    const directoryData = this.directoryState().users;
-    if (!directoryData) {
-      return [];
-    }
-    const now = Math.floor(Date.now() / 1000);
-
-    // IMPORTANT: Clone the objects to create a NEW REFERENCE
-    // for Angular's change detection.
-    return Object.values(directoryData).map((user) => {
-      // Calculate the timer and return a new object reference
-      let actionTimer = 0;
-      if (user.call_date) {
-        const callTimestamp = Number(user.call_date);
-        actionTimer = now - callTimestamp;
-      }
-
-      return {
-        ...user, // Copy all existing properties
-        actionTimer: actionTimer, // Add the calculated dynamic timer
-      };
-    });
-  });
+  agentActionTimer(agent: any): number {
+    this.refreshTrigger();
+    return agent?.last_status_change
+      ? Math.max(0, Math.floor(Date.now() / 1000) - Number(agent.last_status_change))
+      : 0;
+  }
 
 
   public tiersList = computed<{[name: string]: Array<object>}>(() => {
@@ -192,8 +177,6 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.timersIntervalUpdater = setInterval(() => this.updateTimers(), 1000);
-    this.updateAgentTimers();
-    this.timersIntervalUpdaterTier = setInterval(this.updateAgentTimers.bind(this), 1000);
   }
 
   ngOnDestroy() {
@@ -201,10 +184,6 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
     if (this.timersIntervalUpdater) {
       clearInterval(this.timersIntervalUpdater);
       this.timersIntervalUpdater = null;
-    }
-    if (this.timersIntervalUpdaterTier) {
-      clearInterval(this.timersIntervalUpdaterTier);
-      this.timersIntervalUpdaterTier = null;
     }
     // Subscriptions (users$, phone$, config$) removed by toSignal
     if (this.route.snapshot?.data?.reconnectUpdater) {
@@ -465,21 +444,6 @@ export class UsersPanelComponent implements OnInit, OnDestroy {
       return null;
     }
     return usersByAgent[id];
-  }
-
-  updateAgentTimers() {
-    const agentsByName = this.agentsListByName(); // Read signal
-    if (!agentsByName) {
-      return;
-    }
-    const now = Math.floor(Date.now() / 1000);
-    Object.keys(agentsByName).forEach(
-      (agentName) => {
-        // Since agentsByName is a computed signal, this mutation only affects the local copy
-        agentsByName[agentName]['actionTimer'] =
-          now - Number(agentsByName[agentName]['last_status_change'] || now);
-      }
-    );
   }
 
   cutNameAndDomain(fullName: string): Array<string> { /* ... kept as is ... */

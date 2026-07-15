@@ -28,10 +28,6 @@ article {
   grid-template-columns: 1fr auto auto auto auto auto auto;
 }
 
-section {
-  margin-left: 10px;
-}
-
 .grid-inner {
   display: inline-block;
   margin-top: 8px;

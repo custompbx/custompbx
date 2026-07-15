@@ -49,7 +49,7 @@
   box-shadow: var(--cpbx-shadow);
 }
 
-.dashboard-card mat-card-title {
+.dashboard-card .cpbx-card__title {
   font-size: 15px;
   font-weight: 650;
   color: var(--cpbx-text);

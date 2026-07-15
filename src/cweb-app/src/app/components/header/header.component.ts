@@ -12,15 +12,15 @@ import {Store} from '@ngrx/store';
 import {AppState, selectHeader} from '../../store/app.states';
 import {StartPhone, ToggleShowPhone} from '../../store/header/header.actions';
 import {initialState as initialHeaderState} from '../../store/header/header.reducer';
-import {MaterialModule} from "../../../material-module";
 import {PhoneComponent} from "../phone/phone.component";
 import {RouterLink} from "@angular/router";
 import {toSignal} from '@angular/core/rxjs-interop';
+import {IconComponent} from '../icon/icon.component';
 
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, PhoneComponent, RouterLink],
+  imports: [PhoneComponent, RouterLink, IconComponent],
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']

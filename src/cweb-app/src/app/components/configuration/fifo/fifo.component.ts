@@ -1,13 +1,11 @@
 import {computed, Component, effect, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
 import {Iitem, Ififo, IfifoMember} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import {ActivatedRoute} from '@angular/router';
 import {
   AddFifoFifo,
@@ -20,13 +18,15 @@ import {
   UpdateFifoParameter, UpdateFifoFifoImportance
 } from '../../../store/config/fifo/config.actions.fifo';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
 standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent],
   selector: 'app-fifo',
   templateUrl: './fifo.component.html',
   styleUrls: ['./fifo.component.css']
@@ -50,8 +50,8 @@ export class FifoComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
+    private bottomSheet: ConfirmationService,
+    private _snackBar: ToastService,
     private route: ActivatedRoute,
   ) {
     this.selectedIndex = 0;
@@ -259,7 +259,7 @@ export class FifoComponent implements OnInit, OnDestroy {
           case2Text: 'Are you sure you want to rename fifo "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

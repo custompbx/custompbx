@@ -12,8 +12,7 @@ import {
   selectPhoneState,
   selectSettingsState
 } from '../../store/app.states';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../services/toast.service';
 import {ActivatedRoute} from '@angular/router';
 import {StoreCommand} from '../../store/phone/phone.actions';
 import {WsDataService} from '../../services/ws-data.service';
@@ -32,16 +31,17 @@ import {UserService} from '../../services/user.service';
 import {StartPhone, ToggleShowPhone} from '../../store/header/header.actions';
 import {GetDirectoryUsers} from '../../store/directory/directory.actions';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../material-module";
 import {FormsModule} from "@angular/forms";
 import {IwebUser} from "../../store/settings/settings.reducers";
 import {FormatTimerPipe} from "../../pipes/format-timer.pipe";
+import {LoadingBarComponent} from '../loading-bar/loading-bar.component';
+import {IconComponent} from '../icon/icon.component';
 
 const scrollTop = 64;
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, FormatTimerPipe],
+  imports: [CommonModule, FormsModule, FormatTimerPipe, LoadingBarComponent, IconComponent],
   selector: 'app-conversations',
   templateUrl: './conversations.component.html',
   styleUrls: ['./conversations.component.css']
@@ -54,8 +54,7 @@ export class ConversationsComponent {
   // Injectable services
   private userService = inject(UserService);
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
   private ws = inject(WsDataService);
   private destroyRef = inject(DestroyRef);

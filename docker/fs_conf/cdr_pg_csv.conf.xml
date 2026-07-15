@@ -1,7 +1,8 @@
 <configuration name="cdr_pg_csv.conf" description="CDR PG CSV Format">
     <settings>
         <!-- See parameters for PQconnectdb() at http://www.postgresql.org/docs/8.4/static/libpq-connect.html -->
-        <param name="db-info" value="host=localhost dbname=cdr connect_timeout=10" />
+        <!-- Docker quick-start default. This remains configurable from CustomPBX. -->
+        <param name="db-info" value="host=postgres-host port=5432 dbname=custompbx user=custompbx password=custompbx connect_timeout=10" />
         <!-- CDR table name -->
         <!--<param name="db-table" value="cdr"/>-->
 
@@ -36,7 +37,6 @@
         <field var="write_codec"/>
         <field var="sip_hangup_disposition"/>
         <field var="ani"/>
-        <field var="RECORD_STEREO"/>
         <field var="RECORD_STEREO"/>
         <field var="record_path"/>
         <field var="record_name"/>

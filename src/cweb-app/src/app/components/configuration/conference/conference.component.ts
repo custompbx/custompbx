@@ -1,14 +1,12 @@
 import { Component, OnDestroy, OnInit, inject, computed, effect } from '@angular/core';
 import { CommonModule } from "@angular/common";
-import { MaterialModule } from "../../../../material-module";
 import { toSignal } from '@angular/core/rxjs-interop'; // Import for signal conversion
 import {Iconference, Iitem, State} from '../../../store/config/config.state.struct';
 import { select, Store } from '@ngrx/store';
 import { AppState, selectConfigurationState } from '../../../store/app.states';
 import { AbstractControl, FormsModule } from '@angular/forms';
-import { ConfirmBottomSheetComponent } from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import { ActivatedRoute } from '@angular/router';
 import {
   AddConferenceProfile,
@@ -76,10 +74,12 @@ import { InnerHeaderComponent } from "../../inner-header/inner-header.component"
 import { ModuleNotExistsBannerComponent } from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, CpbxSelectDirective],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, CpbxSelectDirective, TabNavComponent, DisclosureComponent],
   selector: 'app-conference',
   templateUrl: './conference.component.html',
   styleUrls: ['./conference.component.css']
@@ -88,8 +88,8 @@ export class ConferenceComponent implements OnInit, OnDestroy {
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   // --- Reactive State from NgRx using toSignal ---
@@ -121,6 +121,8 @@ export class ConferenceComponent implements OnInit, OnDestroy {
   public newChatPermissionName: string = '';
   private newGroupName: string = '';
   public selectedIndex: number = 0;
+  public mainSectionIndex: number = 0;
+  public conferenceTabIndex: number = 0;
   public profileId: number = 0;
   public controlGroupId: number = 0;
   public chatPermissionId: number = 0;
@@ -428,7 +430,7 @@ export class ConferenceComponent implements OnInit, OnDestroy {
           case2Text: 'Are you sure you want to rename group "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -467,7 +469,7 @@ export class ConferenceComponent implements OnInit, OnDestroy {
           case2Text: 'Are you sure you want to rename profile "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -540,7 +542,7 @@ export class ConferenceComponent implements OnInit, OnDestroy {
           case2Text: 'Are you sure you want to rename profile "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -661,7 +663,7 @@ export class ConferenceComponent implements OnInit, OnDestroy {
           case2Text: 'Are you sure you want to rename layout "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -684,7 +686,7 @@ export class ConferenceComponent implements OnInit, OnDestroy {
           case2Text: 'Are you sure you want to rename layout "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

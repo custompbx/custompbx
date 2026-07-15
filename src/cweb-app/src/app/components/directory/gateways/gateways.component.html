@@ -1,51 +1,41 @@
-@if (loadCounter() > 0) {
-  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-}
 <app-inner-header name="User Gateways" [loadCounter]="loadCounter()"></app-inner-header>
 @if (loadCounter() === 0 && !onlyValues(list())?.length) {
-  <mat-card>
-    <mat-card-content>
+  <section class="cpbx-card"><div class="cpbx-card__content">
       <div class="directory-empty">
         <div>
           <h3>No domains yet</h3>
           <p>Create or import a domain before adding gateways.</p>
         </div>
-      <button mat-stroked-button color="basic" class="switch-button"
+      <button class="switch-button cpbx-button cpbx-button--secondary"
         routerLink="/directory/domains">
         Go to domains
       </button>
       </div>
-    </mat-card-content>
-  </mat-card>
+  </div></section>
 }
 @if (onlyValues(list())?.length) {
-  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
-    <mat-tab label="List">
+  <app-tab-nav ariaLabel="Gateway sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
       @for (domain of onlyValues(list()); track domain) {
         <div class="directory-domain-section">
-          <mat-card>
-            <mat-card-header>
-              <mat-card-subtitle>Domain: <b>{{domain.name}}</b></mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
+          <section class="cpbx-card">
+            <header class="cpbx-card__header"><p class="cpbx-card__subtitle">Domain: <b>{{domain.name}}</b></p></header>
+            <div class="cpbx-card__content">
               @for (user of onlyValuesByParent(userList(), domain.id); track user) {
                 @if (onlyValuesByParent(gatewayList(), user.id).length > 0) {
                   <h4>User: {{user.name}}</h4>
                 }
                 @for (gateway of onlyValuesByParent(gatewayList(), user.id); track gateway) {
-                  <mat-expansion-panel (opened)="getDetails(gateway.id)" (closed)="clearDetails(gateway.id)">
-                    <mat-expansion-panel-header>
-                      <mat-panel-title class="vert-centered">
-                        <mat-icon class="icon-spacer">swap_horizontal_circle</mat-icon>
-                        <span>{{gateway.name}}</span>
-                      </mat-panel-title>
-                      <mat-panel-description>
-                        Click to get details
-                      </mat-panel-description>
-                    </mat-expansion-panel-header>
+                  <app-disclosure (opened)="getDetails(gateway.id)" (closed)="clearDetails(gateway.id)">
+                    <span disclosureTitle class="vert-centered">
+                      <app-icon class="icon-spacer" name="swap_horizontal_circle"></app-icon>
+                      <span>{{gateway.name}}</span>
+                    </span>
+                    <span disclosureDescription>Click to get details</span>
                     <form #details="ngForm">
                       @if (listDetails()[gateway.id] && (listDetails()[gateway.id].parameters || listDetails()[gateway.id].variables)) {
-                        <button mat-stroked-button color="basic" class="directory-copy-button" (click)="copy(gateway.id)">
+                        <button class="directory-copy-button cpbx-button cpbx-button--secondary" (click)="copy(gateway.id)">
                           Copy
                         </button>
                       }
@@ -62,106 +52,27 @@
                         </app-key-value-pad>
                       </div>
                       <h3>Variables:</h3>
-                      @if (listDetails()[gateway.id] && listDetails()[gateway.id].variables) {
-                        <div>
-                          @for (variable of onlyValues(listDetails()[gateway.id].variables); track variable) {
-                            <div class="spacer">
-                              @if (variable.id && !isArray(variable)) {
-                                <div class="cpbx-edit-row">
-                                  <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input name="name" [(ngModel)]="variable.name" required [disabled]="!variable.enabled" [name]="'variableName' + variable.id" placeholder="Name" class="cpbx-input">
-</label>
-                                    <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
-<input name="value" [(ngModel)]="variable.value" required [disabled]="!variable.enabled" [name]="'variableValue' + variable.id" placeholder="Value" class="cpbx-input">
-</label>
-                                      <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Direction</span>
-<input name="direction" [(ngModel)]="variable.direction" [disabled]="!variable.enabled" [name]="'variableDirection' + variable.id" placeholder="Direction" class="cpbx-input">
-</label>
-                                        <button mat-flat-button color="primary"
-                                          [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.id], details.controls['variableValue' + variable.id], details.controls['variableDirection' + variable.id])"
-                                          (click)="updateVar(variable)">
-                                          Update
-                                        </button>
-                                        @if (variable.enabled) {
-                                          <button mat-flat-button color="accent"
-                                            class="switch-button"
-                                            (click)="switchVar(variable)">
-                                            Disable
-                                          </button>
-                                        }
-                                        @if (!variable.enabled) {
-                                          <button mat-flat-button color="primary"
-                                            class="switch-button"
-                                            (click)="switchVar(variable)">
-                                            Enable
-                                          </button>
-                                        }
-                                        <button mat-flat-button color="warn"
-                                          (click)="deleteVar(variable)">
-                                          Delete
-                                        </button>
-                                      </div>
-                                    }
-                                  </div>
-                                }
-                                @if (listDetails()[gateway.id] && listDetails()[gateway.id].variables) {
-                                  <div>
-                                    @for (variable of listDetails()[gateway.id].variables.new; track trackByFn(i, variable); let i = $index) {
-                                      <div class="spacer"
-                                        >
-                                        @if (variable) {
-                                          <div class="cpbx-edit-row">
-                                            <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input name="name" [(ngModel)]="variable.name" required [name]="'newVarName' + i" placeholder="Name" class="cpbx-input">
-</label>
-                                              <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
-<input name="value" [(ngModel)]="variable.value" required [name]="'newVarValue' + i" placeholder="Value" class="cpbx-input">
-</label>
-                                                <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Direction</span>
-<input name="direction" [(ngModel)]="variable.direction" [name]="'newVarDirection' + i" placeholder="Direction" class="cpbx-input">
-</label>
-                                                  <button mat-flat-button color="primary"
-                                                    [disabled]="!isNewReadyToSend(details.controls['newVarName' + i], details.controls['newVarValue' + i])"
-                                                    (click)="newVar(gateway.id, i, details.controls['newVarName' + i].value, details.controls['newVarValue' + i].value, details.controls['newVarDirection' + i].value)">
-                                                    Update
-                                                  </button>
-                                                  <button mat-stroked-button color="warn"
-                                                    (click)="dropNewVar(gateway.id, i)">
-                                                    Delete
-                                                  </button>
-                                                </div>
-                                              }
-                                            </div>
-                                          }
-                                        </div>
-                                      }
-                                    </div>
-                                  }
-                                  <button mat-flat-button color="accent" class="spacer" (click)="addVarField(gateway.id)">
-                                    Add
-                                  </button>
-                                  @if (toCopy && toCopy != gateway.id) {
-                                    <button mat-flat-button color="primary" (click)="pasteVars(gateway.id)"
-                                      >
-                                      Paste
-                                    </button>
-                                  }
+                      @if (listDetails()[gateway.id]?.variables) {
+                        <app-key-value-pad-2
+                          [exist]="true"
+                          [items]="listDetails()[gateway.id].variables"
+                          [newItems]="listDetails()[gateway.id].variables.new"
+                          [id]="gateway.id"
+                          [toCopy]="toCopy"
+                          [dispatchersCallbacks]="gatewayVariableDispatchers"
+                          [fieldsMask]="gatewayVariableMask">
+                        </app-key-value-pad-2>
+                      }
                                 </form>
-                              </mat-expansion-panel>
+                              </app-disclosure>
                             }
                           }
-                        </mat-card-content>
-                      </mat-card>
+                        </div>
+                      </section>
                     </div>
                   }
-                </mat-tab>
-                <mat-tab label="Add">
+                </div>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
                   <form class="cpbx-form-panel" (ngSubmit)="onUserSubmit()">
                     <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Domain</span>
@@ -187,10 +98,10 @@
 <span class="cpbx-label">Name</span>
 <input placeholder="New gateway name" required name="name" [ngModel]="newGatewayName()" (ngModelChange)="newGatewayName.set($event)" class="cpbx-input">
 </label>
-                    <button mat-flat-button color="primary" type="submit">Submit</button>
+                    <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
                   </form>
-                </mat-tab>
-                <mat-tab label="Delete/Rename">
+                </div>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
                   <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
                     <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Domain</span>
@@ -200,7 +111,6 @@
                         @for (domain of onlyValues(list()); track domain) {
                           <option [ngValue]="domain.id">{{domain.name}}</option>
                         }
-                      <!--mat-hint>{{selectdomain?.sound}}</mat-hint-->
                     </select>
 </label>
                   @for (user of onlyValuesByParent(userList(), domainId); track user) {
@@ -212,11 +122,11 @@
 <span class="cpbx-label">Gateway name</span>
 <input name="gateway name" required [ngModel]="gateway.name" [name]="'user::' + gateway.id" placeholder="Gateway name" class="cpbx-input">
 </label>
-                            <button mat-flat-button color="primary" [disabled]="checkDirty(deleteForm.controls['user::' + gateway.id])"
+                            <button class="cpbx-button cpbx-button--primary" [disabled]="checkDirty(deleteForm.controls['user::' + gateway.id])"
                               (click)="openBottomSheet(gateway.id, deleteForm.controls['user::' + gateway.id].value, gateway.name, 'rename')">
                               Update
                             </button>
-                            <button mat-flat-button color="warn"
+                            <button class="cpbx-button cpbx-button--danger"
                               (click)="openBottomSheet(gateway.id, deleteForm.controls['user::' + gateway.id].value, gateway.name, 'delete')">
                               Delete
                             </button>
@@ -225,6 +135,5 @@
                       </div>
                     }
                   </form>
-                </mat-tab>
-              </mat-tab-group>
+                </div>
             }

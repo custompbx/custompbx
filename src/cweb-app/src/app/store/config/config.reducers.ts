@@ -513,27 +513,17 @@ export function updateNestedState<State>(
   state: State,
   updates: { path: string[], value: any }[]
 ): State {
-  let newState = { ...state };
+  return updates.reduce((currentState, {path, value}) => {
+    if (path.length === 0) return currentState;
 
-  updates.forEach(update => {
-    const { path, value } = update;
-    let current = newState;
+    const setAtPath = (current: any, index: number): any => {
+      const key = path[index];
+      if (index === path.length - 1) return {...(current || {}), [key]: value};
+      return {...(current || {}), [key]: setAtPath(current?.[key], index + 1)};
+    };
 
-    for (let i = 0; i < path.length - 1; i++) {
-      const key = path[i];
-      if (current.hasOwnProperty(key) && typeof current[key] === 'object' && current[key] !== null) {
-        current = current[key];
-      } else {
-        // Create intermediate objects if they don't exist
-        current[key] = {};
-        current = current[key];
-      }
-    }
-
-    current[path[path.length - 1]] = value;
-  });
-
-  return newState;
+    return setAtPath(currentState, 0);
+  }, state);
 }
 
 export function getParentId(data: any): number {

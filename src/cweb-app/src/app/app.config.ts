@@ -1,5 +1,4 @@
-import {APP_INITIALIZER, ApplicationConfig, importProvidersFrom, provideZonelessChangeDetection} from '@angular/core';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import {ApplicationConfig, importProvidersFrom, provideZonelessChangeDetection} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app-routing.module';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -11,10 +10,8 @@ import { reducers } from './store/app.states';
 import { AuthEffects } from './store/auth/auth.effects';
 // ... all your effects here
 
-import { MaterialModule } from '../material-module';
 import { WebsocketModule } from './services/websocket';
 import { environment } from '../environments/environment';
-import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import {APP_BASE_HREF} from "@angular/common";
 import {SettingsEffects} from "./store/settings/settings.effects";
 import {DirectoryEffects} from "./store/directory/directory.effects";
@@ -81,17 +78,15 @@ import {ConfigEffectsPostLoadModules} from "./store/config/post_load_modules/con
 import {ConfigEffectsVoicemail} from "./store/config/voicemail/config.effects.voicemail";
 import {ConversationsEffects} from "./store/conversations/conversations.effects";
 import {provideCharts, withDefaultRegisterables} from "ng2-charts";
-import {MatIconRegistry} from "@angular/material/icon";
+import {OperationFeedbackEffects} from './store/operation-feedback.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
 
     provideRouter(routes),
     provideZonelessChangeDetection(),
-    provideAnimations(),
 
     importProvidersFrom(
-      MaterialModule,
       WebsocketModule.config({ url: environment.WSServ }),
 
       StoreModule.forRoot({}, {
@@ -172,26 +167,12 @@ export const appConfig: ApplicationConfig = {
         ConfigEffectsPostLoadModules,
         ConfigEffectsVoicemail,
         ConversationsEffects,
+        OperationFeedbackEffects,
       ]),
     ),
 
     provideHttpClient(withInterceptorsFromDi()),
 
-    {
-      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
-      useValue: { appearance: 'outline' }
-    },
-
-    { provide: APP_BASE_HREF, useValue: '/cweb/' },
-    {
-      provide: APP_INITIALIZER,
-      multi: true,
-      useFactory: (iconRegistry: MatIconRegistry) => {
-        return () => {
-          iconRegistry.setDefaultFontSetClass('material-icons-outlined');
-        };
-      },
-      deps: [MatIconRegistry]
-    }
+    { provide: APP_BASE_HREF, useValue: '/cweb/' }
   ]
 };

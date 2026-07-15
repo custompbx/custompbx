@@ -15,6 +15,7 @@ describe('InnerHeaderComponent', () => {
     expect(fixture.nativeElement.querySelector('h1').textContent).toContain('Dashboard');
     expect(fixture.nativeElement.querySelector('p').textContent).toContain('System health');
     expect(fixture.nativeElement.querySelector('.status-badge').textContent).toContain('Online');
-    expect(fixture.nativeElement.querySelector('mat-progress-bar')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.cpbx-loading-bar')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.cpbx-loading-bar').getAttribute('role')).toBe('progressbar');
   });
 });

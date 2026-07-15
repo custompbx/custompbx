@@ -1,10 +1,10 @@
 import {Component, inject, signal, computed, effect, OnInit} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 
-import {MaterialModule} from "../../../../material-module";
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {ConfirmationService} from '../../../services/confirmation.service';
 import {AbstractControl, FormsModule} from '@angular/forms';
 import {
   AddAclList,
@@ -21,18 +21,20 @@ import {
   UpdateAclNode
 } from '../../../store/config/acl/config.actions.acl';
 import {Iacl, Inode, State} from '../../../store/config/config.state.struct';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../../services/toast.service';
 import {ActivatedRoute} from '@angular/router';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {ResizeInputDirective} from "../../../directives/resize-input.directive";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {resolvePositionedReorder} from '../../../utils/reorder';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, ResizeInputDirective, CpbxSelectDirective],
+  imports: [DragDropModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, ResizeInputDirective, CpbxSelectDirective, TabNavComponent, DisclosureComponent],
   selector: 'app-acl',
   templateUrl: './acl.component.html',
   styleUrls: ['./acl.component.css']
@@ -41,8 +43,8 @@ export class AclComponent { // Removed OnDestroy
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   // --- Reactive State from NgRx using toSignal ---
@@ -134,7 +136,7 @@ export class AclComponent { // Removed OnDestroy
         case1Text: message,
       }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -195,7 +197,7 @@ export class AclComponent { // Removed OnDestroy
           case2Text: action === 'rename' ? 'Are you sure you want to rename list "' + oldName + '" to "' + newName + '"?' : null,
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -234,17 +236,8 @@ export class AclComponent { // Removed OnDestroy
   }
 
   dropAction(event: CdkDragDrop<string[]>, parent: Array<any>) {
-    const previousItem = parent[event.previousIndex];
-    const currentItem = parent[event.currentIndex];
-
-    if (!previousItem || !currentItem || previousItem.position === currentItem.position) {
-      return;
-    }
-    this.store.dispatch(MoveAclListNode({
-      previous_index: previousItem.position,
-      current_index: currentItem.position,
-      id: previousItem.id
-    }));
+    const change = resolvePositionedReorder(parent, event.previousIndex, event.currentIndex);
+    if (change) this.store.dispatch(MoveAclListNode(change.move));
   }
 
 }

@@ -1,21 +1,24 @@
 <app-service-status></app-service-status>
+<app-toast-container></app-toast-container>
+<app-confirmation-dialog></app-confirmation-dialog>
 @if (userService.isAuthenticated && !login) {
   <app-header [currentComponent]="currentComponent"
   (showRightSideNav)="toggleRightSideNav()"
   (toggleMenu)="toggleNavigation()"></app-header>
 }
-<mat-sidenav-container class="sidenav-container" [autosize]="true">
-  <mat-sidenav [mode]="compact() ? 'over' : 'side'"
-    [opened]="userService.isAuthenticated && !login && (compact() ? menuOpen : true)"
-    [class.sidenav-collapsed]="!compact() && !menuOpen"
-    (openedChange)="onNavigationOpenedChange($event)">
-    <mat-nav-list>
-      <div class="menu-sidenav">
+<div class="app-shell" [class.app-shell--authenticated]="userService.isAuthenticated && !login"
+  [class.app-shell--collapsed]="!compact() && !menuOpen">
+  @if (userService.isAuthenticated && !login) {
+    @if (compact() && menuOpen) {
+      <button class="nav-backdrop" type="button" aria-label="Close navigation" (click)="menuOpen = false"></button>
+    }
+    <aside class="app-sidebar" [class.app-sidebar--open]="!compact() || menuOpen" aria-label="Main navigation">
+      <nav class="menu-sidenav">
         <app-sidenav [collapsed]="!compact() && !menuOpen"></app-sidenav>
-      </div>
-    </mat-nav-list>
-  </mat-sidenav>
-  <mat-sidenav-content>
+      </nav>
+    </aside>
+  }
+  <div class="app-content">
     @if (userService.isAuthenticated && !login) {
       @if (showRightNav) {
         <app-conversations (closeConversations)="showRightNav = false"></app-conversations>
@@ -24,5 +27,5 @@
     <main class="app-main">
       <router-outlet (activate)="onRouterOutletActivate($event)"></router-outlet>
     </main>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </div>
+</div>

@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.memcache) {
-        state.memcache = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, memcache: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

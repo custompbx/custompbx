@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.pocketsphinx) {
-        state.pocketsphinx = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, pocketsphinx: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

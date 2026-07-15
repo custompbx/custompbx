@@ -1,7 +1,6 @@
 import {Component, OnDestroy, OnInit, ViewChild, inject, signal, computed, effect} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-import {MaterialModule} from "../../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectDirectoryState} from '../../../store/app.states';
 import {
@@ -32,19 +31,21 @@ import {
   GetWebDirectoryUsersTemplateForm, CreateWebDirectoryUsersByTemplate
 } from '../../../store/directory/directory.actions';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import {ActivatedRoute} from '@angular/router';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {KeyValuePadComponent} from "../../key-value-pad/key-value-pad.component";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {State} from "../../../store/directory/directory.reducers";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
+import {IconComponent} from '../../icon/icon.component';
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, CpbxSelectDirective],
+  imports: [FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent],
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
@@ -53,8 +54,8 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   // --- Dependency Injection using inject() ---
   protected store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   // --- Reactive State from NgRx using toSignal ---
@@ -240,7 +241,7 @@ export class UsersComponent implements OnInit, OnDestroy {
           case2Text: 'Are you sure you want to rename user "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

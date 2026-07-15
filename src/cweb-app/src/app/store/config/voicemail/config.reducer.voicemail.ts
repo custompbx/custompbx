@@ -47,8 +47,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.voicemail) {
-        state.voicemail = <Ivoicemail>{};
-        state.loadCounter = 0;
+        state = {...state, voicemail: <Ivoicemail>{}, loadCounter: 0};
       }
 
       return {
@@ -71,8 +70,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.voicemail) {
-        state.voicemail = <Ivoicemail>{};
-        state.loadCounter = 0;
+        state = {...state, voicemail: <Ivoicemail>{}, loadCounter: 0};
       }
 
       return {
@@ -98,8 +96,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.voicemail) {
-        state.voicemail = <Ivoicemail>{};
-        state.loadCounter = 0;
+        state = {...state, voicemail: <Ivoicemail>{}, loadCounter: 0};
       }
 
       return {

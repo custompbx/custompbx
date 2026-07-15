@@ -1,0 +1,25 @@
+@if (confirmation.request(); as request) {
+  <div class="confirmation-backdrop" (click)="confirmation.close(false)">
+    <section
+      class="confirmation-dialog"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="confirmation-title"
+      aria-describedby="confirmation-message"
+      (click)="$event.stopPropagation()">
+      <div class="confirmation-dialog__icon" aria-hidden="true">!</div>
+      <div>
+        <h2 id="confirmation-title">{{ title() }}</h2>
+        <p id="confirmation-message">{{ message() }}</p>
+      </div>
+      <div class="confirmation-dialog__actions">
+        <button class="cpbx-button cpbx-button--secondary" type="button" autofocus (click)="confirmation.close(false)">
+          {{ request.data.cancelText || 'Cancel' }}
+        </button>
+        <button class="cpbx-button cpbx-button--danger" type="button" (click)="confirmation.close(true)">
+          {{ request.data.confirmText || 'Confirm' }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

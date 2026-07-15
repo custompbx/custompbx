@@ -24,22 +24,23 @@
 .directory-user-details {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: .875rem;
   padding: .75rem 0 1.25rem;
+  width: 100%;
 }
 
 .directory-user-actions {
-  align-items: center;
   display: flex;
   justify-content: flex-start;
+  width: min(100%, 38rem);
 }
 
 .directory-user-settings {
-  align-items: start;
   display: grid;
   gap: .75rem;
-  grid-template-columns: minmax(0, 38rem);
-  justify-content: flex-start;
+  grid-template-columns: minmax(0, 1fr);
+  width: min(100%, 38rem);
 }
 
 .directory-user-setting {
@@ -72,17 +73,6 @@
   margin-right: .35rem;
 }
 
-.mat-progress-bar {
-  display: block;
-  height: 2px;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  position: fixed;
-  transition: opacity 250ms linear;
-  width: 100%;
-  z-index: 1000;
-}
 
 @media (max-width: 900px) {
   .directory-user-settings {

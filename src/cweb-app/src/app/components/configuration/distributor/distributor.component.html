@@ -1,26 +1,25 @@
 <app-inner-header name="Distributor" [loadCounter]="loadCounter()" [status]="statusText()" [statusTone]="statusTone()" [errorMessage]="errorMessage()">
-  <button mat-stroked-button type="button" (click)="expandAllPanels()">Expand all</button>
-  <button mat-stroked-button type="button" (click)="collapseAllPanels()">Collapse all</button>
+  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="expandAllPanels()">Expand all</button>
+  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="collapseAllPanels()">Collapse all</button>
 </app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
- <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex" *ngIf="list() && list().exists !== false">
-  <mat-tab label="List">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-subtitle>Lists</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
+ <div *ngIf="list() && list().exists !== false">
+  <app-tab-nav ariaLabel="Distributor sections" [tabs]="['List', 'Add', 'Delete/Rename']" [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+    <section class="cpbx-card">
+      <header class="cpbx-card__header">
+        <p class="cpbx-card__subtitle">Lists</p>
+      </header>
+      <div class="cpbx-card__content">
         <div *ngFor="let item of onlyValues(list().lists); trackBy: trackByFn">
-          <mat-expansion-panel (opened)="getDetails(item.id)" (closed)="clearDetails(item.id)"
+          <app-disclosure (opened)="getDetails(item.id)" (closed)="clearDetails(item.id)"
                                [expanded]="expandedLists['list' + item.id]">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
+              <span disclosureTitle>
                 {{item.name}}
-              </mat-panel-title>
-              <mat-panel-description>
+              </span>
+              <span disclosureDescription>
                 Click to get details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
+              </span>
             <form #details="ngForm">
               <h3>Nodes:</h3>
               <div *ngIf="item && item.nodes">
@@ -34,22 +33,22 @@
 <span class="cpbx-label">Weight</span>
 <input name="weight" [(ngModel)]="node.weight" required [disabled]="!node.enabled" [name]="'nodeMain' + node.id" appResizeInput [resizeOnString]="node.weight" placeholder="Weight" class="cpbx-input">
 </label>
-                    <button mat-flat-button color="primary" type="button"
+                    <button class="cpbx-button cpbx-button--primary" type="button"
                             [disabled]="loadCounter() > 0 || !isReadyToSend(details.controls['nodeName' + node.id], details.controls['nodeMain' + node.id])"
                             (click)="updateNode(node)">
                       Update
                     </button>
-                    <button *ngIf="node.enabled" mat-stroked-button color="basic" type="button"
+                    <button class="cpbx-button cpbx-button--secondary" *ngIf="node.enabled" type="button"
                             [disabled]="loadCounter() > 0"
                             class="switch-button" (click)="switchNode(node)">
                       Disable
                     </button>
-                    <button *ngIf="!node.enabled" mat-stroked-button color="primary" type="button"
+                    <button class="cpbx-button cpbx-button--primary-outline" *ngIf="!node.enabled" type="button"
                             [disabled]="loadCounter() > 0"
                             class="switch-button" (click)="switchNode(node)">
                       Enable
                     </button>
-                    <button mat-stroked-button color="warn" type="button" [disabled]="loadCounter() > 0" (click)="deleteNode(node)">
+                    <button class="cpbx-button cpbx-button--danger-outline" type="button" [disabled]="loadCounter() > 0" (click)="deleteNode(node)">
                       Delete
                     </button>
                   </div>
@@ -65,55 +64,55 @@
 <span class="cpbx-label">Weight</span>
 <input name="weight" [(ngModel)]="node.weight" required [name]="'newNodeWeight' + i" appResizeInput [resizeOnString]="node.weight" placeholder="Weight" class="cpbx-input">
 </label>
-                      <button mat-flat-button color="primary" type="button"
+                      <button class="cpbx-button cpbx-button--primary" type="button"
                               [disabled]="loadCounter() > 0 || !isReadyToSend(details.controls['newNodeName' + i], details.controls['newNodeWeight' + i])"
                               (click)="newNode(item.id, i, details.controls['newNodeName' + i].value, details.controls['newNodeWeight' + i])">
                         Update
                       </button>
-                      <button mat-stroked-button color="warn" type="button" [disabled]="loadCounter() > 0" (click)="dropNewNode(item.id, i)">
+                      <button class="cpbx-button cpbx-button--danger-outline" type="button" [disabled]="loadCounter() > 0" (click)="dropNewNode(item.id, i)">
                         Delete
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
-              <button mat-flat-button color="primary" type="button" [disabled]="loadCounter() > 0" (click)="addDistributorNodeField(item.id)">
+              <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="loadCounter() > 0" (click)="addDistributorNodeField(item.id)">
                 Add
               </button>
             </form>
-          </mat-expansion-panel>
+          </app-disclosure>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-tab>
+      </div>
+    </section>
+  </div>
 
-  <mat-tab label="Add">
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
     <form class="cpbx-form-panel" (ngSubmit)="onDistributorListSubmit()" *ngIf="list()">
       <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Name</span>
 <input placeholder="New list name" required name="name" [(ngModel)]="newItemName" class="cpbx-input">
 </label>
-      <button mat-flat-button color="primary" name="submit" [disabled]="loadCounter() > 0">Submit</button>
+      <button class="cpbx-button cpbx-button--primary" name="submit" [disabled]="loadCounter() > 0">Submit</button>
     </form>
-  </mat-tab>
+  </div>
 
-  <mat-tab label="Delete/Rename">
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
     <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm"  *ngIf="list()">
       <div class="cpbx-edit-row" *ngFor="let item of onlyValues(list().lists); trackBy: trackByFn">
         <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Distributor list name</span>
 <input name="Distributor list name" required [ngModel]="item.name" [name]="'list::' + item.id" placeholder="Distributor list name" class="cpbx-input">
 </label>
-        <button mat-flat-button color="primary" type="button" [disabled]="loadCounter() > 0 || checkDirty(deleteForm.controls['list::' + item.id])"
+        <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="loadCounter() > 0 || checkDirty(deleteForm.controls['list::' + item.id])"
                 (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'rename')">
           Update
         </button>
-        <button mat-stroked-button color="warn" type="button"
+        <button class="cpbx-button cpbx-button--danger-outline" type="button"
                 [disabled]="loadCounter() > 0"
                 (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'delete')">
           Delete
         </button>
       </div>
     </form>
-  </mat-tab>
-</mat-tab-group>
+  </div>
+</div>

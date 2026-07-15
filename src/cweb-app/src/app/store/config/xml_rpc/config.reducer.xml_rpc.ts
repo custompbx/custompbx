@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.xml_rpc) {
-        state.xml_rpc = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, xml_rpc: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

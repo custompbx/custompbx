@@ -1,22 +1,21 @@
 <app-inner-header name="Voicemail" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
-    <mat-tab label="List">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Settings</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-expansion-panel (opened)="getVoicemailSetting()">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
+  <app-tab-nav ariaLabel="Voicemail sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+      <section class="cpbx-card">
+        <header class="cpbx-card__header">
+          <p class="cpbx-card__subtitle">Settings</p>
+        </header>
+        <div class="cpbx-card__content">
+          <app-disclosure (opened)="getVoicemailSetting()">
+              <span disclosureTitle>
                 Settings
-              </mat-panel-title>
-              <mat-panel-description>
+              </span>
+              <span disclosureDescription>
                 Click to get details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
+              </span>
             <h3>Params:</h3>
             <app-key-value-pad-2 [exist]="list().parameters"
                                  [items]="list().parameters"
@@ -26,28 +25,26 @@
                                  [dispatchersCallbacks]="globalSettingsDispatchers"
             >
             </app-key-value-pad-2>
-          </mat-expansion-panel>
-        </mat-card-content>
-      </mat-card>
+          </app-disclosure>
+        </div>
+      </section>
 
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Profiles</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
+      <section class="cpbx-card">
+        <header class="cpbx-card__header">
+          <p class="cpbx-card__subtitle">Profiles</p>
+        </header>
+        <div class="cpbx-card__content">
           @for(item of onlyValues(list().profiles); track item.id) {
             <div class="panel-wrapper">
-              <mat-expansion-panel (opened)="getVoicemailProfilesParams(item.id)">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
+              <app-disclosure (opened)="getVoicemailProfilesParams(item.id)">
+                  <span disclosureTitle>
                     {{item.name}}
-                  </mat-panel-title>
-                  <mat-panel-description>
+                  </span>
+                  <span disclosureDescription>
                     Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
+                  </span>
                 @if (list().profiles[item.id] && (list().profiles[item.id].parameters)) {
-                  <button mat-stroked-button color="basic" class="config-copy-button" (click)="copyProfile(item.id)">Copy
+                  <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyProfile(item.id)">Copy
                   </button>
                 }
                 <h3>Params:</h3>
@@ -61,25 +58,25 @@
                   >
                   </app-key-value-pad-2>
                 </div>
-              </mat-expansion-panel>
+              </app-disclosure>
             </div>
           }
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </section>
 
-    </mat-tab>
+    </div>
 
-    <mat-tab label="Add">
+    <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
       <form class="cpbx-form-panel" (ngSubmit)="onProfileSubmit()">
         <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Name</span>
 <input placeholder="New profile name" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
 </label>
-        <button mat-flat-button color="primary" type="submit">Submit</button>
+        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
       </form>
-    </mat-tab>
+    </div>
 
-    <mat-tab label="Delete/Rename">
+    <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
         <h3 class="cpbx-form-title">Profiles</h3>
         @for (profile of onlyValues(list().profiles); track profile.id) {
@@ -88,17 +85,16 @@
 <span class="cpbx-label">Profile name</span>
 <input name="Profile name" required [ngModel]="profile.name" [name]="'profile::' + profile.id" placeholder="Profile name" class="cpbx-input">
 </label>
-            <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
+            <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
                     (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'rename')">
               Update
             </button>
-            <button mat-stroked-button color="warn" type="button"
+            <button class="cpbx-button cpbx-button--danger-outline" type="button"
                     (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, profile.name, 'delete')">
               Delete
             </button>
           </div>
         }
       </form>
-    </mat-tab>
-  </mat-tab-group>
+    </div>
 }

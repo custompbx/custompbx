@@ -91,6 +91,11 @@ You can start Docker with PostgresDB + Freeswitch + Custompbx by using the comma
 docker compose up -d
 ```
 
+The quick-start stack creates the demo CDR table and connects
+`mod_cdr_pg_csv` to the bundled PostgreSQL service. This bootstrap only
+replaces FreeSWITCH's unchanged `host=localhost dbname=cdr` sample value;
+CDR database settings configured by an operator in CustomPBX are preserved.
+
 After start of the containers open ``https://127.0.0.1:8080/cweb`` (or your Docker host), making sure to allow self-signed certificates.
 
 When rebuilding only the CustomPBX application container locally, remove the existing `custompbx-host` container before starting the rebuilt one if Docker Desktop does not pick up the new image:

@@ -1,0 +1,47 @@
+:host {
+  pointer-events: none;
+  position: fixed;
+  right: 1rem;
+  top: 4.75rem;
+  z-index: 4000;
+}
+
+.toast-stack { display: grid; gap: .75rem; width: min(28rem, calc(100vw - 2rem)); }
+.toast {
+  align-items: center;
+  background: var(--cpbx-surface);
+  border: 1px solid var(--cpbx-border);
+  border-radius: .875rem;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, .18);
+  color: var(--cpbx-text);
+  display: grid;
+  grid-template-columns: .3rem 1fr auto;
+  min-height: 4rem;
+  overflow: hidden;
+  pointer-events: auto;
+}
+.toast__indicator { align-self: stretch; background: var(--cpbx-info); }
+.toast--success .toast__indicator { background: var(--cpbx-success); }
+.toast--warning .toast__indicator { background: var(--cpbx-warning); }
+.toast--error .toast__indicator { background: var(--cpbx-danger); }
+.toast__message { font-size: .95rem; font-weight: 550; line-height: 1.4; padding: 1rem; }
+.toast__close {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: .375rem;
+  color: var(--cpbx-text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 1.25rem;
+  height: 2rem;
+  justify-content: center;
+  margin-right: .625rem;
+  width: 2rem;
+}
+.toast__close:hover { background: var(--cpbx-surface-muted); color: var(--cpbx-text); }
+
+@media (max-width: 640px) {
+  :host { left: 1rem; right: 1rem; top: 4.5rem; }
+}

@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.fax) {
-        state.fax = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, fax: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

@@ -1,8 +1,8 @@
 <app-inner-header name="Post switch" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-card>
-    <mat-card-content>
+  <section class="cpbx-card">
+    <div class="cpbx-card__content">
       <h3>Settings:</h3>
       <app-key-value-pad-2 [exist]="list().settings"
                            [items]="list().settings"
@@ -31,8 +31,8 @@
                            [fieldsMask]="defaultPtimesMask"
       >
       </app-key-value-pad-2>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 }
 
 

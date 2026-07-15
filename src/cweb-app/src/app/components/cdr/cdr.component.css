@@ -12,13 +12,6 @@ td {
   padding-right: 5px;
 }
 
-td.mat-cell {
-  padding-right: 5px;
-}
-
-th.mat-header-cell {
-  padding-right: 20px;
-}
 
 .table-container {
   overflow: auto;
@@ -37,19 +30,76 @@ th.mat-header-cell {
   margin: 4px;
 }
 
-.warn-sign {
-  margin: 5px 0;
-  max-width: 300px;
-}
-
-.save-but {
-  margin: 10px;
-}
-
 th {
   cursor: pointer;
 }
 
 th:hover {
   color: #3a3a3a;
+}
+
+.cdr-settings-page {
+  padding: 1.5rem 2rem;
+}
+
+.cdr-settings-form {
+  display: grid;
+  width: min(100%, 46rem);
+  gap: 1.5rem;
+}
+
+.cdr-settings-header {
+  display: grid;
+  gap: .25rem;
+}
+
+.cdr-settings-header h2,
+.cdr-settings-group h3 {
+  margin: 0;
+  color: var(--cpbx-text);
+  font-weight: 650;
+}
+
+.cdr-settings-header h2 {
+  font-size: 1.125rem;
+}
+
+.cdr-settings-header p,
+.cdr-group-help {
+  margin: 0;
+  color: var(--cpbx-text-muted);
+  font-size: .875rem;
+  line-height: 1.45;
+}
+
+.cdr-settings-group {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--cpbx-border);
+}
+
+.cdr-settings-group .cpbx-field {
+  width: 100%;
+}
+
+.cdr-settings-group h3 {
+  font-size: 1rem;
+}
+
+.cdr-settings-warning {
+  margin: -.25rem 0 0;
+  padding: .625rem .75rem;
+  border-radius: var(--cpbx-control-radius);
+  background: var(--cpbx-warning-soft);
+  color: var(--cpbx-warning);
+  font-size: .8125rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 760px) {
+  .cdr-settings-page {
+    padding: 1rem;
+  }
 }

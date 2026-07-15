@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild, inject, signal, computed, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-import { MaterialModule } from "../../../../material-module";
 import { select, Store } from '@ngrx/store';
 import { AppState, selectDirectoryState } from '../../../store/app.states';
 import {
@@ -26,17 +25,18 @@ import {
   StorePasteDirectoryDomainParameters, ImportXMLDomain, SwitchDirectoryDomain,
 } from '../../../store/directory/directory.actions';
 import { AbstractControl, FormsModule } from '@angular/forms';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { ConfirmBottomSheetComponent } from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import { InnerHeaderComponent } from "../../inner-header/inner-header.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {KeyValuePadComponent} from "../../key-value-pad/key-value-pad.component";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {State} from "../../../store/directory/directory.reducers";
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent],
+  imports: [FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, TabNavComponent, DisclosureComponent],
   selector: 'app-domains',
   templateUrl: './domains.component.html',
   styleUrls: ['./domains.component.css']
@@ -45,8 +45,8 @@ export class DomainsComponent implements OnInit {
 
   // --- Dependency Injection using inject() ---
   public store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
 
   private directoryState = toSignal(
     this.store.pipe(select(selectDirectoryState)),
@@ -194,7 +194,7 @@ export class DomainsComponent implements OnInit {
           case2Text: 'Are you sure you want to rename domain "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

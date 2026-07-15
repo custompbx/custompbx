@@ -1,24 +1,27 @@
 import {Component, computed, effect} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../material-module";
 import {Store} from '@ngrx/store';
 import {AppState, selectInstancesState} from '../../store/app.states';
 import {initialState, Iinstances} from '../../store/instances/instances.reducers';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../services/toast.service';
 import {UpdateInstanceDescription} from '../../store/instances/instances.actions';
 import {AbstractControl, FormsModule} from '@angular/forms';
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
+import {TabNavComponent} from '../tab-nav/tab-nav.component';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {IconComponent} from '../icon/icon.component';
 
 
 @Component({
 standalone: true,
-    imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent],
+    imports: [CommonModule, FormsModule, InnerHeaderComponent, TabNavComponent, IconComponent],
     selector: 'app-instances',
     templateUrl: './instances.component.html',
     styleUrls: ['./instances.component.css']
 })
 export class InstancesComponent {
+
+  public selectedIndex = 0;
 
   private readonly state = toSignal(this.store.select(selectInstancesState), {initialValue: initialState});
   public readonly list = computed(() => this.state().instances as Iinstances);
@@ -28,7 +31,7 @@ export class InstancesComponent {
 
   constructor(
     private store: Store<AppState>,
-    private _snackBar: MatSnackBar,
+    private _snackBar: ToastService,
   ) {
     effect(() => {
       const error = this.state().errorMessage;

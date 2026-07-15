@@ -49,8 +49,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.unicall) {
-        state.unicall = <Iunicall>{};
-        state.loadCounter = 0;
+        state = {...state, unicall: <Iunicall>{}, loadCounter: 0};
       }
 
       return {
@@ -74,8 +73,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.unicall) {
-        state.unicall = <Iunicall>{};
-        state.loadCounter = 0;
+        state = {...state, unicall: <Iunicall>{}, loadCounter: 0};
       }
 
       return {

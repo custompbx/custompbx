@@ -1,8 +1,4 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
-import { MatTableModule } from '@angular/material/table';
 
 import { InstancesComponent } from './instances.component';
 
@@ -14,10 +10,6 @@ describe('SystemComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         InstancesComponent,
-        NoopAnimationsModule,
-        MatPaginatorModule,
-        MatSortModule,
-        MatTableModule,
       ]
     }).compileComponents();
   }));

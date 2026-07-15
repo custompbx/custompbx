@@ -376,13 +376,39 @@ func TestReadWaiterRejectsMalformedMessagesWithoutCallingHandler(t *testing.T) {
 	if err := json.Unmarshal(raw, &response); err != nil {
 		t.Fatal(err)
 	}
-	if response.MessageType != "none" || response.Error == "" {
+	if response.MessageType != "bad" || response.Error == "" {
 		t.Fatalf("unexpected response: %+v", response)
 	}
 	select {
 	case <-handled:
 		t.Fatal("handler was called for malformed message")
 	case <-time.After(100 * time.Millisecond):
+	}
+	_ = context.Close()
+}
+
+func TestReadWaiterCorrelatesTypedPayloadErrorsToRequest(t *testing.T) {
+	context, client := testWebSocketContext(t)
+	go context.SendWaiter()
+	go context.ReadWaiter(func(*Message, *WsContext) {
+		t.Error("handler was called for an invalid typed payload")
+	})
+
+	const event = "[Config][Update] Callcenter Agent"
+	payload := []byte(`{"event":"` + event + `","data":{"id":7,"name":"max-no-answer","value":3}}`)
+	if err := client.WriteMessage(websocket.TextMessage, payload); err != nil {
+		t.Fatal(err)
+	}
+	_, raw, err := client.ReadMessage()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var response UserResponse
+	if err := json.Unmarshal(raw, &response); err != nil {
+		t.Fatal(err)
+	}
+	if response.MessageType != event || response.Error != "invalid request payload" {
+		t.Fatalf("unexpected response: %+v", response)
 	}
 	_ = context.Close()
 }

@@ -1,18 +1,17 @@
-import {Component, inject, signal, computed, effect, OnInit} from '@angular/core';
+import {Component, inject, signal, computed, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectCDRState} from '../../store/app.states';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {PageEvent} from '@angular/material/paginator';
+import {ToastService} from '../../services/toast.service';
+import {CpbxPageEvent as PageEvent, PaginatorComponent} from '../paginator/paginator.component';
 import {State} from '../../store/cdr/cdr.reducers';
 import {GetCDR} from '../../store/cdr/cdr.actions';
 import {GetWebSettings, SaveWebSettings} from '../../store/settings/settings.actions';
 
-import {MaterialModule} from "../../../material-module";
-import {ResizeInputDirective} from "../../directives/resize-input.directive";
 import {FormsModule} from "@angular/forms";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
+import {TabNavComponent} from '../tab-nav/tab-nav.component';
 
 export interface IfilterField {
   field: string|null;
@@ -27,16 +26,18 @@ export interface IsortField {
 
 @Component({
   standalone: true,
-  imports: [MaterialModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective],
+  imports: [FormsModule, InnerHeaderComponent, CpbxSelectDirective, TabNavComponent, PaginatorComponent],
   selector: 'app-cdr',
   templateUrl: './cdr.component.html',
   styleUrls: ['./cdr.component.css']
 })
 export class CdrComponent { // Removed OnDestroy
 
+  readonly selectedTab = signal(0);
+
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
 
   // --- Reactive State from NgRx using toSignal ---
   private cdrState = toSignal(
@@ -76,7 +77,11 @@ export class CdrComponent { // Removed OnDestroy
 
   // Settings fields
   public settings = signal<{[key: string]: any}>({});
-  public moduleOptions = ['auto', 'cdr_pg_csv', 'odbc_cdr'];
+  public moduleOptions = [
+    {value: 'auto', label: 'Automatic'},
+    {value: 'cdr_pg_csv', label: 'PostgreSQL (cdr_pg_csv)'},
+    {value: 'odbc_cdr', label: 'ODBC (odbc_cdr)'},
+  ];
   public fieldModule = 'cdr_module';
   public fieldTable = 'cdr_table';
   public fieldFileServeColumn = 'cdr_file_serve_column';

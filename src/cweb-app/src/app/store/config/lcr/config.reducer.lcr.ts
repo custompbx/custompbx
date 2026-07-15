@@ -47,15 +47,12 @@ export function reducer(state = initialState, action: All): State {
         };
       }
 
-      if (!state.lcr) {
-        state.lcr = <Ilcr>{};
-        state.loadCounter = 0;
-      }
+      const lcr = state.lcr || <Ilcr>{};
 
       return {
         ...state,
         lcr: {
-          ...state.lcr,
+          ...lcr,
           settings: {...settings},
           profiles: {...profiles},
           exists: action.payload.response.exists,
@@ -71,16 +68,13 @@ export function reducer(state = initialState, action: All): State {
         return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
-      if (!state.lcr) {
-        state.lcr = <Ilcr>{};
-        state.loadCounter = 0;
-      }
+      const lcr = state.lcr || <Ilcr>{};
 
       return {
         ...state,
         lcr: {
-          ...state.lcr,
-          profiles: {...state.lcr.profiles, [data.id]: data},
+          ...lcr,
+          profiles: {...lcr.profiles, [data.id]: data},
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },

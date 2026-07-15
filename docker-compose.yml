@@ -61,6 +61,10 @@ services:
       postgres:
         condition: service_started
     restart: always
+    environment:
+      # Quick-start only: replace the unusable stock FreeSWITCH CDR sample DSN
+      # when it is imported unchanged. User-configured CDR databases are preserved.
+      CUSTOMPBX_DEMO_CDR_BOOTSTRAP: "true"
     ports:
       - 8080:8080
       - 8081:8081

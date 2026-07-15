@@ -1,10 +1,10 @@
 <app-inner-header name="Post Load Modules" [loadCounter]="loadCounter()"></app-inner-header>
 @if (list()) {
-  <mat-card>
-    <mat-card-header>
-      <mat-card-subtitle>Modules</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
+  <section class="cpbx-card">
+    <header class="cpbx-card__header">
+      <div class="cpbx-card__subtitle">Modules</div>
+    </header>
+    <div class="cpbx-card__content">
       <h3>Load:</h3>
       <app-key-value-pad-2 [exist]="list().modules"
                            [items]="list().modules"
@@ -15,8 +15,8 @@
                            [fieldsMask]="globalSettingsMask"
       >
       </app-key-value-pad-2>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 }
 
 

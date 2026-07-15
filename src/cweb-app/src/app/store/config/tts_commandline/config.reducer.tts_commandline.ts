@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.tts_commandline) {
-        state.tts_commandline = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, tts_commandline: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

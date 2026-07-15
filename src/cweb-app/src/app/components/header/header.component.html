@@ -1,6 +1,6 @@
-<mat-toolbar class="app-toolbar" role="banner">
-  <button mat-icon-button (click)="toggleMenu.emit()" matTooltip="Toggle navigation" aria-label="Toggle navigation">
-    <mat-icon>menu</mat-icon>
+<header class="app-toolbar" role="banner">
+  <button class="cpbx-button cpbx-button--icon" (click)="toggleMenu.emit()" title="Toggle navigation" aria-label="Toggle navigation">
+    <app-icon name="menu"></app-icon>
   </button>
   <a class="brand" routerLink="/dashboard" aria-label="CustomPBX dashboard">
     <img class="brand-logo" src="./assets/img/logo-small.png" alt="">
@@ -8,49 +8,51 @@
   </a>
   <span class="example-spacer"></span>
   <div class="header-actions" aria-label="Application actions">
-    <button mat-icon-button class="header-icon-button" (click)="showHideConversations()" matTooltip="Conversations" aria-label="Open conversations">
-      <mat-icon>question_answer</mat-icon>
+    <button class="header-icon-button cpbx-button cpbx-button--icon" (click)="showHideConversations()" title="Conversations" aria-label="Open conversations">
+      <app-icon name="question_answer"></app-icon>
     </button>
-    <button mat-icon-button class="header-icon-button" (click)="showHidePhone()" matTooltip="Phone" aria-label="Toggle phone">
-      <mat-icon>phone</mat-icon>
+    <button class="header-icon-button cpbx-button cpbx-button--icon" (click)="showHidePhone()" title="Phone" aria-label="Toggle phone">
+      <app-icon name="phone"></app-icon>
     </button>
-    <button mat-icon-button class="header-icon-button" (click)="cloneComponent()" [disabled]="!currentComponent"
-      matTooltip="Duplicate current view" aria-label="Duplicate current view">
-      <mat-icon>filter_2</mat-icon>
+    <button class="header-icon-button cpbx-button cpbx-button--icon" (click)="cloneComponent()" [disabled]="!currentComponent"
+      title="Duplicate current view" aria-label="Duplicate current view">
+      <app-icon name="filter_2"></app-icon>
     </button>
     @if (user()?.group_id === 1) {
-      <button mat-icon-button class="header-icon-button" [routerLink]="['/settings']" matTooltip="Settings" aria-label="Open settings">
-        <mat-icon>settings</mat-icon>
+      <button class="header-icon-button cpbx-button cpbx-button--icon" [routerLink]="['/settings']" title="Settings" aria-label="Open settings">
+        <app-icon name="settings"></app-icon>
       </button>
     }
   </div>
-  <button type="button" class="user-block" [matMenuTriggerFor]="menu" aria-label="Open user menu">
+  <details class="user-menu">
+    <summary class="user-block" aria-label="Open user menu">
       @if (!user()?.avatar_format) {
-        <mat-icon>face</mat-icon>
+        <app-icon name="face"></app-icon>
       }
       @if (user()?.avatar_format) {
         <img class="avatar-img"
           [src]="'./assets/img/avatar/' + user().id + '.' + user().avatar_format" alt="">
         }
-      <span class="user-name">{{user()?.login}}</span>
-    </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item>
-        <mat-icon>account_circle</mat-icon>
+    </summary>
+    <div class="user-menu__panel" role="menu">
+      <button type="button" class="user-menu__item" role="menuitem">
+        <app-icon name="account_circle"></app-icon>
         <span>Profile</span>
       </button>
       @if (user()?.group_id === 1) {
-        <button mat-menu-item [routerLink]="['/settings']">
-          <mat-icon>settings</mat-icon>
+        <button type="button" class="user-menu__item" role="menuitem" [routerLink]="['/settings']">
+          <app-icon name="settings"></app-icon>
           <span>Settings</span>
         </button>
       }
-      <button mat-menu-item (click)="logOut()">
-        <mat-icon>keyboard_tab</mat-icon>
+      <button type="button" class="user-menu__item" role="menuitem" (click)="logOut()">
+        <app-icon name="keyboard_tab"></app-icon>
         <span>Log out</span>
       </button>
-    </mat-menu>
-  </mat-toolbar>
+    </div>
+  </details>
+  <span class="user-name">{{user()?.login}}</span>
+</header>
   <div [hidden]="hidePhone()">
     @if (startPhone()) {
       <app-phone></app-phone>

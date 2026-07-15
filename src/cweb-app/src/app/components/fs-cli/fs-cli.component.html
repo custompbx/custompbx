@@ -1,16 +1,11 @@
-@if (loadCounter() > 0) {
-  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-}
-<mat-toolbar color="basic">
-  <span>FS_CLI</span>
-</mat-toolbar>
+<app-inner-header name="FS_CLI" [loadCounter]="loadCounter()"></app-inner-header>
 <div class="fs-cli-card">
   <div class="cpbx-form-panel">
     <label class="cpbx-field cpbx-field--wide">
 <span class="cpbx-label">Command</span>
 <input name="value" placeholder="Enter FreeSWITCH command" [ngModel]="command()" (ngModelChange)="command.set($event)" appResizeInput [resizeOnString]="command()" required (keyup.enter)="runCommand()" class="cpbx-input">
 </label>
-      <button mat-flat-button color="primary" class="switch-button" [disabled]="!command()"
+      <button class="switch-button cpbx-button cpbx-button--primary" [disabled]="!command()"
         (click)="runCommand()">
         Run Command
       </button>

@@ -1,11 +1,11 @@
 <app-inner-header name="CDR PG CSV" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-card>
-    <mat-card-header>
-      <mat-card-subtitle>Settings</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
+  <section class="cpbx-card">
+    <header class="cpbx-card__header">
+      <p class="cpbx-card__subtitle">Settings</p>
+    </header>
+    <div class="cpbx-card__content">
       <h3>Params:</h3>
       <app-key-value-pad-2 [exist]="list().settings"
         [items]="list().settings"
@@ -15,16 +15,16 @@
         [dispatchersCallbacks]="globalSettingsDispatchers"
         >
       </app-key-value-pad-2>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 }
 
 @if (list() && list().exists !== false) {
-  <mat-card>
-    <mat-card-header>
-      <mat-card-subtitle>Schema</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
+  <section class="cpbx-card">
+    <header class="cpbx-card__header">
+      <p class="cpbx-card__subtitle">Schema</p>
+    </header>
+    <div class="cpbx-card__content">
       <h3>Fields:</h3>
       <app-key-value-pad-2 [exist]="list().schema"
         [items]="list().schema"
@@ -35,6 +35,6 @@
         [fieldsMask]="schemaFieldMask"
         >
       </app-key-value-pad-2>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </section>
 }

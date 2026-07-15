@@ -37,8 +37,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.alsa) {
-        state.alsa = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, alsa: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

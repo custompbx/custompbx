@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.cdr_mongodb) {
-        state.cdr_mongodb = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, cdr_mongodb: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

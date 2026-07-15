@@ -48,17 +48,14 @@ export function reducer(state = initialState, action: All): State {
         };
       }
 
-      if (!state.fifo) {
-        state.fifo = <Ififo>{};
-        state.loadCounter = 0;
-      }
+      const fifo = state.fifo || <Ififo>{};
 
       return {
         ...state,
         fifo: {
-          ...state.fifo,
-          settings: {...state.fifo.settings, ...settings},
-          fifos: {...state.fifo.fifos, ...fifos},
+          ...fifo,
+          settings: {...fifo.settings, ...settings},
+          fifos: {...fifo.fifos, ...fifos},
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error || null,
         },
@@ -74,16 +71,13 @@ export function reducer(state = initialState, action: All): State {
         return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0 };
       }
 
-      if (!state.fifo) {
-        state.fifo = <Ififo>{};
-        state.loadCounter = 0;
-      }
+      const fifo = state.fifo || <Ififo>{};
 
       return {
         ...state,
         fifo: {
-          ...state.fifo,
-          fifos: {...state.fifo.fifos, [data.id]: data},
+          ...fifo,
+          fifos: {...fifo.fifos, [data.id]: data},
           errorMessage: action.payload.response.error || null,
         },
         loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0,

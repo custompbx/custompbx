@@ -1,22 +1,21 @@
 <app-inner-header name="Opal" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selectedIndex">
-    <mat-tab label="List">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Settings</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title>
+  <app-tab-nav ariaLabel="Opal sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+      <section class="cpbx-card">
+        <header class="cpbx-card__header">
+          <p class="cpbx-card__subtitle">Settings</p>
+        </header>
+        <div class="cpbx-card__content">
+          <app-disclosure>
+              <span disclosureTitle>
                 Settings
-              </mat-panel-title>
-              <mat-panel-description>
+              </span>
+              <span disclosureDescription>
                 Click to get details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
+              </span>
             <h3>Params:</h3>
             <app-key-value-pad-2 [exist]="list().settings"
                                  [items]="list().settings"
@@ -26,28 +25,26 @@
                                  [dispatchersCallbacks]="globalSettingsDispatchers"
             >
             </app-key-value-pad-2>
-          </mat-expansion-panel>
-        </mat-card-content>
-      </mat-card>
+          </app-disclosure>
+        </div>
+      </section>
 
-      <mat-card>
-        <mat-card-header>
-          <mat-card-subtitle>Listeners</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
+      <section class="cpbx-card">
+        <header class="cpbx-card__header">
+          <p class="cpbx-card__subtitle">Listeners</p>
+        </header>
+        <div class="cpbx-card__content">
           @for (item of onlyValues(list().listeners); track item.id) {
             <div class="panel-wrapper">
-              <mat-expansion-panel (opened)="getOpalListenersParams(item.id)"
+              <app-disclosure (opened)="getOpalListenersParams(item.id)"
                                    [expanded]="panelCloser['listener' + item.id]">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
+                  <span disclosureTitle>
                     {{item.name}}
-                  </mat-panel-title>
-                  <mat-panel-description>
+                  </span>
+                  <span disclosureDescription>
                     Click to get details
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
-                <button mat-stroked-button color="basic" class="config-copy-button" (click)="copyListener(item.id)"
+                  </span>
+                <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyListener(item.id)"
                         *ngIf="list().listeners[item.id] && (list().listeners[item.id].parameters)">Copy
                 </button>
                 <h3>Params:</h3>
@@ -61,24 +58,24 @@
                   >
                   </app-key-value-pad-2>
                 </div>
-              </mat-expansion-panel>
+              </app-disclosure>
             </div>
           }
-        </mat-card-content>
-      </mat-card>
-    </mat-tab>
+        </div>
+      </section>
+    </div>
 
-    <mat-tab label="Add">
+    <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
       <form class="cpbx-form-panel" (ngSubmit)="onListenerSubmit()">
         <label class="cpbx-field cpbx-field--md">
 <span class="cpbx-label">Name</span>
 <input placeholder="New listener name" required name="name" [ngModel]="newListenerName()" (ngModelChange)="newListenerName.set($event)" class="cpbx-input">
 </label>
-        <button mat-flat-button color="primary" type="submit">Submit</button>
+        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
       </form>
-    </mat-tab>
+    </div>
 
-    <mat-tab label="Delete/Rename">
+    <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
         <h3 class="cpbx-form-title">Listeners</h3>
         @for (listener of onlyValues(list().listeners); track listener.id) {
@@ -87,19 +84,18 @@
 <span class="cpbx-label">Listener name</span>
 <input name="Listener name" required [ngModel]="listener.name" [name]="'listener::' + listener.id" placeholder="Listener name" class="cpbx-input">
 </label>
-            <button mat-flat-button color="primary" type="button" [disabled]="checkDirty(deleteForm.controls['listener::' + listener.id])"
+            <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['listener::' + listener.id])"
                     (click)="openBottomSheetListener(listener.id, deleteForm.controls['listener::' + listener.id].value, listener.name, 'rename')">
               Update
             </button>
-            <button mat-stroked-button color="warn" type="button"
+            <button class="cpbx-button cpbx-button--danger-outline" type="button"
                     (click)="openBottomSheetListener(listener.id, deleteForm.controls['listener::' + listener.id].value, listener.name, 'delete')">
               Delete
             </button>
           </div>
         }
       </form>
-    </mat-tab>
-  </mat-tab-group>
+    </div>
 }
 
 

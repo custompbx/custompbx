@@ -1,4 +1,7 @@
 .code-editor {
   font-size: 1.2em;
-
+  min-height: 28rem;
+  width: 100%;
 }
+
+:host { display: block; min-width: 0; width: 100%; }

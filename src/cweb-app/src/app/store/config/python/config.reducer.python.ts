@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.python) {
-        state.python = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, python: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

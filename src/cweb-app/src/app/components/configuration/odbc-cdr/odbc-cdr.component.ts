@@ -1,12 +1,11 @@
 import {Component, computed, effect, OnDestroy, OnInit} from '@angular/core';
 
-import {MaterialModule} from "../../../../material-module";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
+import {ConfirmationService} from '../../../services/confirmation.service';
 import {AbstractControl, FormsModule} from '@angular/forms';
 import {IodbcCdr, Iitem, IodbcField, Itable} from '../../../store/config/config.state.struct';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../../services/toast.service';
 import {
   AddOdbcCdrField,
   AddOdbcCdrParameter, AddOdbcCdrTable, DeleteOdbcCdrField, DeleteOdbcCdrParameter, DeleteOdbcCdrTable,
@@ -19,14 +18,15 @@ import {
   UpdateOdbcCdrParameter, UpdateOdbcCdrTable, GetOdbcCdrField
 } from '../../../store/config/odbc_cdr/config.actions.odbc-cdr';
 import {ActivatedRoute} from '@angular/router';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {toSignal} from "@angular/core/rxjs-interop";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
 
 @Component({
 standalone: true,
-imports:  [MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent],
+imports:  [FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, TabNavComponent, DisclosureComponent],
     selector: 'app-odbc-cdr',
     templateUrl: './odbc-cdr.component.html',
     styleUrls: ['./odbc-cdr.component.css']
@@ -47,8 +47,8 @@ export class OdbcCdrComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<AppState>,
-    private bottomSheet: MatBottomSheet,
-    private _snackBar: MatSnackBar,
+    private bottomSheet: ConfirmationService,
+    private _snackBar: ToastService,
     private route: ActivatedRoute,
   ) {
     this.selectedIndex = 0;
@@ -223,7 +223,7 @@ export class OdbcCdrComponent implements OnInit, OnDestroy {
           case2Text: 'Are you sure you want to rename gateway "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;

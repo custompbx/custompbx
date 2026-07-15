@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../material-module";
+import {DragDropModule} from '@angular/cdk/drag-drop';
 import {AbstractControl, FormsModule} from '@angular/forms';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import {MatBottomSheet} from "@angular/material/bottom-sheet";
-import {ConfirmBottomSheetComponent} from "../confirm-bottom-sheet/confirm-bottom-sheet.component";
+import {ConfirmationService} from '../../services/confirmation.service';
+import {resolvePositionedReorder} from '../../utils/reorder';
 
 type FieldSlot = 'name' | 'value' | 'extraField1' | 'extraField2' | 'extraField3' | 'extraField4' | 'extraField5' | 'extraField6' | 'extraField7';
 type FieldSize = 'sm' | 'md' | 'wide';
@@ -21,7 +21,7 @@ type FieldConfig = {
 
 @Component({
 standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule],
+  imports: [CommonModule, DragDropModule, FormsModule],
     selector: 'app-key-value-pad-2',
     templateUrl: './key-value-pad-2.component.html',
     styleUrls: ['./key-value-pad-2.component.css']
@@ -61,7 +61,7 @@ export class KeyValuePad2Component implements OnInit {
     'extraField7',
   ];
 
-  constructor(private bottomSheet: MatBottomSheet) { }
+  constructor(private bottomSheet: ConfirmationService) { }
 
   ngOnInit() {
     if (!this.fieldsMask) {
@@ -333,7 +333,7 @@ export class KeyValuePad2Component implements OnInit {
 
   confirmDeleteItem(obj: any): void {
     const name = this.itemDisplayName(obj);
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, {
+    const sheet = this.bottomSheet.open({
       data: {
         action: 'delete',
         case1Text: `Delete item "${name}"?`,
@@ -531,14 +531,9 @@ export class KeyValuePad2Component implements OnInit {
     if (!this.sortable || !this.dispatchersCallbacks || !this.dispatchersCallbacks['dropActionItem']) {
       return;
     }
-    if (!parent[event.previousIndex] || !parent[event.currentIndex]) {
-      return;
+    if (resolvePositionedReorder(parent, event.previousIndex, event.currentIndex)) {
+      this.dispatchersCallbacks['dropActionItem'](event, parent);
     }
-    if (parent[event.previousIndex].position === parent[event.currentIndex].position) {
-      return;
-    }
-
-    this.dispatchersCallbacks['dropActionItem'](event, parent);
   }
 
   private controlsForItem(form: any, id: number): AbstractControl[] {

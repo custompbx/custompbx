@@ -1,13 +1,9 @@
 import {Component, computed, effect, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../material-module";
-import {filter, map} from 'rxjs/operators';
-import {Breakpoints, BreakpointObserver} from '@angular/cdk/layout';
 import {Observable, Subscription} from 'rxjs';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState, selectDataFlowState} from '../../store/app.states';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {ToastService} from '../../services/toast.service';
 import {Idashboard} from '../../store/dataFlow/dataFlow.reducers';
 import {ChartOptions, ChartDataset} from 'chart.js';
 import * as pluginDataLabels from 'chartjs-plugin-datalabels';
@@ -37,7 +33,7 @@ interface ChartDataMap {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, BaseChartDirective],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, BaseChartDirective],
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -139,10 +135,8 @@ export class DashboardComponent implements OnDestroy {
     },
   ];
 
-  private breakpointObserver = inject(BreakpointObserver);
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
 // --- NgRx Observables converted to Signals (Primary State) ---
@@ -211,23 +205,8 @@ export class DashboardComponent implements OnDestroy {
     };
   });
 
-  // --- Screen Breakpoint Observable (Kept as Observable, bound with | async) ---
-  public cards: Observable<any> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
-    map(({ matches }) => {
-      // ... (Your card definition logic remains the same) ...
-      if (matches) {
-        return [
-          {title: 'Card 1', type: '', show: false},
-          {title: 'Card 2', type: '', show: false},
-          {title: 'Card 3', type: '', show: false},
-          {title: 'Card 4', type: '', show: false},
-          {title: 'Card 5', type: '', show: false},
-          {title: 'Card 6', type: '', show: false},
-          {title: 'Card 7', type: '', show: false},
-        ];
-      }
-
-      return [
+  // Card content is independent of viewport size; CSS controls the responsive grid.
+  public readonly cards = [
         {
           title: 'Sip Profiles',
           class: 'two-cols',
@@ -287,9 +266,7 @@ export class DashboardComponent implements OnDestroy {
           chartLabels: /*<Label[]>*/['CPU Cores'],
           show: true,
         },
-      ];
-    })
-  );
+  ];
 // --- Side Effect (Snackbar Logic) ---
   // 5. Use effect() to handle side effects (snackbars) whenever an error changes.
   private errorEffect = effect(() => {

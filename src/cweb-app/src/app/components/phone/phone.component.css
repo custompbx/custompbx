@@ -12,9 +12,12 @@
 }
 
 .phone-header {
+  align-items: center;
   background: #3548ad;
   color: #fff;
   cursor: move;
+  display: flex;
+  gap: .35rem;
   min-height: 64px;
   padding: 0 10px 0 18px;
 }
@@ -66,7 +69,18 @@
 }
 
 .phone-header-action {
+  align-items: center;
   color: #fff;
+  display: inline-flex;
+  flex: 0 0 44px;
+  height: 44px;
+  justify-content: center;
+  min-width: 44px;
+  width: 44px;
+}
+
+.phone-header-action app-icon {
+  font-size: 28px;
 }
 
 #main-content {
@@ -87,6 +101,13 @@
 .dial-input-action {
   color: #64748b;
   flex: 0 0 auto;
+  height: 40px;
+  min-width: 40px;
+  width: 40px;
+}
+
+.dial-input-action app-icon {
+  font-size: 23px;
 }
 
 .buttons-pad {
@@ -130,8 +151,19 @@
 
 .phone-action-button {
   border-radius: 10px;
+  gap: 9px;
   min-height: 46px;
   width: 100%;
+}
+
+.phone-action-button app-icon {
+  font-size: 22px;
+}
+
+.phone-action-button--active {
+  background: var(--cpbx-info);
+  border-color: var(--cpbx-info);
+  color: #fff;
 }
 
 .timer {
@@ -162,16 +194,24 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .reg-button {
-  --mat-fab-small-container-color: rgba(255, 255, 255, .14);
-  --mat-fab-small-foreground-color: #fff;
-  height: 38px;
-  width: 38px;
+  align-items: center;
+  background: rgba(255, 255, 255, .14);
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  height: 46px;
+  justify-content: center;
+  width: 46px;
   box-shadow: none;
 }
 
+.reg-button app-icon {
+  font-size: 28px;
+}
+
 .reg-button--registered {
-  --mat-fab-small-container-color: #22c55e;
-  --mat-fab-small-foreground-color: #fff;
   background-color: #22c55e;
   color: #fff;
   box-shadow: 0 0 0 3px rgba(74, 222, 128, .2);
@@ -179,9 +219,10 @@ input[type=number]::-webkit-outer-spin-button {
 
 .reg-button--registered:hover,
 .reg-button--registered:focus-visible {
-  --mat-fab-small-container-color: #16a34a;
   background-color: #16a34a;
 }
+
+.phone-no-credentials { background: var(--cpbx-danger-soft); color: var(--cpbx-danger); cursor: default; padding: .75rem 1rem; }
 
 @media (max-width: 600px) {
   .main-content-wrapper {

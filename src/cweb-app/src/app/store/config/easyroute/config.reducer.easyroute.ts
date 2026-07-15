@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.easyroute) {
-        state.easyroute = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, easyroute: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

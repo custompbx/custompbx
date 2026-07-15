@@ -47,17 +47,14 @@ export function reducer(state = initialState, action: All): State {
         };
       }
 
-      if (!state.directory) {
-        state.directory = <Idirectory>{};
-        state.loadCounter = 0;
-      }
+      const directory = state.directory || <Idirectory>{};
 
       return {
         ...state,
         directory: {
-          ...state.directory,
-          settings: {...state.directory.settings, ...settings},
-          profiles: {...state.directory.profiles, ...profiles},
+          ...directory,
+          settings: {...directory.settings, ...settings},
+          profiles: {...directory.profiles, ...profiles},
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },
@@ -72,16 +69,13 @@ export function reducer(state = initialState, action: All): State {
         return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }
 
-      if (!state.directory) {
-        state.directory = <Idirectory>{};
-        state.loadCounter = 0;
-      }
+      const directory = state.directory || <Idirectory>{};
 
       return {
         ...state,
         directory: {
-          ...state.directory,
-          profiles: {...state.directory.profiles, [data.id]: data},
+          ...directory,
+          profiles: {...directory.profiles, [data.id]: data},
           exists: action.payload.response.exists,
           errorMessage: action.payload.response.error ||  '',
         },

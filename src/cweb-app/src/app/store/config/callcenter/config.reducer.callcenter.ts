@@ -73,8 +73,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.callcenter) {
-        state.callcenter = <Icallcenter>{};
-        state.loadCounter = 0;
+        state = {...state, callcenter: <Icallcenter>{}, loadCounter: 0};
       }
 
       return {
@@ -434,8 +433,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.callcenter) {
-        state.callcenter = <Icallcenter>{};
-        state.loadCounter = 0;
+        state = {...state, callcenter: <Icallcenter>{}, loadCounter: 0};
       }
       const agents = state.callcenter?.agents || {table: [], list: {}, total: 0};
       const tiers = state.callcenter?.tiers || {table: [], list: {}, total: 0};
@@ -465,8 +463,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.callcenter) {
-        state.callcenter = <Icallcenter>{};
-        state.loadCounter = 0;
+        state = {...state, callcenter: <Icallcenter>{}, loadCounter: 0};
       }
       const agents = state.callcenter?.agents || {table: [], list: {}, total: 0};
 
@@ -493,8 +490,7 @@ export function reducer(state = initialState, action: All): State {
       const data = action.payload.response.data || {};
 
       if (!state.callcenter) {
-        state.callcenter = <Icallcenter>{};
-        state.loadCounter = 0;
+        state = {...state, callcenter: <Icallcenter>{}, loadCounter: 0};
       }
       const agents = state.callcenter?.agents || {table: [], list: {}, total: 0};
       let total = agents.total || 0;
@@ -585,8 +581,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.callcenter) {
-        state.callcenter = <Icallcenter>{};
-        state.loadCounter = 0;
+        state = {...state, callcenter: <Icallcenter>{}, loadCounter: 0};
       }
       const tiers = state.callcenter?.tiers || {table: [], list: {}, total: 0};
 
@@ -612,8 +607,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.callcenter) {
-        state.callcenter = <Icallcenter>{};
-        state.loadCounter = 0;
+        state = {...state, callcenter: <Icallcenter>{}, loadCounter: 0};
       }
       const tiers = state.callcenter?.tiers || {table: [], list: {}, total: 0};
       let total = tiers.total || 0;
@@ -703,8 +697,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.callcenter) {
-        state.callcenter = <Icallcenter>{};
-        state.loadCounter = 0;
+        state = {...state, callcenter: <Icallcenter>{}, loadCounter: 0};
       }
       const agents = state.callcenter?.agents || {list: {}, table: [], total: 0};
 
@@ -731,8 +724,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.callcenter) {
-        state.callcenter = <Icallcenter>{};
-        state.loadCounter = 0;
+        state = {...state, callcenter: <Icallcenter>{}, loadCounter: 0};
       }
       const tiers = state.callcenter?.tiers || {list: {}, table: [], total: 0};
 
@@ -760,8 +752,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.callcenter) {
-        state.callcenter = <Icallcenter>{};
-        state.loadCounter = 0;
+        state = {...state, callcenter: <Icallcenter>{}, loadCounter: 0};
       }
       const tiers = state.callcenter?.members || {table: [], list: {}, total: 0};
 
@@ -815,7 +806,7 @@ export function reducer(state = initialState, action: All): State {
               ...state.callcenter?.changed[tableName] || {},
               [rowId]: {
                 ...state.callcenter?.changed[tableName][rowId] || {},
-                [fieldName]: true,
+                [fieldName]: action.payload.changed !== false,
               },
             }
           },

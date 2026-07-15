@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.sangoma_codec) {
-        state.sangoma_codec = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, sangoma_codec: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.redis) {
-        state.redis = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, redis: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="assessment" viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3M3 21h18"/></symbol>
+    <symbol id="navigate_next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="folder_shared" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z"/><circle cx="15" cy="12" r="2"/><path d="M11.5 17c.7-1.6 2-2.4 3.5-2.4s2.8.8 3.5 2.4"/></symbol>
+    <symbol id="settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></symbol>
+    <symbol id="dialpad" viewBox="0 0 24 24"><circle cx="6" cy="5" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="18" cy="5" r="1"/><circle cx="6" cy="11" r="1"/><circle cx="12" cy="11" r="1"/><circle cx="18" cy="11" r="1"/><circle cx="6" cy="17" r="1"/><circle cx="12" cy="17" r="1"/><circle cx="18" cy="17" r="1"/><circle cx="12" cy="22" r="1"/></symbol>
+    <symbol id="find_in_page" viewBox="0 0 24 24"><path d="M5 3h10l4 4v6M5 3v18h8"/><path d="M15 3v5h4"/><circle cx="15" cy="16" r="3"/><path d="m17.2 18.2 2.3 2.3"/></symbol>
+    <symbol id="insert_drive_file" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5"/></symbol>
+    <symbol id="chevron_right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="storage" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6"/><path d="M17 8h.01M17 14h.01"/></symbol>
+    <symbol id="settings_input_component" viewBox="0 0 24 24"><path d="M4 3v4m0 4v10M12 3v10m0 4v4M20 3v2m0 4v12M1 7h6M9 13h6M17 5h6"/></symbol>
+    <symbol id="playlist_add_check" viewBox="0 0 24 24"><path d="M4 6h10M4 11h10M4 16h7M16 15l2 2 4-5"/></symbol>
+    <symbol id="menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="question_answer" viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4z"/><path d="M8 8h8M8 12h5"/></symbol>
+    <symbol id="phone" viewBox="0 0 24 24"><path d="M6.6 3 4 5.6c.3 7.2 7.2 14.1 14.4 14.4l2.6-2.6-4.2-3-2.1 2.1c-3.1-1.2-6-4.1-7.2-7.2l2.1-2.1z"/></symbol>
+    <symbol id="call" viewBox="0 0 24 24"><path d="M6.6 3 4 5.6c.3 7.2 7.2 14.1 14.4 14.4l2.6-2.6-4.2-3-2.1 2.1c-3.1-1.2-6-4.1-7.2-7.2l2.1-2.1z"/></symbol>
+    <symbol id="filter_2" viewBox="0 0 24 24"><rect x="5" y="5" width="12" height="12" rx="2"/><path d="M9 9h4l-4 4h4M9 21h10a2 2 0 0 0 2-2V9"/></symbol>
+    <symbol id="face" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.3 2.3 2 4 2s3-.7 4-2M9 10h.01M15 10h.01M7 7c2 1 3.7 1.2 5 0 1.3 1.2 3 1 5 0"/></symbol>
+    <symbol id="account_circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="9" r="3"/><path d="M6.5 19c1.1-3 3-4.5 5.5-4.5s4.4 1.5 5.5 4.5"/></symbol>
+    <symbol id="keyboard_tab" viewBox="0 0 24 24"><path d="M4 5v14M20 5v14M8 12h8m-3-3 3 3-3 3"/></symbol>
+    <symbol id="close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="forum" viewBox="0 0 24 24"><path d="M3 4h14v10H7l-4 4z"/><path d="M8 17h9l4 3V9h-2"/></symbol>
+    <symbol id="chat" viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 4z"/></symbol>
+    <symbol id="send" viewBox="0 0 24 24"><path d="m3 4 18 8-18 8 4-8zM7 12h14"/></symbol>
+    <symbol id="phone_disabled" viewBox="0 0 24 24"><path d="m3 3 18 18M6.6 3 4 5.6c.2 4.8 3.3 9.8 7.6 12.3M15 14.3l1.8.2 4.2 3-2.6 2.5c-1.2 0-2.4-.3-3.5-.6"/></symbol>
+    <symbol id="call_end" viewBox="0 0 24 24"><path d="M4 15c4.8-4 11.2-4 16 0l-2.5 4-3-1.5.3-2.1a10 10 0 0 0-5.6 0l.3 2.1-3 1.5z"/></symbol>
+    <symbol id="phone_callback" viewBox="0 0 24 24"><path d="M6.6 3 4 5.6c.3 7.2 7.2 14.1 14.4 14.4l2.6-2.6-4.2-3-2.1 2.1c-3.1-1.2-6-4.1-7.2-7.2l2.1-2.1zM14 3h6v6M20 3l-6 6"/></symbol>
+    <symbol id="phone_paused" viewBox="0 0 24 24"><path d="M5.8 3 3.5 5.5c.3 7.1 7.1 13.9 14.2 14.2l2.5-2.3-4-3-2.1 2c-3-1.2-5.8-4-7-7l2-2zM15 3v6M19 3v6"/></symbol>
+    <symbol id="play_arrow" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></symbol>
+    <symbol id="autorenew" viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M19 11a7.5 7.5 0 0 0-13.4-3.4L4 10"/><path d="M4 18v-5h5"/><path d="M5 13a7.5 7.5 0 0 0 13.4 3.4L20 14"/></symbol>
+    <symbol id="backspace" viewBox="0 0 24 24"><path d="M21 6H9l-6 6 6 6h12zM13 9l5 6M18 9l-5 6"/></symbol>
+    <symbol id="multiple_stop" viewBox="0 0 24 24"><path d="M4 7h16m-4-4 4 4-4 4M20 17H4m4-4-4 4 4 4"/></symbol>
+    <symbol id="sync_disabled" viewBox="0 0 24 24"><path d="m3 3 18 18M20 7h-6l2-2a8 8 0 0 0-8.5.4M4 17h6l-2 2a8 8 0 0 0 8.5-.4"/></symbol>
+    <symbol id="sync_problem" viewBox="0 0 24 24"><path d="M20 7h-6l2-2a8 8 0 0 0-12 7M4 17h6l-2 2a8 8 0 0 0 12-7M12 8v5M12 17h.01"/></symbol>
+    <symbol id="wifi_off" viewBox="0 0 24 24"><path d="m3 3 18 18M5 9c3.4-2.8 7.5-3.5 11.3-2.1M8.5 12.5c1.7-1.2 3.5-1.6 5.3-1M12 19h.01"/></symbol>
+    <symbol id="error" viewBox="0 0 24 24"><path d="M12 3 2 21h20zM12 9v5M12 18h.01"/></symbol>
+    <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+    <symbol id="get_app" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 21h14"/></symbol>
+    <symbol id="delete_outline" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/></symbol>
+    <symbol id="edit" viewBox="0 0 24 24"><path d="m4 20 4.5-1 10-10-3.5-3.5-10 10zM13.5 7 17 10.5"/></symbol>
+    <symbol id="swap_horizontal_circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 9h9m-3-3 3 3-3 3M17 15H8m3 3-3-3 3-3"/></symbol>
+    <symbol id="file_upload" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6zM14 2v5h5M12 18V10m-3 3 3-3 3 3"/></symbol>
+  </defs>
+</svg>

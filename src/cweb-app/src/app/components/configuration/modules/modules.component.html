@@ -1,8 +1,9 @@
 <app-inner-header name="Modules" [loadCounter]="loadCounter()"></app-inner-header>
-<mat-tab-group class="cpbx-tabs" mat-stretch-tabs="false" mat-align-tabs="start">
-  <mat-tab label="List">
-    <mat-card>
-      <mat-card-content>
+<app-tab-nav ariaLabel="Module sections" [tabs]="['List', 'Import from XML', 'Truncate']"
+  [(selectedIndex)]="selectedTab"></app-tab-nav>
+<div class="cpbx-tab-panel" [hidden]="selectedTab() !== 0">
+    <section class="cpbx-card">
+      <div class="cpbx-card__content">
         <article class="modules-list">
           @for (module of list() | keyvalue; track module.key) {
             @if (isModuleConf(module.value)) {
@@ -30,24 +31,24 @@
                 </div>
                 <div class="module-actions">
                   <div class="module-action-group" aria-label="Runtime actions">
-                    <button mat-stroked-button color="primary" class="module-action module-action--config"
+                    <button class="module-action module-action--config cpbx-button cpbx-button--primary-outline"
                       [routerLink]="['/configuration/' + escapeModuleName(module.key)]">
                       Config
                     </button>
-                    <button mat-stroked-button color="basic" class="module-action"
+                    <button class="module-action cpbx-button cpbx-button--secondary"
                       [disabled]="!module.value || !module.value.id || !module.value.loaded"
                       (click)="reloadModule(module.value.id)">
                       Reload
                     </button>
                   @if (module.value && module.value.loaded) {
-                      <button mat-flat-button color="warn" class="module-action module-action--danger"
+                      <button class="module-action module-action--danger cpbx-button cpbx-button--danger"
                         [disabled]="!module.value || !module.value.id || module.value.unloadable"
                         (click)="unloadModule(module.value.id)">
                         Unload
                       </button>
                   }
                   @if (!module.value || !module.value.loaded) {
-                      <button mat-stroked-button color="basic" class="module-action"
+                      <button class="module-action cpbx-button cpbx-button--secondary"
                         [disabled]="!module.value || !module.value.id || module.value.unloadable"
                         (click)="loadModule(module.value.id)">
                         Load
@@ -56,33 +57,32 @@
                   </div>
                   <div class="module-action-group" aria-label="Configuration actions">
                   @if (!module.value || !module.value.id) {
-                      <button mat-flat-button color="primary" class="module-action" disabled>Enable</button>
+                      <button class="module-action cpbx-button cpbx-button--primary" disabled>Enable</button>
                   }
                   @if (module.value && module.value.id && !module.value.enabled) {
-                      <button mat-flat-button color="primary" class="module-action"
+                      <button class="module-action cpbx-button cpbx-button--primary"
                         (click)="switchModule(module.value.id, module.value.enabled)">
                         Enable
                       </button>
                   }
                   @if (module.value && module.value.id && module.value.enabled) {
-                      <button mat-stroked-button color="basic" class="module-action"
+                      <button class="module-action cpbx-button cpbx-button--secondary"
                         (click)="switchModule(module.value.id, module.value.enabled)">
                         Disable
                       </button>
                   }
-                    <button mat-stroked-button color="basic" class="module-action"
+                    <button class="module-action cpbx-button cpbx-button--secondary"
                       [disabled]="module.value && module.value.id" (click)="createConfigModule(module.key)">
                       From scratch
                     </button>
-                    <button mat-stroked-button color="basic" class="module-action"
+                    <button class="module-action cpbx-button cpbx-button--secondary"
                       [disabled]="module.value && module.value.id" (click)="importConfigModule(module.key)">
                       Import from FS
                     </button>
                   </div>
                   <div class="module-action-group" aria-label="Autoload actions">
                     @if (autoload()['mod_'+module.key] && autoload()['mod_'+module.key].enabled) {
-                      <button
-                        mat-flat-button color="primary" class="module-action"
+                      <button class="module-action cpbx-button cpbx-button--primary"
                         (click)="autoLoadModule(module.value.id)"
                         [disabled]="!(module.value && module.value.id)"
                         >
@@ -90,8 +90,7 @@
                       </button>
                     }
                     @if (!autoload()['mod_'+module.key] || !autoload()['mod_'+module.key].enabled) {
-                      <button
-                        mat-stroked-button color="basic" class="module-action"
+                      <button class="module-action cpbx-button cpbx-button--secondary"
                         (click)="autoLoadModule(module.value.id)"
                         [disabled]="!(module.value && module.value.id)"
                         >
@@ -104,43 +103,41 @@
             }
           }
           <div class="total">
-            <button mat-flat-button color="primary" class="module-bulk-action"
+            <button class="module-bulk-action cpbx-button cpbx-button--primary"
               (click)="importConfigAllModules()">
               Import All Possible Modules Configs From FS
             </button>
           </div>
         </article>
-      </mat-card-content>
-    </mat-card>
-  </mat-tab>
-  <mat-tab label="Import from XML">
-    <mat-card>
-      <mat-card-content>
-        <button mat-stroked-button color="basic" class="switch-button modules-import-button"
+      </div>
+    </section>
+  </div>
+<div class="cpbx-tab-panel" [hidden]="selectedTab() !== 1">
+    <section class="cpbx-card">
+      <div class="cpbx-card__content">
+        <button class="switch-button modules-import-button cpbx-button cpbx-button--secondary"
           [disabled]="!XMLBody()"
           (click)="ImportXMLModuleConfig()"
           >
           Import
         </button>
-        <mat-expansion-panel (opened)="initEditor()">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
+        <app-disclosure (opened)="initEditor()">
+            <span disclosureTitle>
               XML editor
-            </mat-panel-title>
-            <mat-panel-description>
+            </span>
+            <span disclosureDescription>
               Click to get details
-            </mat-panel-description>
-          </mat-expansion-panel-header>
+            </span>
           @if (editorInited) {
             <app-code-editor [(content)]="XMLBody"></app-code-editor>
           }
-        </mat-expansion-panel>
-      </mat-card-content>
-    </mat-card>
-  </mat-tab>
-  <mat-tab label="Truncate">
-    <mat-card>
-      <mat-card-content>
+        </app-disclosure>
+      </div>
+    </section>
+  </div>
+<div class="cpbx-tab-panel" [hidden]="selectedTab() !== 2">
+    <section class="cpbx-card">
+      <div class="cpbx-card__content">
         <article class="modules-list modules-list--truncate">
           @for (module of list() | keyvalue; track module.key) {
             @if (isModuleConf(module.value)) {
@@ -149,7 +146,7 @@
                     {{module.key}}
                 </div>
                 <div class="module-actions">
-                    <button mat-flat-button color="warn" class="module-action module-action--danger"
+                    <button class="module-action module-action--danger cpbx-button cpbx-button--danger"
                       [disabled]="!module.value || !module.value.id"
                       (click)="openBottomSheetModule(module.value.id, module.key, 'delete')">
                       Truncate
@@ -159,7 +156,6 @@
             }
           }
         </article>
-      </mat-card-content>
-    </mat-card>
-  </mat-tab>
-</mat-tab-group>
+      </div>
+    </section>
+  </div>

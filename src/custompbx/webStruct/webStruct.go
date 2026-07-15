@@ -403,14 +403,18 @@ func (c *WsContext) ReadWaiter(handler func(*Message, *WsContext)) {
 			return
 		}
 
-		err = json.NewDecoder(r).Decode(&msg)
-		if err == io.EOF {
+		raw, err := io.ReadAll(r)
+		if err == nil {
+			err = json.Unmarshal(raw, &msg)
+		}
+		if err == io.EOF || len(raw) == 0 {
 			err = io.ErrUnexpectedEOF
 		}
 
 		if err != nil {
+			messageType := messageTypeFromEnvelope(raw)
 			log.Printf("component=websocket connection_id=%d user_id=%d operation=decode_message error=%q", c.ID, c.UserID(), err)
-			if !c.Enqueue(&UserResponse{Error: "failed to read message", MessageType: "none"}) {
+			if !c.Enqueue(&UserResponse{Error: "invalid request payload", MessageType: messageType}) {
 				c.RecordHandlerFailure()
 				c.CloseWithReason("outbound queue full")
 			}
@@ -418,7 +422,7 @@ func (c *WsContext) ReadWaiter(handler func(*Message, *WsContext)) {
 		}
 		if err := msg.Validate(); err != nil {
 			log.Printf("component=websocket connection_id=%d user_id=%d operation=validate_message error=%q", c.ID, c.UserID(), err)
-			if !c.Enqueue(&UserResponse{Error: "invalid message", MessageType: "none"}) {
+			if !c.Enqueue(&UserResponse{Error: "invalid message", MessageType: messageTypeOrNone(msg.Event)}) {
 				c.RecordHandlerFailure()
 				c.CloseWithReason("outbound queue full")
 			}
@@ -427,6 +431,24 @@ func (c *WsContext) ReadWaiter(handler func(*Message, *WsContext)) {
 		handler(msg, c)
 		// log.Printf("[WEBSOCKET] Got message: %+v\n", msg)
 	}
+}
+
+func messageTypeFromEnvelope(raw []byte) string {
+	var envelope struct {
+		Event string `json:"event"`
+	}
+	if err := json.Unmarshal(raw, &envelope); err != nil {
+		return "none"
+	}
+	return messageTypeOrNone(envelope.Event)
+}
+
+func messageTypeOrNone(event string) string {
+	event = strings.TrimSpace(event)
+	if event == "" {
+		return "none"
+	}
+	return event
 }
 
 // WsHub manages a collection of WebSocket contexts and provides broadcast capabilities.

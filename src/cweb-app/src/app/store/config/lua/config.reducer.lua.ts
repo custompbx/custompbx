@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.lua) {
-        state.lua = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, lua: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

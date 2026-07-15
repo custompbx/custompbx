@@ -71,8 +71,14 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
   outline-offset: 2px;
 }
 
-mat-progress-bar,
-.mat-mdc-progress-bar {
+.cpbx-divider {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--cpbx-border);
+}
+
+.cpbx-progress {
+  background: var(--cpbx-primary-soft);
   display: block !important;
   height: 3px !important;
   left: 0 !important;
@@ -83,13 +89,44 @@ mat-progress-bar,
   top: 0 !important;
   width: 100% !important;
   z-index: 3000 !important;
+  overflow: hidden;
+}
+
+.cpbx-progress__bar {
+  animation: cpbx-progress-slide 1.15s ease-in-out infinite;
+  background: var(--cpbx-primary);
+  display: block;
+  height: 100%;
+  transform-origin: left center;
+  width: 42%;
+}
+
+@keyframes cpbx-progress-slide {
+  0% { transform: translateX(-110%) scaleX(.55); }
+  50% { transform: translateX(105%) scaleX(1); }
+  100% { transform: translateX(260%) scaleX(.55); }
 }
 
 .page-content { padding: var(--cpbx-space-5); max-width: 1600px; margin: 0 auto; }
 .page-section { background: var(--cpbx-surface); border: 1px solid var(--cpbx-border); border-radius: var(--cpbx-radius); box-shadow: var(--cpbx-shadow-sm); }
+.cpbx-card { background: var(--cpbx-surface); border: 1px solid var(--cpbx-border); border-radius: var(--cpbx-radius); display: block; min-width: 0; }
+.cpbx-card__header { border-bottom: 1px solid var(--cpbx-border); padding: 1rem 1.25rem; }
+.cpbx-card__title { color: var(--cpbx-text); font-size: 1rem; font-weight: 650; margin: 0; }
+.cpbx-card__subtitle { color: var(--cpbx-text-muted); font-size: .875rem; margin: .2rem 0 0; }
+.cpbx-card__content { padding: 1.25rem; }
+.cpbx-card__actions { align-items: center; display: flex; flex-wrap: wrap; gap: .5rem; padding: .75rem 1.25rem 1.25rem; }
+.cpbx-card__avatar { align-items: center; display: inline-flex; justify-content: center; }
+.cpbx-alert { border-radius: var(--cpbx-radius-sm); margin-bottom: 1rem; padding: .75rem 1rem; }
+.cpbx-alert--warning { background: var(--cpbx-warning-soft); color: var(--cpbx-warning); }
 .action-toolbar, .filter-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cpbx-space-3); padding: var(--cpbx-space-4); }
 .form-row { display: flex; flex-wrap: wrap; align-items: start; gap: var(--cpbx-space-3); }
 .responsive-table { overflow: auto; border: 1px solid var(--cpbx-border); border-radius: var(--cpbx-radius); background: var(--cpbx-surface); }
+.cpbx-data-table { border-collapse: separate; border-spacing: 0; min-width: 100%; width: max-content; }
+.cpbx-data-table th, .cpbx-data-table td { border-bottom: 1px solid var(--cpbx-border); padding: .7rem .875rem; text-align: left; vertical-align: middle; }
+.cpbx-data-table th { background: var(--cpbx-surface-muted); color: var(--cpbx-text-muted); font-size: .78rem; font-weight: 650; letter-spacing: .025em; position: sticky; text-transform: uppercase; top: 0; z-index: 1; }
+.cpbx-data-table tbody tr { background: var(--cpbx-surface); transition: background-color .14s ease; }
+.cpbx-data-table tbody tr:hover { background: var(--cpbx-surface-subtle); }
+.cpbx-data-table tbody tr:last-child td { border-bottom: 0; }
 .responsive-table table { min-width: 720px; width: 100%; box-shadow: none; }
 .state-panel { padding: var(--cpbx-space-6); text-align: center; color: var(--cpbx-text-muted); }
 .status-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--cpbx-primary-soft); color: var(--cpbx-primary-strong); }
@@ -97,23 +134,69 @@ mat-progress-bar,
 .status-badge.warning { background: var(--cpbx-warning-soft); color: var(--cpbx-warning); }
 .status-badge.danger { background: var(--cpbx-danger-soft); color: var(--cpbx-danger); }
 .text-muted { color: var(--cpbx-text-muted); }
+
+.cpbx-chip-list {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.cpbx-chip {
+  align-items: center;
+  background: var(--cpbx-surface-muted);
+  border: 1px solid var(--cpbx-border);
+  border-radius: 999px;
+  color: var(--cpbx-text);
+  display: inline-flex;
+  min-height: 2rem;
+  overflow: hidden;
+}
+
+.cpbx-chip--sort {
+  background: var(--cpbx-primary-soft);
+  border-color: #d9defe;
+  color: var(--cpbx-primary-strong);
+  gap: .2rem;
+  padding-left: .75rem;
+}
+
+.cpbx-chip__label,
+.cpbx-chip__remove {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cpbx-chip__label {
+  padding: .35rem 0 .35rem .75rem;
+}
+
+.cpbx-chip__remove {
+  align-items: center;
+  align-self: stretch;
+  display: inline-flex;
+  font-size: 1.15rem;
+  justify-content: center;
+  min-width: 2rem;
+}
+
+.cpbx-chip__label:hover,
+.cpbx-chip__remove:hover {
+  background: rgb(15 23 42 / .06);
+}
+
+.cpbx-chip__label:focus-visible,
+.cpbx-chip__remove:focus-visible {
+  outline: 2px solid var(--cpbx-control-focus);
+  outline-offset: -2px;
+}
 .warn-text { color: var(--cpbx-danger); }
 .button-row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--cpbx-space-2); }
 
 @media (max-width: 1023px) { .page-content { padding: var(--cpbx-space-4); } }
 @media (max-width: 767px) { .page-content { padding: var(--cpbx-space-3); } .action-toolbar > *, .filter-toolbar > * { max-width: 100%; } }
-
-.nopadding .mat-expansion-panel-body {
-  padding: 0;
-}
-
-.sidenav-container .mat-drawer-inner-container {
-  overflow: hidden;
-}
-
-.sidenav-container .mat-drawer-inner-container:hover {
-  overflow: overlay;
-}
 
 .sidenav-container ::-webkit-scrollbar {
   width: 5px;
@@ -146,47 +229,8 @@ mat-progress-bar,
   color: var(--cpbx-danger);
 }
 
-mat-toolbar.mat-basic {
-  background-color: var(--cpbx-surface-muted);
-  color: var(--cpbx-text);
-}
-.mat-green {
-  background-color: var(--cpbx-success);
-  color: #fff;
-}
-.mat-yellow {
-  background-color: var(--cpbx-warning-soft);
-  color: var(--cpbx-warning);
-}
-.mat-blue {
-  background-color: var(--cpbx-info);
-  color: #ffffff;
-}
-.mat-purple {
-  background-color: var(--cpbx-primary-strong);
-  color: #ffffff;
-}
-.mat-accent-new {
-  background-color: var(--cpbx-primary);
-  color: #ffffff;
-}
-.mat-primary-new {
-  background-color: var(--cpbx-primary);
-  color: #ffffff;
-}
-/*
-
 .cdk-overlay-container {
   position: unset;
-}
-*/
-
-.mat-tab-labels {
-  background-color: #ffffff;
-}
-
-.mat-tab-body-content {
-  background-color: #ffffff;
 }
 
 .vert-centered {
@@ -479,37 +523,6 @@ span {
     @apply mt-3 text-slate-500;
   }
 
-  .dragHandler,
-  .mat-icon.dragHandler {
-    align-items: center !important;
-    background: #fff;
-    border: 1px solid var(--cpbx-border);
-    border-radius: .625rem;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, .06);
-    color: var(--cpbx-control-muted) !important;
-    cursor: grab;
-    display: inline-flex !important;
-    flex: 0 0 auto;
-    font-size: 1.125rem !important;
-    height: 2rem !important;
-    justify-content: center;
-    line-height: 1 !important;
-    margin: 0 .25rem 0 0 !important;
-    width: 2rem !important;
-  }
-
-  .dragHandler:hover,
-  .mat-icon.dragHandler:hover {
-    background: var(--cpbx-primary-soft);
-    border-color: #c7d2fe;
-    color: var(--cpbx-primary) !important;
-  }
-
-  .dragHandler:active,
-  .mat-icon.dragHandler:active {
-    cursor: grabbing;
-  }
-
   .cpbx-form-panel {
     @apply m-5 flex flex-wrap items-start gap-3 rounded-xl bg-white;
   }
@@ -547,94 +560,29 @@ span {
     @apply m-5 flex flex-wrap items-start gap-3;
   }
 
-  .cpbx-tabs .mat-mdc-form-field {
-    width: 280px;
-    max-width: 100%;
-  }
-
-  .cpbx-tabs form .mat-mdc-button-base {
-    min-width: 6rem;
-    height: 2.75rem;
-  }
-
   .cpbx-tabs .but-spacer-left {
     margin-left: 0;
   }
 
-  .cpbx-tabs .mat-mdc-tab-header {
-    @apply border-b border-slate-200 bg-slate-50/80 px-4;
-  }
-
-  .cpbx-tabs .mdc-tab {
-    @apply my-2 mr-2 h-10 rounded-lg px-4 text-sm font-semibold tracking-normal text-slate-600 transition;
-    min-width: 0;
-  }
-
-  .cpbx-tabs .mdc-tab:hover {
-    background: #eef2ff;
-    color: var(--cpbx-primary);
-  }
-
-  .cpbx-tabs .mdc-tab--active {
-    background: #eef2ff;
-    color: var(--cpbx-primary);
-  }
-
-  .cpbx-tabs .mdc-tab-indicator__content--underline {
-    display: none;
-  }
-
-  .cpbx-tabs .mat-mdc-tab-body-content {
-    @apply bg-white;
-    max-width: 100%;
-    overflow-x: hidden !important;
-  }
-
-  .cpbx-tabs .mat-mdc-card {
+  .cpbx-tabs .cpbx-card {
     @apply m-0 rounded-none border-0 bg-white p-0 shadow-none;
-    --mat-card-elevated-container-elevation: none;
-    --mat-card-outlined-outline-width: 0;
     box-shadow: none;
   }
 
-  .cpbx-tabs .mat-mdc-card + .mat-mdc-card {
+  .cpbx-tabs .cpbx-card + .cpbx-card {
     @apply mt-5;
   }
 
-  .cpbx-tabs .mat-mdc-card-header {
+  .cpbx-tabs .cpbx-card__header {
     @apply px-5 pb-1 pt-4;
   }
 
-  .cpbx-tabs .mat-mdc-card-subtitle {
+  .cpbx-tabs .cpbx-card__subtitle {
     @apply text-sm font-semibold text-slate-500;
   }
 
-  .cpbx-tabs .mat-mdc-card-content {
+  .cpbx-tabs .cpbx-card__content {
     @apply px-5 pb-5 pt-1;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-header {
-    @apply border-b border-slate-200 bg-slate-50/80 px-4;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mdc-tab {
-    @apply my-2 mr-2 h-10 rounded-lg px-4 text-sm font-semibold tracking-normal text-slate-600 transition;
-    min-width: 0;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mdc-tab:hover,
-  mat-tab-group:not(.legacy-tabs) .mdc-tab--active {
-    background: #eef2ff;
-    color: var(--cpbx-primary);
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mdc-tab-indicator__content--underline {
-    display: none;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content {
-    @apply bg-white;
-    min-height: calc(100vh - 13.5rem);
   }
 
   .filter-container,
@@ -654,424 +602,6 @@ span {
   form.filter-container > div,
   form.spacer > div {
     @apply flex flex-wrap items-start gap-3;
-  }
-
-  .filter-container > .mat-mdc-form-field,
-  .filter-container > div > .mat-mdc-form-field,
-  form.spacer > .mat-mdc-form-field,
-  form.spacer > div > .mat-mdc-form-field,
-  .cpbx-form-panel .mat-mdc-form-field,
-  .mat-mdc-card-content > .mat-mdc-form-field,
-  .mat-mdc-card-content > div > .mat-mdc-form-field,
-  .component-inner > .mat-mdc-form-field,
-  .component-inner > div > .mat-mdc-form-field,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-form-field {
-    width: 280px;
-    max-width: 100%;
-  }
-
-  .filter-container .mat-mdc-form-field,
-  form.spacer .mat-mdc-form-field,
-  .cpbx-form-panel .mat-mdc-form-field,
-  .mat-mdc-card-content .mat-mdc-form-field,
-  .component-inner .mat-mdc-form-field,
-  .cpbx-tabs .mat-mdc-form-field,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-form-field {
-    --mdc-filled-text-field-container-color: #ffffff;
-    --mdc-filled-text-field-focus-active-indicator-color: transparent;
-    --mdc-filled-text-field-active-indicator-color: transparent;
-    --mdc-filled-text-field-hover-active-indicator-color: transparent;
-    --mat-form-field-container-height: 52px;
-    --mat-form-field-container-vertical-padding: 12px;
-  }
-
-  .filter-container .mat-mdc-text-field-wrapper,
-  form.spacer .mat-mdc-text-field-wrapper,
-  .cpbx-form-panel .mat-mdc-text-field-wrapper,
-  .mat-mdc-card-content .mat-mdc-text-field-wrapper,
-  .component-inner .mat-mdc-text-field-wrapper,
-  .cpbx-tabs .mat-mdc-text-field-wrapper,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-text-field-wrapper {
-    @apply rounded-lg border border-slate-300 bg-white shadow-sm transition;
-    min-height: 52px;
-  }
-
-  .filter-container .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper,
-  form.spacer .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper,
-  .cpbx-form-panel .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper,
-  .mat-mdc-card-content .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper,
-  .component-inner .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper,
-  .cpbx-tabs .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper {
-    border-color: #cbd5e1;
-  }
-
-  .filter-container .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper,
-  form.spacer .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper,
-  .cpbx-form-panel .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper,
-  .mat-mdc-card-content .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper,
-  .component-inner .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper,
-  .cpbx-tabs .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 4px rgb(224 231 255);
-  }
-
-  .filter-container .mat-mdc-form-field-flex,
-  form.spacer .mat-mdc-form-field-flex,
-  .cpbx-form-panel .mat-mdc-form-field-flex,
-  .mat-mdc-card-content .mat-mdc-form-field-flex,
-  .component-inner .mat-mdc-form-field-flex,
-  .cpbx-tabs .mat-mdc-form-field-flex,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-form-field-flex {
-    align-items: center;
-    min-height: 52px;
-  }
-
-  .filter-container .mat-mdc-input-element,
-  form.spacer .mat-mdc-input-element,
-  .cpbx-form-panel .mat-mdc-input-element,
-  .mat-mdc-card-content .mat-mdc-input-element,
-  .component-inner .mat-mdc-input-element,
-  .cpbx-tabs .mat-mdc-input-element,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-input-element {
-    line-height: 1.25;
-  }
-
-  .filter-container .mat-mdc-form-field-infix,
-  form.spacer .mat-mdc-form-field-infix,
-  .cpbx-form-panel .mat-mdc-form-field-infix,
-  .mat-mdc-card-content .mat-mdc-form-field-infix,
-  .component-inner .mat-mdc-form-field-infix,
-  .cpbx-tabs .mat-mdc-form-field-infix,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-form-field-infix {
-    min-height: 52px;
-  }
-
-  .filter-container .mat-mdc-floating-label,
-  form.spacer .mat-mdc-floating-label,
-  .cpbx-form-panel .mat-mdc-floating-label,
-  .mat-mdc-card-content .mat-mdc-floating-label,
-  .component-inner .mat-mdc-floating-label,
-  .cpbx-tabs .mat-mdc-floating-label,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-floating-label {
-    @apply bg-white px-1 text-sm font-medium text-slate-500;
-  }
-
-  .filter-container .mat-mdc-form-field:not(.mat-form-field-should-float) .mat-mdc-floating-label,
-  form.spacer .mat-mdc-form-field:not(.mat-form-field-should-float) .mat-mdc-floating-label,
-  .cpbx-form-panel .mat-mdc-form-field:not(.mat-form-field-should-float) .mat-mdc-floating-label,
-  .mat-mdc-card-content .mat-mdc-form-field:not(.mat-form-field-should-float) .mat-mdc-floating-label,
-  .component-inner .mat-mdc-form-field:not(.mat-form-field-should-float) .mat-mdc-floating-label,
-  .cpbx-tabs .mat-mdc-form-field:not(.mat-form-field-should-float) .mat-mdc-floating-label,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-form-field:not(.mat-form-field-should-float) .mat-mdc-floating-label {
-    background: transparent;
-    padding-inline: 0;
-  }
-
-  .filter-container .mat-mdc-select-value,
-  .filter-container input.mat-mdc-input-element,
-  form.spacer .mat-mdc-select-value,
-  form.spacer input.mat-mdc-input-element,
-  .cpbx-form-panel .mat-mdc-select-value,
-  .cpbx-form-panel input.mat-mdc-input-element,
-  .mat-mdc-card-content .mat-mdc-select-value,
-  .mat-mdc-card-content input.mat-mdc-input-element,
-  .component-inner .mat-mdc-select-value,
-  .component-inner input.mat-mdc-input-element,
-  .cpbx-tabs .mat-mdc-select-value,
-  .cpbx-tabs input.mat-mdc-input-element,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-select-value,
-  mat-tab-group:not(.legacy-tabs) input.mat-mdc-input-element {
-    @apply text-sm text-slate-950;
-  }
-
-  .filter-container .mdc-line-ripple,
-  form.spacer .mdc-line-ripple,
-  .cpbx-form-panel .mdc-line-ripple,
-  .mat-mdc-card-content .mdc-line-ripple,
-  .component-inner .mdc-line-ripple,
-  .cpbx-tabs .mdc-line-ripple,
-  mat-tab-group:not(.legacy-tabs) .mdc-line-ripple {
-    display: none;
-  }
-
-  .filter-container .mat-mdc-form-field-subscript-wrapper,
-  form.spacer .mat-mdc-form-field-subscript-wrapper,
-  .cpbx-form-panel .mat-mdc-form-field-subscript-wrapper,
-  .mat-mdc-card-content .mat-mdc-form-field-subscript-wrapper,
-  .component-inner .mat-mdc-form-field-subscript-wrapper,
-  .cpbx-tabs .mat-mdc-form-field-subscript-wrapper,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-form-field-subscript-wrapper {
-    display: none;
-  }
-
-  .filter-container .mat-mdc-button-base,
-  form.spacer .mat-mdc-button-base,
-  .cpbx-form-panel .mat-mdc-button-base,
-  .mat-mdc-card-content .mat-mdc-button-base,
-  .component-inner .mat-mdc-button-base,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-button-base {
-    flex: 0 0 auto;
-    min-width: 6rem;
-    height: 2.75rem;
-    width: auto;
-  }
-
-  .filter-container .mat-mdc-raised-button,
-  .filter-container .mat-mdc-unelevated-button,
-  .filter-container .mat-mdc-outlined-button,
-  .filter-container .mat-mdc-button,
-  form.spacer .mat-mdc-raised-button,
-  form.spacer .mat-mdc-unelevated-button,
-  form.spacer .mat-mdc-outlined-button,
-  form.spacer .mat-mdc-button,
-  .cpbx-form-panel .mat-mdc-raised-button,
-  .cpbx-form-panel .mat-mdc-unelevated-button,
-  .cpbx-form-panel .mat-mdc-outlined-button,
-  .cpbx-form-panel .mat-mdc-button,
-  .mat-mdc-card-content .mat-mdc-raised-button,
-  .mat-mdc-card-content .mat-mdc-unelevated-button,
-  .mat-mdc-card-content .mat-mdc-outlined-button,
-  .mat-mdc-card-content .mat-mdc-button,
-  .component-inner .mat-mdc-raised-button,
-  .component-inner .mat-mdc-unelevated-button,
-  .component-inner .mat-mdc-outlined-button,
-  .component-inner .mat-mdc-button,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-raised-button,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-unelevated-button,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-outlined-button,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-button {
-    @apply rounded-lg px-4 text-sm font-medium shadow-sm;
-    --mdc-protected-button-container-shape: 0.5rem;
-    --mdc-filled-button-container-shape: 0.5rem;
-    --mdc-outlined-button-container-shape: 0.5rem;
-    --mdc-text-button-container-shape: 0.5rem;
-  }
-
-  .filter-container .mat-primary,
-  form.spacer .mat-primary,
-  .cpbx-form-panel .mat-primary,
-  .mat-mdc-card-content .mat-primary,
-  .component-inner .mat-primary,
-  mat-tab-group:not(.legacy-tabs) .mat-primary {
-    --mdc-protected-button-container-color: var(--cpbx-primary);
-    --mdc-protected-button-label-text-color: #ffffff;
-    --mdc-filled-button-container-color: var(--cpbx-primary);
-    --mdc-filled-button-label-text-color: #ffffff;
-  }
-
-  .filter-container .mat-accent,
-  form.spacer .mat-accent,
-  .cpbx-form-panel .mat-accent,
-  .mat-mdc-card-content .mat-accent,
-  .component-inner .mat-accent,
-  mat-tab-group:not(.legacy-tabs) .mat-accent {
-    --mdc-protected-button-container-color: var(--cpbx-primary);
-    --mdc-protected-button-label-text-color: #ffffff;
-    --mdc-filled-button-container-color: var(--cpbx-primary);
-    --mdc-filled-button-label-text-color: #ffffff;
-    color: var(--cpbx-primary);
-  }
-
-  .filter-container .mat-warn,
-  form.spacer .mat-warn,
-  .cpbx-form-panel .mat-warn,
-  .mat-mdc-card-content .mat-warn,
-  .component-inner .mat-warn,
-  mat-tab-group:not(.legacy-tabs) .mat-warn {
-    --mdc-protected-button-container-color: #ef4444;
-    --mdc-protected-button-label-text-color: #ffffff;
-    --mdc-filled-button-container-color: #ef4444;
-    --mdc-filled-button-label-text-color: #ffffff;
-    color: #dc2626;
-  }
-
-  .filter-container .mat-mdc-button:not(:disabled),
-  form.spacer .mat-mdc-button:not(:disabled),
-  .cpbx-form-panel .mat-mdc-button:not(:disabled),
-  .mat-mdc-card-content .mat-mdc-button:not(:disabled),
-  .component-inner .mat-mdc-button:not(:disabled),
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-button:not(:disabled) {
-    color: var(--cpbx-primary);
-  }
-
-  .filter-container .mat-mdc-button.mat-warn:not(:disabled),
-  form.spacer .mat-mdc-button.mat-warn:not(:disabled),
-  .cpbx-form-panel .mat-mdc-button.mat-warn:not(:disabled),
-  .mat-mdc-card-content .mat-mdc-button.mat-warn:not(:disabled),
-  .component-inner .mat-mdc-button.mat-warn:not(:disabled),
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-button.mat-warn:not(:disabled) {
-    color: #dc2626;
-  }
-
-  .mat-mdc-select-panel {
-    @apply rounded-xl border border-slate-200 bg-white shadow-lg;
-    padding-block: 6px !important;
-  }
-
-  .mat-mdc-select-panel .mat-mdc-option {
-    @apply mx-1 my-0.5 min-h-10 rounded-lg text-sm text-slate-800;
-  }
-
-  .mat-mdc-select-panel .mat-mdc-option:hover,
-  .mat-mdc-select-panel .mat-mdc-option.mat-mdc-option-active,
-  .mat-mdc-select-panel .mat-mdc-option.mdc-list-item--selected,
-  .mat-mdc-select-panel .mat-mdc-option.mdc-list-item--activated {
-    background: #eef2ff !important;
-    color: var(--cpbx-primary) !important;
-  }
-
-  .mat-mdc-select-panel .mat-mdc-option .mdc-list-item__primary-text {
-    color: inherit !important;
-    font-size: 0.925rem;
-    font-weight: 500;
-  }
-
-  .mat-mdc-select-panel .mat-pseudo-checkbox {
-    border-color: #94a3b8;
-    border-radius: 0.25rem;
-  }
-
-  .mat-mdc-select-panel .mat-pseudo-checkbox {
-    margin-right: 10px;
-  }
-
-  .users-panel-select-field.mat-mdc-form-field {
-    width: 420px;
-    max-width: 100%;
-  }
-
-  .users-panel-select-field .mat-mdc-text-field-wrapper {
-    border-radius: 0.75rem;
-    border-color: #d5dbea;
-    box-shadow: none;
-  }
-
-  .users-panel-select-field.mat-focused .mat-mdc-text-field-wrapper {
-    border-color: var(--cpbx-primary);
-    box-shadow: 0 0 0 4px rgb(224 231 255);
-  }
-
-  .users-panel-select-field .mat-mdc-select-trigger {
-    min-height: 44px;
-  }
-
-  .users-panel-select-field .mat-mdc-select-value {
-    color: var(--cpbx-text);
-    font-size: 0.95rem;
-    font-weight: 500;
-  }
-
-  .users-panel-select-field .mat-mdc-select-placeholder {
-    color: #64748b;
-  }
-
-  .users-panel-select-field .mat-mdc-select-arrow {
-    color: #64748b;
-  }
-
-  .users-panel-select-panel.mat-mdc-select-panel {
-    border-radius: 0.875rem !important;
-    border: 1px solid #dbe1ef;
-    box-shadow: 0 16px 34px rgba(15, 23, 42, .18);
-    min-width: 420px;
-    padding: 0.5rem !important;
-  }
-
-  .users-panel-select-panel .mat-mdc-option {
-    min-height: 42px;
-    border-radius: 0.625rem;
-    color: var(--cpbx-text);
-    font-size: 0.925rem;
-    margin: 0.125rem 0;
-  }
-
-  .users-panel-select-panel .mat-mdc-option:hover,
-  .users-panel-select-panel .mat-mdc-option.mdc-list-item--selected {
-    background: #eef2ff !important;
-    color: var(--cpbx-primary-strong) !important;
-  }
-
-  .users-panel-select-panel .mat-pseudo-checkbox {
-    border-color: #94a3b8;
-    border-radius: 0.25rem;
-    height: 18px;
-    margin-right: 0.75rem;
-    width: 18px;
-  }
-
-  .users-panel-select-panel .mat-pseudo-checkbox-checked,
-  .users-panel-select-panel .mat-pseudo-checkbox-minimal.mat-pseudo-checkbox-checked::after {
-    color: var(--cpbx-primary);
-  }
-
-  .cpbx-expansion-panel.mat-expansion-panel,
-  .cpbx-tabs .mat-expansion-panel {
-    @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-none;
-    transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
-  }
-
-  .cpbx-expansion-panel.mat-expansion-panel:not([class*="mat-elevation-z"]),
-  .cpbx-tabs .mat-expansion-panel:not([class*="mat-elevation-z"]) {
-    box-shadow: none;
-  }
-
-  .cpbx-expansion-panel.mat-expansion-panel:hover,
-  .cpbx-tabs .mat-expansion-panel:hover {
-    border-color: #cbd5e1;
-    box-shadow: none;
-  }
-
-  .cpbx-expansion-panel.mat-expanded,
-  .cpbx-tabs .mat-expansion-panel.mat-expanded {
-    border-color: #c7d2fe;
-  }
-
-  .cpbx-expansion-panel .mat-expansion-panel-header,
-  .cpbx-tabs .mat-expansion-panel-header {
-    @apply h-14 px-5 transition;
-    background: #ffffff;
-    border-radius: 0.75rem;
-  }
-
-  .cpbx-expansion-panel .mat-expansion-panel-header:hover,
-  .cpbx-tabs .mat-expansion-panel-header:hover {
-    background: #f8fafc;
-  }
-
-  .cpbx-expansion-panel.mat-expanded .mat-expansion-panel-header,
-  .cpbx-tabs .mat-expansion-panel.mat-expanded .mat-expansion-panel-header {
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .cpbx-expansion-panel .mat-expansion-panel-header-title,
-  .cpbx-tabs .mat-expansion-panel-header-title {
-    @apply flex-[0_0_280px] text-sm font-normal text-slate-900;
-  }
-
-  .cpbx-expansion-panel .mat-expansion-panel-header-description,
-  .cpbx-tabs .mat-expansion-panel-header-description {
-    @apply justify-start text-sm font-medium text-slate-500;
-  }
-
-  .cpbx-expansion-panel .mat-expansion-panel-body,
-  .cpbx-tabs .mat-expansion-panel-body {
-    @apply bg-white px-5 pb-5 pt-4;
-  }
-
-  .cpbx-expansion-panel .mat-expansion-indicator,
-  .cpbx-tabs .mat-expansion-indicator {
-    @apply grid h-8 w-8 place-items-center rounded-lg text-slate-500 transition;
-  }
-
-  .cpbx-expansion-panel .mat-expansion-panel-header:hover .mat-expansion-indicator,
-  .cpbx-tabs .mat-expansion-panel-header:hover .mat-expansion-indicator {
-    background: #e0e7ff;
-    color: var(--cpbx-primary);
   }
 
   .kv-drag-handle,
@@ -1100,6 +630,7 @@ span {
   .cdk-drag-preview {
     @apply rounded-xl bg-white shadow-lg;
     box-sizing: border-box;
+    pointer-events: none;
   }
 
   .cdk-drag-placeholder {
@@ -1107,11 +638,11 @@ span {
   }
 
   .cdk-drag-animating {
-    transition: transform 120ms cubic-bezier(0, 0, 0.2, 1);
+    transition: transform 90ms cubic-bezier(0, 0, 0.2, 1);
   }
 
   .cdk-drop-list-dragging .kv-row:not(.cdk-drag-placeholder) {
-    transition: transform 120ms cubic-bezier(0, 0, 0.2, 1);
+    transition: transform 90ms cubic-bezier(0, 0, 0.2, 1);
   }
 }
 
@@ -1142,47 +673,10 @@ span {
  * CustomPBX UI compatibility layer
  *
  * Keep app-wide styling decisions here. Older/generated pages still use raw
- * Angular Material primitives, so this layer makes those primitives look like
- * the newer Tailwind-based UI without passing style classes through every
- * component template.
+ * generated layouts, so this layer keeps native controls and page structures
+ * consistent without passing style classes through every component template.
  */
 @layer components {
-  app-inner-header + mat-tab-group:not(.legacy-tabs),
-  mat-tab-group.cpbx-tabs,
-  mat-tab-group:not(.legacy-tabs) {
-    background: #fff;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-header {
-    @apply border-b border-slate-200 bg-slate-50/80 px-5;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mdc-tab {
-    @apply my-2 mr-3 h-10 rounded-lg px-4 text-sm font-medium tracking-normal text-slate-600 transition;
-    min-width: 0;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mdc-tab:hover,
-  mat-tab-group:not(.legacy-tabs) .mdc-tab--active {
-    background: var(--cpbx-primary-soft);
-    color: var(--cpbx-primary);
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mdc-tab-indicator__content--underline {
-    display: none;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content {
-    @apply bg-white;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > form,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > .filter-container,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > .component-inner,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > mat-card,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > div:not(.users-panel-sections) {
-    margin: var(--cpbx-page-gutter);
-  }
 
   .component-inner,
   .filter-container,
@@ -1196,14 +690,10 @@ span {
   .grid-inner,
   .grid-inner-title,
   .section,
-  .mat-mdc-card-content > form,
-  .mat-mdc-card-content > div,
-  mat-expansion-panel form,
-  mat-expansion-panel .spacer {
+  .cpbx-card__content > form {
     @apply flex flex-wrap items-center gap-3;
   }
 
-  .component-inner,
   .filter-container,
   form.spacer,
   form.spacerb,
@@ -1214,37 +704,17 @@ span {
   /*
    * Legacy generated pages still use local classes such as panel-wrapper,
    * grid-inner, section and article with inline-grid/inline-block layouts.
-   * Keep styling centralized here so all configuration/directory/dialplan pages
-   * move together while templates are migrated incrementally.
+   * Keep styling centralized here so all configuration, directory and
+   * dialplan pages move together while templates are migrated incrementally.
    */
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > mat-card,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > .mat-mdc-card,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > app-module-not-exists-banner + mat-card {
-    display: block !important;
-    margin: var(--cpbx-page-gutter) !important;
-  }
 
-  mat-card .panel-wrapper,
-  mat-card .panel-wrapper-top,
-  mat-card .grid-inner,
-  mat-card .grid-inner-title,
-  mat-card .section,
-  mat-card article,
-  mat-card section,
-  mat-expansion-panel .panel-wrapper,
-  mat-expansion-panel .panel-wrapper-top,
-  mat-expansion-panel .grid-inner,
-  mat-expansion-panel .grid-inner-title,
-  mat-expansion-panel .section,
-  mat-expansion-panel article,
-  mat-expansion-panel section,
-  .mat-mdc-tab-body-content .panel-wrapper,
-  .mat-mdc-tab-body-content .panel-wrapper-top,
-  .mat-mdc-tab-body-content .grid-inner,
-  .mat-mdc-tab-body-content .grid-inner-title,
-  .mat-mdc-tab-body-content .section,
-  .mat-mdc-tab-body-content article,
-  .mat-mdc-tab-body-content section {
+  .cpbx-card .panel-wrapper,
+  .cpbx-card .panel-wrapper-top,
+  .cpbx-card .grid-inner,
+  .cpbx-card .grid-inner-title,
+  .cpbx-card .section,
+  .cpbx-card article,
+  .cpbx-card section {
     align-items: center !important;
     display: flex !important;
     flex-wrap: wrap !important;
@@ -1254,27 +724,13 @@ span {
     padding: 0 !important;
   }
 
-  mat-card .panel-wrapper:has(> mat-expansion-panel),
-  mat-expansion-panel .panel-wrapper:has(> mat-expansion-panel),
-  .mat-mdc-tab-body-content .panel-wrapper:has(> mat-expansion-panel) {
-    display: block !important;
-    margin: 0 !important;
-    width: 100% !important;
-  }
-
-  mat-card article,
-  mat-expansion-panel article,
-  .mat-mdc-tab-body-content article {
+  .cpbx-card article {
     max-width: 100%;
     overflow-x: visible;
   }
 
-  mat-card h2,
-  mat-card h3,
-  mat-expansion-panel h2,
-  mat-expansion-panel h3,
-  .mat-mdc-tab-body-content h2,
-  .mat-mdc-tab-body-content h3 {
+  .cpbx-card h2,
+  .cpbx-card h3 {
     color: var(--cpbx-control-text);
     flex: 0 0 100%;
     font-size: 1rem;
@@ -1283,34 +739,47 @@ span {
     margin: 1rem 0 0.25rem !important;
   }
 
-  mat-card h2:first-child,
-  mat-card h3:first-child,
-  mat-expansion-panel h2:first-child,
-  mat-expansion-panel h3:first-child,
-  .mat-mdc-tab-body-content h2:first-child,
-  .mat-mdc-tab-body-content h3:first-child {
+  .cpbx-card h2:first-child,
+  .cpbx-card h3:first-child {
     margin-top: 0 !important;
   }
 
-  mat-card .mat-mdc-card-content > form,
-  mat-card .mat-mdc-card-content > div:not(.kv-shell),
-  mat-expansion-panel .mat-expansion-panel-body > form,
-  mat-expansion-panel .mat-expansion-panel-body > div:not(.kv-shell) {
+  .cpbx-card .cpbx-card__content > form {
     align-items: center !important;
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 0.75rem !important;
   }
 
-  mat-card .mat-mdc-card-content > form,
-  mat-expansion-panel .mat-expansion-panel-body > form {
+  .cpbx-card .cpbx-card__content > form {
     margin: 0 !important;
   }
 
-  mat-card .mat-mdc-card-content > form > div,
-  mat-expansion-panel .mat-expansion-panel-body > form > div,
-  mat-card .spacer > div,
-  mat-expansion-panel .spacer > div {
+  .component-inner {
+    box-sizing: border-box;
+    margin: 0 !important;
+    max-width: 100%;
+    padding: 1.25rem;
+    width: 100%;
+  }
+
+  app-code-editor,
+  .xml-area,
+  .xml-area > div {
+    display: block !important;
+    min-width: 0;
+    width: 100% !important;
+  }
+
+  app-key-value-pad,
+  app-key-value-pad-2 {
+    display: block;
+    max-width: none !important;
+    width: 100%;
+  }
+
+  .cpbx-card .cpbx-card__content > form > div,
+  .cpbx-card .spacer > div {
     align-items: center !important;
     display: flex !important;
     flex-wrap: wrap !important;
@@ -1328,15 +797,6 @@ span {
     padding-block: 0.25rem;
   }
 
-  .cpbx-detail-grid .mat-mdc-form-field {
-    margin: 0 !important;
-    width: var(--cpbx-control-width) !important;
-  }
-
-  .cpbx-detail-grid .mat-mdc-button-base {
-    align-self: center;
-  }
-
   .spacer,
   .spacerb,
   .but-spacer-left {
@@ -1348,18 +808,15 @@ span {
     margin: var(--cpbx-page-gutter) !important;
   }
 
-  .cpbx-field--sm,
-  .mat-mdc-form-field.cpbx-field--sm {
+  .cpbx-field--sm {
     width: var(--cpbx-control-width-sm) !important;
   }
 
-  .cpbx-field--md,
-  .mat-mdc-form-field.cpbx-field--md {
+  .cpbx-field--md {
     width: var(--cpbx-control-width) !important;
   }
 
-  .cpbx-field--wide,
-  .mat-mdc-form-field.cpbx-field--wide {
+  .cpbx-field--wide {
     width: var(--cpbx-control-width-wide) !important;
   }
 
@@ -1610,116 +1067,9 @@ span {
     cursor: not-allowed;
   }
 
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid) {
-    width: var(--cpbx-control-width);
-    max-width: 100%;
-    --mat-form-field-container-height: var(--cpbx-control-height);
-    --mat-form-field-container-vertical-padding: 0.5rem;
-    --mdc-outlined-text-field-container-shape: var(--cpbx-control-radius);
-    --mdc-outlined-text-field-outline-color: transparent;
-    --mdc-outlined-text-field-hover-outline-color: transparent;
-    --mdc-outlined-text-field-focus-outline-color: transparent;
-    --mdc-outlined-text-field-label-text-color: var(--cpbx-control-muted);
-    --mdc-outlined-text-field-focus-label-text-color: var(--cpbx-control-focus);
-    --mdc-outlined-text-field-input-text-color: var(--cpbx-control-text);
-    --mdc-outlined-text-field-input-text-placeholder-color: var(--cpbx-control-placeholder);
-    --mdc-outlined-text-field-error-label-text-color: var(--cpbx-control-muted);
-    --mdc-outlined-text-field-error-outline-color: transparent;
-    --mdc-outlined-text-field-error-hover-outline-color: transparent;
-    --mdc-outlined-text-field-error-focus-outline-color: transparent;
-    --mdc-filled-text-field-container-color: #fff;
-    --mdc-filled-text-field-active-indicator-color: transparent;
-    --mdc-filled-text-field-focus-active-indicator-color: transparent;
-    --mdc-filled-text-field-hover-active-indicator-color: transparent;
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid) .mat-mdc-text-field-wrapper {
-    @apply border bg-white shadow-sm transition;
-    border-color: var(--cpbx-control-border);
-    border-radius: var(--cpbx-control-radius);
-    min-height: var(--cpbx-control-height) !important;
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid):hover .mat-mdc-text-field-wrapper {
-    border-color: var(--cpbx-control-border-hover);
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid).mat-focused .mat-mdc-text-field-wrapper {
-    border-color: var(--cpbx-control-focus);
-    box-shadow: var(--cpbx-control-ring);
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid).mat-form-field-invalid.ng-touched .mat-mdc-text-field-wrapper,
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid).mat-form-field-invalid.ng-dirty .mat-mdc-text-field-wrapper {
-    border-color: #ef4444;
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid) .mat-mdc-form-field-flex {
-    align-items: center;
-    min-height: var(--cpbx-control-height) !important;
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid) .mat-mdc-form-field-infix {
-    min-height: var(--cpbx-control-height) !important;
-    padding-bottom: 0.35rem !important;
-    padding-top: 0.85rem !important;
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid) input.mat-mdc-input-element,
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid) .mat-mdc-select-value {
-    @apply text-sm font-medium;
-    color: var(--cpbx-control-text);
-    line-height: 1.35;
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid) .mat-mdc-floating-label {
-    @apply bg-white px-1 text-sm font-medium;
-    color: var(--cpbx-control-muted);
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid):not(.mat-form-field-should-float) .mat-mdc-floating-label {
-    background: transparent;
-    padding-inline: 0;
-  }
-
-  mat-form-field.mat-mdc-form-field .mdc-notched-outline__leading,
-  mat-form-field.mat-mdc-form-field .mdc-notched-outline__notch,
-  mat-form-field.mat-mdc-form-field .mdc-notched-outline__trailing {
-    border-color: transparent !important;
-  }
-
-  mat-form-field.mat-mdc-form-field .mdc-line-ripple {
-    display: none;
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid) .mat-mdc-select-arrow {
-    color: var(--cpbx-control-muted);
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid).mat-form-field-invalid:not(.ng-touched):not(.ng-dirty) .mat-mdc-select-arrow {
-    color: var(--cpbx-control-muted);
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid).mat-form-field-invalid:not(.ng-touched):not(.ng-dirty) .mat-mdc-floating-label {
-    color: var(--cpbx-control-muted);
-  }
-
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid).mat-form-field-invalid.ng-touched,
-  mat-form-field.mat-mdc-form-field:not(.mat-mdc-form-field-type-mat-chip-grid).mat-form-field-invalid.ng-dirty {
-    --mdc-outlined-text-field-error-label-text-color: #dc2626;
-  }
-
-  mat-form-field.mat-mdc-form-field .mat-mdc-form-field-subscript-wrapper {
-    margin-top: 0.25rem;
-  }
-
-  mat-form-field.mat-mdc-form-field .mat-mdc-form-field-error {
-    @apply text-xs font-medium leading-tight text-red-600;
-  }
-
-  input:not([type="checkbox"]):not([type="radio"]):not([matinput]):not(.mat-mdc-input-element):not(.kv-input):not(.kv-search-input),
-  textarea:not([matinput]):not(.mat-mdc-input-element),
-  select:not(.mat-mdc-select),
+  input:not([type="checkbox"]):not([type="radio"]):not(.kv-input):not(.kv-search-input),
+  textarea,
+  select,
   .kv-input,
   .kv-search-input {
     appearance: none;
@@ -1736,46 +1086,46 @@ span {
     transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
   }
 
-  input:not([type="checkbox"]):not([type="radio"]):not([matinput]):not(.mat-mdc-input-element):not(.kv-input):not(.kv-search-input),
-  select:not(.mat-mdc-select),
+  input:not([type="checkbox"]):not([type="radio"]):not(.kv-input):not(.kv-search-input),
+  select,
   .kv-input,
   .kv-search-input {
     height: var(--cpbx-control-height);
   }
 
-  textarea:not([matinput]):not(.mat-mdc-input-element) {
+  textarea {
     min-height: calc(var(--cpbx-control-height) * 2);
     resize: vertical;
   }
 
-  input:not([type="checkbox"]):not([type="radio"]):not([matinput]):not(.mat-mdc-input-element):not(.kv-input):not(.kv-search-input)::placeholder,
-  textarea:not([matinput]):not(.mat-mdc-input-element)::placeholder,
+  input:not([type="checkbox"]):not([type="radio"]):not(.kv-input):not(.kv-search-input)::placeholder,
+  textarea::placeholder,
   .kv-input::placeholder,
   .kv-search-input::placeholder {
     color: var(--cpbx-control-placeholder);
     opacity: 1;
   }
 
-  input:not([type="checkbox"]):not([type="radio"]):not([matinput]):not(.mat-mdc-input-element):not(.kv-input):not(.kv-search-input):hover,
-  textarea:not([matinput]):not(.mat-mdc-input-element):hover,
-  select:not(.mat-mdc-select):hover,
+  input:not([type="checkbox"]):not([type="radio"]):not(.kv-input):not(.kv-search-input):hover,
+  textarea:hover,
+  select:hover,
   .kv-input:hover,
   .kv-search-input:hover {
     border-color: var(--cpbx-control-border-hover);
   }
 
-  input:not([type="checkbox"]):not([type="radio"]):not([matinput]):not(.mat-mdc-input-element):not(.kv-input):not(.kv-search-input):focus,
-  textarea:not([matinput]):not(.mat-mdc-input-element):focus,
-  select:not(.mat-mdc-select):focus,
+  input:not([type="checkbox"]):not([type="radio"]):not(.kv-input):not(.kv-search-input):focus,
+  textarea:focus,
+  select:focus,
   .kv-input:focus,
   .kv-search-input:focus {
     border-color: var(--cpbx-control-focus);
     box-shadow: var(--cpbx-control-ring);
   }
 
-  input:not([type="checkbox"]):not([type="radio"]):not([matinput]):not(.mat-mdc-input-element):not(.kv-input):not(.kv-search-input):disabled,
-  textarea:not([matinput]):not(.mat-mdc-input-element):disabled,
-  select:not(.mat-mdc-select):disabled,
+  input:not([type="checkbox"]):not([type="radio"]):not(.kv-input):not(.kv-search-input):disabled,
+  textarea:disabled,
+  select:disabled,
   .kv-input:disabled,
   .kv-input--disabled,
   .kv-search-input:disabled {
@@ -1786,231 +1136,391 @@ span {
     cursor: not-allowed;
   }
 
-  .mat-mdc-button-base:not(.mat-mdc-icon-button):not(.mat-mdc-fab):not(.mat-mdc-mini-fab) {
+  .cpbx-button {
+    display: inline-flex;
     min-height: var(--cpbx-button-height);
     min-width: var(--cpbx-button-min-width);
-    border-radius: var(--cpbx-control-radius) !important;
-    font-size: 0.875rem;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .625rem 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--cpbx-control-radius);
+    font: inherit;
+    font-size: .875rem;
     font-weight: 600;
-    letter-spacing: normal;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
   }
 
-  .mat-mdc-raised-button,
-  .mat-mdc-unelevated-button,
-  .mat-mdc-outlined-button {
-    box-shadow: none !important;
+  .cpbx-button--primary {
+    background: var(--cpbx-primary);
+    color: #fff;
   }
 
-  .mat-mdc-unelevated-button.mat-primary,
-  .mat-mdc-raised-button.mat-primary {
-    --mdc-filled-button-container-color: var(--cpbx-primary);
-    --mdc-filled-button-label-text-color: #fff;
-    --mdc-protected-button-container-color: var(--cpbx-primary);
-    --mdc-protected-button-label-text-color: #fff;
+  .cpbx-button--compact {
+    min-height: 2.25rem;
+    min-width: 0;
+    padding: .5rem .75rem;
   }
 
-  .mat-mdc-unelevated-button.mat-accent,
-  .mat-mdc-raised-button.mat-accent {
-    --mdc-filled-button-container-color: var(--cpbx-primary);
-    --mdc-filled-button-label-text-color: #fff;
-    --mdc-protected-button-container-color: var(--cpbx-primary);
-    --mdc-protected-button-label-text-color: #fff;
+  .sr-only {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
   }
 
-  .mat-mdc-unelevated-button.mat-warn,
-  .mat-mdc-raised-button.mat-warn {
-    --mdc-filled-button-container-color: #ef4444;
-    --mdc-filled-button-label-text-color: #fff;
-    --mdc-protected-button-container-color: #ef4444;
-    --mdc-protected-button-label-text-color: #fff;
+  .cpbx-button--primary:hover:not(:disabled) {
+    background: var(--cpbx-primary-strong);
   }
 
-  .mat-mdc-outlined-button {
-    --mdc-outlined-button-outline-color: #dbe1ef;
-    --mdc-outlined-button-label-text-color: #334155;
-    background: #fff;
+  .cpbx-button--secondary {
+    border-color: var(--cpbx-border);
+    background: var(--cpbx-surface);
+    color: var(--cpbx-text);
   }
 
-  .mat-mdc-outlined-button.mat-primary {
-    --mdc-outlined-button-outline-color: #c7d2fe;
-    --mdc-outlined-button-label-text-color: var(--cpbx-primary);
+  .cpbx-button--secondary:hover:not(:disabled) {
+    border-color: var(--cpbx-border-strong);
+    background: var(--cpbx-surface-muted);
+  }
+
+  .cpbx-button--primary-outline {
+    border-color: #c7d2fe;
     background: var(--cpbx-primary-soft);
-  }
-
-  .mat-mdc-outlined-button.mat-warn {
-    --mdc-outlined-button-outline-color: #fecaca;
-    --mdc-outlined-button-label-text-color: #dc2626;
-  }
-
-  .mat-mdc-button.mat-primary,
-  .mat-mdc-button.mat-accent,
-  .mat-mdc-button:not(.mat-warn) {
     color: var(--cpbx-primary);
   }
 
-  .mat-mdc-button.mat-warn {
-    color: #dc2626;
+  .cpbx-button--primary-outline:hover:not(:disabled) {
+    background: var(--cpbx-primary-hover);
   }
 
-  .mat-mdc-card {
-    --mat-card-elevated-container-elevation: none;
-    --mat-card-outlined-outline-width: 0;
+  .cpbx-button--danger {
+    background: var(--cpbx-danger);
+    color: #fff;
+  }
+
+  .cpbx-button--danger:hover:not(:disabled) {
+    background: #b91c1c;
+  }
+
+  .cpbx-button--danger-outline {
+    border-color: #fecaca;
+    background: var(--cpbx-surface);
+    color: var(--cpbx-danger);
+  }
+
+  .cpbx-button--danger-outline:hover:not(:disabled) {
+    background: var(--cpbx-danger-soft);
+  }
+
+  .cpbx-button--success {
+    background: var(--cpbx-success);
+    color: #fff;
+  }
+
+  .cpbx-button--success:hover:not(:disabled) {
+    background: #166534;
+  }
+
+  .cpbx-button--icon {
+    width: var(--cpbx-button-height);
+    min-width: var(--cpbx-button-height);
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
+    color: var(--cpbx-text-muted);
+  }
+
+  .cpbx-button--icon:hover:not(:disabled) {
+    background: var(--cpbx-surface-muted);
+    color: var(--cpbx-text);
+  }
+
+  .cpbx-button:disabled {
+    background: var(--cpbx-control-disabled-bg);
+    border-color: var(--cpbx-border);
+    color: var(--cpbx-control-disabled-text);
+    cursor: not-allowed;
+  }
+
+  .cpbx-checkbox {
+    display: inline-flex;
+    min-height: var(--cpbx-control-height);
+    align-items: center;
+    gap: .625rem;
+    color: var(--cpbx-control-text);
+    font-size: .875rem;
+    font-weight: 500;
+    line-height: 1.25;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .cpbx-checkbox__input {
+    display: grid;
+    width: 1.125rem;
+    height: 1.125rem;
+    flex: 0 0 1.125rem;
+    appearance: none;
+    place-content: center;
+    border: 1.5px solid var(--cpbx-control-border);
+    border-radius: .25rem;
+    background: var(--cpbx-control-bg);
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .cpbx-checkbox__input::before {
+    width: .6rem;
+    height: .6rem;
+    content: '';
+    clip-path: polygon(14% 44%, 0 59%, 40% 100%, 100% 20%, 84% 6%, 39% 65%);
+    background: #fff;
+    transform: scale(0);
+    transition: transform .12s ease-in-out;
+  }
+
+  .cpbx-checkbox__input:checked {
+    border-color: var(--cpbx-primary);
+    background: var(--cpbx-primary);
+  }
+
+  .cpbx-checkbox__input:checked::before {
+    transform: scale(1);
+  }
+
+  .cpbx-checkbox__input:focus-visible {
+    outline: none;
+    border-color: var(--cpbx-control-focus);
+    box-shadow: var(--cpbx-control-ring);
+  }
+
+  .cpbx-checkbox__input:disabled {
+    border-color: var(--cpbx-border);
+    background: var(--cpbx-control-disabled-bg);
+    cursor: not-allowed;
+  }
+
+  .cpbx-checkbox:has(.cpbx-checkbox__input:disabled) {
+    color: var(--cpbx-control-disabled-text);
+    cursor: not-allowed;
+  }
+
+  .cpbx-confirm-sheet {
+    min-width: min(26rem, calc(100vw - 2rem));
+    padding: 1.25rem;
+    color: var(--cpbx-text);
+  }
+
+  .cpbx-confirm-sheet h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 650;
+  }
+
+  .cpbx-confirm-sheet p {
+    margin: .5rem 0 0;
+    color: var(--cpbx-text-muted);
+    font-size: .875rem;
+  }
+
+  .cpbx-confirm-sheet__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: .625rem;
+    margin-top: 1.25rem;
+  }
+
+  .cpbx-segmented {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    padding: .25rem;
+    border: 1px solid var(--cpbx-border);
+    border-radius: var(--cpbx-control-radius);
+    background: var(--cpbx-surface-muted);
+  }
+
+  .cpbx-segmented__item {
+    min-height: 2.25rem;
+    padding: .5rem .875rem;
+    border: 0;
+    border-radius: .45rem;
+    background: transparent;
+    color: var(--cpbx-text-muted);
+    font: inherit;
+    font-size: .875rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .cpbx-segmented__item:hover:not(.is-active) {
+    background: var(--cpbx-surface);
+    color: var(--cpbx-text);
+  }
+
+  .cpbx-segmented__item.is-active {
+    background: var(--cpbx-surface);
+    color: var(--cpbx-primary);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 8%);
+  }
+
+  .cpbx-segmented__item:focus-visible,
+  .cpbx-tab-nav__item:focus-visible {
+    outline: none;
+    box-shadow: var(--cpbx-control-ring);
+  }
+
+  .cpbx-tab-nav {
+    display: flex;
+    min-height: 4.25rem;
+    align-items: center;
+    gap: .375rem;
+    overflow-x: auto;
+    padding: 0 1.25rem;
+    border-bottom: 1px solid var(--cpbx-border);
+    background: var(--cpbx-surface-muted);
+  }
+
+  .cpbx-tab-nav__item {
+    min-height: 3rem;
+    padding: .75rem 1.375rem;
+    border: 0;
+    border-radius: .375rem;
+    background: transparent;
+    color: var(--cpbx-text-muted);
+    font: inherit;
+    font-size: .9375rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .cpbx-tab-nav__item:hover:not(:disabled) {
+    background: #e9edf3;
+    color: var(--cpbx-text);
+  }
+
+  .cpbx-tab-nav__item.is-active {
+    background: #e5e9f0;
+    color: var(--cpbx-primary);
+    font-weight: 600;
+  }
+
+  .cpbx-tab-nav__item:disabled {
+    color: var(--cpbx-control-disabled-text);
+    cursor: not-allowed;
+  }
+
+  .cpbx-tab-panel {
+    min-width: 0;
+    max-width: 100%;
+    min-height: calc(100vh - 13.5rem);
+    overflow-x: hidden;
+    background: var(--cpbx-surface);
+  }
+
+  .cpbx-tab-panel--nested {
+    min-height: 0;
+  }
+
+  .cpbx-tab-panel--controlled {
+    display: none !important;
+  }
+
+  .cpbx-tab-panel--controlled.is-active {
+    display: block !important;
+  }
+
+  .cpbx-tab-panel[hidden] {
+    display: none !important;
+  }
+
+  .cpbx-tab-panel > .cpbx-card {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: var(--cpbx-surface);
+    box-shadow: none;
+  }
+
+  .cpbx-tab-panel > .cpbx-card + .cpbx-card {
+    margin-top: 1.25rem;
+  }
+
+  .cpbx-tab-panel > .cpbx-card > .cpbx-card__header {
+    padding: 1rem 1.25rem .25rem;
+  }
+
+  .cpbx-tab-panel > .cpbx-card > .cpbx-card__content {
+    padding: .25rem 1.25rem 1.25rem;
+  }
+
+  .cpbx-tab-panel > .cpbx-card > .cpbx-card__header .cpbx-card__subtitle {
+    color: var(--cpbx-text-muted);
+    font-size: .875rem;
+    font-weight: 600;
+  }
+
+  .cpbx-card {
+    display: block;
+    width: 100%;
+    overflow: hidden;
     border: 1px solid var(--cpbx-border);
     border-radius: var(--cpbx-panel-radius);
-    box-shadow: none !important;
+    background: var(--cpbx-surface);
   }
 
-  mat-card > .mat-mdc-card-header,
-  .mat-mdc-card > .mat-mdc-card-header {
+  .cpbx-card__header {
+    padding: 1rem 1.25rem .5rem;
+  }
+
+  .cpbx-card__subtitle {
+    color: var(--cpbx-text-muted);
+    font-size: .875rem;
+    font-weight: 500;
+  }
+
+  .cpbx-card__content {
+    padding: .5rem 1.25rem 1.25rem;
+  }
+
+  .cpbx-card > .cpbx-card__header {
     @apply px-5 pb-2 pt-4;
   }
 
-  mat-card > .mat-mdc-card-content,
-  .mat-mdc-card > .mat-mdc-card-content {
+  .cpbx-card > .cpbx-card__content {
     @apply px-5 pb-5 pt-2;
   }
 
-  .mat-mdc-card-subtitle {
+  .cpbx-card__subtitle {
     @apply text-sm font-medium text-slate-500;
   }
 
-  .mat-expansion-panel {
-    border: 1px solid var(--cpbx-border);
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    display: block !important;
-    overflow: hidden;
-    margin: 0 !important;
-    width: 100% !important;
+  .config-subheading {
+    color: var(--cpbx-text);
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
   }
 
-  mat-accordion,
-  .mat-accordion {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  mat-card mat-expansion-panel,
-  mat-card mat-accordion,
-  .mat-mdc-card-content > mat-expansion-panel,
-  .mat-mdc-card-content > mat-accordion,
-  .mat-mdc-tab-body-content mat-expansion-panel,
-  .mat-mdc-tab-body-content mat-accordion {
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  .mat-mdc-card-content:has(> mat-expansion-panel),
-  .mat-mdc-card-content:has(> mat-accordion),
-  .mat-mdc-card-content:has(> .panel-wrapper > mat-expansion-panel),
-  .mat-mdc-card-content:has(> .panel-wrapper > mat-accordion) {
+  .domains-list {
     display: flex !important;
     flex-direction: column !important;
     gap: 0.5rem !important;
-    min-height: inherit;
-    width: 100% !important;
-  }
-
-  mat-card .panel-wrapper:has(> mat-expansion-panel),
-  mat-card .panel-wrapper:has(> mat-accordion),
-  mat-expansion-panel .panel-wrapper:has(> mat-expansion-panel),
-  mat-expansion-panel .panel-wrapper:has(> mat-accordion),
-  .mat-mdc-card-content > .panel-wrapper:has(> mat-expansion-panel),
-  .mat-mdc-card-content > .panel-wrapper:has(> mat-accordion),
-  .mat-mdc-tab-body-content .panel-wrapper:has(> mat-expansion-panel),
-  .mat-mdc-tab-body-content .panel-wrapper:has(> mat-accordion) {
-    display: block !important;
-    flex: 0 0 100% !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  .domains-list,
-  .mat-mdc-card-content:has(> mat-expansion-panel),
-  .mat-mdc-card-content:has(> .panel-wrapper > mat-expansion-panel) {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.5rem !important;
-  }
-
-  .mat-expansion-panel-header {
-    box-sizing: border-box;
-    min-height: 3.5rem;
-    padding-inline: 1.25rem;
-    border-radius: 0 !important;
-    width: 100%;
-  }
-
-  .mat-expansion-panel-header:hover {
-    background: #f8fafc !important;
-  }
-
-  .mat-expansion-panel.mat-expanded .mat-expansion-panel-header {
-    background: #f8fafc;
-    border-bottom: 1px solid var(--cpbx-border);
-  }
-
-  .mat-expansion-panel-header-title {
-    @apply text-sm font-medium text-slate-900;
-  }
-
-  .mat-expansion-panel-header-description {
-    @apply justify-start text-sm font-medium text-slate-500;
-  }
-
-  .mat-expansion-panel-body {
-    padding: 1.25rem !important;
-  }
-
-  mat-tab-group:not(.legacy-tabs),
-  mat-tab-group.cpbx-tabs {
-    display: flex !important;
-    flex-direction: column !important;
-    min-height: 0;
-    max-width: 100%;
-    overflow-x: hidden;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-wrapper,
-  mat-tab-group.cpbx-tabs .mat-mdc-tab-body-wrapper {
-    flex: 1 1 auto !important;
-    max-width: 100%;
-    min-height: max(22rem, calc(100vh - 17rem)) !important;
-    overflow-x: hidden;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content,
-  mat-tab-group.cpbx-tabs .mat-mdc-tab-body,
-  mat-tab-group.cpbx-tabs .mat-mdc-tab-body-content {
-    max-width: 100%;
-    min-height: max(22rem, calc(100vh - 17rem)) !important;
-    overflow-x: hidden !important;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > form,
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > .cpbx-form-panel,
-  mat-tab-group.cpbx-tabs .mat-mdc-tab-body-content > form,
-  mat-tab-group.cpbx-tabs .mat-mdc-tab-body-content > .cpbx-form-panel {
-    align-content: flex-start !important;
-    align-items: flex-start !important;
-    justify-content: flex-start !important;
-    margin-left: var(--cpbx-page-gutter) !important;
-    margin-right: var(--cpbx-page-gutter) !important;
-  }
-
-  mat-tab-group:not(.legacy-tabs) .mat-mdc-tab-body-content > .cpbx-form-panel--stack,
-  mat-tab-group.cpbx-tabs .mat-mdc-tab-body-content > .cpbx-form-panel--stack {
-    width: calc(100% - (var(--cpbx-page-gutter) * 2)) !important;
   }
 
   .users-panel-filters {
     align-items: center !important;
-  }
-
-  .users-panel-select-field.mat-mdc-form-field {
-    width: 26.25rem !important;
   }
 
   .domain-users {
@@ -2034,27 +1544,6 @@ span {
     min-height: 3rem !important;
   }
 
-  .mat-mdc-select-panel,
-  .users-panel-select-panel.mat-mdc-select-panel {
-    border: 1px solid #dbe1ef;
-    border-radius: 0.875rem !important;
-    box-shadow: 0 16px 34px rgba(15, 23, 42, .16);
-    padding: 0.5rem !important;
-  }
-
-  .mat-mdc-select-panel .mat-mdc-option {
-    min-height: 2.75rem;
-    border-radius: 0.625rem;
-    margin-block: 0.125rem;
-  }
-
-  .mat-mdc-select-panel .mat-mdc-option:hover,
-  .mat-mdc-select-panel .mat-mdc-option.mat-mdc-option-active,
-  .mat-mdc-select-panel .mat-mdc-option.mdc-list-item--selected,
-  .mat-mdc-select-panel .mat-mdc-option.mdc-list-item--activated {
-    background: var(--cpbx-primary-soft) !important;
-    color: var(--cpbx-primary-strong) !important;
-  }
 }
 
 @media (max-width: 1280px) {
@@ -2062,4 +1551,15 @@ span {
     display: flex !important;
     flex-wrap: wrap;
   }
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+  cursor: pointer;
+  height: .9rem;
+  opacity: .58;
+  width: .9rem;
+}
+
+input[type="search"]::-webkit-search-cancel-button:hover {
+  opacity: .9;
 }

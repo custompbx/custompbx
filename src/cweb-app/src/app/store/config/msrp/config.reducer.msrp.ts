@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.msrp) {
-        state.msrp = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, msrp: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

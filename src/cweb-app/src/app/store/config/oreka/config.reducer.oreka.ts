@@ -38,8 +38,7 @@ export function reducer(state = initialState, action: All): State {
       }
 
       if (!state.oreka) {
-        state.oreka = <IsimpleModule>{};
-        state.loadCounter = 0;
+        state = {...state, oreka: <IsimpleModule>{}, loadCounter: 0};
       }
 
       return {

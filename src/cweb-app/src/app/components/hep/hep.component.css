@@ -12,13 +12,6 @@ td {
   padding-right: 5px;
 }
 
-td.mat-cell {
-  padding-right: 5px;
-}
-
-th.mat-header-cell {
-  padding-right: 20px;
-}
 
 .table-container {
   overflow: auto;
@@ -53,54 +46,6 @@ th {
 th:hover {
   color: #3a3a3a;
 }
-
-/*styles for accordion*/
-/*
-.mat-accordion .mat-header-row {
-  padding-left: 1.5rem;
-  padding-right: 2rem;
-  border-bottom: none;
-}
-
-.mat-expansion-panel-header.mat-row {
-  border-bottom: none;
-}
-
-.mat-table {
-  display: block;
-}
-
-.mat-header-row {
-  min-height: 56px;
-}
-
-.mat-row {
-  min-height: 48px;
-}
-
-.mat-row, .mat-header-row {
-  display: flex;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  align-items: center;
-  padding: 0 24px;
-  box-sizing: border-box;
-}
-
-.mat-cell, .mat-header-cell {
-  flex: 1;
-  overflow: hidden;
-  word-wrap: break-word;
-}
-
-.mat-cell, .mat-header-cell {
-  flex: 1;
-  overflow: hidden;
-  word-wrap: break-word;
-}
-*/
-
-/*styles for accordion END*/
 
 .chosen {
   background-color: #6ce4d9 !important;

@@ -1,4 +1,4 @@
-.var-type {
+﻿.var-type {
   max-width: 100px;
 }
 
@@ -25,10 +25,6 @@ article {
   grid-template-columns: 1fr auto auto auto auto auto auto;
 }
 
-section {
-  margin-left: 10px;
-}
-
 .grid-inner {
   display: inline-block;
   margin-top: 8px;
@@ -39,17 +35,22 @@ section {
   margin-top: 15px;
 }
 
-.mat-expansion-panel {
-  border-radius: 0;
-}
-
-.mat-expansion-panel-header {
-  border-radius: 0;
-}
 
 
 
 .secure{
   max-width: 55px;
+}
+
+.global-variable-list,
+.global-variable-drafts {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  width: 100%;
+}
+
+.cpbx-edit-row {
+  width: 100%;
 }
 

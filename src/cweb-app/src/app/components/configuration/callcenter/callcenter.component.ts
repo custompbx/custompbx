@@ -1,13 +1,11 @@
-import {Component, inject, computed, OnInit, effect, signal} from '@angular/core';
+import {Component, inject, computed, OnInit, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
-import {MaterialModule} from "../../../../material-module";
 import {ActivatedRoute} from '@angular/router';
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {MatBottomSheet} from '@angular/material/bottom-sheet';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {PageEvent} from '@angular/material/paginator';
+import {ConfirmationService} from '../../../services/confirmation.service';
+import {ToastService} from '../../../services/toast.service';
 import {
   AddCallcenterAgent,
   AddCallcenterQueue,
@@ -41,17 +39,19 @@ import {
   UpdateCallcenterTier,
 } from '../../../store/config/callcenter/config.actions.callcenter';
 import {AbstractControl, FormsModule} from '@angular/forms';
-import {ConfirmBottomSheetComponent} from '../../confirm-bottom-sheet/confirm-bottom-sheet.component';
 import {IfilterField, IsortField} from '../../cdr/cdr.component';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
-import {AppAutoFocusDirective} from "../../../directives/auto-focus.directive";
 import {Icallcenter, Iitem, State} from '../../../store/config/config.state.struct';
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
+import {TabNavComponent} from '../../tab-nav/tab-nav.component';
+import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {EditableTableCellEvent, EditableTableComponent} from '../../editable-table/editable-table.component';
+import {CpbxPageEvent, PaginatorComponent} from '../../paginator/paginator.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MaterialModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, AppAutoFocusDirective, KeyValuePad2Component],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent, EditableTableComponent, PaginatorComponent],
   selector: 'app-callcenter',
   templateUrl: './callcenter.component.html',
   styleUrls: ['./callcenter.component.css']
@@ -60,8 +60,8 @@ export class CallcenterComponent implements OnInit {
 
   // --- Dependency Injection using inject() ---
   private store = inject(Store<AppState>);
-  private bottomSheet = inject(MatBottomSheet);
-  private _snackBar = inject(MatSnackBar);
+  private bottomSheet = inject(ConfirmationService);
+  private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
 
   // --- Reactive State from NgRx using toSignal ---
@@ -95,18 +95,14 @@ export class CallcenterComponent implements OnInit {
     return members?.table?.length ? Object.keys(members.table[0]) : [];
   });
 
-  // --- Local Component State (Signals) ---
-  public showDel = signal<{[key: number]: boolean}>({});
-
   // --- Local Component State (Variables) ---
   public newQueueName: string = '';
   public newAgentName: string = '';
   public agentName: string = '';
   public selectedIndex: number = 0;
+  public detailTabIndex: number = 0;
   protected queueId: number | null = null;
   protected panelCloser: {[key: string]: boolean} = {};
-  protected toEdit: {[key: number]: any} = {};
-  protected toEditTier: {[key: number]: any} = {};
   protected toCopyqueue: number = 0;
 
   public operands: Array<string> = ['=', '>', '<', 'CONTAINS'];
@@ -124,21 +120,21 @@ export class CallcenterComponent implements OnInit {
   public membersFilters: Array<IfilterField> = [];
 
   public paginationScale = [25, 50, 100, 250];
-  public pageEvent: PageEvent = {
+  public pageEvent: CpbxPageEvent = {
     length: 0,
     pageIndex: 0,
     pageSize: this.paginationScale[0],
-  } as PageEvent;
-  public tiersPageEvent: PageEvent = {
+  };
+  public tiersPageEvent: CpbxPageEvent = {
     length: 0,
     pageIndex: 0,
     pageSize: this.paginationScale[0],
-  } as PageEvent;
-  public membersPageEvent: PageEvent = {
+  };
+  public membersPageEvent: CpbxPageEvent = {
     length: 0,
     pageIndex: 0,
     pageSize: this.paginationScale[0],
-  } as PageEvent;
+  };
 
   public sortColumns: string | null = null;
   public tiersSortColumns: string | null = null;
@@ -202,20 +198,12 @@ export class CallcenterComponent implements OnInit {
     }
   }
 
-  toInput(id: number, columnName: any) {
-    this.toEdit = {[id]: columnName};
+  markChanged(id: number, columnName: any, changed: boolean) {
+    this.store.dispatch(new StoreSetChangedCallcenterTableField({tableName: 'agents', rowId: id, fieldName: columnName, changed}));
   }
 
-  toInputTier(id: number, columnName: any) {
-    this.toEditTier = {[id]: columnName};
-  }
-
-  markChanged(id: number, columnName: any) {
-    this.store.dispatch(new StoreSetChangedCallcenterTableField({tableName: 'agents', rowId: id, fieldName: columnName}));
-  }
-
-  markChangedTier(id: number, columnName: any) {
-    this.store.dispatch(new StoreSetChangedCallcenterTableField({tableName: 'tiers', rowId: id, fieldName: columnName}));
+  markChangedTier(id: number, columnName: any, changed: boolean) {
+    this.store.dispatch(new StoreSetChangedCallcenterTableField({tableName: 'tiers', rowId: id, fieldName: columnName, changed}));
   }
 
   isReadyToSendThree(mainObject: AbstractControl | null, object2: AbstractControl | null, object3: AbstractControl | null): boolean {
@@ -249,25 +237,6 @@ export class CallcenterComponent implements OnInit {
 
   isNewReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
     return !!(nameObject && valueObject && nameObject.valid && valueObject.valid);
-  }
-
-  showDelIco(id: number) {
-      this.showDel.update(current => {
-        const updated = { ...current };
-        updated[id] = true;
-        return updated;
-      });
-  }
-
-  leaveDelIco(id: number) {
-    setTimeout(() => {
-      // Update the signal immutably
-      this.showDel.update(current => {
-        const updated = { ...current };
-        updated[id] = false;
-        return updated;
-      });
-    }, 300);
   }
 
   copyQueue(key: number) {
@@ -388,7 +357,7 @@ export class CallcenterComponent implements OnInit {
     this.store.dispatch(new ImportCallcenterAgentsAndTiers(null));
   }
 
-  handlePageEvent(e: PageEvent) {
+  handlePageEvent(e: CpbxPageEvent) {
     this.pageEvent = e;
     this.GetCallcenterAgents();
   }
@@ -416,9 +385,17 @@ export class CallcenterComponent implements OnInit {
     const param = <Iitem>{
       id: id,
       name: key,
-      value: value,
+      value: value == null ? '' : String(value),
     };
     this.store.dispatch(new UpdateCallcenterAgent({param: param}));
+  }
+
+  saveAgentCell(event: EditableTableCellEvent): void {
+    this.UpdateCallcenterAgent(event.row['id'], event.column, event.value);
+  }
+
+  changeAgentCell(event: EditableTableCellEvent): void {
+    this.markChanged(event.row['id'], event.column, event.changed);
   }
 
   openBottomSheetQueue(id: number, newName: string, oldName: string, action: string): void {
@@ -432,7 +409,7 @@ export class CallcenterComponent implements OnInit {
           case2Text: 'Are you sure you want to rename queue "' + oldName + '" to "' + newName + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -453,7 +430,7 @@ export class CallcenterComponent implements OnInit {
           case1Text: 'Are you sure you want to delete agent "' + name + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -484,7 +461,7 @@ export class CallcenterComponent implements OnInit {
     this.sortObject.fields = [];
   }
 
-  handleTiersPageEvent(e: PageEvent) {
+  handleTiersPageEvent(e: CpbxPageEvent) {
     this.tiersPageEvent = e;
     this.GetCallcenterTiers();
   }
@@ -515,9 +492,17 @@ export class CallcenterComponent implements OnInit {
     const param = <Iitem>{
       id: id,
       name: key,
-      value: value,
+      value: value == null ? '' : String(value),
     };
     this.store.dispatch(new UpdateCallcenterTier({param: param}));
+  }
+
+  saveTierCell(event: EditableTableCellEvent): void {
+    this.UpdateCallcenterTier(event.row['id'], event.column, event.value);
+  }
+
+  changeTierCell(event: EditableTableCellEvent): void {
+    this.markChangedTier(event.row['id'], event.column, event.changed);
   }
 
   DelCallcenterTier(id: number, name: string): void {
@@ -528,7 +513,7 @@ export class CallcenterComponent implements OnInit {
           case1Text: 'Are you sure you want to delete tier with id "' + name + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
@@ -585,7 +570,7 @@ export class CallcenterComponent implements OnInit {
     this.membersSortObject.fields = [];
   }
 
-  handleMembersPageEvent(e: PageEvent) {
+  handleMembersPageEvent(e: CpbxPageEvent) {
     this.membersPageEvent = e;
     this.GetCallcenterMembers();
   }
@@ -609,7 +594,7 @@ export class CallcenterComponent implements OnInit {
           case1Text: 'Are you sure you want to delete member with uuid "' + uuid + '"?',
         }
     };
-    const sheet = this.bottomSheet.open(ConfirmBottomSheetComponent, config);
+    const sheet = this.bottomSheet.open(config);
     sheet.afterDismissed().subscribe(result => {
       if (!result) {
         return;
