@@ -73,11 +73,14 @@ section {
   white-space: pre-line;
 }
 
-.hep-export-actions {
+.hep-details-toolbar {
   align-items: center;
+  background: var(--cpbx-surface);
+  border-bottom: 1px solid var(--cpbx-border);
   display: flex;
   flex-wrap: wrap;
   gap: .75rem;
+  padding: .75rem 1rem;
 }
 
 .hep-details-body {

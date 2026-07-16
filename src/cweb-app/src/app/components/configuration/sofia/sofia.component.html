@@ -6,7 +6,7 @@
     <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Global Settings</p>
+          <p class="cpbx-card__subtitle">Settings</p>
         </header>
         <div class="cpbx-card__content">
           <app-disclosure (opened)="getGlobalSettings()" (closed)="clearGlobalSettings()">
@@ -29,6 +29,9 @@
         </div>
       </section>
       <section class="cpbx-card">
+        <header class="cpbx-card__header">
+          <p class="cpbx-card__subtitle">Profiles</p>
+        </header>
         <div class="cpbx-card__content">
           @if (list() && list().profiles) {
             <app-tab-nav ariaLabel="Sofia profile data" [tabs]="['Parameters', 'Gateways', 'Domains', 'Aliases', 'Commands']"

@@ -84,3 +84,45 @@ th {
 .table-cell:first-child {
   padding-left: 24px;
 }
+
+.queue-command-panel {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.queue-command-list {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  width: min(100%, 42rem);
+}
+
+.queue-command-row {
+  align-items: center;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(10rem, 1fr) auto;
+  padding: .5rem 0;
+  width: 100%;
+}
+
+.queue-command-name {
+  font-weight: 600;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.queue-command-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+@media (max-width: 640px) {
+  .queue-command-row {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+}

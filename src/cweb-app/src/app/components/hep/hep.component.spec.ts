@@ -25,7 +25,7 @@ describe('SystemComponent', () => {
   });
 
   it('places export actions before the sequence diagram', () => {
-    const actions = fixture.nativeElement.querySelector('.hep-export-actions') as HTMLElement;
+    const actions = fixture.nativeElement.querySelector('.hep-details-toolbar') as HTMLElement;
     const body = fixture.nativeElement.querySelector('.hep-details-body') as HTMLElement;
     expect(actions).not.toBeNull();
     expect(body).not.toBeNull();

@@ -145,13 +145,13 @@
     </div>
   </div>
 <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
+    <div class="hep-details-toolbar" aria-label="HEP export actions">
+      <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsPng()">Export PNG</button>
+      <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsText()">Export TXT</button>
+    </div>
     <section class="cpbx-card">
       <div class="cpbx-card__content">
         <article class="hep-details">
-          <section class="hep-export-actions">
-            <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsPng()">Export PNG</button>
-            <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsText()">Export TXT</button>
-          </section>
           <div class="hep-details-body">
             <section class="flow">
               <app-svg-seq-diagram [inData]="list().hepDetails" (toView)="gotMsg($event)"></app-svg-seq-diagram>

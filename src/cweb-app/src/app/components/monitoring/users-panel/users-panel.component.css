@@ -225,6 +225,9 @@
   justify-content: flex-end;
   min-height: 48px;
   padding: 6px 12px 8px;
+  box-sizing: border-box;
+  justify-content: flex-end !important;
+  width: 100%;
 }
 
 .connect-button {
@@ -233,6 +236,7 @@
   font-weight: 600;
   min-height: 34px;
   min-width: 96px;
+  margin-left: auto;
 }
 
 .connect-button:hover {

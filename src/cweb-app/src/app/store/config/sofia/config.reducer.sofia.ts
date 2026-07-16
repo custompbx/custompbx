@@ -435,11 +435,7 @@ export function reducer(state = initialState, action: All): State {
     case ConfigActionTypes.STORE_GET_SOFIA_PROFILE_GATEWAYS: {
       const data = action.payload.response.data || {};
       const ids = Object.keys(data);
-
-      if (ids.length === 0) {
-        return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
-      }
-      const profileId = data[ids[0]].parent?.id || 0;
+      const profileId = action.payload.profileId || data[ids[0]]?.parent?.id || 0;
       if (profileId === 0) {
         return {...state, loadCounter: state.loadCounter > 0 ? state.loadCounter - 1 : 0};
       }

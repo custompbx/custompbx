@@ -457,35 +457,29 @@
                       }
                     </div>
                 <div class="cpbx-tab-panel cpbx-tab-panel--nested cpbx-tab-panel--controlled" [class.is-active]="detailTabIndex === 4">
-                      <div class="panel-wrapper panel-wrapper-top">
+                      <div class="queue-command-panel">
                         <h3>Queues:</h3>
-                        <article>
+                        <div class="queue-command-list">
                           @for (queue of onlyValues(list().queues); track trackByFnId($index, queue)) {
-                            <div class="section">
-                              <section class="config-subheading">
-                                <span class=" grid-inner-title">{{queue.name}}</span>
-                              </section>
-                              <section>
-                                <button class="but-spacer-left switch-button grid-inner cpbx-button cpbx-button--secondary"
+                            <div class="queue-command-row">
+                              <span class="queue-command-name">{{queue.name}}</span>
+                              <div class="queue-command-actions">
+                                <button class="switch-button cpbx-button cpbx-button--secondary"
                                   (click)="queueCommand(queue.id, 0, 'load')">
                                   Load
                                 </button>
-                              </section>
-                              <section>
-                                <button class="but-spacer-left switch-button grid-inner cpbx-button cpbx-button--secondary"
-                                  (click)="queueCommand(queue.id, 0, 'load')">
+                                <button class="switch-button cpbx-button cpbx-button--secondary"
+                                  (click)="queueCommand(queue.id, 0, 'reload')">
                                   Reload
                                 </button>
-                              </section>
-                              <section>
-                                <button class="but-spacer-left switch-button grid-inner cpbx-button cpbx-button--secondary"
-                                  (click)="queueCommand(queue.id, 0, 'load')">
+                                <button class="switch-button cpbx-button cpbx-button--secondary"
+                                  (click)="queueCommand(queue.id, 0, 'unload')">
                                   Unload
                                 </button>
-                              </section>
+                              </div>
                             </div>
                           }
-                        </article>
+                        </div>
                       </div>
                     </div>
                 <div class="cpbx-tab-panel cpbx-tab-panel--nested cpbx-tab-panel--controlled" [class.is-active]="detailTabIndex === 5">

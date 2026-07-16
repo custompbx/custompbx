@@ -64,7 +64,7 @@ import {
   UpdateSofiaProfileGatewayParam, UpdateSofiaProfileGatewayVar,
   UpdateSofiaProfileParam,
 } from './config.actions.sofia';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, concatMap, map, switchMap} from 'rxjs/operators';
 import {WsDataService} from '../../../services/ws-data.service';
 import {Failure} from '../config.actions';
 
@@ -314,13 +314,13 @@ export class ConfigEffectsSofia {
     return this.actions.pipe(
       ofType(ConfigActionTypes.GET_SOFIA_PROFILE_GATEWAYS),
       map((action: GetSofiaProfileGateways) => action),
-      switchMap(action => {
+      concatMap(action => {
           return this.ws.universalSender(action.type, action.payload).pipe(
             map((response) => {
               if (response.error) {
                 return new StoreGotSofiaError({error: response.error});
               }
-              return new StoreGetSofiaProfileGateways({response});
+              return new StoreGetSofiaProfileGateways({response, profileId: action.payload.id});
             }),
             catchError((error) => {
               console.log(error);

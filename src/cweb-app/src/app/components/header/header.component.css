@@ -127,7 +127,15 @@
 }
 
 .user-avatar-icon {
-  font-size: 34px;
+  align-items: center;
+  align-self: center;
+  color: inherit;
+  display: inline-flex;
+  font-size: 28px;
   height: 34px;
+  justify-content: center;
+  opacity: .92;
+  transform: translateY(1px);
+  transition: color .16s ease;
   width: 34px;
 }

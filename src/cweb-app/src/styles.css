@@ -713,8 +713,7 @@ span {
   .cpbx-card .grid-inner,
   .cpbx-card .grid-inner-title,
   .cpbx-card .section,
-  .cpbx-card article,
-  .cpbx-card section {
+  .cpbx-card article {
     align-items: center !important;
     display: flex !important;
     flex-wrap: wrap !important;
