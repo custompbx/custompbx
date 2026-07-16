@@ -34,6 +34,8 @@ describe('HeaderComponent', () => {
     expect(labels).toContain('Open conversations');
     expect(labels).toContain('Toggle phone');
     expect(labels).toContain('Open user menu');
+    expect(fixture.nativeElement.querySelector('.user-menu .user-name')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector(':scope > .user-name')).toBeNull();
   });
 
   it('does not require a loaded user before first render', () => {

@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-event-multicast', // Changed selector
   templateUrl: './event-multicast.component.html', // Kept original template reference
-  styleUrls: ['./event-multicast.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class EventMulticastComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'EventMulticast';

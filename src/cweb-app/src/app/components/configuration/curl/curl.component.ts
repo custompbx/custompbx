@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-curl', // Changed selector
   templateUrl: './curl.component.html', // Kept original template reference
-  styleUrls: ['./curl.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class CurlComponent implements OnInit { // Removed OnDestroy
 

@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-msrp', // Changed selector
   templateUrl: './msrp.component.html', // Kept original template reference
-  styleUrls: ['./msrp.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class MsrpComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'Msrp';

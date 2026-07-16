@@ -1,4 +1,5 @@
 import {hasOperationError, isConfirmedOperation, operationMessage} from './operation-feedback.effects';
+import {operationKindFromType, withOperationFeedback} from '../services/operation-feedback';
 
 describe('operation feedback', () => {
   it('recognizes confirmed bracketed Dialplan mutations', () => {
@@ -41,5 +42,33 @@ describe('operation feedback', () => {
       type: '[Dialplan]{Store}[Update] Condition',
       payload: {response}
     })).toBeFalse();
+  });
+
+  it('does not treat entity names containing Switch as mutations', () => {
+    expect(isConfirmedOperation({
+      type: 'StoreGetPostSwitch',
+      payload: {response: {settings: {}}}
+    })).toBeFalse();
+    expect(isConfirmedOperation({
+      type: '[Config][Store][Get] Post switch',
+      payload: {response: {settings: {}}}
+    })).toBeFalse();
+  });
+
+  it('parses only explicit operation opcodes', () => {
+    expect(operationKindFromType('[Config][Store][Get] Post switch')).toBeNull();
+    expect(operationKindFromType('[Dialplan][Switch][Store] Parameter')).toBe('switch');
+    expect(operationKindFromType('StoreSwitchPostSwitchParameter')).toBe('switch');
+    expect(operationKindFromType('StoreGetPostSwitch')).toBeNull();
+  });
+
+  it('uses request metadata for ambiguous completion action names', () => {
+    const action = withOperationFeedback({
+      type: 'StoreAclList',
+      payload: {response: {id: 1}},
+    }, 'AddAclList');
+
+    expect(action.operationFeedback).toEqual({kind: 'add', sourceType: 'AddAclList'});
+    expect(isConfirmedOperation(action)).toBeTrue();
   });
 });

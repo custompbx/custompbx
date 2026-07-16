@@ -23,4 +23,12 @@ describe('SystemComponent', () => {
   it('should compile', () => {
     expect(component).toBeTruthy();
   });
+
+  it('places export actions before the sequence diagram', () => {
+    const actions = fixture.nativeElement.querySelector('.hep-export-actions') as HTMLElement;
+    const body = fixture.nativeElement.querySelector('.hep-details-body') as HTMLElement;
+    expect(actions).not.toBeNull();
+    expect(body).not.toBeNull();
+    expect(actions.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 });

@@ -22,7 +22,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, KeyValuePad2Component],
   selector: 'app-post-load-modules',
   templateUrl: './post-load-modules.component.html',
-  styleUrls: ['./post-load-modules.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class PostLoadModulesComponent {
 

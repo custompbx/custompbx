@@ -1,11 +1,10 @@
-import {Component, effect, inject, Input, OnInit} from '@angular/core';
+import {Component, effect, inject, Input} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 import {Iuser} from '../../store/auth/auth.reducers';
 import {UserService} from '../../services/user.service';
-import {Subscription} from 'rxjs';
-import {IsActiveMatchOptions, Router, RouterLink} from '@angular/router';
-import {Store} from "@ngrx/store";
-import {AppState} from "../../store/app.states";
+import {IsActiveMatchOptions, NavigationEnd, Router, RouterLink} from '@angular/router';
+import {filter, map, startWith} from 'rxjs/operators';
 import {IconComponent} from '../icon/icon.component';
 
 @Component({
@@ -24,6 +23,14 @@ export class SidenavComponent {
 
   private userService = inject(UserService);
   private router = inject(Router);
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects),
+      startWith(this.router.url),
+    ),
+    {initialValue: this.router.url},
+  );
 
   private menuUpdateEffect = effect(() => {
     // a) Read the user signal (userSignal is public in the UserService)
@@ -34,6 +41,7 @@ export class SidenavComponent {
   });
 
   isRouteActive(route: string): boolean {
+    this.currentUrl();
     if (!route) {
       return false;
     }
@@ -47,11 +55,11 @@ export class SidenavComponent {
   private normalizeRoute(route: string): string {
     return route.startsWith('/') ? route : `/${route}`;
   }
-  getMenuItems(id): Array<IMenuItemExpand> {
+  getMenuItems(id: number | null | undefined): Array<IMenuItemExpand> {
     if (!id) {
       return [];
     }
-    switch (this.user.group_id) {
+    switch (id) {
       case 1:
         return [
           {
@@ -215,5 +223,5 @@ export interface IMenuItemExpand {
   icon: string;
   route: string;
   name: string;
-  subMenu: Array<IMenuItem>;
+  subMenu: Array<IMenuItem> | null;
 }

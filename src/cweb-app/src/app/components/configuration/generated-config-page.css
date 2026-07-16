@@ -1,0 +1,43 @@
+.but-spacer-left {
+  margin-left: .3125rem;
+}
+
+.spacerb {
+  margin-top: .9375rem;
+}
+
+.panel-wrapper {
+  padding-inline: .3125rem;
+}
+
+.panel-wrapper-top {
+  padding-top: .3125rem;
+}
+
+.panel-wrapper:last-child {
+  padding-bottom: .3125rem;
+}
+
+article {
+  display: inline-grid;
+  grid-template-columns: auto;
+}
+
+.section {
+  display: inline-grid;
+  grid-template-columns: 1fr repeat(6, auto);
+}
+
+.grid-inner {
+  display: inline-block;
+  margin-top: .5rem;
+}
+
+.grid-inner-title {
+  display: inline-block;
+  margin-top: .9375rem;
+}
+
+.secure {
+  max-width: 3.4375rem;
+}

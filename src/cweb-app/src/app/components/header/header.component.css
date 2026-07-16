@@ -75,7 +75,6 @@
 }
 
 .user-name {
-  margin-left: .4rem;
   font-size: 14px;
   font-weight: 600;
   line-height: 1;
@@ -121,8 +120,14 @@
 
 .avatar-img {
   display: inline-block;
-  height: 30px;
-  width: 30px;
+  height: 34px;
+  width: 34px;
   border-radius: 45px;
   overflow: hidden;
+}
+
+.user-avatar-icon {
+  font-size: 34px;
+  height: 34px;
+  width: 34px;
 }

@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-xml-rpc', // Changed selector
   templateUrl: './xml-rpc.component.html', // Kept original template reference
-  styleUrls: ['./xml-rpc.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class XmlRpcComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'XmlRpc';

@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-lua', // Changed selector
   templateUrl: './lua.component.html', // Kept original template reference
-  styleUrls: ['./lua.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class LuaComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'Lua';

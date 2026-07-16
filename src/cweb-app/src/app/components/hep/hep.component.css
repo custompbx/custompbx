@@ -51,10 +51,10 @@ th:hover {
   background-color: #6ce4d9 !important;
 }
 
-article {
-  display: inline-grid;
-  grid-template-columns: auto auto;
-  grid-column-gap: 10px;
+.hep-details {
+  display: grid !important;
+  gap: 1rem;
+  width: 100%;
 }
 
 section {
@@ -73,6 +73,22 @@ section {
   white-space: pre-line;
 }
 
-.pad {
-  grid-column: 1 / span 2;
+.hep-export-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.hep-details-body {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, .6fr);
+}
+
+@media (max-width: 900px) {
+  .hep-details-body {
+    grid-template-columns: 1fr;
+  }
 }

@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-sangoma-codec', // Changed selector
   templateUrl: './sangoma-codec.component.html', // Kept original template reference
-  styleUrls: ['./sangoma-codec.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class SangomaCodecComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'SangomaCodec';

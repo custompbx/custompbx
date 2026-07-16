@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-erlang-event', // Changed selector
   templateUrl: './erlang-event.component.html', // Kept original template reference
-  styleUrls: ['./erlang-event.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class ErlangEventComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'ErlangEvent';

@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-xml-cdr', // Changed selector
   templateUrl: './xml-cdr.component.html', // Kept original template reference
-  styleUrls: ['./xml-cdr.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class XmlCdrComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'XmlCdr';

@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-perl', // Changed selector
   templateUrl: './perl.component.html', // Kept original template reference
-  styleUrls: ['./perl.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class PerlComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'Perl';

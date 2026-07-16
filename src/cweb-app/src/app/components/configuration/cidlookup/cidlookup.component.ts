@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-cidlookup', // Changed selector
   templateUrl: './cidlookup.component.html', // Kept original template reference
-  styleUrls: ['./cidlookup.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class CidlookupComponent implements OnInit { // Removed OnDestroy
 

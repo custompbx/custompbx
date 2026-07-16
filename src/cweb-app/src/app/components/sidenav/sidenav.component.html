@@ -1,4 +1,4 @@
-@for (item of menuItems; track item) {
+@for (item of menuItems; track item.name) {
   @if (collapsed) {
     <a [routerLink]="[item.subMenu ? item.subMenu[0].route : item.route]"
       class="menu-rail-item"
@@ -8,7 +8,7 @@
       <app-icon [name]="item.icon"></app-icon>
     </a>
   } @else if (item.subMenu) {
-    <details class="menu-panel" [class.menu-section-active]="isMenuSectionActive(item)" open>
+    <details class="menu-panel" [class.menu-section-active]="isMenuSectionActive(item)" [open]="isMenuSectionActive(item)">
       <summary class="mep-header" [attr.aria-label]="item.name + ' navigation section'">
         <span class="menu-title">
           <app-icon class="icon-spacer menu-name-1 menu-name-2" [name]="item.icon"></app-icon><span class="menu-name-2">{{item.name}}</span>
@@ -16,7 +16,7 @@
         <span class="menu-chevron" aria-hidden="true"></span>
       </summary>
       <div class="menu-sub-list">
-        @for (subItem of item.subMenu; track subItem) {
+        @for (subItem of item.subMenu; track subItem.route) {
           <a [routerLink]="[subItem.route]" class="menu-sub-item" [class.menu-item-active]="isRouteActive(subItem.route)"
             [attr.aria-current]="isRouteActive(subItem.route) ? 'page' : null"
             [attr.aria-label]="subItem.name">

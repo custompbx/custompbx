@@ -97,6 +97,7 @@
   padding: 11px 16px 9px;
   box-sizing: border-box;
   width: 100%;
+  border-bottom: 0;
 }
 
 .card-header .cpbx-card__header-text {

@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-easyroute', // Changed selector
   templateUrl: './easyroute.component.html', // Kept original template reference
-  styleUrls: ['./easyroute.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class EasyrouteComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'Easyroute';

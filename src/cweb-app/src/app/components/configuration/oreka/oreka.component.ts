@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-oreka', // Changed selector
   templateUrl: './oreka.component.html', // Kept original template reference
-  styleUrls: ['./oreka.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class OrekaComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'Oreka';

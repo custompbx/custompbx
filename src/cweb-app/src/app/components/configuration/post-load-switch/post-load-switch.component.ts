@@ -35,7 +35,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-post-load-switch',
   templateUrl: './post-load-switch.component.html',
-  styleUrls: ['./post-load-switch.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class PostLoadSwitchComponent {
 

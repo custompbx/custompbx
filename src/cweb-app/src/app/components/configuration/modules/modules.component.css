@@ -128,8 +128,8 @@
 }
 
 .module-action--danger {
-  --mdc-filled-button-container-color: #ef4444;
-  --mdc-filled-button-label-text-color: #fff;
+  background: var(--cpbx-danger) !important;
+  color: #fff !important;
 }
 
 .module-action--config {

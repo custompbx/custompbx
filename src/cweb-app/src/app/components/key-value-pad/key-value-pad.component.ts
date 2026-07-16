@@ -7,7 +7,7 @@ import {KeyValuePad2Component} from '../key-value-pad-2/key-value-pad-2.componen
   imports: [KeyValuePad2Component],
   selector: 'app-key-value-pad',
   templateUrl: './key-value-pad.component.html',
-  styleUrls: ['./key-value-pad.component.css'],
+  styles: [':host { display: block; width: 100%; }'],
 })
 export class KeyValuePadComponent {
   @Input() items: object;

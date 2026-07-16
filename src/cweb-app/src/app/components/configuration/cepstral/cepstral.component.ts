@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-cepstral', // Changed selector
   templateUrl: './cepstral.component.html', // Kept original template reference
-  styleUrls: ['./cepstral.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class CepstralComponent implements OnInit { // Removed OnDestroy
 

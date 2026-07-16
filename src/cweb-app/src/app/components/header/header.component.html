@@ -27,12 +27,13 @@
   <details class="user-menu">
     <summary class="user-block" aria-label="Open user menu">
       @if (!user()?.avatar_format) {
-        <app-icon name="face"></app-icon>
+        <app-icon class="user-avatar-icon" name="face"></app-icon>
       }
       @if (user()?.avatar_format) {
         <img class="avatar-img"
           [src]="'./assets/img/avatar/' + user().id + '.' + user().avatar_format" alt="">
         }
+      <span class="user-name">{{user()?.login}}</span>
     </summary>
     <div class="user-menu__panel" role="menu">
       <button type="button" class="user-menu__item" role="menuitem">
@@ -51,7 +52,6 @@
       </button>
     </div>
   </details>
-  <span class="user-name">{{user()?.login}}</span>
 </header>
   <div [hidden]="hidePhone()">
     @if (startPhone()) {

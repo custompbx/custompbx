@@ -3,6 +3,7 @@ import {Observable, of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
 import {Action} from '@ngrx/store';
 import {WsDataService} from '../ws-data.service';
+import {withOperationFeedback} from '../operation-feedback';
 
 export function createEffectForActions(
   actions,
@@ -21,18 +22,22 @@ export function createEffectForActions(
             if (response.error) {
               return action3({error: response.error});
             }
+            let completedAction: Action;
             switch (payloadType) {
               case 'index':
-                return action2({response: response, index: action.payload.index});
+                completedAction = action2({response: response, index: action.payload.index});
+                break;
               case 'id':
-                return action2({id: action.payload.id, response});
+                completedAction = action2({id: action.payload.id, response});
+                break;
               default:
-                return action2({response, payload: action.payload});
+                completedAction = action2({response, payload: action.payload});
             }
+            return withOperationFeedback(completedAction, action.type);
           }),
           catchError((error) => {
-            console.log(error);
-            return of(action3({error}));
+            const errorMessage = error instanceof Error ? error.message : error;
+            return of(action3({error: errorMessage}));
           })
         );
       })

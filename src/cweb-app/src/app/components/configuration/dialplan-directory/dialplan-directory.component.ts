@@ -24,7 +24,7 @@ import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.compo
   imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
   selector: 'app-dialplan-directory', // Changed selector
   templateUrl: './dialplan-directory.component.html', // Kept original template reference
-  styleUrls: ['./dialplan-directory.component.css']
+  styleUrls: ['../generated-config-page.css']
 })
 export class DialplanDirectoryComponent implements OnInit { // Removed OnDestroy
   public moduleName: string = 'DialplanDirectory';
