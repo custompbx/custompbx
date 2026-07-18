@@ -210,6 +210,17 @@ export class KeyValuePad2Component implements OnInit {
     return classes.join(' ');
   }
 
+  fieldLabel(field: FieldConfig): string {
+    switch (field.name.trim().toLowerCase()) {
+      case 'name':
+        return this.transloco.translate('common.fields.name');
+      case 'value':
+        return this.transloco.translate('common.fields.value');
+      default:
+        return field.name;
+    }
+  }
+
   optionLabel(option: string): string {
     return option === '' ? this.transloco.translate('common.default') : option;
   }

@@ -19,7 +19,7 @@
                    "duplicateName":  "다른 항목에서 이 이름을 이미 사용 중입니다.",
                    "deleteItemConfirm":  "\"{{name}}\" 항목을 삭제할까요?",
                    "deleteItemDescription":  "서버가 변경 사항을 확인한 후 구성에서 항목이 제거됩니다.",
-                   "copied":"복사했습니다!","clickDetails":"클릭하여 세부 정보 보기","parameters":"매개변수","variables":"변수","xmlEditor":"XML 편집기","tabs":{"list":"목록","add":"추가","deleteRename":"삭제/이름 변경"},"fields":{"name":"이름","domain":"도메인","user":"사용자","cache":"캐시","numberAlias":"번호 별칭","cidr":"CIDR","bulk":"개수","userName":"사용자 이름","domainName":"도메인 이름","groupName":"그룹 이름","gatewayName":"게이트웨이 이름"},
+  "copied":"복사했습니다!","clickDetails":"클릭하여 세부 정보 보기","parameters":"매개변수","variables":"변수","xmlEditor":"XML 편집기","tabs":{"list":"목록","add":"추가","deleteRename":"삭제/이름 변경"},"fields":{"name":"이름","value":"값","domain":"도메인","user":"사용자","cache":"캐시","numberAlias":"번호 별칭","cidr":"CIDR","bulk":"개수","userName":"사용자 이름","domainName":"도메인 이름","groupName":"그룹 이름","gatewayName":"게이트웨이 이름"},
                    "actions":  {
                                    "import":"가져오기","copy":"복사","submit":"제출","goToDomains":"도메인으로 이동","manage":"관리","done":"완료","remove":"제거",
                                    "save":  "저장",

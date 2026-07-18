@@ -21,7 +21,7 @@
                    "deleteItemDescription":  "L’élément sera supprimé de la configuration après confirmation du serveur.",
                    "copied":"Copié !","clickDetails":"Cliquer pour afficher les détails","parameters":"Paramètres","variables":"Variables","xmlEditor":"Éditeur XML",
                    "tabs":{"list":"Liste","add":"Ajouter","deleteRename":"Supprimer/Renommer"},
-                   "fields":{"name":"Nom","domain":"Domaine","user":"Utilisateur","cache":"Cache","numberAlias":"Alias numérique","cidr":"CIDR","bulk":"Quantité","userName":"Nom d’utilisateur","domainName":"Nom du domaine","groupName":"Nom du groupe","gatewayName":"Nom de la passerelle"},
+  "fields":{"name":"Nom","value":"Valeur","domain":"Domaine","user":"Utilisateur","cache":"Cache","numberAlias":"Alias numérique","cidr":"CIDR","bulk":"Quantité","userName":"Nom d’utilisateur","domainName":"Nom du domaine","groupName":"Nom du groupe","gatewayName":"Nom de la passerelle"},
                    "actions":  {
                                    "save":  "Enregistrer",
                                    "cancel":  "Annuler",

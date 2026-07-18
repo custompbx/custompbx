@@ -19,7 +19,7 @@
                    "duplicateName":  "其他项目已使用此名称。",
                    "deleteItemConfirm":  "删除项目“{{name}}”？",
                    "deleteItemDescription":  "服务器确认更改后，该项目将从配置中删除。",
-                   "copied":"已复制！","clickDetails":"点击查看详情","parameters":"参数","variables":"变量","xmlEditor":"XML 编辑器","tabs":{"list":"列表","add":"添加","deleteRename":"删除/重命名"},"fields":{"name":"名称","domain":"域","user":"用户","cache":"缓存","numberAlias":"号码别名","cidr":"CIDR","bulk":"数量","userName":"用户名","domainName":"域名","groupName":"组名","gatewayName":"网关名称"},
+  "copied":"已复制！","clickDetails":"点击查看详情","parameters":"参数","variables":"变量","xmlEditor":"XML 编辑器","tabs":{"list":"列表","add":"添加","deleteRename":"删除/重命名"},"fields":{"name":"名称","value":"值","domain":"域","user":"用户","cache":"缓存","numberAlias":"号码别名","cidr":"CIDR","bulk":"数量","userName":"用户名","domainName":"域名","groupName":"组名","gatewayName":"网关名称"},
                    "actions":  {
                                    "import":"导入","copy":"复制","submit":"提交","goToDomains":"转到域","manage":"管理","done":"完成","remove":"移除",
                                    "save":  "保存",

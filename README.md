@@ -8,65 +8,76 @@
 
 <h1 align="center">CustomPBX</h1>
 
-**CustomPBX** is an API server and Web GUI for [FreeSwitch](https://github.com/signalwire/freeswitch), offering a pure FreeSWITCH experience. It can be installed on existing systems, allowing for the import of existing configurations. The system is encapsulated within a single [binary file](https://github.com/custompbx/custompbx/releases).
+**CustomPBX** is an API server and web interface for [FreeSWITCH](https://github.com/signalwire/freeswitch). It can manage a new installation or import an existing FreeSWITCH configuration. The Angular frontend is embedded in the Go application and distributed as a single [release binary](https://github.com/custompbx/custompbx/releases).
 
-Please note that this project is still in development, has not undergone extensive testing.
+> [!IMPORTANT]
+> CustomPBX is under active development. Validate configuration changes and keep backups before using it in production.
 
-The **Backend** is developed using Go 1.25 and is located in the ``src/custompbx`` directory.
+The **backend** uses Go 1.25 and is located in `src/custompbx`.
 
-The **Frontend**, built with Angular v21, can be found in the ``src/cweb-app`` directory.
+The **frontend** uses Angular 21 and is located in `src/cweb-app`.
 
 ---
-System Requirements:
-* Linux OS (amd64)
-* FreeSWITCH
-* Postgres Database
-* Go 1.25.11 or newer in the Go 1.25 release line, and Node.js 22 when building from source
+## Requirements
+
+For the recommended container deployment:
+
+- Docker with Compose support
+
+For a source build:
+
+- Linux or WSL on amd64
+- Go 1.25.11 or newer in the Go 1.25 release line
+- Node.js 22
+- GNU Make
+- FreeSWITCH and PostgreSQL available at runtime
+
 ---
-### Build Process
-Install **make** first (apt example):
-```
-sodo apt install -y make
+## Build from source
+
+Run source builds from Linux or WSL. Frontend builds on native Windows and host-mounted `node_modules` are not supported.
+
+Install **make** first (Debian/Ubuntu example):
+
+```bash
+sudo apt install -y make
 ```
 
-After installing the required Go and Node.js versions, install dependencies and build with:
-```
+Install dependencies and build:
+
+```bash
 make install
 ```
-For subsequent builds, use:
-```
+
+For subsequent builds:
+
+```bash
 make build
-``` 
-To locally run the frontend, perform the following steps: build and test the project, set the backend websocket URL using the command ``export WS_BACKEND_OVERRIDE=wss://HOST:PORT/ws``, and finally execute:
 ```
+
+The compiled binary is written to `bin/cpbx`.
+
+To run the frontend development server, set the backend WebSocket URL and start it:
+
+```bash
+export WS_BACKEND_OVERRIDE=wss://HOST:PORT/ws
 make front-serve
-```  
-Additional options can be found in the Makefile.
-- install-dep (install dependencies for back and front)
-- dep-front
-- dep-back
-- docker-fmt
-- docker-vet
-- docker-test
-- docker-race
-- docker-frontend-test
-- docker-frontend-build
-- docker-integration-test
-- docker-release
+```
 
-The compiled binary file is located in the ``bin/`` directory and can be used as outlined in the [Documentation](https://github.com/custompbx/custompbx/wiki).
+Copy `config.example.json` to the ignored `config.json` for a non-container runtime. Never commit the runtime file.
 
-Copy `config.example.json` to `config.json` for local runtime configuration. WebSocket origins default to `same_origin`; use `allow_list` with exact `allowed_origins` in production when the UI is hosted separately. The explicit `allow_all` policy is intended only for development. WebSocket write/read/ping timings use `ws_write_timeout_seconds`, `ws_read_timeout_seconds`, and `ws_ping_interval_seconds`; outbound queue capacity uses `websocket_queue_size` and defaults to 64.
+WebSocket origins default to `same_origin`. Use `allow_list` with exact `allowed_origins` when the UI is hosted separately. The explicit `allow_all` policy is for development only. WebSocket timing and queue settings are documented in `config.example.json`.
 
 Alternatively, you can utilize the precompiled binary available on the **[Releases Page](https://github.com/custompbx/custompbx/releases)**.
 
 ---
-#### Build with Docker (TEST ONLY)
-A Docker version of the project is also available. Production frontend builds should be run through Docker or WSL, not through Windows-mounted `node_modules`.
+## Docker build and test targets
 
-Useful Docker build and test targets:
+Docker is the recommended build path for the complete embedded frontend/backend artifact.
 
-```
+Useful targets:
+
+```bash
 make docker-fmt
 make docker-vet
 make docker-test
@@ -77,52 +88,71 @@ make docker-integration-test
 make docker-release
 ```
 
-The Docker build uses `npm ci` and builds embedded frontend assets from container-generated static output. Runtime secrets and local `config.json` are excluded from the Docker build context.
-Run Angular unit tests through the Chromium-backed Docker target:
+The Docker build uses `npm ci` and embeds the container-generated frontend assets. Runtime configurations and secrets are excluded from the build context.
 
-```
+Run Angular unit tests with containerized Chromium:
+
+```bash
 make docker-frontend-test
 ```
 
-For WSL or CI Linux without Docker, use `npm ci` followed by `npm run test:ci` from `src/cweb-app`.
+For Linux/WSL without Docker, run `npm ci` followed by `npm run test:ci` from `src/cweb-app`.
 
-You can start Docker with PostgresDB + Freeswitch + Custompbx by using the command:
+## Docker Compose quick start
+
+Compose starts PostgreSQL, FreeSWITCH, and CustomPBX with demo-only credentials. First create the ignored runtime configuration:
+
+```bash
+cp docker/config.example.json docker/config.json
 ```
+
+PowerShell equivalent:
+
+```powershell
+Copy-Item docker/config.example.json docker/config.json
+```
+
+Then start the stack:
+
+```bash
 docker compose up -d
 ```
 
-The quick-start stack creates the demo CDR table and connects
-`mod_cdr_pg_csv` to the bundled PostgreSQL service. This bootstrap only
-replaces FreeSWITCH's unchanged `host=localhost dbname=cdr` sample value;
-CDR database settings configured by an operator in CustomPBX are preserved.
+The example credentials are intended only for a local evaluation environment. Replace them before any shared or Internet-accessible deployment.
 
-After start of the containers open ``https://127.0.0.1:8080/cweb`` (or your Docker host), making sure to allow self-signed certificates.
+The quick-start stack creates the demo CDR table and connects `mod_cdr_pg_csv` to PostgreSQL. This bootstrap replaces only FreeSWITCH's unchanged `host=localhost dbname=cdr` sample value; operator-configured CDR database settings are preserved.
 
-When rebuilding only the CustomPBX application container locally, remove the existing `custompbx-host` container before starting the rebuilt one if Docker Desktop does not pick up the new image:
+After the containers start, open `https://127.0.0.1:8080/cweb` (or the equivalent Docker host address) and accept the development self-signed certificate.
 
-```
-docker rm -f custompbx-host
-docker compose up -d --no-deps custompbx
+To rebuild and replace only the CustomPBX application container without recreating PostgreSQL or FreeSWITCH:
+
+```bash
+make docker-local-recreate
 ```
 
----
+## Pull the published image
 
-#### Pull Docker image from **[Packages Page](https://github.com/custompbx/custompbx/pkgs/container/custompbx)**
-For latest:
-```
+Images are available on the **[Packages Page](https://github.com/custompbx/custompbx/pkgs/container/custompbx)**.
+
+```bash
 docker pull ghcr.io/custompbx/custompbx:latest
 ```
+
 ---
-### Documentation
+
+## Documentation
+
 For detailed instructions on **Installation** and **Configuration**, please refer to the project's **[Wiki Page](https://github.com/custompbx/custompbx/wiki)**.
 
 If you have any questions or feedback, don't hesitate to get in touch through the **[discussions](https://github.com/custompbx/custompbx/discussions)** or by opening an **[issue](https://github.com/custompbx/custompbx/issues)**!
 
 ![system diagram](https://github.com/custompbx/doc/raw/master/img/Diagram1.png)
 
----
-### GUI Demo
-GIF
+
+<details>
+  <summary>Old GUI style</summary>
+
+  GIF
 ![demo](https://github.com/custompbx/doc/blob/master/img/demo_anim.gif?raw=true)
 
 ---
@@ -180,3 +210,7 @@ GIF
 ---
 
 ![14](https://github.com/user-attachments/assets/45847e99-8f7f-45e3-a721-5df134c2cbfa)
+
+</details>
+---
+

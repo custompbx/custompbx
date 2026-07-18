@@ -19,7 +19,7 @@
                    "duplicateName":  "مورد دیگری قبلاً از این نام استفاده می‌کند.",
                    "deleteItemConfirm":  "مورد \"{{name}}\" حذف شود؟",
                    "deleteItemDescription":  "پس از تأیید تغییر توسط سرور، مورد از پیکربندی حذف می‌شود.",
-                   "copied":"کپی شد!","clickDetails":"برای مشاهده جزئیات کلیک کنید","parameters":"پارامترها","variables":"متغیرها","xmlEditor":"ویرایشگر XML","tabs":{"list":"فهرست","add":"افزودن","deleteRename":"حذف/تغییر نام"},"fields":{"name":"نام","domain":"دامنه","user":"کاربر","cache":"حافظه پنهان","numberAlias":"نام مستعار شماره","cidr":"CIDR","bulk":"تعداد","userName":"نام کاربری","domainName":"نام دامنه","groupName":"نام گروه","gatewayName":"نام دروازه"},
+  "copied":"کپی شد!","clickDetails":"برای مشاهده جزئیات کلیک کنید","parameters":"پارامترها","variables":"متغیرها","xmlEditor":"ویرایشگر XML","tabs":{"list":"فهرست","add":"افزودن","deleteRename":"حذف/تغییر نام"},"fields":{"name":"نام","value":"مقدار","domain":"دامنه","user":"کاربر","cache":"حافظه پنهان","numberAlias":"نام مستعار شماره","cidr":"CIDR","bulk":"تعداد","userName":"نام کاربری","domainName":"نام دامنه","groupName":"نام گروه","gatewayName":"نام دروازه"},
                    "actions":  {
                                    "import":"وارد کردن","copy":"کپی","submit":"ارسال","goToDomains":"رفتن به دامنه‌ها","manage":"مدیریت","done":"انجام شد","remove":"حذف",
                                    "save":  "ذخیره",

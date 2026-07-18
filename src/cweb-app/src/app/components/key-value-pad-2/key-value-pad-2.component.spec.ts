@@ -6,6 +6,8 @@ describe('KeyValuePad2Component', () => {
   beforeEach(() => {
     const messages = {
       'common.default': 'Default',
+      'common.fields.name': 'Nom',
+      'common.fields.value': 'Valeur',
       'common.nameRequired': 'Name is required.',
       'common.duplicateName': 'Another item already uses this name.',
     };
@@ -63,6 +65,12 @@ describe('KeyValuePad2Component', () => {
   it('labels empty select values as Default', () => {
     expect(component.optionLabel('')).toBe('Default');
     expect(component.optionLabel('true')).toBe('true');
+  });
+
+  it('translates shared name and value fields while preserving FreeSWITCH field names', () => {
+    expect(component.fieldLabel({slot: 'name', name: 'name'} as any)).toBe('Nom');
+    expect(component.fieldLabel({slot: 'value', name: 'value'} as any)).toBe('Valeur');
+    expect(component.fieldLabel({slot: 'extraField1', name: 'secure'} as any)).toBe('secure');
   });
 
   it('sorts values by position only when sortable is enabled', () => {

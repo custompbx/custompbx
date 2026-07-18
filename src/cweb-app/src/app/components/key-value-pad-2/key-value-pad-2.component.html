@@ -22,7 +22,7 @@
               }
               @for (field of fieldConfigs(); track field.slot) {
                 <label class="kv-field" [ngClass]="fieldClass(field)" [ngStyle]="field.style">
-                  <span class="kv-label">{{ field.name }}</span>
+                  <span class="kv-label">{{ fieldLabel(field) }}</span>
                   @if (field.options?.length) {
                     <select class="kv-input kv-select"
                       [class.kv-input--disabled]="isFieldDisabled(item, field)"
@@ -37,7 +37,7 @@
                   } @else {
                     <input class="kv-input"
                       [class.kv-input--disabled]="isFieldDisabled(item, field)"
-                      [placeholder]="field.name"
+                      [placeholder]="fieldLabel(field)"
                       [ngModel]="itemFieldValue(item, field)"
                       [required]="field.required"
                       [disabled]="isFieldDisabled(item, field)"
@@ -103,7 +103,7 @@
                 }
                 @for (field of fieldConfigs(); track field.slot) {
                   <label class="kv-field" [ngClass]="fieldClass(field)" [ngStyle]="field.style">
-                    <span class="kv-label">{{ field.name }}</span>
+                    <span class="kv-label">{{ fieldLabel(field) }}</span>
                     @if (field.options?.length) {
                       <select class="kv-input kv-select"
                         [ngModel]="newItemFieldValue(item, field)"
@@ -117,7 +117,7 @@
                       </select>
                     } @else {
                       <input class="kv-input"
-                        [placeholder]="field.name"
+                        [placeholder]="fieldLabel(field)"
                         [ngModel]="newItemFieldValue(item, field)"
                         (ngModelChange)="setNewItemField(item, field, $event)"
                         [required]="field.required"

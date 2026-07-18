@@ -19,6 +19,13 @@ export const SUPPORTED_LOCALES: readonly SupportedLocale[] = [
   {code: 'ko', label: 'Korean', nativeLabel: '한국어', direction: 'ltr', flag: '🇰🇷'},
 ] as const;
 
+export const LANGUAGE_MENU_LOCALES: readonly SupportedLocale[] = [
+  ...SUPPORTED_LOCALES.filter(locale => locale.code === DEFAULT_LOCALE),
+  ...SUPPORTED_LOCALES
+    .filter(locale => locale.code !== DEFAULT_LOCALE)
+    .sort((left, right) => left.label.localeCompare(right.label, 'en', {sensitivity: 'base'})),
+];
+
 const localeSet = new Set<string>(localeCodes);
 
 export function isLocaleCode(value: unknown): value is LocaleCode {

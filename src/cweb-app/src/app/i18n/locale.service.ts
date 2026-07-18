@@ -8,7 +8,7 @@ import {SettingsActionTypes} from '../store/settings/settings.actions';
 import {Actions, ofType} from '@ngrx/effects';
 import {LocaleCode} from './locale.model';
 import {
-  DEFAULT_LOCALE, isLocaleCode, normalizeLocale, SUPPORTED_LOCALES
+  DEFAULT_LOCALE, isLocaleCode, LANGUAGE_MENU_LOCALES, normalizeLocale, SUPPORTED_LOCALES
 } from './locale.registry';
 
 @Injectable({providedIn: 'root'})
@@ -21,7 +21,7 @@ export class LocaleService {
   private pendingPrevious: LocaleCode | null = null;
 
   readonly activeLocale = this.locale.asReadonly();
-  readonly supportedLocales = SUPPORTED_LOCALES;
+  readonly supportedLocales = LANGUAGE_MENU_LOCALES;
   readonly direction = computed(() =>
     SUPPORTED_LOCALES.find(item => item.code === this.locale())?.direction ?? 'ltr'
   );

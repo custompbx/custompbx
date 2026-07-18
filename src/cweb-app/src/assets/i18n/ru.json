@@ -19,7 +19,7 @@
                    "duplicateName":  "Другой элемент уже использует это имя.",
                    "deleteItemConfirm":  "Удалить элемент \"{{name}}\"?",
                    "deleteItemDescription":  "Элемент будет удалён из конфигурации после подтверждения сервера.",
-                   "copied":"Скопировано!","clickDetails":"Нажмите, чтобы получить подробности","parameters":"Параметры","variables":"Переменные","xmlEditor":"XML-редактор","tabs":{"list":"Список","add":"Добавить","deleteRename":"Удалить/Переименовать"},"fields":{"name":"Название","domain":"Домен","user":"Пользователь","cache":"Кэш","numberAlias":"Псевдоним номера","cidr":"CIDR","bulk":"Количество","userName":"Имя пользователя","domainName":"Имя домена","groupName":"Имя группы","gatewayName":"Имя шлюза"},
+  "copied":"Скопировано!","clickDetails":"Нажмите, чтобы получить подробности","parameters":"Параметры","variables":"Переменные","xmlEditor":"XML-редактор","tabs":{"list":"Список","add":"Добавить","deleteRename":"Удалить/Переименовать"},"fields":{"name":"Название","value":"Значение","domain":"Домен","user":"Пользователь","cache":"Кэш","numberAlias":"Псевдоним номера","cidr":"CIDR","bulk":"Количество","userName":"Имя пользователя","domainName":"Имя домена","groupName":"Имя группы","gatewayName":"Имя шлюза"},
                    "actions":  {
                                    "import":"Импорт","copy":"Копировать","submit":"Отправить","goToDomains":"К доменам","manage":"Управлять","done":"Готово","remove":"Убрать",
                                    "save":  "Сохранить",

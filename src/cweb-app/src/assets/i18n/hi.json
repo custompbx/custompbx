@@ -19,7 +19,7 @@
                    "duplicateName":  "कोई अन्य आइटम पहले से इस नाम का उपयोग कर रहा है।",
                    "deleteItemConfirm":  "\"{{name}}\" आइटम हटाएँ?",
                    "deleteItemDescription":  "सर्वर द्वारा परिवर्तन की पुष्टि के बाद आइटम कॉन्फ़िगरेशन से हटेगा।",
-                   "copied":"कॉपी हो गया!","clickDetails":"विवरण देखने के लिए क्लिक करें","parameters":"पैरामीटर","variables":"वेरिएबल","xmlEditor":"XML संपादक","tabs":{"list":"सूची","add":"जोड़ें","deleteRename":"हटाएँ/नाम बदलें"},"fields":{"name":"नाम","domain":"डोमेन","user":"उपयोगकर्ता","cache":"कैश","numberAlias":"नंबर उपनाम","cidr":"CIDR","bulk":"संख्या","userName":"उपयोगकर्ता नाम","domainName":"डोमेन नाम","groupName":"समूह नाम","gatewayName":"गेटवे नाम"},
+  "copied":"कॉपी हो गया!","clickDetails":"विवरण देखने के लिए क्लिक करें","parameters":"पैरामीटर","variables":"वेरिएबल","xmlEditor":"XML संपादक","tabs":{"list":"सूची","add":"जोड़ें","deleteRename":"हटाएँ/नाम बदलें"},"fields":{"name":"नाम","value":"मान","domain":"डोमेन","user":"उपयोगकर्ता","cache":"कैश","numberAlias":"नंबर उपनाम","cidr":"CIDR","bulk":"संख्या","userName":"उपयोगकर्ता नाम","domainName":"डोमेन नाम","groupName":"समूह नाम","gatewayName":"गेटवे नाम"},
                    "actions":  {
                                    "import":"आयात करें","copy":"कॉपी करें","submit":"सबमिट करें","goToDomains":"डोमेन पर जाएँ","manage":"प्रबंधित करें","done":"पूर्ण","remove":"हटाएँ",
                                    "save":  "सहेजें",

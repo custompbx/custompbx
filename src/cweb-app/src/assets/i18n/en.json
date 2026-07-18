@@ -25,7 +25,7 @@
                    "variables":  "Variables",
                    "xmlEditor":  "XML editor",
                    "tabs":  {"list":"List","add":"Add","deleteRename":"Delete/Rename"},
-                   "fields":  {"name":"Name","domain":"Domain","user":"User","cache":"Cache","numberAlias":"Number Alias","cidr":"CIDR","bulk":"Bulk","userName":"User name","domainName":"Domain name","groupName":"Group name","gatewayName":"Gateway name"},
+  "fields":  {"name":"Name","value":"Value","domain":"Domain","user":"User","cache":"Cache","numberAlias":"Number Alias","cidr":"CIDR","bulk":"Bulk","userName":"User name","domainName":"Domain name","groupName":"Group name","gatewayName":"Gateway name"},
                    "actions":  {
                                    "save":  "Save",
                                    "cancel":  "Cancel",

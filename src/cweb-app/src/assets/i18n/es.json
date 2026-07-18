@@ -19,7 +19,7 @@
                    "duplicateName":  "Otro elemento ya usa este nombre.",
                    "deleteItemConfirm":  "¿Eliminar el elemento \"{{name}}\"?",
                    "deleteItemDescription":  "El elemento se eliminará de la configuración cuando el servidor confirme el cambio.",
-                   "copied":"¡Copiado!","clickDetails":"Haga clic para ver los detalles","parameters":"Parámetros","variables":"Variables","xmlEditor":"Editor XML","tabs":{"list":"Lista","add":"Añadir","deleteRename":"Eliminar/Renombrar"},"fields":{"name":"Nombre","domain":"Dominio","user":"Usuario","cache":"Caché","numberAlias":"Alias numérico","cidr":"CIDR","bulk":"Cantidad","userName":"Nombre de usuario","domainName":"Nombre de dominio","groupName":"Nombre del grupo","gatewayName":"Nombre de la puerta de enlace"},
+  "copied":"¡Copiado!","clickDetails":"Haga clic para ver los detalles","parameters":"Parámetros","variables":"Variables","xmlEditor":"Editor XML","tabs":{"list":"Lista","add":"Añadir","deleteRename":"Eliminar/Renombrar"},"fields":{"name":"Nombre","value":"Valor","domain":"Dominio","user":"Usuario","cache":"Caché","numberAlias":"Alias numérico","cidr":"CIDR","bulk":"Cantidad","userName":"Nombre de usuario","domainName":"Nombre de dominio","groupName":"Nombre del grupo","gatewayName":"Nombre de la puerta de enlace"},
                    "actions":  {
                                    "save":  "Guardar",
                                    "cancel":  "Cancelar",

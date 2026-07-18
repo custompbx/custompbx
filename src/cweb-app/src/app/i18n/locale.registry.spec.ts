@@ -1,4 +1,11 @@
-import {isLocaleCode, localeFromBrowser, localeFromLegacy, normalizeLocale, SUPPORTED_LOCALES} from './locale.registry';
+import {
+  isLocaleCode,
+  LANGUAGE_MENU_LOCALES,
+  localeFromBrowser,
+  localeFromLegacy,
+  normalizeLocale,
+  SUPPORTED_LOCALES
+} from './locale.registry';
 
 describe('locale registry', () => {
   it('contains the complete supported locale set', () => {
@@ -27,5 +34,24 @@ describe('locale registry', () => {
 
   it('marks only Arabic and Persian as RTL', () => {
     expect(SUPPORTED_LOCALES.filter(locale => locale.direction === 'rtl').map(locale => locale.code)).toEqual(['ar', 'fa']);
+  });
+
+  it('pins English first and alphabetizes the remaining language menu entries', () => {
+    expect(LANGUAGE_MENU_LOCALES[0].code).toBe('en');
+    expect(LANGUAGE_MENU_LOCALES.slice(1).map(locale => locale.label)).toEqual([
+      'Arabic',
+      'Chinese',
+      'French',
+      'German',
+      'Hindi',
+      'Italian',
+      'Japanese',
+      'Korean',
+      'Persian',
+      'Portuguese',
+      'Russian',
+      'Spanish',
+      'Turkish',
+    ]);
   });
 });

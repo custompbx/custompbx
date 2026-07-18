@@ -1,0 +1,46 @@
+{
+  "freeswitch": {
+    "switchname": "freeswitch-host",
+    "esl": {
+      "host": "freeswitch-host",
+      "port": 8021,
+      "pass": "ClueCon",
+      "timeout": 10,
+      "collect_logs": 7
+    },
+    "hep_collector": {
+      "host": "0.0.0.0",
+      "port": 9060
+    }
+  },
+  "webserver": {
+    "route": "/ws",
+    "host": "0.0.0.0",
+    "port": 8080,
+    "stun_port": 3478,
+    "cert_path": "",
+    "key_path": "",
+    "secure": true,
+    "origin_policy": "same_origin",
+    "allowed_origins": [],
+    "ws_write_timeout_seconds": 10,
+    "ws_read_timeout_seconds": 60,
+    "ws_ping_interval_seconds": 30,
+    "websocket_queue_size": 64
+  },
+  "xml_curl_server": {
+    "route": "/conf/config",
+    "host": "0.0.0.0",
+    "port": 8081,
+    "cert_path": "",
+    "key_path": "",
+    "secure": true
+  },
+  "database": {
+    "name": "custompbx",
+    "host": "postgres-host",
+    "port": 5432,
+    "user": "custompbx",
+    "pass": "custompbx"
+  }
+}

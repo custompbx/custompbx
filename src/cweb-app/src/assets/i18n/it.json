@@ -19,7 +19,7 @@
                    "duplicateName":  "Un altro elemento usa già questo nome.",
                    "deleteItemConfirm":  "Eliminare l’elemento \"{{name}}\"?",
                    "deleteItemDescription":  "L’elemento verrà rimosso dalla configurazione dopo la conferma del server.",
-                   "copied":"Copiato!","clickDetails":"Fai clic per i dettagli","parameters":"Parametri","variables":"Variabili","xmlEditor":"Editor XML","tabs":{"list":"Elenco","add":"Aggiungi","deleteRename":"Elimina/Rinomina"},"fields":{"name":"Nome","domain":"Dominio","user":"Utente","cache":"Cache","numberAlias":"Alias numero","cidr":"CIDR","bulk":"Quantità","userName":"Nome utente","domainName":"Nome dominio","groupName":"Nome gruppo","gatewayName":"Nome gateway"},
+  "copied":"Copiato!","clickDetails":"Fai clic per i dettagli","parameters":"Parametri","variables":"Variabili","xmlEditor":"Editor XML","tabs":{"list":"Elenco","add":"Aggiungi","deleteRename":"Elimina/Rinomina"},"fields":{"name":"Nome","value":"Valore","domain":"Dominio","user":"Utente","cache":"Cache","numberAlias":"Alias numero","cidr":"CIDR","bulk":"Quantità","userName":"Nome utente","domainName":"Nome dominio","groupName":"Nome gruppo","gatewayName":"Nome gateway"},
                    "actions":  {
                                    "import":"Importa","copy":"Copia","submit":"Invia","goToDomains":"Vai ai domini","manage":"Gestisci","done":"Fatto","remove":"Rimuovi",
                                    "save":  "Salva",

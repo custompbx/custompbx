@@ -21,7 +21,7 @@
                    "deleteItemDescription":  "Der Eintrag wird aus der Konfiguration entfernt, nachdem der Server die Änderung bestätigt hat.",
                    "copied":"Kopiert!","clickDetails":"Klicken, um Details anzuzeigen","parameters":"Parameter","variables":"Variablen","xmlEditor":"XML-Editor",
                    "tabs":{"list":"Liste","add":"Hinzufügen","deleteRename":"Löschen/Umbenennen"},
-                   "fields":{"name":"Name","domain":"Domäne","user":"Benutzer","cache":"Cache","numberAlias":"Nummern-Alias","cidr":"CIDR","bulk":"Anzahl","userName":"Benutzername","domainName":"Domänenname","groupName":"Gruppenname","gatewayName":"Gateway-Name"},
+  "fields":{"name":"Name","value":"Wert","domain":"Domäne","user":"Benutzer","cache":"Cache","numberAlias":"Nummern-Alias","cidr":"CIDR","bulk":"Anzahl","userName":"Benutzername","domainName":"Domänenname","groupName":"Gruppenname","gatewayName":"Gateway-Name"},
                    "actions":  {
                                    "save":  "Speichern",
                                    "cancel":  "Abbrechen",

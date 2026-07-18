@@ -19,7 +19,7 @@
                    "duplicateName":  "Başka bir öğe bu adı zaten kullanıyor.",
                    "deleteItemConfirm":  "\"{{name}}\" öğesi silinsin mi?",
                    "deleteItemDescription":  "Sunucu değişikliği onayladıktan sonra öğe yapılandırmadan kaldırılır.",
-                   "copied":"Kopyalandı!","clickDetails":"Ayrıntılar için tıklayın","parameters":"Parametreler","variables":"Değişkenler","xmlEditor":"XML düzenleyici","tabs":{"list":"Liste","add":"Ekle","deleteRename":"Sil/Yeniden adlandır"},"fields":{"name":"Ad","domain":"Alan adı","user":"Kullanıcı","cache":"Önbellek","numberAlias":"Numara takma adı","cidr":"CIDR","bulk":"Toplu","userName":"Kullanıcı adı","domainName":"Alan adı","groupName":"Grup adı","gatewayName":"Ağ geçidi adı"},
+  "copied":"Kopyalandı!","clickDetails":"Ayrıntılar için tıklayın","parameters":"Parametreler","variables":"Değişkenler","xmlEditor":"XML düzenleyici","tabs":{"list":"Liste","add":"Ekle","deleteRename":"Sil/Yeniden adlandır"},"fields":{"name":"Ad","value":"Değer","domain":"Alan adı","user":"Kullanıcı","cache":"Önbellek","numberAlias":"Numara takma adı","cidr":"CIDR","bulk":"Toplu","userName":"Kullanıcı adı","domainName":"Alan adı","groupName":"Grup adı","gatewayName":"Ağ geçidi adı"},
                    "actions":  {
                                    "import":"İçe aktar","copy":"Kopyala","submit":"Gönder","goToDomains":"Alan adlarına git","manage":"Yönet","done":"Bitti","remove":"Kaldır",
                                    "save":  "Kaydet",

@@ -19,7 +19,7 @@
                    "duplicateName":  "يستخدم عنصر آخر هذا الاسم بالفعل.",
                    "deleteItemConfirm":  "حذف العنصر \"{{name}}\"؟",
                    "deleteItemDescription":  "سيتم إزالة العنصر من التكوين بعد أن يؤكد الخادم التغيير.",
-                   "copied":"تم النسخ!","clickDetails":"انقر لعرض التفاصيل","parameters":"المعلمات","variables":"المتغيرات","xmlEditor":"محرر XML","tabs":{"list":"القائمة","add":"إضافة","deleteRename":"حذف/إعادة تسمية"},"fields":{"name":"الاسم","domain":"النطاق","user":"المستخدم","cache":"ذاكرة التخزين المؤقت","numberAlias":"الاسم المستعار للرقم","cidr":"CIDR","bulk":"العدد","userName":"اسم المستخدم","domainName":"اسم النطاق","groupName":"اسم المجموعة","gatewayName":"اسم البوابة"},
+  "copied":"تم النسخ!","clickDetails":"انقر لعرض التفاصيل","parameters":"المعلمات","variables":"المتغيرات","xmlEditor":"محرر XML","tabs":{"list":"القائمة","add":"إضافة","deleteRename":"حذف/إعادة تسمية"},"fields":{"name":"الاسم","value":"القيمة","domain":"النطاق","user":"المستخدم","cache":"ذاكرة التخزين المؤقت","numberAlias":"الاسم المستعار للرقم","cidr":"CIDR","bulk":"العدد","userName":"اسم المستخدم","domainName":"اسم النطاق","groupName":"اسم المجموعة","gatewayName":"اسم البوابة"},
                    "actions":  {
                                    "import":"استيراد","copy":"نسخ","submit":"إرسال","goToDomains":"الانتقال إلى النطاقات","manage":"إدارة","done":"تم","remove":"إزالة",
                                    "save":  "حفظ",

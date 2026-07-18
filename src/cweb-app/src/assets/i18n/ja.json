@@ -19,7 +19,7 @@
                    "duplicateName":  "別の項目がすでにこの名前を使用しています。",
                    "deleteItemConfirm":  "項目「{{name}}」を削除しますか？",
                    "deleteItemDescription":  "サーバーが変更を確認した後、項目は構成から削除されます。",
-                   "copied":"コピーしました！","clickDetails":"クリックして詳細を表示","parameters":"パラメーター","variables":"変数","xmlEditor":"XML エディター","tabs":{"list":"一覧","add":"追加","deleteRename":"削除/名前変更"},"fields":{"name":"名前","domain":"ドメイン","user":"ユーザー","cache":"キャッシュ","numberAlias":"番号エイリアス","cidr":"CIDR","bulk":"件数","userName":"ユーザー名","domainName":"ドメイン名","groupName":"グループ名","gatewayName":"ゲートウェイ名"},
+  "copied":"コピーしました！","clickDetails":"クリックして詳細を表示","parameters":"パラメーター","variables":"変数","xmlEditor":"XML エディター","tabs":{"list":"一覧","add":"追加","deleteRename":"削除/名前変更"},"fields":{"name":"名前","value":"値","domain":"ドメイン","user":"ユーザー","cache":"キャッシュ","numberAlias":"番号エイリアス","cidr":"CIDR","bulk":"件数","userName":"ユーザー名","domainName":"ドメイン名","groupName":"グループ名","gatewayName":"ゲートウェイ名"},
                    "actions":  {
                                    "import":"インポート","copy":"コピー","submit":"送信","goToDomains":"ドメインへ移動","manage":"管理","done":"完了","remove":"削除",
                                    "save":  "保存",
