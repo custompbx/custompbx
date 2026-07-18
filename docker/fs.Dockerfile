@@ -38,7 +38,9 @@ RUN echo "deb [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] htt
 RUN echo "deb-src [signed-by=/usr/share/keyrings/signalwire-freeswitch-repo.gpg] https://freeswitch.signalwire.com/repo/deb/debian-release/ $(lsb_release -sc) main" >> /etc/apt/sources.list.d/freeswitch.list
 
 # Install FreeSWITCH. Pinning the main package makes apt resolve matching module
-# dependencies from the same repository version.
+# dependencies from the same repository version. Keep this list limited to
+# modules shipped by current FreeSWITCH releases; 1.11 removed cdr_mongodb,
+# oreka, and pocketsphinx.
 RUN apt-get update && apt-get install -y "freeswitch${FREESWITCH_VERSION:+=${FREESWITCH_VERSION}}" \
                                          freeswitch-init \
                                          freeswitch-lang \
@@ -95,16 +97,12 @@ RUN apt-get update && apt-get install -y "freeswitch${FREESWITCH_VERSION:+=${FRE
                                          freeswitch-mod-say-en \
                                          freeswitch-mod-cdr-pg-csv \
                                          freeswitch-mod-nibblebill \
-                                         freeswitch-mod-cdr-mongodb \
                                          freeswitch-mod-perl \
                                          freeswitch-mod-distributor \
-                                         freeswitch-mod-cdr-pg-csv \
                                          freeswitch-mod-alsa \
                                          freeswitch-mod-lcr \
                                          freeswitch-mod-memcache \
                                          freeswitch-mod-redis \
-                                         freeswitch-mod-oreka \
-                                         freeswitch-mod-pocketsphinx \
                                          freeswitch-mod-tts-commandline \
                                          freeswitch-mod-xml-rpc
 
