@@ -2486,8 +2486,10 @@ func setConfigCdrPgCsv(conf *xmlStruct.Configuration) error {
 
 // ApplyDemoCDRBootstrap upgrades only the non-working FreeSWITCH sample DSN
 // used by the Docker quick-start. Any value configured by an operator is left
-// unchanged. Fresh imports are handled by setConfigCdrPgCsv above; this handles
-// an existing demo database created by an older image.
+// unchanged. The module is reloaded whenever a stored db-info setting exists so
+// FreeSWITCH does not keep using an older image's on-disk localhost fallback.
+// Fresh imports are handled by setConfigCdrPgCsv above; this handles an existing
+// demo database created by an older image.
 func ApplyDemoCDRBootstrap() (bool, error) {
 	if !demoCDRBootstrapEnabled() {
 		return false, nil
@@ -2506,17 +2508,23 @@ func ApplyDemoCDRBootstrap() (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	reloadRequested := false
 	for _, item := range settings {
 		setting, ok := item.(altStruct.ConfigCdrPgCsvSetting)
-		if !ok || strings.TrimSpace(setting.Value) != legacyDemoCDRDBInfo {
+		if !ok {
 			continue
 		}
-		setting.Value = configuredCDRDBInfo()
-		if err := intermediateDB.UpdateByIdByValuesMap(&setting, map[string]bool{"Value": true}); err != nil {
-			return false, err
+		if !reloadRequested {
+			requestDemoCDRReload()
+			reloadRequested = true
 		}
-		requestDemoCDRReload()
-		return true, nil
+		if strings.TrimSpace(setting.Value) == legacyDemoCDRDBInfo {
+			setting.Value = configuredCDRDBInfo()
+			if err := intermediateDB.UpdateByIdByValuesMap(&setting, map[string]bool{"Value": true}); err != nil {
+				return false, err
+			}
+			return true, nil
+		}
 	}
 	return false, nil
 }

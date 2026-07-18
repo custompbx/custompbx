@@ -31,7 +31,7 @@ export class ConversationsEffects {
   GetConversationMessages: Observable<any> = createEffectForActions(this.actions, this.ws,
     GetConversationPrivateMessages, StoreGetConversationPrivateMessages, StoreConversationError);
   SendConversationMessage: Observable<any> = createEffectForActions(this.actions, this.ws,
-    SendConversationPrivateMessage, StoreSendConversationPrivateMessage, StoreConversationError);
+    SendConversationPrivateMessage, StoreSendConversationPrivateMessage, StoreConversationError, undefined, false);
   SendConversationPrivateCall: Observable<any> = createEffectForActions(this.actions, this.ws,
     SendConversationPrivateCall, StoreSendConversationPrivateCall, StoreConversationError);
   GetConversationPrivateCalls: Observable<any> = createEffectForActions(this.actions, this.ws,

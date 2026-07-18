@@ -47,4 +47,24 @@ describe('createEffectForActions', () => {
     expect(failures.length).toBe(2);
     expect(failures.every(action => action.type === 'StoreGotAclError')).toBeTrue();
   });
+
+  it('can explicitly suppress operation feedback for quiet operations', () => {
+    const source = new Subject<any>();
+    const ws = {universalSender: () => of({id: 9})} as any;
+    let result: any;
+
+    createEffectForActions(
+      new Actions(source),
+      ws,
+      request,
+      completed,
+      failed,
+      undefined,
+      false,
+    ).subscribe(action => result = action);
+    source.next(request({name: 'trusted'}));
+
+    expect(result.type).toBe('StoreAclList');
+    expect(result.operationFeedback).toBeFalse();
+  });
 });

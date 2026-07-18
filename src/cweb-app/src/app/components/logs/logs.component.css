@@ -2,17 +2,13 @@
   background: #fff;
   border-radius: var(--cpbx-panel-radius);
   margin: var(--cpbx-page-gutter);
-  min-height: 18rem;
+  min-width: 0;
   padding: 1px 0 1rem;
 }
 
 .full-width-table {
   width: 100%;
   box-shadow: none;
-}
-
-.table-container {
-  height: 70vh;
 }
 
 td {
@@ -30,7 +26,13 @@ td {
   line-height: 22px;
   width: fit-content;
   min-width: 95%;
-  max-height: calc(100vh - 330px);
+  max-height: calc(100dvh - 30rem);
+}
+
+@media (max-height: 760px) {
+  .log-container {
+    max-height: 18rem;
+  }
 }
 
 .get-button {

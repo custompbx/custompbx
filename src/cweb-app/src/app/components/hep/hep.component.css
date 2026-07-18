@@ -3,10 +3,6 @@
   box-shadow: none;
 }
 
-.table-container {
-  height: 70vh;
-}
-
 td {
   min-width: 50px;
   padding-right: 5px;
@@ -14,7 +10,14 @@ td {
 
 
 .table-container {
+  max-height: calc(100dvh - 30rem);
   overflow: auto;
+}
+
+@media (max-height: 760px) {
+  .table-container {
+    max-height: 18rem;
+  }
 }
 
 .get-button {

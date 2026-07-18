@@ -11,7 +11,8 @@ export function createEffectForActions(
   action1: Action,
   action2: (payload: any) => Action,
   action3: (payload: any) => Action,
-  payloadType?: string
+  payloadType?: string,
+  operationFeedback = true,
 ): Observable<any> {
   return createEffect(() =>
     actions.pipe(
@@ -33,7 +34,9 @@ export function createEffectForActions(
               default:
                 completedAction = action2({response, payload: action.payload});
             }
-            return withOperationFeedback(completedAction, action.type);
+            return operationFeedback
+              ? withOperationFeedback(completedAction, action.type)
+              : {...completedAction, operationFeedback: false};
           }),
           catchError((error) => {
             const errorMessage = error instanceof Error ? error.message : error;

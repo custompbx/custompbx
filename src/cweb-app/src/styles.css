@@ -1422,7 +1422,7 @@ span {
   .cpbx-tab-panel {
     min-width: 0;
     max-width: 100%;
-    min-height: calc(100vh - 13.5rem);
+    min-height: calc(100dvh - 14rem);
     overflow-x: hidden;
     background: var(--cpbx-surface);
   }
