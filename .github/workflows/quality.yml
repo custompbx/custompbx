@@ -83,12 +83,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - name: Scan repository history for secrets
+      - name: Prepare tracked release tree
+        run: |
+          mkdir -p /tmp/custompbx-release-tree
+          git archive HEAD | tar -x -C /tmp/custompbx-release-tree
+      - name: Scan tracked release tree for secrets
         run: >-
           docker run --rm
-          -v "$PWD:/repo"
+          -v "/tmp/custompbx-release-tree:/repo:ro"
           ghcr.io/gitleaks/gitleaks:v8.28.0
-          git /repo
+          dir /repo
           --no-banner
           --redact
+          --verbose
