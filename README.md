@@ -213,3 +213,75 @@ If you have any questions or feedback, don't hesitate to get in touch through th
 
 </details>
 ---
+
+### GUI Screenshots
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_185430_localhost" src="https://github.com/user-attachments/assets/a35a28ba-de0f-4afc-abf5-f25faa03d81a" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_185623_localhost" src="https://github.com/user-attachments/assets/4c53404a-601f-4f5d-b2c3-2897ac1e1204" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_185658_localhost" src="https://github.com/user-attachments/assets/7f848675-e037-4c60-8d99-628995cb6c27" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_185725_localhost" src="https://github.com/user-attachments/assets/e0a4b5e5-c758-4ca3-a5ba-b67602fc405d" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_185928_localhost" src="https://github.com/user-attachments/assets/5a2ce5d1-7d06-43d0-9af7-88686f3a82b6" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_190053_localhost" src="https://github.com/user-attachments/assets/dd8ce1bb-89db-4181-9d6a-87c250c1d979" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_192213_localhost" src="https://github.com/user-attachments/assets/0857bbf4-925f-4b6c-8bff-63b267b8c73c" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_191125_localhost" src="https://github.com/user-attachments/assets/d3a1f8b3-181a-4795-89bc-c49d0b4f5ed7" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_191048_localhost" src="https://github.com/user-attachments/assets/8a9786bb-d5fc-4c1a-8ad6-65daf4cd5e6f" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_190105_localhost" src="https://github.com/user-attachments/assets/dde07e54-40ee-45aa-9685-7debd1dcb26a" />
+
+---
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_192446_localhost" src="https://github.com/user-attachments/assets/0fc2baeb-b755-4f3e-b1d1-fc8314a14035" />
+
+---
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_192530_localhost" src="https://github.com/user-attachments/assets/34c77b9d-0553-4a54-bce6-07314def1e8b" />
+
+---
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_192324_localhost" src="https://github.com/user-attachments/assets/e590aaf0-aece-4a5e-899d-7efa7995e55b" />
+
+---
+
+
+<img width="2558" height="1401" alt="Opera Instantané_2026-07-18_192427_localhost" src="https://github.com/user-attachments/assets/2b8e2611-9359-4525-84cf-35aadecde036" />
+
+
+
+
+
