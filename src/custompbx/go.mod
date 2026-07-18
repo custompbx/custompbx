@@ -1,6 +1,6 @@
 module custompbx
 
-go 1.25.0
+go 1.25.12
 
 require (
 	github.com/Masterminds/squirrel v1.5.4

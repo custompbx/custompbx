@@ -44,7 +44,7 @@ RUN npm run test:i18n
 RUN npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox
 
 ### STAGE 2: Build Golang backend ###
-FROM golang:1.25.11 AS backend-base
+FROM golang:1.25.12 AS backend-base
 WORKDIR /app
 
 # Copy go.mod and go.sum

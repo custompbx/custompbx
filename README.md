@@ -27,7 +27,7 @@ For the recommended container deployment:
 For a source build:
 
 - Linux or WSL on amd64
-- Go 1.25.11 or newer in the Go 1.25 release line
+- Go 1.25.12 or newer in the Go 1.25 release line
 - Node.js 22
 - GNU Make
 - FreeSWITCH and PostgreSQL available at runtime
@@ -213,4 +213,3 @@ If you have any questions or feedback, don't hesitate to get in touch through th
 
 </details>
 ---
-

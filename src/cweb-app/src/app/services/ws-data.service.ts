@@ -59,6 +59,11 @@ export class WsDataService {
     );
   }
 
+  subscriptionSender(method: string, data: any): Observable<any> {
+    this.websocketService.send(method, {token: this.cookie.getToken(), ...data});
+    return this.websocketService.on<IMessage>(method);
+  }
+
   proceedMessageType(method: string): Observable<any> {
     return this.websocketService.on<IMessage>(method);
   }

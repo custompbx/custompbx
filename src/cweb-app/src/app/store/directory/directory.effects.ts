@@ -430,7 +430,7 @@ export class DirectoryEffects {
       ofType(DirectoryActionTypes.GetDirectoryUsers),
       map((action: GetDirectoryUsers) => action),
       switchMap(action => {
-          return this.ws.universalSender(action.type, action.payload).pipe(
+          return this.ws.subscriptionSender(action.type, action.payload).pipe(
             map((response) => {
               if (response.error) {
                 return new StoreDirectoryError({error: response.error});
