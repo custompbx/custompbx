@@ -48,6 +48,7 @@ const (
 	eventSettingsUsersSwitch        = "[Settings][Users][Switch] Web user"
 	eventSettingsUsersUpdatePass    = "[Settings][Users][Update] Password"
 	eventSettingsUsersUpdateLang    = "[Settings][Users][Update] Lang"
+	eventSettingsUsersUpdateLocale  = "[Settings][Users][Update] Locale"
 	eventSettingsUsersUpdateSip     = "[Settings][Users][Update] Sip user"
 	eventSettingsUsersUpdateWS      = "[Settings][Users][Update] Ws"
 	eventSettingsUsersUpdateVerto   = "[Settings][Users][Update] Verto Ws"

@@ -13,10 +13,11 @@ import {State} from "../../store/phone/phone.reducers";
 import {FormatTimerPipe} from "../../pipes/format-timer.pipe";
 import {FormsModule} from "@angular/forms";
 import {IconComponent} from '../icon/icon.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [DragDropModule, FormatTimerPipe, FormsModule, IconComponent],
+  imports: [DragDropModule, FormatTimerPipe, FormsModule, IconComponent, TranslocoPipe],
   selector: 'app-phone',
   templateUrl: './phone.component.html',
   styleUrls: ['./phone.component.css'],

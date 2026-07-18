@@ -1,21 +1,22 @@
-<app-inner-header name="Verto" [loadCounter]="loadCounter()"></app-inner-header>
-<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+<app-config-page-shell name="Verto" translationKey="navigation.verto"
+  [loadCounter]="loadCounter()" [module]="list()"
+  ariaLabel="Verto sections" ariaLabelKey="configuration.vertoSections"
+  [tabs]="mainTabs" [tabKeys]="mainTabKeys" [(selectedIndex)]="selectedIndex" />
 @if (list() && list().exists !== false) {
-  <app-tab-nav ariaLabel="Verto sections" [tabs]="['List', 'Add', 'Delete/Rename']" [(selectedIndex)]="selectedIndex"></app-tab-nav>
-    <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+    <div appCpbxTabPanel [active]="selectedIndex === 0">
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Settings</p>
+          <p class="cpbx-card__subtitle">{{'configuration.settings' | transloco}}</p>
         </header>
         <div class="cpbx-card__content">
           <app-disclosure>
               <span disclosureTitle>
-                Settings
+                {{'configuration.settings' | transloco}}
               </span>
               <span disclosureDescription>
-                Click to get details
+                {{'common.clickDetails' | transloco}}
               </span>
-            <h3>Params:</h3>
+            <h3>{{'common.parameters' | transloco}}:</h3>
             <app-key-value-pad-2 [exist]="list().settings"
               [items]="list().settings"
               [newItems]="list().settings?.new"
@@ -29,7 +30,7 @@
       </section>
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Profiles</p>
+          <p class="cpbx-card__subtitle">{{'configuration.profiles' | transloco}}</p>
         </header>
         <div class="cpbx-card__content">
           @for (item of onlyValues(list().profiles); track item.id) {
@@ -40,14 +41,14 @@
                     {{item.name}}
                   </span>
                   <span disclosureDescription>
-                    Click to get details
+                    {{'common.clickDetails' | transloco}}
                   </span>
                 @if (list().profiles[item.id] && (list().profiles[item.id].parameters)) {
                   <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyProfile(item.id)"
-                    >Copy
+                    >{{'common.actions.copy' | transloco}}
                   </button>
                 }
-                <h3>Params:</h3>
+                <h3>{{'common.parameters' | transloco}}:</h3>
                 <app-key-value-pad-position [exist]="item.parameters"
                   [items]="item.parameters"
                   [newItems]="item.parameters?.new"
@@ -63,31 +64,31 @@
         </div>
       </section>
     </div>
-    <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
+    <div appCpbxTabPanel [active]="selectedIndex === 1">
       <form class="cpbx-form-panel" (ngSubmit)="onProfileSubmit()">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New profile name" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
+<input [placeholder]="'configuration.newProfileName' | transloco" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
 </label>
-        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+        <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
       </form>
     </div>
-    <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
+    <div appCpbxTabPanel [active]="selectedIndex === 2">
       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
-        <h3 class="cpbx-form-title">Profiles</h3>
+        <h3 class="cpbx-form-title">{{'configuration.profiles' | transloco}}</h3>
         @for (profile of onlyValues(list().profiles); track profile.id) {
           <div class="cpbx-edit-row">
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Profile name</span>
-<input name="Profile name" required [ngModel]="profile.name" [name]="'profile::' + profile.id" placeholder="Profile name" class="cpbx-input">
+<span class="cpbx-label">{{'configuration.profileName' | transloco}}</span>
+<input name="Profile name" required [ngModel]="profile.name" [name]="'profile::' + profile.id" [placeholder]="'configuration.profileName' | transloco" class="cpbx-input">
 </label>
               <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
                 (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'rename')">
-                Update
+                {{'common.actions.update' | transloco}}
               </button>
               <button class="cpbx-button cpbx-button--danger-outline" type="button"
                 (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'delete')">
-                Delete
+                {{'common.actions.delete' | transloco}}
               </button>
             </div>
           }

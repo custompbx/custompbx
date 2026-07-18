@@ -47,4 +47,25 @@ describe('TabNavComponent', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.selectedIndex()).toBe(0);
   });
+
+  it('keeps long translated labels usable in RTL layouts', () => {
+    const previousDirection = document.documentElement.dir;
+    document.documentElement.dir = 'rtl';
+    fixture.componentRef.setInput('tabs', [
+      'Globale Einstellungen und Warteschlangenbefehle',
+      'Paramètres globaux et commandes de file d’attente',
+      'إعدادات عامة',
+    ]);
+    fixture.detectChanges();
+
+    const tabList = fixture.nativeElement.querySelector('[role="tablist"]') as HTMLElement;
+    const buttons = tabList.querySelectorAll('[role="tab"]') as NodeListOf<HTMLButtonElement>;
+    expect(buttons.length).toBe(3);
+    expect(buttons[0].textContent?.trim()).toContain('Globale Einstellungen');
+    buttons[2].click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.selectedIndex()).toBe(2);
+
+    document.documentElement.dir = previousDirection;
+  });
 });

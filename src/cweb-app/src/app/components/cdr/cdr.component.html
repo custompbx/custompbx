@@ -1,19 +1,20 @@
-<app-inner-header name="CDR" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="CDR" translationKey="navigation.cdr" [loadCounter]="loadCounter()"></app-inner-header>
 <app-tab-nav ariaLabel="CDR sections" [tabs]="['Search', 'Settings']"
+  [tabKeys]="['common.tabs.search', 'common.tabs.settings']"
   [(selectedIndex)]="selectedTab" (selectedIndexChange)="tabChanged($event)"></app-tab-nav>
 <div class="cpbx-tab-panel" [hidden]="selectedTab() !== 0">
     <div>
       <div class="cpbx-form-panel">
         <button class="switch-button cpbx-button cpbx-button--secondary"
           (click)="getRecords()">
-          Get Records
+          {{'ui.getRecords' | transloco}}
         </button>
       </div>
       <div class="cpbx-form-panel">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Filter Field</span>
+<span class="cpbx-label">{{'ui.field' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="filter().field" [disabled]="!columns()">
-<option [ngValue]="null" disabled hidden>Filter Field</option>
+<option [ngValue]="null" disabled hidden>{{'ui.field' | transloco}}</option>
             <option [ngValue]="null">
               ---
             </option>
@@ -26,9 +27,9 @@
 </label>
 
         <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Operand</span>
+<span class="cpbx-label">{{'ui.operand' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="filter().operand" [disabled]="!filter().field">
-<option [ngValue]="null" disabled hidden>Operand</option>
+<option [ngValue]="null" disabled hidden>{{'ui.operand' | transloco}}</option>
             @for (val of operands; track val) {
               <option [ngValue]="val">
                 {{val}}
@@ -38,27 +39,27 @@
 </label>
 
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
-<input name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required placeholder="Value" class="cpbx-input">
+<span class="cpbx-label">{{'ui.value' | transloco}}</span>
+<input name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required [placeholder]="'ui.value' | transloco" class="cpbx-input">
 </label>
         @if (!filters()[toEditFilter()]) {
           <button class="switch-button cpbx-button cpbx-button--secondary"
             [disabled]="!filter().field_value || !filter().operand || !filter().field"
             (click)="addFilter()">
-            Add filter
+            {{'ui.addFilter' | transloco}}
           </button>
         }
         @if (filters()[toEditFilter()]) {
           <button class="switch-button cpbx-button cpbx-button--primary"
             [disabled]="!filter().field_value || !filter().operand || !filter().field"
             (click)="saveFilter()">
-            Edit filter
+            {{'ui.editFilter' | transloco}}
           </button>
         }
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Order Field</span>
+<span class="cpbx-label">{{'ui.sortField' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="sortColumns" [disabled]="!columns()">
-<option [ngValue]="null" disabled hidden>Order Field</option>
+<option [ngValue]="null" disabled hidden>{{'ui.sortField' | transloco}}</option>
             <option [ngValue]="null">
               ---
             </option>
@@ -77,7 +78,7 @@
         <button class="switch-button cpbx-button cpbx-button--secondary"
           [disabled]="!sortColumns"
           (click)="addSorter()">
-          Add sorting
+          {{'ui.addSorting' | transloco}}
         </button>
       </div>
       <div class="chips-pad">
@@ -126,7 +127,7 @@
                   @if (settings()[fieldFileServeColumn] == disCol) {
                     <audio controls>
                       <source [src]="element[disCol]" [type]="'audio/'+fileTypeByName(element[disCol])">
-                      Your browser does not support the audio element.
+                      {{'cdrPage.audioUnsupported' | transloco}}
                     </audio>
                   }
                   @if (settings()[fieldFileServeColumn] != disCol) {
@@ -155,16 +156,16 @@
     <div class="cdr-settings-page">
       <section class="cdr-settings-form" aria-labelledby="cdr-settings-title">
         <header class="cdr-settings-header">
-          <h2 id="cdr-settings-title">CDR settings</h2>
-          <p>Choose the call-record source and optionally enable recording playback.</p>
+          <h2 id="cdr-settings-title">{{'cdrPage.settingsTitle' | transloco}}</h2>
+          <p>{{'cdrPage.settingsHelp' | transloco}}</p>
         </header>
 
         <div class="cdr-settings-group">
-          <h3>Data source</h3>
+          <h3>{{'cdrPage.dataSource' | transloco}}</h3>
           <label class="cpbx-field cpbx-field--md">
-            <span class="cpbx-label">CDR module</span>
+            <span class="cpbx-label">{{'cdrPage.module' | transloco}}</span>
             <select class="cpbx-select" [(ngModel)]="settings()[fieldModule]">
-              <option [ngValue]="null" disabled hidden>Select CDR module</option>
+              <option [ngValue]="null" disabled hidden>{{'cdrPage.selectModule' | transloco}}</option>
               @for (val of moduleOptions; track val) {
                 <option [ngValue]="val.value">
                   {{val.label}}
@@ -174,31 +175,31 @@
           </label>
           @if (settings()[fieldModule] === 'odbc_cdr') {
             <label class="cpbx-field cpbx-field--md">
-              <span class="cpbx-label">ODBC table</span>
-              <input name="table" [(ngModel)]="settings()[fieldTable]" placeholder="CDR table name" class="cpbx-input">
+              <span class="cpbx-label">{{'cdrPage.odbcTable' | transloco}}</span>
+              <input name="table" [(ngModel)]="settings()[fieldTable]" [placeholder]="'cdrPage.odbcTablePlaceholder' | transloco" class="cpbx-input">
             </label>
           }
         </div>
 
         <div class="cdr-settings-group">
-          <h3>Recording playback</h3>
-          <p class="cdr-group-help">Leave these fields empty when recordings should not be available from the CDR page.</p>
+          <h3>{{'cdrPage.playback' | transloco}}</h3>
+          <p class="cdr-group-help">{{'cdrPage.playbackHelp' | transloco}}</p>
           <label class="cpbx-field cpbx-field--md">
-            <span class="cpbx-label">Media file column</span>
-            <input name="Media file column" [(ngModel)]="settings()[fieldFileServeColumn]" placeholder="For example, record_path" class="cpbx-input">
+            <span class="cpbx-label">{{'cdrPage.mediaFileColumn' | transloco}}</span>
+            <input name="Media file column" [(ngModel)]="settings()[fieldFileServeColumn]" [placeholder]="'cdrPage.mediaFileExample' | transloco" class="cpbx-input">
           </label>
 
           <label class="cpbx-field cpbx-field--wide">
-            <span class="cpbx-label">Recording root</span>
-            <input name="File path" [(ngModel)]="settings()[fieldFileServerPath]" placeholder="Configured recording directory" class="cpbx-input">
+            <span class="cpbx-label">{{'cdrPage.recordingRoot' | transloco}}</span>
+            <input name="File path" [(ngModel)]="settings()[fieldFileServerPath]" [placeholder]="'cdrPage.recordingRootPlaceholder' | transloco" class="cpbx-input">
           </label>
           <p class="cdr-settings-warning" role="note">
-            Use the narrowest recording directory possible. Files outside this root are rejected.
+            {{'cdrPage.warning' | transloco}}
           </p>
         </div>
 
         <button type="button" class="cpbx-button cpbx-button--primary" (click)="saveSettings()">
-          Save settings
+          {{'cdrPage.saveSettings' | transloco}}
         </button>
       </section>
     </div>

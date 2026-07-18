@@ -10,11 +10,12 @@ import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {TabNavComponent} from '../tab-nav/tab-nav.component';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {IconComponent} from '../icon/icon.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 
 @Component({
 standalone: true,
-    imports: [CommonModule, FormsModule, InnerHeaderComponent, TabNavComponent, IconComponent],
+    imports: [CommonModule, FormsModule, InnerHeaderComponent, TabNavComponent, IconComponent, TranslocoPipe],
     selector: 'app-instances',
     templateUrl: './instances.component.html',
     styleUrls: ['./instances.component.css']

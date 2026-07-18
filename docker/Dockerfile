@@ -16,7 +16,9 @@ COPY src/cweb-app/.browserslistrc ./
 COPY src/cweb-app/.postcssrc.json ./
 COPY src/cweb-app/angular.json ./
 COPY src/cweb-app/tsconfig.json ./
+COPY src/cweb-app/scripts ./scripts
 
+RUN npm run test:i18n
 RUN npm run build
 
 FROM node:22 AS frontend-test
@@ -36,7 +38,9 @@ COPY src/cweb-app/.browserslistrc ./
 COPY src/cweb-app/.postcssrc.json ./
 COPY src/cweb-app/angular.json ./
 COPY src/cweb-app/tsconfig.json ./
+COPY src/cweb-app/scripts ./scripts
 
+RUN npm run test:i18n
 RUN npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox
 
 ### STAGE 2: Build Golang backend ###

@@ -1,0 +1,92 @@
+{
+    "feedback": {"changesSaved":"Modifications enregistrées.","itemAdded":"Élément ajouté.","itemRemoved":"Élément supprimé.","statusUpdated":"Statut mis à jour.","importCompleted":"Importation terminée.","itemsPasted":"Éléments collés.","itemRenamed":"Élément renommé.","orderUpdated":"Ordre mis à jour.","reloadCompleted":"Rechargement terminé.","moduleUnloaded":"Module déchargé.","moduleLoaded":"Module chargé.","autoloadUpdated":"Chargement automatique mis à jour.","itemCleared":"Élément effacé.","configurationCleared":"Configuration effacée.","configurationCreated":"Configuration créée.","commandCompleted":"Commande terminée.","errorWithDetail":"Erreur : {{message}}"},
+    "common":  {
+                   "language":  "Langue",
+                   "loading":  "Chargement",
+                   "pageActions":  "Actions de la page",
+                   "lastOperationFailed":  "La dernière opération a échoué",
+                   "notifications":  "Notifications",
+                   "dismissNotification":  "Fermer la notification",
+                   "default":  "Par défaut",
+                   "filterItems":  "Filtrer les éléments",
+                   "searchItems":  "Rechercher par nom, valeur ou identifiant",
+                   "itemsShown":  "{{visible}} / {{total}} affichés",
+                   "moveItem":  "Déplacer l’élément",
+                   "draftItems":  "Brouillons",
+                   "noMatchingItems":  "Aucun élément ne correspond à ce filtre.",
+                   "noItemsYet":  "Aucun élément. Ajoutez le premier ci-dessous.",
+                   "nameRequired":  "Le nom est obligatoire.",
+                   "duplicateName":  "Un autre élément utilise déjà ce nom.",
+                   "deleteItemConfirm":  "Supprimer l’élément \"{{name}}\" ?",
+                   "deleteItemDescription":  "L’élément sera supprimé de la configuration après confirmation du serveur.",
+                   "copied":"Copié !","clickDetails":"Cliquer pour afficher les détails","parameters":"Paramètres","variables":"Variables","xmlEditor":"Éditeur XML",
+                   "tabs":{"list":"Liste","add":"Ajouter","deleteRename":"Supprimer/Renommer"},
+                   "fields":{"name":"Nom","domain":"Domaine","user":"Utilisateur","cache":"Cache","numberAlias":"Alias numérique","cidr":"CIDR","bulk":"Quantité","userName":"Nom d’utilisateur","domainName":"Nom du domaine","groupName":"Nom du groupe","gatewayName":"Nom de la passerelle"},
+                   "actions":  {
+                                   "save":  "Enregistrer",
+                                   "cancel":  "Annuler",
+                                   "add":  "Ajouter",
+                                   "delete":  "Supprimer",
+                                   "update":  "Mettre à jour",
+                                   "reset":  "Réinitialiser",
+                                   "disable":  "Désactiver",
+                                   "enable":  "Activer",
+                                   "addItem":  "+ Ajouter un élément",
+                                   "paste":"Coller","import":"Importer","copy":"Copier","submit":"Valider","goToDomains":"Accéder aux domaines","manage":"Gérer","done":"Terminé","remove":"Retirer"
+                               }
+               },
+    "directory": {
+        "domainSections":"Sections des domaines","userSections":"Sections des utilisateurs","groupSections":"Sections des groupes","gatewaySections":"Sections des passerelles",
+        "noDomains":"Aucun domaine","createOrImportDomain":"Créez un domaine ou importez une configuration d’annuaire FreeSWITCH existante.","domainRequiredForUsers":"Créez ou importez un domaine avant d’ajouter des utilisateurs.","domainRequiredForGroups":"Créez ou importez un domaine avant d’ajouter des groupes.","domainRequiredForGateways":"Créez ou importez un domaine avant d’ajouter des passerelles.",
+        "domainLabel":"Domaine : {{name}}","userLabel":"Utilisateur : {{name}}","copyParametersVariables":"Copier les paramètres / variables","chooseDomain":"Choisir un domaine","newDomainName":"Nouveau nom de domaine","newUserName":"Nouveau nom d’utilisateur","newGroupName":"Nouveau nom de groupe","newGatewayName":"Nouveau nom de passerelle","userTemplates":"Modèles utilisateur","numberOrUserName":"Numéro/Nom d’utilisateur",
+        "confirmDeleteDomain":"Supprimer le domaine \"{{name}}\" ?","confirmRenameDomain":"Renommer le domaine \"{{oldName}}\" en \"{{newName}}\" ?","confirmDeleteUser":"Supprimer l’utilisateur \"{{name}}\" ?","confirmRenameUser":"Renommer l’utilisateur \"{{oldName}}\" en \"{{newName}}\" ?","confirmDeleteGroup":"Supprimer le groupe \"{{name}}\" ?","confirmRenameGroup":"Renommer le groupe \"{{oldName}}\" en \"{{newName}}\" ?","confirmDeleteGateway":"Supprimer la passerelle \"{{name}}\" ?","confirmRenameGateway":"Renommer la passerelle \"{{oldName}}\" en \"{{newName}}\" ?"
+    },
+    "configuration":{"moduleSections":"Sections des modules","aclSections":"Sections ACL","callcenterSections":"Sections du centre d'appels","sofiaSections":"Sections Sofia","vertoSections":"Sections Verto","importFromXml":"Importer depuis XML","truncate":"Tronquer","lists":"Listes","nodes":"Nœuds","type":"Type","newAclListName":"Nom de la nouvelle liste ACL","settings":"Paramètres","profiles":"Profils","globalSettings":"Paramètres globaux","newProfileName":"Nouveau nom de profil","profileName":"Nom du profil","importance":"Importance","members":"Membres","fifo":"FIFO","fifoName":"Nom FIFO","newFifoName":"Nouveau nom FIFO","noAgents":"Il n'y a pas encore d'agents. Créez des agents et des niveaux, ou importez-les lorsque le module est chargé."},
+    "ui":{"field":"Champ","operand":"Opérateur","value":"Valeur","sortField":"Champ de tri","descending":"Décroissant","queues":"Files d’attente","queue":"File d’attente","queueName":"Nom de la file","newAgentName":"Nom du nouvel agent","tierAgentName":"Nom de l’agent de niveau","getList":"Afficher la liste","addFilter":"Ajouter un filtre","editFilter":"Modifier le filtre","addSorting":"Ajouter un tri","gateways":"Passerelles","domains":"Domaines","aliases":"Alias","profileCommands":"Commandes de profil","profile":"Profil","gateway":"Passerelle","direction":"Direction","alias":"Alias","parse":"Analyser","advertise":"Annonces","rooms":"Salles","callerControlGroups":"Groupes de contrôle des appelants","controls":"Contrôles","chatPermissions":"Autorisations de discussion","layouts":"Mises en page","layoutGroups":"Groupes de mises en page","images":"Images","group":"Groupe","permissionProfile":"Profil d’autorisation","command":"Commande","enterSaveEscCancel":"Entrée pour enregistrer · Échap pour annuler","unsaved":"Non enregistré","noRecords":"Aucun enregistrement","exportPng":"Exporter PNG","exportTxt":"Exporter TXT"},
+    "auth":  {
+                 "loginAria":  "Connexion CustomPBX",
+                 "tagline":  "Connectez-vous pour gérer votre PBX, vos appels, votre routage et la configuration du système.",
+                 "welcome":  "Bon retour",
+                 "instructions":  "Utilisez vos identifiants administrateur pour continuer.",
+                 "login":  "Identifiant",
+                 "password":  "Mot de passe",
+                 "passwordPlaceholder":  "Saisissez le mot de passe",
+                 "signIn":  "Se connecter"
+             },
+    "header":  {
+                   "profile":  "Profil",
+                   "settings":  "Paramètres",
+                   "logOut":  "Se déconnecter"
+               },
+    "dashboard":  {
+                      "subtitle":  "Capacité du système et état des services en temps réel"
+                  },
+    "dialplan":{"settings":"Paramètres Dialplan","addCondition":"Ajouter une condition","actions":"Actions","antiactions":"Antiactions","conditionFields":"Champs de condition","field":"Champ","expression":"Expression","break":"Break","defaultOnFalse":"Par défaut (on-false)","regexes":"Expressions régulières","data":"Données","inline":"En ligne","regex":"Expression régulière","noContexts":"Aucun contexte. Créez-en un ou importez une configuration existante.","contexts":"Contextes","continue":"Continuer","newContextName":"Nouveau nom de contexte","context":"Contexte","newExtensionName":"Nouveau nom d’extension","contextName":"Nom du contexte","extensions":"Extensions","extensionName":"Nom de l’extension","enableStatic":"Activer le dialplan statique","disableStatic":"Désactiver le dialplan statique","debug":"Débogage du dialplan","enableCollecting":"Activer la collecte","disableCollecting":"Désactiver la collecte","conditionsLog":"Journal des conditions","gotActions":"Actions correspondantes","true":"Vrai","false":"Faux"},
+    "navigation":  {
+                       "section":  "section de navigation",
+                       "monitoring":  "Supervision",
+                       "dashboard":  "Tableau de bord",
+                       "usersPanel":  "Panneau utilisateurs",
+                       "directory":  "Directory",
+                       "domains":  "Domaines",
+                       "users":  "Utilisateurs",
+                       "groups":  "Groupes",
+                       "gateways":  "Passerelles",
+                       "configuration":  "Configuration",
+                       "modules":  "Modules",
+                       "acl":  "ACL",
+                       "callcenter":  "Centre d\u0027appels",
+                       "sofia":  "Sofia",
+                       "verto":  "Verto",
+                       "switch":  "Switch",
+                       "dialplan":  "Plan de numérotation",
+                       "contexts":  "Contextes",
+                       "cdr":  "CDR",
+                       "logs":  "Journaux",
+                       "fsCli":  "FS_CLI",
+                       "hep":  "HEP",
+                       "instances":  "Instances",
+                       "globalVariables":  "Variables globales"
+                   },
+    "settingsPage": {"webUsers":"Utilisateurs web","userGroup":"Groupe d’utilisateurs","newPassword":"Nouveau mot de passe","newPasswordHint":"Nouveau mot de passe de l’utilisateur web","userLanguage":"Langue de l’utilisateur","directoryUser":"Utilisateur de l’annuaire","stunOverride":"STUN (remplacer la valeur par défaut)","uploadImage":"Téléverser une image","clear":"Effacer","userTokens":"Jetons utilisateur","token":"Jeton","created":"Créé","purpose":"Usage","actions":"Actions","noApiTokens":"Aucun jeton API","newUserData":"Nouvel utilisateur","login":"Identifiant","password":"Mot de passe","userLogins":"Identifiants utilisateur","userLogin":"Identifiant utilisateur","webUserTemplates":"Modèles d’utilisateurs web","template":"Modèle","templateName":"Nom du modèle","connectionsSettings":"Paramètres de connexion","eventSocketSettings":"Paramètres du socket d’événements","host":"Hôte","port":"Port","timeout":"Délai d’attente","collectLogs":"Collecter les journaux","database":"Base de données","databaseSettings":"Paramètres de la base de données","databaseName":"Nom de la base","databaseUser":"Utilisateur de la base","webserver":"Serveur web","webserverSettings":"Paramètres du serveur web","route":"Route","wsWriteTimeout":"Délai d’écriture WebSocket (secondes)","wsReadTimeout":"Délai de lecture WebSocket (secondes)","wsPingInterval":"Intervalle ping WebSocket (secondes)","wsQueueSize":"Taille de la file WebSocket","certificatePath":"Chemin du certificat","keyPath":"Chemin de la clé","xmlCurlServer":"Serveur XML curl","xmlCurlServerSettings":"Paramètres du serveur XML curl","none":"-- Aucun --","wsForSipjs":"WebSocket pour Sip.js","wsForVerto":"WebSocket pour Verto","value":"Valeur","description":"Description","placeholder":"Texte indicatif","hide":"Masquer","show":"Afficher","editable":"Modifiable","uneditable":"Lecture seule"}
+}

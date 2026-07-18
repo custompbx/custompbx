@@ -1,34 +1,35 @@
-<app-inner-header name="Groups" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="Groups" translationKey="navigation.groups" [loadCounter]="loadCounter()"></app-inner-header>
 @if (loadCounter() === 0 && !(list() | keyvalue)?.length) {
   <section class="cpbx-card"><div class="cpbx-card__content">
       <div class="directory-empty">
         <div>
-          <h3>No domains yet</h3>
-          <p>Create or import a domain before adding groups.</p>
+          <h3>{{'directory.noDomains' | transloco}}</h3>
+          <p>{{'directory.domainRequiredForGroups' | transloco}}</p>
         </div>
       <button class="switch-button cpbx-button cpbx-button--secondary"
         routerLink="/directory/domains">
-        Go to domains
+        {{'common.actions.goToDomains' | transloco}}
       </button>
       </div>
   </div></section>
 }
 @if ((list() | keyvalue)?.length) {
-  <app-tab-nav ariaLabel="Group sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+  <app-tab-nav ariaLabelKey="directory.groupSections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']"
     [(selectedIndex)]="selectedIndex"></app-tab-nav>
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
       @for (domain of list() | keyvalue; track domain) {
         <div class="directory-domain-section">
           <section class="cpbx-card">
-            <header class="cpbx-card__header"><p class="cpbx-card__subtitle">Domain: <b>{{domain.value.name}}</b></p></header>
+            <header class="cpbx-card__header"><p class="cpbx-card__subtitle">{{'directory.domainLabel' | transloco: {name: domain.value.name} }}</p></header>
             <div class="cpbx-card__content">
               @for (group of onlyValuesByParent(groupList(), Number(domain.key)); track group) {
                 <app-disclosure (opened)="getDetails(group.id)" (closed)="clearDetails(group.id)">
                   <span disclosureTitle>{{group.name}}</span>
-                  <span disclosureDescription>Click to get details</span>
+                  <span disclosureDescription>{{'common.clickDetails' | transloco}}</span>
                   <button class="group-manage-button cpbx-button cpbx-button--secondary"
                     (click)="manageGroup[group.id]=!manageGroup[group.id]">
-                    {{manageGroup[group.id] ? 'Done' : 'Manage'}}
+                    {{manageGroup[group.id] ? ('common.actions.done' | transloco) : ('common.actions.manage' | transloco)}}
                   </button>
                   <div class="group-user-grid">
                     @for (gUser of onlyValuesByParent(listGroupUsers(), group.id); track gUser) {
@@ -38,7 +39,7 @@
                           <span class="user-name">{{listDomainUsers()[gUser.user?.id]?.name}}</span>
                         </div>
                         @if (manageGroup[group.id]) {
-                          <button type="button" class="group-user-action group-user-action--remove" (click)="delUser(gUser.id)">Remove</button>
+                          <button type="button" class="group-user-action group-user-action--remove" (click)="delUser(gUser.id)">{{'common.actions.remove' | transloco}}</button>
                         }
                       </div>
                     }
@@ -49,7 +50,7 @@
                             <app-icon class="icon-spacer" name="face"></app-icon>
                             <span class="user-name">{{user.name}}</span>
                           </div>
-                          <button type="button" class="group-user-action group-user-action--add" (click)="addUser(user.id, group.id)">Add</button>
+                          <button type="button" class="group-user-action group-user-action--add" (click)="addUser(user.id, group.id)">{{'common.actions.add' | transloco}}</button>
                         </div>
                       }
                     }
@@ -64,9 +65,9 @@
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
       <form class="cpbx-form-panel" (ngSubmit)="onGroupSubmit()">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Domain</span>
+<span class="cpbx-label">{{'common.fields.domain' | transloco}}</span>
 <select class="cpbx-select" required name="domainId" [(ngModel)]="domainId">
-<option [ngValue]="null" disabled hidden>Domain</option>
+<option [ngValue]="null" disabled hidden>{{'common.fields.domain' | transloco}}</option>
             <option>--</option>
             @for (domain of list() | keyvalue; track domain) {
               <option [ngValue]="domain.key">{{domain.value.name}}</option>
@@ -74,18 +75,18 @@
         </select>
 </label>
       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New group name" required name="name" [ngModel]="newGroupName()" (ngModelChange)="newGroupName.set($event)" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
+<input [placeholder]="'directory.newGroupName' | transloco" required name="name" [ngModel]="newGroupName()" (ngModelChange)="newGroupName.set($event)" class="cpbx-input">
 </label>
-      <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+      <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
     </form>
   </div>
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
     <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Domain</span>
+<span class="cpbx-label">{{'common.fields.domain' | transloco}}</span>
 <select class="cpbx-select" required name="domainId" [(ngModel)]="domainId">
-<option [ngValue]="null" disabled hidden>Domain</option>
+<option [ngValue]="null" disabled hidden>{{'common.fields.domain' | transloco}}</option>
           <option>--</option>
           @for (domain of list() | keyvalue; track domain) {
             <option [ngValue]="domain.key">{{domain.value.name}}</option>
@@ -95,16 +96,16 @@
     @for (group of onlyValuesByParent(groupList(), domainId); track group) {
       <div class="cpbx-edit-row">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Group name</span>
-<input name="group name" required [ngModel]="group.name" [name]="'group::' + group.id" placeholder="Group name" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.groupName' | transloco}}</span>
+<input name="group name" required [ngModel]="group.name" [name]="'group::' + group.id" [placeholder]="'common.fields.groupName' | transloco" class="cpbx-input">
 </label>
         <button class="cpbx-button cpbx-button--primary" [disabled]="checkDirty(deleteForm.controls['group::' + group.id])"
           (click)="openBottomSheet(group.id, deleteForm.controls['group::' + group.id].value, group, 'rename')">
-          Update
+          {{'common.actions.update' | transloco}}
         </button>
         <button class="cpbx-button cpbx-button--danger-outline"
           (click)="openBottomSheet(group.id, deleteForm.controls['group::' + group.id].value, group, 'delete')">
-          Delete
+          {{'common.actions.delete' | transloco}}
         </button>
       </div>
     }

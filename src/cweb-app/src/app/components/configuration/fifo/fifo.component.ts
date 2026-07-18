@@ -20,13 +20,14 @@ import {
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
 standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent, TranslocoPipe],
   selector: 'app-fifo',
   templateUrl: './fifo.component.html',
   styleUrls: ['./fifo.component.css']
@@ -239,9 +240,7 @@ export class FifoComponent implements OnInit, OnDestroy {
       return;
     }
     this.toCopyFifo = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   pasteFifoMembers(to: number) {

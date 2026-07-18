@@ -1,0 +1,115 @@
+.profile-page {
+  padding: 2rem;
+}
+
+.profile-card {
+  background: var(--cpbx-surface);
+  border: 1px solid var(--cpbx-border);
+  border-radius: 1rem;
+  max-width: 44rem;
+  padding: 1.5rem;
+}
+
+.profile-card__heading {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-card__heading h2,
+.profile-card__heading p {
+  margin: 0;
+}
+
+.profile-card__heading p {
+  color: var(--cpbx-text-muted);
+  margin-top: .25rem;
+}
+
+.profile-avatar {
+  align-items: center;
+  background: var(--cpbx-primary-soft);
+  border-radius: 999px;
+  display: flex;
+  height: 4.5rem;
+  justify-content: center;
+  position: relative;
+  width: 4.5rem;
+}
+
+.profile-avatar img {
+  border-radius: inherit;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.profile-avatar app-icon {
+  color: var(--cpbx-primary);
+  font-size: 2.5rem;
+}
+
+.profile-avatar__clear {
+  background: rgba(15, 23, 42, .8);
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  height: 1.5rem;
+  opacity: 0;
+  padding: 0;
+  position: absolute;
+  right: -.25rem;
+  top: -.25rem;
+  transition: opacity .15s ease;
+  width: 1.5rem;
+}
+
+.profile-avatar:hover .profile-avatar__clear,
+.profile-avatar:focus-within .profile-avatar__clear {
+  opacity: 1;
+}
+
+.profile-fields {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 38rem;
+}
+
+.profile-edit-row {
+  align-items: center;
+  display: grid;
+  gap: .75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.profile-edit-row .cpbx-button {
+  min-width: 7rem;
+}
+
+.profile-upload {
+  margin-top: 1.25rem;
+  width: max-content;
+}
+
+@media (max-width: 700px) {
+  .profile-page {
+    padding: 1rem;
+  }
+
+  .profile-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-edit-row {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .profile-edit-row .cpbx-button {
+    width: 100%;
+  }
+}

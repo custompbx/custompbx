@@ -1,12 +1,12 @@
-<app-inner-header name="ACL" [loadCounter]="loadCounter()"></app-inner-header>
-<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+<app-config-page-shell name="ACL" translationKey="navigation.acl"
+  [loadCounter]="loadCounter()" [module]="list()"
+  ariaLabel="ACL sections" ariaLabelKey="configuration.aclSections"
+  [tabs]="mainTabs" [tabKeys]="mainTabKeys" [(selectedIndex)]="selectedIndex" />
 @if (list() && list().exists !== false) {
-  <app-tab-nav ariaLabel="ACL sections" [tabs]="['List', 'Add', 'Delete/Rename']"
-    [(selectedIndex)]="selectedIndex"></app-tab-nav>
-  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+  <div appCpbxTabPanel [active]="selectedIndex === 0">
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Lists</p>
+          <p class="cpbx-card__subtitle">{{'configuration.lists' | transloco}}</p>
         </header>
         <div class="cpbx-card__content">
           @for (item of onlyValues(list().lists); track $index) {
@@ -16,16 +16,16 @@
                     {{item.name}}
                   </span>
                   <span disclosureDescription>
-                    Click to get details
+                    {{'common.clickDetails' | transloco}}
                   </span>
                 <form #details="ngForm">
-                  <h3>Default:</h3>
+                  <h3>{{'common.default' | transloco}}:</h3>
                   @if (item.id) {
                     <div class="cpbx-edit-row">
                         <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Default</span>
+<span class="cpbx-label">{{'common.default' | transloco}}</span>
 <select class="cpbx-select" required [ngModel]="item.default" [name]="'default' + item.id">
-<option [ngValue]="null" disabled hidden>Default</option>
+<option [ngValue]="null" disabled hidden>{{'common.default' | transloco}}</option>
                             @for (val of aclBehavior; track val) {
                               <option [ngValue]="val">{{val}}</option>
                             }
@@ -34,11 +34,11 @@
                         <button class="cpbx-button cpbx-button--primary"
                           [disabled]="!isvalueReadyToSend(details.controls['default' + item.id])"
                           (click)="updateDefault(item.id, details.controls['default' + item.id])">
-                          Update
+                          {{'common.actions.update' | transloco}}
                         </button>
                       </div>
                     }
-                    <h3>Nodes:</h3>
+                    <h3>{{'configuration.nodes' | transloco}}:</h3>
                     @if (item && item.nodes) {
                       <div cdkDropList
                         (cdkDropListDropped)="dropAction($event, onlySortedValues(item.nodes))">
@@ -46,19 +46,19 @@
                           <div class="cpbx-edit-row" cdkDrag>
                             @if (node.id && !isArray(node)) {
                               <ng-container>
-                                <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move item">::</button>
+                                <button class="kv-drag-handle" type="button" cdkDragHandle [attr.aria-label]="'common.moveItem' | transloco">::</button>
                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Cidr</span>
+<span class="cpbx-label">{{'common.fields.cidr' | transloco}}</span>
 <input name="cidr" [(ngModel)]="node.cidr" required [disabled]="!node.enabled || node.domain != ''" [name]="'nodeCidr' + node.id" appResizeInput [resizeOnString]="node.cidr" placeholder="Cidr" class="cpbx-input">
 </label>
                                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Domain</span>
-<input name="domain" [(ngModel)]="node.domain" required [disabled]="!node.enabled || node.cidr != ''" [name]="'nodeDomain' + node.id" appResizeInput [resizeOnString]="node.domain" placeholder="Domain" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.domain' | transloco}}</span>
+<input name="domain" [(ngModel)]="node.domain" required [disabled]="!node.enabled || node.cidr != ''" [name]="'nodeDomain' + node.id" appResizeInput [resizeOnString]="node.domain" [placeholder]="'common.fields.domain' | transloco" class="cpbx-input">
 </label>
                                     <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Type</span>
+<span class="cpbx-label">{{'configuration.type' | transloco}}</span>
 <select class="cpbx-select" required [(ngModel)]="node.type" [disabled]="!node.enabled" [name]="'nodeType' + node.id">
-<option [ngValue]="null" disabled hidden>Type</option>
+<option [ngValue]="null" disabled hidden>{{'configuration.type' | transloco}}</option>
                                         @for (val of aclBehavior; track val) {
                                           <option [ngValue]="val">{{val}}</option>
                                         }
@@ -67,21 +67,21 @@
                                       <button class="cpbx-button cpbx-button--primary"
                                         [disabled]="!isReadyToSendThree(details.controls['nodeType' + node.id], details.controls['nodeCidr' + node.id], details.controls['nodeDomain' + node.id])"
                                         (click)="updateNode(node)">
-                                        Update
+                                        {{'common.actions.update' | transloco}}
                                       </button>
                                       @if (node.enabled) {
                                         <button
                                           class="switch-button cpbx-button cpbx-button--secondary" (click)="switchNode(node)">
-                                          Disable
+                                          {{'common.actions.disable' | transloco}}
                                         </button>
                                       } @else {
                                         <button
                                           class="switch-button cpbx-button cpbx-button--primary-outline" (click)="switchNode(node)">
-                                          Enable
+                                          {{'common.actions.enable' | transloco}}
                                         </button>
                                       }
                                       <button class="cpbx-button cpbx-button--danger-outline" (click)="deleteNode(node)">
-                                        Delete
+                                        {{'common.actions.delete' | transloco}}
                                       </button>
                                     </ng-container>
                                   }
@@ -89,23 +89,23 @@
                               }
                               @if (item && item.nodes) {
                                 <div class="acl-draft-list">
-                                  @if (item.nodes.new?.length) { <div class="acl-draft-title">Draft items</div> }
+                                  @if (item.nodes.new?.length) { <div class="acl-draft-title">{{'common.draftItems' | transloco}}</div> }
                                   @for (node of item.nodes.new; track node; let i = $index) {
                                     <div class="cpbx-edit-row acl-draft-row">
                                       @if (node) {
                                         <ng-container>
                                           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Cidr</span>
+<span class="cpbx-label">{{'common.fields.cidr' | transloco}}</span>
 <input name="cidr" required [(ngModel)]="node.cidr" [name]="'newNodeCidr' + i" appResizeInput [resizeOnString]="node.cidr" [disabled]="node.domain != null && node.domain != ''" placeholder="Cidr" class="cpbx-input">
 </label>
                                             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Domain</span>
-<input name="domain" required [(ngModel)]="node.domain" [name]="'newNodeDomain' + i" appResizeInput [resizeOnString]="node.domain" [disabled]="node.cidr != null && node.cidr != ''" placeholder="Domain" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.domain' | transloco}}</span>
+<input name="domain" required [(ngModel)]="node.domain" [name]="'newNodeDomain' + i" appResizeInput [resizeOnString]="node.domain" [disabled]="node.cidr != null && node.cidr != ''" [placeholder]="'common.fields.domain' | transloco" class="cpbx-input">
 </label>
                                               <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Type</span>
+<span class="cpbx-label">{{'configuration.type' | transloco}}</span>
 <select class="cpbx-select" required [(ngModel)]="node.type" [name]="'newNodeType' + i">
-<option [ngValue]="null" disabled hidden>Type</option>
+<option [ngValue]="null" disabled hidden>{{'configuration.type' | transloco}}</option>
                                                   @for (val of aclBehavior; track val) {
                                                     <option [ngValue]="val">{{val}}</option>
                                                   }
@@ -114,10 +114,10 @@
                                                 <button class="cpbx-button cpbx-button--primary"
                                                   [disabled]="!isReadyToSendThree(details.controls['newNodeType' + i], details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])"
                                                   (click)="newNode(item.id, i, details.controls['newNodeType' + i].value, details.controls['newNodeCidr' + i], details.controls['newNodeDomain' + i])">
-                                                  Update
+                                                  {{'common.actions.update' | transloco}}
                                                 </button>
                                                 <button class="cpbx-button cpbx-button--danger-outline" (click)="dropNewNode(item.id, i)">
-                                                  Delete
+                                                  {{'common.actions.delete' | transloco}}
                                                 </button>
                                               </ng-container>
                                             }
@@ -128,7 +128,7 @@
                                   </div>
                                 }
                                 <button class="cpbx-button cpbx-button--primary" type="button" (click)="addAclNodeField(item.id)">
-                                  + Add item
+                                  {{'common.actions.addItem' | transloco}}
                                 </button>
                               </form>
                             </app-disclosure>
@@ -137,42 +137,42 @@
                       </div>
                     </section>
                   </div>
-  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
+  <div appCpbxTabPanel [active]="selectedIndex === 1">
                     @if (list()) {
                       <form class="cpbx-form-panel" (ngSubmit)="onAclListSubmit()">
                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New ACL list name" required name="name" [(ngModel)]="newItemName" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
+<input [placeholder]="'configuration.newAclListName' | transloco" required name="name" [(ngModel)]="newItemName" class="cpbx-input">
 </label>
                         <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Default</span>
+<span class="cpbx-label">{{'common.default' | transloco}}</span>
 <select class="cpbx-select" required name="default" [(ngModel)]="defaultBehavior">
-<option [ngValue]="null" disabled hidden>Default</option>
+<option [ngValue]="null" disabled hidden>{{'common.default' | transloco}}</option>
                             @for (val of aclBehavior; track val) {
                               <option [ngValue]="val">{{val}}</option>
                             }
                           </select>
 </label>
-                        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+                        <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
                       </form>
                     }
                   </div>
-  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
+  <div appCpbxTabPanel [active]="selectedIndex === 2">
                     @if (list()) {
                       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm" >
                         @for (item of onlyValues(list().lists); track item.id) {
                           <div class="cpbx-edit-row">
                             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">ACL list name</span>
+<span class="cpbx-label">{{'configuration.newAclListName' | transloco}}</span>
 <input name="ACL list name" required [ngModel]="item.name" [name]="'list::' + item.id" placeholder="ACL list name" class="cpbx-input">
 </label>
                             <button class="cpbx-button cpbx-button--primary" [disabled]="checkDirty(deleteForm.controls['list::' + item.id])"
                               (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'rename')">
-                              Update
+                              {{'common.actions.update' | transloco}}
                             </button>
                             <button class="cpbx-button cpbx-button--danger-outline"
                               (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'delete')">
-                              Delete
+                              {{'common.actions.delete' | transloco}}
                             </button>
                           </div>
                         }

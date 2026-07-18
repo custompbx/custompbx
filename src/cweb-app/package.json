@@ -8,7 +8,8 @@
     "build_dev": "ng build --configuration=dev",
     "build": "ng build --configuration=production",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox"
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox",
+    "test:i18n": "node scripts/check-i18n.mjs && node scripts/check-feature-i18n.mjs && node scripts/check-template-i18n.mjs"
   },
   "private": true,
   "dependencies": {
@@ -20,12 +21,13 @@
     "@angular/platform-browser": "21.2.18",
     "@angular/platform-browser-dynamic": "21.2.18",
     "@angular/router": "21.2.18",
+    "@jsverse/transloco": "8.4.0",
     "@ngrx/effects": "21.1.1",
     "@ngrx/entity": "21.1.1",
     "@ngrx/operators": "21.1.1",
     "@ngrx/store": "21.1.1",
     "@ngrx/store-devtools": "21.1.1",
-    "ace-builds": "^1.27.0",
+    "ace-builds": "1.43.3",
     "angular-gridster2": "^21.0.0",
     "chart.js": "^4.4.1",
     "chartjs-plugin-datalabels": "^2.2.0",

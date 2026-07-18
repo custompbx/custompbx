@@ -1,13 +1,13 @@
-<app-inner-header name="FS_CLI" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="FS_CLI" translationKey="navigation.fsCli" [loadCounter]="loadCounter()"></app-inner-header>
 <div class="fs-cli-card">
   <div class="cpbx-form-panel">
     <label class="cpbx-field cpbx-field--wide">
-<span class="cpbx-label">Command</span>
+<span class="cpbx-label">{{'ui.command' | transloco}}</span>
 <input name="value" placeholder="Enter FreeSWITCH command" [ngModel]="command()" (ngModelChange)="command.set($event)" appResizeInput [resizeOnString]="command()" required (keyup.enter)="runCommand()" class="cpbx-input">
 </label>
       <button class="switch-button cpbx-button cpbx-button--primary" [disabled]="!command()"
         (click)="runCommand()">
-        Run Command
+      {{'ui.runCommand' | transloco}}
       </button>
     </div>
     @if (list().fsCliData) {

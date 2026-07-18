@@ -1,4 +1,5 @@
-import {Injectable, signal} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
+import {TranslocoService} from '@jsverse/transloco';
 
 export type ToastTone = 'info' | 'success' | 'warning' | 'error';
 
@@ -18,6 +19,7 @@ export interface ToastOptions {
 export class ToastService {
   readonly messages = signal<readonly ToastMessage[]>([]);
 
+  private readonly i18n = inject(TranslocoService);
   private nextId = 0;
 
   open(message: string, _action?: string | null, options: ToastOptions = {}): void {
@@ -34,6 +36,14 @@ export class ToastService {
 
   error(message: string, duration = 9000): void {
     this.open(message, null, {duration, tone: 'error'});
+  }
+
+  copied(duration = 5000): void {
+    this.success(this.i18n.translate('common.copied'), duration);
+  }
+
+  backendError(message: string, duration = 9000): void {
+    this.error(this.i18n.translate('feedback.errorWithDetail', {message}), duration);
   }
 
   dismiss(id: number): void {

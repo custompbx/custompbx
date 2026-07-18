@@ -1,0 +1,72 @@
+<div class="dialplan-application-row" [class.is-draft]="draft()">
+  @if (!draft()) {
+    <button class="kv-drag-handle" type="button" cdkDragHandle [attr.aria-label]="'common.moveItem' | transloco">::</button>
+  }
+
+  <label class="cpbx-field cpbx-field--md">
+    <span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
+    <input
+      #applicationControl="ngModel"
+      [ngModel]="item().application"
+      (ngModelChange)="item().application = $event"
+      required
+      [disabled]="!draft() && !item().enabled"
+      [name]="rowKey() + 'Application'"
+      appResizeInput
+      [resizeOnString]="item().application"
+      (keydown.enter)="saveIfReady($event, applicationControl.valid && dataControl.valid, applicationControl.dirty || dataControl.dirty || inlineDirty())"
+      [placeholder]="'common.fields.name' | transloco"
+      class="cpbx-input">
+  </label>
+
+  <label class="cpbx-field cpbx-field--md">
+    <span class="cpbx-label">{{ 'dialplan.data' | transloco }}</span>
+    <input
+      #dataControl="ngModel"
+      [ngModel]="item().data"
+      (ngModelChange)="item().data = $event"
+      required
+      [disabled]="!draft() && !item().enabled"
+      [name]="rowKey() + 'Data'"
+      appResizeInput
+      [resizeOnString]="item().data"
+      (keydown.enter)="saveIfReady($event, applicationControl.valid && dataControl.valid, applicationControl.dirty || dataControl.dirty || inlineDirty())"
+      [placeholder]="'dialplan.data' | transloco"
+      class="cpbx-input">
+  </label>
+
+  @if (supportsInline() && isAction(item())) {
+    <label class="cpbx-field cpbx-field--sm inline-action">
+      <span class="cpbx-label">{{ 'dialplan.inline' | transloco }}</span>
+      <select
+        cpbxSelect
+        [ngModel]="item().inline"
+        (ngModelChange)="item().inline = $event; inlineDirty.set(true)"
+        required
+        [disabled]="!draft() && !item().enabled"
+        [name]="rowKey() + 'Inline'"
+        class="cpbx-select">
+        <option [ngValue]="false">{{'dialplan.false' | transloco}}</option>
+        <option [ngValue]="true">{{'dialplan.true' | transloco}}</option>
+      </select>
+    </label>
+  }
+
+  <button
+    class="cpbx-button cpbx-button--primary"
+    type="button"
+    [disabled]="applicationControl.invalid || dataControl.invalid || (!draft() && !applicationControl.dirty && !dataControl.dirty && !inlineDirty())"
+    (click)="save.emit(item())">
+    {{'common.actions.save' | transloco}}
+  </button>
+
+  @if (!draft()) {
+    <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="toggle.emit(item())">
+      {{(item().enabled ? 'common.actions.disable' : 'common.actions.enable') | transloco}}
+    </button>
+  }
+
+  <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="remove.emit()">
+    {{(draft() ? 'common.actions.cancel' : 'common.actions.delete') | transloco}}
+  </button>
+</div>

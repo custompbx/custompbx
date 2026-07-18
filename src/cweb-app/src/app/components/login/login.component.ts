@@ -6,12 +6,13 @@ import {UserService} from '../../services/user.service';
 import {Iuser} from '../../store/auth/auth.reducers';
 
 import {FormsModule} from "@angular/forms";
+import {TranslocoPipe} from '@jsverse/transloco';
 
 
 
 @Component({
 standalone: true,
-    imports: [FormsModule],
+    imports: [FormsModule, TranslocoPipe],
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css']

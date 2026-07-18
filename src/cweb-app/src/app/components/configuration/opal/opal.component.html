@@ -1,22 +1,22 @@
 <app-inner-header name="Opal" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <app-tab-nav ariaLabel="Opal sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+  <app-tab-nav ariaLabel="Opal sections" ariaLabelKey="navigation.configuration" [tabs]="['List', 'Add', 'Delete/Rename']" [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']"
     [(selectedIndex)]="selectedIndex"></app-tab-nav>
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Settings</p>
+          <p class="cpbx-card__subtitle">{{ 'configuration.settings' | transloco }}</p>
         </header>
         <div class="cpbx-card__content">
           <app-disclosure>
               <span disclosureTitle>
-                Settings
+                {{ 'configuration.settings' | transloco }}
               </span>
               <span disclosureDescription>
-                Click to get details
+                {{ 'common.clickDetails' | transloco }}
               </span>
-            <h3>Params:</h3>
+            <h3>{{ 'common.parameters' | transloco }}:</h3>
             <app-key-value-pad-2 [exist]="list().settings"
                                  [items]="list().settings"
                                  [newItems]="list().settings?.new"
@@ -31,7 +31,7 @@
 
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Listeners</p>
+          <p class="cpbx-card__subtitle">{{ 'configuration.listeners' | transloco }}</p>
         </header>
         <div class="cpbx-card__content">
           @for (item of onlyValues(list().listeners); track item.id) {
@@ -42,12 +42,11 @@
                     {{item.name}}
                   </span>
                   <span disclosureDescription>
-                    Click to get details
+                    {{ 'common.clickDetails' | transloco }}
                   </span>
                 <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyListener(item.id)"
-                        *ngIf="list().listeners[item.id] && (list().listeners[item.id].parameters)">Copy
-                </button>
-                <h3>Params:</h3>
+                        *ngIf="list().listeners[item.id] && (list().listeners[item.id].parameters)">{{ 'common.actions.copy' | transloco }}</button>
+                <h3>{{ 'common.parameters' | transloco }}:</h3>
                 <div>
                   <app-key-value-pad-2 [exist]="item.parameters"
                                        [items]="item.parameters"
@@ -68,30 +67,26 @@
     <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
       <form class="cpbx-form-panel" (ngSubmit)="onListenerSubmit()">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input placeholder="New listener name" required name="name" [ngModel]="newListenerName()" (ngModelChange)="newListenerName.set($event)" class="cpbx-input">
 </label>
-        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+        <button class="cpbx-button cpbx-button--primary" type="submit">{{ 'common.actions.submit' | transloco }}</button>
       </form>
     </div>
 
     <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
-        <h3 class="cpbx-form-title">Listeners</h3>
+        <h3 class="cpbx-form-title">{{ 'configuration.listeners' | transloco }}</h3>
         @for (listener of onlyValues(list().listeners); track listener.id) {
           <div class="cpbx-edit-row">
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Listener name</span>
+<span class="cpbx-label">{{ 'configuration.listenerName' | transloco }}</span>
 <input name="Listener name" required [ngModel]="listener.name" [name]="'listener::' + listener.id" placeholder="Listener name" class="cpbx-input">
 </label>
             <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['listener::' + listener.id])"
-                    (click)="openBottomSheetListener(listener.id, deleteForm.controls['listener::' + listener.id].value, listener.name, 'rename')">
-              Update
-            </button>
+                    (click)="openBottomSheetListener(listener.id, deleteForm.controls['listener::' + listener.id].value, listener.name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
             <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                    (click)="openBottomSheetListener(listener.id, deleteForm.controls['listener::' + listener.id].value, listener.name, 'delete')">
-              Delete
-            </button>
+                    (click)="openBottomSheetListener(listener.id, deleteForm.controls['listener::' + listener.id].value, listener.name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
           </div>
         }
       </form>

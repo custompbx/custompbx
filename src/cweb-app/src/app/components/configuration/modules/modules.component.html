@@ -1,5 +1,6 @@
-<app-inner-header name="Modules" [loadCounter]="loadCounter()"></app-inner-header>
-<app-tab-nav ariaLabel="Module sections" [tabs]="['List', 'Import from XML', 'Truncate']"
+<app-inner-header name="Modules" translationKey="navigation.modules" [loadCounter]="loadCounter()"></app-inner-header>
+<app-tab-nav ariaLabel="Module sections" ariaLabelKey="configuration.moduleSections"
+  [tabs]="['List', 'Import from XML', 'Truncate']" [tabKeys]="['common.tabs.list', 'configuration.importFromXml', 'configuration.truncate']"
   [(selectedIndex)]="selectedTab"></app-tab-nav>
 <div class="cpbx-tab-panel" [hidden]="selectedTab() !== 0">
     <section class="cpbx-card">
@@ -15,17 +16,17 @@
                   </button>
                   <div class="module-badges">
                     @if (module.value && module.value.id) {
-                      <span class="module-badge module-badge--config">Config</span>
+                      <span class="module-badge module-badge--config">{{ 'modules.config' | transloco }}</span>
                     } @else {
-                      <span class="module-badge module-badge--muted">No config</span>
+                      <span class="module-badge module-badge--muted">{{ 'modules.noConfig' | transloco }}</span>
                     }
                     @if (module.value && module.value.loaded) {
-                      <span class="module-badge module-badge--success">Loaded</span>
+                      <span class="module-badge module-badge--success">{{ 'modules.loaded' | transloco }}</span>
                     } @else {
-                      <span class="module-badge module-badge--muted">Not loaded</span>
+                      <span class="module-badge module-badge--muted">{{ 'modules.notLoaded' | transloco }}</span>
                     }
                     @if (autoload()['mod_'+module.key] && autoload()['mod_'+module.key].enabled) {
-                      <span class="module-badge module-badge--primary">Autoload</span>
+                      <span class="module-badge module-badge--primary">{{ 'modules.autoload' | transloco }}</span>
                     }
                   </div>
                 </div>
@@ -33,51 +34,51 @@
                   <div class="module-action-group" aria-label="Runtime actions">
                     <button class="module-action module-action--config cpbx-button cpbx-button--primary-outline"
                       [routerLink]="['/configuration/' + escapeModuleName(module.key)]">
-                      Config
+                      {{ 'modules.config' | transloco }}
                     </button>
                     <button class="module-action cpbx-button cpbx-button--secondary"
                       [disabled]="!module.value || !module.value.id || !module.value.loaded"
                       (click)="reloadModule(module.value.id)">
-                      Reload
+                      {{ 'modules.reload' | transloco }}
                     </button>
                   @if (module.value && module.value.loaded) {
                       <button class="module-action module-action--danger cpbx-button cpbx-button--danger"
                         [disabled]="!module.value || !module.value.id || module.value.unloadable"
                         (click)="unloadModule(module.value.id)">
-                        Unload
+                        {{ 'modules.unload' | transloco }}
                       </button>
                   }
                   @if (!module.value || !module.value.loaded) {
                       <button class="module-action cpbx-button cpbx-button--secondary"
                         [disabled]="!module.value || !module.value.id || module.value.unloadable"
                         (click)="loadModule(module.value.id)">
-                        Load
+                        {{ 'modules.load' | transloco }}
                       </button>
                   }
                   </div>
                   <div class="module-action-group" aria-label="Configuration actions">
                   @if (!module.value || !module.value.id) {
-                      <button class="module-action cpbx-button cpbx-button--primary" disabled>Enable</button>
+                      <button class="module-action cpbx-button cpbx-button--primary" disabled>{{ 'common.actions.enable' | transloco }}</button>
                   }
                   @if (module.value && module.value.id && !module.value.enabled) {
                       <button class="module-action cpbx-button cpbx-button--primary"
                         (click)="switchModule(module.value.id, module.value.enabled)">
-                        Enable
+                        {{ 'common.actions.enable' | transloco }}
                       </button>
                   }
                   @if (module.value && module.value.id && module.value.enabled) {
                       <button class="module-action cpbx-button cpbx-button--secondary"
                         (click)="switchModule(module.value.id, module.value.enabled)">
-                        Disable
+                        {{ 'common.actions.disable' | transloco }}
                       </button>
                   }
                     <button class="module-action cpbx-button cpbx-button--secondary"
                       [disabled]="module.value && module.value.id" (click)="createConfigModule(module.key)">
-                      From scratch
+                      {{ 'modules.fromScratch' | transloco }}
                     </button>
                     <button class="module-action cpbx-button cpbx-button--secondary"
                       [disabled]="module.value && module.value.id" (click)="importConfigModule(module.key)">
-                      Import from FS
+                      {{ 'modules.importFromFs' | transloco }}
                     </button>
                   </div>
                   <div class="module-action-group" aria-label="Autoload actions">
@@ -86,7 +87,7 @@
                         (click)="autoLoadModule(module.value.id)"
                         [disabled]="!(module.value && module.value.id)"
                         >
-                        Autoload
+                        {{ 'modules.autoload' | transloco }}
                       </button>
                     }
                     @if (!autoload()['mod_'+module.key] || !autoload()['mod_'+module.key].enabled) {
@@ -94,7 +95,7 @@
                         (click)="autoLoadModule(module.value.id)"
                         [disabled]="!(module.value && module.value.id)"
                         >
-                        Autoload
+                        {{ 'modules.autoload' | transloco }}
                       </button>
                     }
                   </div>
@@ -105,7 +106,7 @@
           <div class="total">
             <button class="module-bulk-action cpbx-button cpbx-button--primary"
               (click)="importConfigAllModules()">
-              Import All Possible Modules Configs From FS
+              {{ 'modules.importAllFromFs' | transloco }}
             </button>
           </div>
         </article>
@@ -119,14 +120,14 @@
           [disabled]="!XMLBody()"
           (click)="ImportXMLModuleConfig()"
           >
-          Import
+          {{'common.actions.import' | transloco}}
         </button>
         <app-disclosure (opened)="initEditor()">
             <span disclosureTitle>
-              XML editor
+              {{'common.xmlEditor' | transloco}}
             </span>
             <span disclosureDescription>
-              Click to get details
+              {{'common.clickDetails' | transloco}}
             </span>
           @if (editorInited) {
             <app-code-editor [(content)]="XMLBody"></app-code-editor>
@@ -149,7 +150,7 @@
                     <button class="module-action module-action--danger cpbx-button cpbx-button--danger"
                       [disabled]="!module.value || !module.value.id"
                       (click)="openBottomSheetModule(module.value.id, module.key, 'delete')">
-                      Truncate
+                      {{ 'configuration.truncate' | transloco }}
                     </button>
                 </div>
               </div>

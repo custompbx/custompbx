@@ -1,6 +1,6 @@
 import {
   Component,
-  ComponentRef, computed, EventEmitter, inject,
+  ComponentRef, computed, ElementRef, EventEmitter, HostListener, inject,
   Input,
   OnDestroy, Output,
   ViewChild,
@@ -16,11 +16,13 @@ import {PhoneComponent} from "../phone/phone.component";
 import {RouterLink} from "@angular/router";
 import {toSignal} from '@angular/core/rxjs-interop';
 import {IconComponent} from '../icon/icon.component';
+import {TranslocoPipe} from '@jsverse/transloco';
+import {LocaleService} from '../../i18n/locale.service';
 
 
 @Component({
   standalone: true,
-  imports: [PhoneComponent, RouterLink, IconComponent],
+  imports: [PhoneComponent, RouterLink, IconComponent, TranslocoPipe],
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
@@ -34,11 +36,14 @@ export class HeaderComponent implements OnDestroy {
   @Output() showRightSideNav = new EventEmitter<boolean>();
   @Output() toggleMenu = new EventEmitter<void>();
   @ViewChild('componentContainer', {read: ViewContainerRef}) container: ViewContainerRef;
+  @ViewChild('localeMenu', {read: ElementRef}) localeMenu?: ElementRef<HTMLDetailsElement>;
+  @ViewChild('userMenu', {read: ElementRef}) userMenu?: ElementRef<HTMLDetailsElement>;
   componentRef: ComponentRef<any>;
 
   private userService = inject(UserService);
   private resolver = inject(ViewContainerRef);
   private store = inject(Store<AppState>);
+  public readonly localeService = inject(LocaleService);
   private readonly phoneState = toSignal(this.store.select(selectHeader), {initialValue: initialHeaderState});
   public readonly startPhone = computed(() => this.phoneState().phone.started);
   public readonly hidePhone = computed(() => !this.phoneState().phone.shown);
@@ -56,6 +61,30 @@ export class HeaderComponent implements OnDestroy {
       this.store.dispatch(StartPhone(null));
     }
     this.store.dispatch(ToggleShowPhone(null));
+  }
+
+  changeLocale(locale: string, menu?: HTMLDetailsElement): void {
+    this.localeService.setLocale(locale);
+    if (menu) {
+      menu.open = false;
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeMenusOnOutsideClick(event: Event): void {
+    const target = event.target;
+    if (!(target instanceof Node)) {
+      return;
+    }
+
+    this.closeMenuWhenOutside(this.localeMenu?.nativeElement, target);
+    this.closeMenuWhenOutside(this.userMenu?.nativeElement, target);
+  }
+
+  @HostListener('document:keydown.escape')
+  closeMenusOnEscape(): void {
+    this.closeMenu(this.localeMenu?.nativeElement);
+    this.closeMenu(this.userMenu?.nativeElement);
   }
 
   showHideConversations() {
@@ -81,6 +110,18 @@ export class HeaderComponent implements OnDestroy {
     }
     const hostElement = this.componentRef.location.nativeElement;
     hostElement.classList.add('over-component');
+  }
+
+  private closeMenuWhenOutside(menu: HTMLDetailsElement | undefined, target: Node): void {
+    if (menu?.open && !menu.contains(target)) {
+      this.closeMenu(menu);
+    }
+  }
+
+  private closeMenu(menu: HTMLDetailsElement | undefined): void {
+    if (menu) {
+      menu.open = false;
+    }
   }
 
 }

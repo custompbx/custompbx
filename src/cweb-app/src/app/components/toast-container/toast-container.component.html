@@ -1,4 +1,4 @@
-<div class="toast-stack" aria-label="Notifications">
+<div class="toast-stack" [attr.aria-label]="'common.notifications' | transloco">
   @for (item of toast.messages(); track item.id) {
     <div
       class="toast"
@@ -8,7 +8,7 @@
       [attr.role]="item.tone === 'error' ? 'alert' : 'status'">
       <span class="toast__indicator" aria-hidden="true"></span>
       <span class="toast__message">{{ item.message }}</span>
-      <button class="toast__close" type="button" aria-label="Dismiss notification" (click)="toast.dismiss(item.id)">×</button>
+      <button class="toast__close" type="button" [attr.aria-label]="'common.dismissNotification' | transloco" (click)="toast.dismiss(item.id)">×</button>
     </div>
   }
 </div>

@@ -1,14 +1,14 @@
 <app-inner-header name="Distributor" [loadCounter]="loadCounter()" [status]="statusText()" [statusTone]="statusTone()" [errorMessage]="errorMessage()">
-  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="expandAllPanels()">Expand all</button>
-  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="collapseAllPanels()">Collapse all</button>
+  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="expandAllPanels()">{{ 'configuration.expandAll' | transloco }}</button>
+  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="collapseAllPanels()">{{ 'configuration.collapseAll' | transloco }}</button>
 </app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
  <div *ngIf="list() && list().exists !== false">
-  <app-tab-nav ariaLabel="Distributor sections" [tabs]="['List', 'Add', 'Delete/Rename']" [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <app-tab-nav ariaLabel="Distributor sections" ariaLabelKey="navigation.configuration" [tabs]="['List', 'Add', 'Delete/Rename']" [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']" [(selectedIndex)]="selectedIndex"></app-tab-nav>
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
     <section class="cpbx-card">
       <header class="cpbx-card__header">
-        <p class="cpbx-card__subtitle">Lists</p>
+        <p class="cpbx-card__subtitle">{{ 'configuration.lists' | transloco }}</p>
       </header>
       <div class="cpbx-card__content">
         <div *ngFor="let item of onlyValues(list().lists); trackBy: trackByFn">
@@ -18,38 +18,38 @@
                 {{item.name}}
               </span>
               <span disclosureDescription>
-                Click to get details
+                {{ 'common.clickDetails' | transloco }}
               </span>
             <form #details="ngForm">
-              <h3>Nodes:</h3>
+              <h3>{{ 'configuration.nodes' | transloco }}:</h3>
               <div *ngIf="item && item.nodes">
                 <div class="cpbx-edit-row" *ngFor="let node of onlyValues(item.nodes)">
                   <div class="cpbx-edit-row" *ngIf="node.id && !isArray(node)">
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input name="name" [(ngModel)]="node.name" required [disabled]="!node.enabled" [name]="'nodeName' + node.id" appResizeInput [resizeOnString]="node.name" placeholder="Name" class="cpbx-input">
 </label>
                     <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Weight</span>
+<span class="cpbx-label">{{ 'configuration.weight' | transloco }}</span>
 <input name="weight" [(ngModel)]="node.weight" required [disabled]="!node.enabled" [name]="'nodeMain' + node.id" appResizeInput [resizeOnString]="node.weight" placeholder="Weight" class="cpbx-input">
 </label>
                     <button class="cpbx-button cpbx-button--primary" type="button"
                             [disabled]="loadCounter() > 0 || !isReadyToSend(details.controls['nodeName' + node.id], details.controls['nodeMain' + node.id])"
                             (click)="updateNode(node)">
-                      Update
+                      {{ 'common.actions.update' | transloco }}
                     </button>
                     <button class="cpbx-button cpbx-button--secondary" *ngIf="node.enabled" type="button"
                             [disabled]="loadCounter() > 0"
                             class="switch-button" (click)="switchNode(node)">
-                      Disable
+                      {{ 'common.actions.disable' | transloco }}
                     </button>
                     <button class="cpbx-button cpbx-button--primary-outline" *ngIf="!node.enabled" type="button"
                             [disabled]="loadCounter() > 0"
                             class="switch-button" (click)="switchNode(node)">
-                      Enable
+                      {{ 'common.actions.enable' | transloco }}
                     </button>
                     <button class="cpbx-button cpbx-button--danger-outline" type="button" [disabled]="loadCounter() > 0" (click)="deleteNode(node)">
-                      Delete
+                      {{ 'common.actions.delete' | transloco }}
                     </button>
                   </div>
                 </div>
@@ -57,27 +57,27 @@
                   <div class="cpbx-edit-row" *ngFor="let node of item.nodes.new; let i = index">
                     <div class="cpbx-edit-row" *ngIf="node">
                       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input name="name" [(ngModel)]="node.name" required [name]="'newNodeName' + i" appResizeInput [resizeOnString]="node.name" placeholder="Name" class="cpbx-input">
 </label>
                       <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Weight</span>
+<span class="cpbx-label">{{ 'configuration.weight' | transloco }}</span>
 <input name="weight" [(ngModel)]="node.weight" required [name]="'newNodeWeight' + i" appResizeInput [resizeOnString]="node.weight" placeholder="Weight" class="cpbx-input">
 </label>
                       <button class="cpbx-button cpbx-button--primary" type="button"
                               [disabled]="loadCounter() > 0 || !isReadyToSend(details.controls['newNodeName' + i], details.controls['newNodeWeight' + i])"
                               (click)="newNode(item.id, i, details.controls['newNodeName' + i].value, details.controls['newNodeWeight' + i])">
-                        Update
+                        {{ 'common.actions.update' | transloco }}
                       </button>
                       <button class="cpbx-button cpbx-button--danger-outline" type="button" [disabled]="loadCounter() > 0" (click)="dropNewNode(item.id, i)">
-                        Delete
+                        {{ 'common.actions.delete' | transloco }}
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
               <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="loadCounter() > 0" (click)="addDistributorNodeField(item.id)">
-                Add
+                {{ 'common.actions.add' | transloco }}
               </button>
             </form>
           </app-disclosure>
@@ -89,10 +89,10 @@
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
     <form class="cpbx-form-panel" (ngSubmit)="onDistributorListSubmit()" *ngIf="list()">
       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input placeholder="New list name" required name="name" [(ngModel)]="newItemName" class="cpbx-input">
 </label>
-      <button class="cpbx-button cpbx-button--primary" name="submit" [disabled]="loadCounter() > 0">Submit</button>
+      <button class="cpbx-button cpbx-button--primary" name="submit" [disabled]="loadCounter() > 0">{{ 'common.actions.submit' | transloco }}</button>
     </form>
   </div>
 
@@ -100,17 +100,17 @@
     <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm"  *ngIf="list()">
       <div class="cpbx-edit-row" *ngFor="let item of onlyValues(list().lists); trackBy: trackByFn">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Distributor list name</span>
+<span class="cpbx-label">{{ 'configuration.distributorListName' | transloco }}</span>
 <input name="Distributor list name" required [ngModel]="item.name" [name]="'list::' + item.id" placeholder="Distributor list name" class="cpbx-input">
 </label>
         <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="loadCounter() > 0 || checkDirty(deleteForm.controls['list::' + item.id])"
                 (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'rename')">
-          Update
+          {{ 'common.actions.update' | transloco }}
         </button>
         <button class="cpbx-button cpbx-button--danger-outline" type="button"
                 [disabled]="loadCounter() > 0"
                 (click)="openBottomSheet(item.id, deleteForm.controls['list::' + item.id].value, item.name, 'delete')">
-          Delete
+          {{ 'common.actions.delete' | transloco }}
         </button>
       </div>
     </form>

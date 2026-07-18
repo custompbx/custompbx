@@ -63,7 +63,7 @@ func TestLegacyTokensAreHashedAndRemainValid(t *testing.T) {
 	db = conn
 	_, err = db.Exec(`DROP TABLE IF EXISTS web_users_tokens; DROP TABLE IF EXISTS web_users; CREATE TABLE web_users (
 		id bigserial PRIMARY KEY, login text, group_id int, sip_id bigint, webrtc_lib text, ws text,
-		verto_ws text, stun text, key text, lang int, avatar text, avatar_format text, enabled boolean
+		verto_ws text, stun text, key text, lang int, locale varchar(16) default 'en', avatar text, avatar_format text, enabled boolean
 	); CREATE TABLE web_users_tokens (
 		id bigserial PRIMARY KEY, user_id bigint REFERENCES web_users(id), token varchar,
 		created timestamp DEFAULT now(), purpose varchar DEFAULT 'gui', UNIQUE(user_id, token)
@@ -71,7 +71,7 @@ func TestLegacyTokensAreHashedAndRemainValid(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = db.Exec(`INSERT INTO web_users(id,login,group_id,webrtc_lib,ws,verto_ws,stun,key,lang,avatar,avatar_format,enabled) VALUES (1,'admin',1,'sipjs','','','','hash',0,'','',true); INSERT INTO web_users_tokens(user_id,token,purpose) VALUES (1,'legacy-secret','gui')`)
+	_, err = db.Exec(`INSERT INTO web_users(id,login,group_id,webrtc_lib,ws,verto_ws,stun,key,lang,locale,avatar,avatar_format,enabled) VALUES (1,'admin',1,'sipjs','','','','hash',0,'en','','',true); INSERT INTO web_users_tokens(user_id,token,purpose) VALUES (1,'legacy-secret','gui')`)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,22 +1,23 @@
-<app-inner-header name="Sofia" [loadCounter]="loadCounter()"></app-inner-header>
-<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+<app-config-page-shell name="Sofia" translationKey="navigation.sofia"
+  [loadCounter]="loadCounter()" [module]="list()"
+  ariaLabel="Sofia sections" ariaLabelKey="configuration.sofiaSections"
+  [tabs]="mainTabs" [tabKeys]="mainTabKeys"
+  [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)" />
 @if (list() && list().exists !== false) {
-  <app-tab-nav ariaLabel="Sofia sections" [tabs]="['List', 'Add', 'Delete/Rename']"
-    [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"></app-tab-nav>
-    <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+    <div appCpbxTabPanel [active]="selectedIndex === 0">
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Settings</p>
+          <p class="cpbx-card__subtitle">{{'configuration.settings' | transloco}}</p>
         </header>
         <div class="cpbx-card__content">
           <app-disclosure (opened)="getGlobalSettings()" (closed)="clearGlobalSettings()">
               <span disclosureTitle>
-                Global Settings
+                {{'configuration.globalSettings' | transloco}}
               </span>
               <span disclosureDescription>
-                Click to get details
+                {{'common.clickDetails' | transloco}}
               </span>
-            <h3>Params:</h3>
+            <h3>{{'common.parameters' | transloco}}:</h3>
             <app-key-value-pad-2 [exist]="list().global_settings"
               [items]="list().global_settings"
               [newItems]="list().global_settings?.new"
@@ -30,13 +31,13 @@
       </section>
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Profiles</p>
+          <p class="cpbx-card__subtitle">{{'configuration.profiles' | transloco}}</p>
         </header>
         <div class="cpbx-card__content">
           @if (list() && list().profiles) {
-            <app-tab-nav ariaLabel="Sofia profile data" [tabs]="['Parameters', 'Gateways', 'Domains', 'Aliases', 'Commands']"
+            <app-tab-nav ariaLabel="Sofia profile data" [tabs]="detailTabs" [tabKeys]="detailTabKeys"
               [(selectedIndex)]="detailTabIndex" (selectedIndexChange)="tabChanged($event)"></app-tab-nav>
-              <div class="cpbx-tab-panel cpbx-tab-panel--nested cpbx-tab-panel--controlled" [class.is-active]="detailTabIndex === 0">
+              <div appCpbxTabPanel [active]="detailTabIndex === 0">
                 @for (item of onlyValues(list().profiles); track item.id) {
                   <div class="panel-wrapper">
                     <app-disclosure (opened)="getSofiaProfilesParams(item.id)"
@@ -45,12 +46,12 @@
                           {{item.name}}
                         </span>
                         <span disclosureDescription>
-                          Click to get details
+                          {{'common.clickDetails' | transloco}}
                         </span>
                       @if (list().profiles[item.id] && (list().profiles[item.id].parameters)) {
-                        <button class="config-copy-button cpbx-button cpbx-button--secondary" type="button" (click)="copyProfile(item.id)">Copy</button>
+                        <button class="config-copy-button cpbx-button cpbx-button--secondary" type="button" (click)="copyProfile(item.id)">{{'common.actions.copy' | transloco}}</button>
                       }
-                      <h3>Params:</h3>
+                      <h3>{{'common.parameters' | transloco}}:</h3>
                       <app-key-value-pad-2 [exist]="item.parameters"
                         [items]="item.parameters"
                         [newItems]="item.parameters?.new"
@@ -63,7 +64,7 @@
                   </div>
                 }
               </div>
-              <div class="cpbx-tab-panel cpbx-tab-panel--nested cpbx-tab-panel--controlled" [class.is-active]="detailTabIndex === 1">
+              <div appCpbxTabPanel [active]="detailTabIndex === 1">
                 @for (profile of onlyValues(list().profiles); track profile.id) {
                   <div>
                     <section class="cpbx-card">
@@ -79,13 +80,13 @@
                                   {{item.name}}
                                 </span>
                                 <span disclosureDescription>
-                                  Click to get details
+                                  {{'common.clickDetails' | transloco}}
                                 </span>
                               <form #details="ngForm">
                                 @if (profile.gateways[item.id] && (profile.gateways[item.id].parameters || profile.gateways[item.id].variables)) {
-                                  <button class="config-copy-button cpbx-button cpbx-button--secondary" type="button" (click)="copyGateway(profile.id, item.id)">Copy</button>
+                                  <button class="config-copy-button cpbx-button cpbx-button--secondary" type="button" (click)="copyGateway(profile.id, item.id)">{{'common.actions.copy' | transloco}}</button>
                                 }
-                                <h3>Params:</h3>
+                                <h3>{{'common.parameters' | transloco}}:</h3>
                                 <app-key-value-pad-2 [exist]="item.parameters"
                                   [items]="item.parameters"
                                   [newItems]="item.parameters?.new"
@@ -95,7 +96,6 @@
                                   [grandParentId]="profile.id"
                                   >
                                 </app-key-value-pad-2>
-                                <!-- <h3>Variables:</h3>-->
                                 <!--                        <app-key-value-pad-2 [exist]="item.variables"
                                 [items]="item.variables"
                                 [newItems]="item.variables?.new"
@@ -109,36 +109,32 @@
                               <div class="spacer" *ngFor="let variable of item.variables | keyvalue; trackBy: trackByFnId">
                                 <div *ngIf="variable.key && !isArray(variable.value)">
                                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input name="name" [(ngModel)]="variable.value.name" required [disabled]="!variable.value.enabled" [name]="'variableName' + variable.key" appResizeInput [resizeOnString]="variable.value.name" placeholder="Name" class="cpbx-input">
 </label>
                                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
+<span class="cpbx-label">{{'ui.value' | transloco}}</span>
 <input name="value" [(ngModel)]="variable.value.value" required [disabled]="!variable.value.enabled" [name]="'variableValue' + variable.key" appResizeInput [resizeOnString]="variable.value.value" placeholder="Value" class="cpbx-input">
 </label>
                                       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Direction</span>
+<span class="cpbx-label">{{ 'ui.direction' | transloco }}</span>
 <input name="direction" [(ngModel)]="variable.value.direction" [disabled]="!variable.value.enabled" [name]="'variableDirection' + variable.key" appResizeInput [resizeOnString]="variable.value.direction" placeholder="Direction" class="cpbx-input">
 </label>
                                         <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                           [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.key], details.controls['variableValue' + variable.key], details.controls['variableDirection' + variable.key])"
-                                          (click)="updateProfileGatewayVar(variable.value); details.controls['variableName' + param.key].markAsPristine(); details.controls['variableValue' + param.key].markAsPristine(); details.controls['variableDirection' + variable.key].markAsPristine()">
-                                          Update
-                                        </button>
+                                          (click)="updateProfileGatewayVar(variable.value); details.controls['variableName' + param.key].markAsPristine(); details.controls['variableValue' + param.key].markAsPristine(); details.controls['variableDirection' + variable.key].markAsPristine()">{{ 'common.actions.update' | transloco }}</button>
                                         <button *ngIf="variable.value.enabled"
                                           class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                           (click)="switchProfileGatewayVar(variable.value)">
-                                          Disable
+                                          {{ 'common.actions.disable' | transloco }}
                                         </button>
                                         <button *ngIf="!variable.value.enabled"
                                           class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
                                           (click)="switchProfileGatewayVar(variable.value)">
-                                          Enable
+                                          {{ 'common.actions.enable' | transloco }}
                                         </button>
                                         <button class="but-spacer-left cpbx-button cpbx-button--danger"
-                                          (click)="deleteProfileGatewayVar(variable.value)">
-                                          Delete
-                                        </button>
+                                          (click)="deleteProfileGatewayVar(variable.value)">{{ 'common.actions.delete' | transloco }}</button>
                                       </div>
                                     </div>
                                     <div *ngIf="item.variables">
@@ -146,37 +142,31 @@
                                         *ngFor="let variable of item.variables.new; trackBy: trackByFn; let i = index;">
                                         <div *ngIf="variable">
                                           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input name="name" [(ngModel)]="variable.name" required [name]="'newVarName' + i" appResizeInput [resizeOnString]="variable.name" placeholder="Name" class="cpbx-input">
 </label>
                                             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
+<span class="cpbx-label">{{'ui.value' | transloco}}</span>
 <input name="value" [(ngModel)]="variable.value" required [name]="'newVarValue' + i" appResizeInput [resizeOnString]="variable.value" placeholder="Value" class="cpbx-input">
 </label>
                                               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Direction</span>
+<span class="cpbx-label">{{ 'ui.direction' | transloco }}</span>
 <input name="direction" [(ngModel)]="variable.direction" [name]="'newVarDirection' + i" appResizeInput [resizeOnString]="variable.direction" placeholder="Direction" class="cpbx-input">
 </label>
                                                 <button class="but-spacer-left cpbx-button cpbx-button--primary"
                                                   [disabled]="!isNewReadyToSend(details.controls['newVarName' + i], details.controls['newVarValue' + i])"
-                                                  (click)="newProfileGatewayVar(item.id, i, details.controls['newVarName' + i].value, details.controls['newVarValue' + i].value, details.controls['newVarDirection' + i].value)">
-                                                  Update
-                                                </button>
+                                                  (click)="newProfileGatewayVar(item.id, i, details.controls['newVarName' + i].value, details.controls['newVarValue' + i].value, details.controls['newVarDirection' + i].value)">{{ 'common.actions.update' | transloco }}</button>
                                                 <button
                                                   (click)="dropNewProfileGatewayVar(profile.id, item.id, i)"
-                                                  class="but-spacer-left cpbx-button cpbx-button--danger-outline">
-                                                  Delete
-                                                </button>
+                                                  class="but-spacer-left cpbx-button cpbx-button--danger-outline">{{ 'common.actions.delete' | transloco }}</button>
                                               </div>
                                             </div>
                                           </div>
                                         </div>
                                         <button class="cpbx-button cpbx-button--primary"
-                                          (click)="addNewProfileGatewayVar(profile.id, item.id)">
-                                          Add
-                                        </button>
+                                          (click)="addNewProfileGatewayVar(profile.id, item.id)">{{ 'common.actions.add' | transloco }}</button>
                                         <button class="but-spacer-left cpbx-button cpbx-button--primary" (click)="pasteGatewayVars(item.id,profile.id)" *ngIf="toCopyGateway && toCopyGateway != item.id">
-                                          Paste
+                                          {{ 'common.actions.paste' | transloco }}
                                         </button>-->
                                       </form>
                                     </app-disclosure>
@@ -187,7 +177,7 @@
                           </div>
                         }
                       </div>
-                      <div class="cpbx-tab-panel cpbx-tab-panel--nested cpbx-tab-panel--controlled" [class.is-active]="detailTabIndex === 2">
+                      <div appCpbxTabPanel [active]="detailTabIndex === 2">
                         @for (item of onlyValues(list().profiles); track item.id) {
                           <div class="panel-wrapper">
                             <app-disclosure (opened)="getSofiaProfileDomain(item.id)"
@@ -196,10 +186,10 @@
                                   {{item.name}}
                                 </span>
                                 <span disclosureDescription>
-                                  Click to get details
+                                  {{'common.clickDetails' | transloco}}
                                 </span>
                               <form #details="ngForm">
-                                <h3>Domains:</h3><!--
+                                <h3>{{ 'ui.domains' | transloco }}</h3><!--
                                 <app-key-value-pad-2 [exist]="item.domains"
                                   [items]="item.domains"
                                   [newItems]="item.domains?.new"
@@ -215,38 +205,34 @@
                                         @if (domain.id && !isArray(domain)) {
                                           <div class="cpbx-edit-row">
                                             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input name="name" [(ngModel)]="domain.name" required [disabled]="!domain.enabled" [name]="'domainName' + domain.id" placeholder="Name" class="cpbx-input">
 </label>
                                               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Alias</span>
+<span class="cpbx-label">{{ 'ui.alias' | transloco }}</span>
 <input name="alias" [(ngModel)]="domain.alias" required [disabled]="!domain.enabled" [name]="'domainAlias' + domain.id" placeholder="Alias" class="cpbx-input">
 </label>
                                                 <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Parse</span>
+<span class="cpbx-label">{{ 'ui.parse' | transloco }}</span>
 <input name="parse" [(ngModel)]="domain.parse" required [disabled]="!domain.enabled" [name]="'domainParse' + domain.id" placeholder="Parse" class="cpbx-input">
 </label>
                                                   <button class="cpbx-button cpbx-button--primary" type="button"
                                                     [disabled]="!isReadyToSendThree(details.controls['domainName' + domain.id], details.controls['domainAlias' + domain.id], details.controls['domainParse' + domain.id])"
-                                                    (click)="updateProfileDomain(domain); details.controls['domainName' + domain.id].markAsPristine(); details.controls['domainAlias' + domain.id].markAsPristine(); details.controls['domainParse' + domain.id].markAsPristine();">
-                                                    Update
-                                                  </button>
+                                                    (click)="updateProfileDomain(domain); details.controls['domainName' + domain.id].markAsPristine(); details.controls['domainAlias' + domain.id].markAsPristine(); details.controls['domainParse' + domain.id].markAsPristine();">{{ 'common.actions.update' | transloco }}</button>
                                                   @if (domain.enabled) {
                                                     <button type="button"
                                                       class="switch-button cpbx-button cpbx-button--secondary" (click)="switchProfileDomain(domain)">
-                                                      Disable
+                                                      {{ 'common.actions.disable' | transloco }}
                                                     </button>
                                                   }
                                                   @if (!domain.enabled) {
                                                     <button type="button"
                                                       class="switch-button cpbx-button cpbx-button--primary-outline" (click)="switchProfileDomain(domain)">
-                                                      Enable
+                                                      {{ 'common.actions.enable' | transloco }}
                                                     </button>
                                                   }
                                                   <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                                                    (click)="deleteProfileDomain(domain)">
-                                                    Delete
-                                                  </button>
+                                                    (click)="deleteProfileDomain(domain)">{{ 'common.actions.delete' | transloco }}</button>
                                                 </div>
                                               }
                                             </div>
@@ -260,40 +246,34 @@
                                               @if (domain) {
                                                 <div class="cpbx-edit-row">
                                                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input name="name" [(ngModel)]="domain.name" required [name]="'newDomainName' + i" placeholder="Name" class="cpbx-input">
 </label>
                                                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Alias</span>
+<span class="cpbx-label">{{ 'ui.alias' | transloco }}</span>
 <input name="alias" [(ngModel)]="domain.alias" required [name]="'newDomainAlias' + i" placeholder="Alias" class="cpbx-input">
 </label>
                                                       <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Parse</span>
+<span class="cpbx-label">{{ 'ui.parse' | transloco }}</span>
 <input name="parse" [(ngModel)]="domain.parse" required [name]="'newDomainParse' + i" placeholder="Parse" class="cpbx-input">
 </label>
                                                         <button class="cpbx-button cpbx-button--primary" type="button"
                                                           [disabled]="!isReadyToSendThree(details.controls['newDomainName' + i], details.controls['newDomainAlias' + i], details.controls['newDomainParse' + i])"
-                                                          (click)="newProfileDomain(item.id, i, details.controls['newDomainName' + i].value, details.controls['newDomainAlias' + i].value, details.controls['newDomainParse' + i].value)">
-                                                          Update
-                                                        </button>
-                                                        <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="dropNewProfileDomain(item.id, i)">
-                                                          Delete
-                                                        </button>
+                                                          (click)="newProfileDomain(item.id, i, details.controls['newDomainName' + i].value, details.controls['newDomainAlias' + i].value, details.controls['newDomainParse' + i].value)">{{ 'common.actions.update' | transloco }}</button>
+                                                        <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="dropNewProfileDomain(item.id, i)">{{ 'common.actions.delete' | transloco }}</button>
                                                       </div>
                                                     }
                                                   </div>
                                                 }
                                               </div>
                                             }
-                                            <button class="cpbx-button cpbx-button--primary" type="button" (click)="addNewProfileDomain(item.id)">
-                                              Add
-                                            </button>
+                                            <button class="cpbx-button cpbx-button--primary" type="button" (click)="addNewProfileDomain(item.id)">{{ 'common.actions.add' | transloco }}</button>
                                           </form>
                                         </app-disclosure>
                                       </div>
                                     }
                                   </div>
-                      <div class="cpbx-tab-panel cpbx-tab-panel--nested cpbx-tab-panel--controlled" [class.is-active]="detailTabIndex === 3">
+                      <div appCpbxTabPanel [active]="detailTabIndex === 3">
                                     @for (item of onlyValues(list().profiles); track item.id) {
                                       <div class="panel-wrapper">
                                         <app-disclosure (opened)="getSofiaProfileAlias(item.id)"
@@ -302,10 +282,10 @@
                                               {{item.name}}
                                             </span>
                                             <span disclosureDescription>
-                                              Click to get details
+                                              {{'common.clickDetails' | transloco}}
                                             </span>
                                           <form #details="ngForm">
-                                            <h3>Aliases:</h3>
+                                            <h3>{{ 'ui.aliases' | transloco }}</h3>
                                             @if (item.aliases) {
                                               <div>
                                                 @for (alias of onlyValues(item.aliases); track alias.id) {
@@ -313,30 +293,26 @@
                                                     @if (alias.id && !isArray(alias)) {
                                                       <div class="cpbx-edit-row">
                                                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input name="name" [(ngModel)]="alias.name" required [disabled]="!alias.enabled" [name]="'aliasName' + alias.id" placeholder="Name" class="cpbx-input">
 </label>
                                                           <button class="cpbx-button cpbx-button--primary" type="button"
                                                             [disabled]="!isvalueReadyToSend(details.controls['aliasName' + alias.id])"
-                                                            (click)="updateProfileAlias(alias)">
-                                                            Update
-                                                          </button>
+                                                            (click)="updateProfileAlias(alias)">{{ 'common.actions.update' | transloco }}</button>
                                                           @if (alias.enabled) {
                                                             <button type="button"
                                                               class="switch-button cpbx-button cpbx-button--secondary" (click)="switchProfileAlias(alias)">
-                                                              Disable
+                                                              {{ 'common.actions.disable' | transloco }}
                                                             </button>
                                                           }
                                                           @if (!alias.enabled) {
                                                             <button type="button"
                                                               class="switch-button cpbx-button cpbx-button--primary-outline" (click)="switchProfileAlias(alias)">
-                                                              Enable
+                                                              {{ 'common.actions.enable' | transloco }}
                                                             </button>
                                                           }
                                                           <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                                                            (click)="deleteProfileAlias(alias)">
-                                                            Delete
-                                                          </button>
+                                                            (click)="deleteProfileAlias(alias)">{{ 'common.actions.delete' | transloco }}</button>
                                                         </div>
                                                       }
                                                     </div>
@@ -350,34 +326,28 @@
                                                       @if (alias) {
                                                         <div class="cpbx-edit-row">
                                                           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input name="name" [(ngModel)]="alias.name" required [name]="'newAliasName' + i" placeholder="Name" class="cpbx-input">
 </label>
                                                             <button class="cpbx-button cpbx-button--primary" type="button"
                                                               [disabled]="!isvalueReadyToSend(details.controls['newAliasName' + i])"
-                                                              (click)="newProfileAlias(item.id, i, details.controls['newAliasName' + i].value)">
-                                                              Update
-                                                            </button>
-                                                            <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="dropNewProfileAlias(item.id, i)">
-                                                              Delete
-                                                            </button>
+                                                              (click)="newProfileAlias(item.id, i, details.controls['newAliasName' + i].value)">{{ 'common.actions.update' | transloco }}</button>
+                                                            <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="dropNewProfileAlias(item.id, i)">{{ 'common.actions.delete' | transloco }}</button>
                                                           </div>
                                                         }
                                                       </div>
                                                     }
                                                   </div>
                                                 }
-                                                <button class="cpbx-button cpbx-button--primary" type="button" (click)="addNewProfileAlias(item.id)">
-                                                  Add
-                                                </button>
+                                                <button class="cpbx-button cpbx-button--primary" type="button" (click)="addNewProfileAlias(item.id)">{{ 'common.actions.add' | transloco }}</button>
                                               </form>
                                             </app-disclosure>
                                           </div>
                                         }
                                       </div>
-                      <div class="cpbx-tab-panel cpbx-tab-panel--nested cpbx-tab-panel--controlled" [class.is-active]="detailTabIndex === 4">
+                      <div appCpbxTabPanel [active]="detailTabIndex === 4">
                                         <div class="panel-wrapper panel-wrapper-top">
-                                          <h3>Profiles commands</h3>
+                                          <h3>{{ 'ui.profileCommands' | transloco }}</h3>
                                           <article>
                                             @for (item of onlyValues(list().profiles); track item.id) {
                                               <div class="section">
@@ -388,14 +358,14 @@
                                                   <button class="switch-button grid-inner cpbx-button cpbx-button--secondary"
                                                     [disabled]="item.started"
                                                     (click)="profileComand(item.id, 0, 'start')">
-                                                    Start
+                                                    {{ 'ui.start' | transloco }}
                                                   </button>
                                                 </section>
                                                 <section>
                                                   <button class="switch-button grid-inner cpbx-button cpbx-button--secondary"
                                                     [disabled]="!item.started"
                                                     (click)="profileComand(item.id, 0, 'stop')">
-                                                    Stop
+                                                    {{ 'ui.stop' | transloco }}
                                                   </button>
                                                 </section>
                                                 @if (item) {
@@ -403,7 +373,7 @@
                                                     <button class="switch-button grid-inner cpbx-button cpbx-button--secondary"
                                                       [disabled]="!item.started"
                                                       (click)="profileComand(item.id, 0, 'restart')">
-                                                      Restart
+                                                      {{ 'ui.restart' | transloco }}
                                                     </button>
                                                   </section>
                                                 }
@@ -411,14 +381,14 @@
                                                   <button class="switch-button grid-inner cpbx-button cpbx-button--secondary"
                                                     [disabled]="!item.started"
                                                     (click)="profileComand(item.id, 0, 'rescan')">
-                                                    Rescan
+                                                    {{ 'ui.rescan' | transloco }}
                                                   </button>
                                                 </section>
                                                 <section>
                                                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Gateway</span>
+<span class="cpbx-label">{{ 'ui.gateway' | transloco }}</span>
 <select class="cpbx-select" required name="gateway" [disabled]="!item.gateways" [(ngModel)]="choosedGateway[item.id]">
-<option [ngValue]="null" disabled hidden>Gateway</option>
+<option [ngValue]="null" disabled hidden>{{ 'ui.gateway' | transloco }}</option>
                                                       @for (val of onlyValues(item.gateways); track val.id) {
                                                         <option [ngValue]="val.id">
                                                           {{val.name}}
@@ -428,24 +398,24 @@
 </label>
                                                   <button class="switch-button cpbx-button cpbx-button--secondary"
                                                     [disabled]="!item.gateways || !choosedGateway[item.id] || !item.started || !item.gateways[choosedGateway[item.id]].started" (click)="profileComand(item.id, choosedGateway[item.id], 'killgw')">
-                                                    Killgw
+                                                    {{ 'ui.killGateway' | transloco }}
                                                   </button>
                                                   <button class="switch-button cpbx-button cpbx-button--secondary"
                                                     [disabled]="!item.gateways || !choosedGateway[item.id] || !item.started || item.gateways[choosedGateway[item.id]].started" (click)="profileComand(item.id, choosedGateway[item.id], 'startgw')">
-                                                    Startgw
+                                                    {{ 'ui.startGateway' | transloco }}
                                                   </button>
                                                 </section>
                                                 <section>
                                                   @if (item.enabled) {
                                                     <button class="switch-button grid-inner cpbx-button cpbx-button--secondary"
                                                       (click)="switchProfile(item)">
-                                                      Disable
+                                                      {{ 'common.actions.disable' | transloco }}
                                                     </button>
                                                   }
                                                   @if (!item.enabled) {
                                                     <button class="switch-button grid-inner cpbx-button cpbx-button--primary-outline"
                                                       (click)="switchProfile(item)">
-                                                      Enable
+                                                      {{ 'common.actions.enable' | transloco }}
                                                     </button>
                                                   }
                                                 </section>
@@ -458,19 +428,19 @@
                                 </div>
                               </section>
                             </div>
-                            <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
+                            <div appCpbxTabPanel [active]="selectedIndex === 1">
                               <form class="cpbx-form-panel" (ngSubmit)="onProfileSubmit()">
                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New profile name" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
+<input [placeholder]="'configuration.newProfileName' | transloco" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
 </label>
-                                <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+                                <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
                               </form>
                               <form class="cpbx-form-panel" (ngSubmit)="onGatewaySubmit()">
                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Profile</span>
+<span class="cpbx-label">{{ 'ui.profile' | transloco }}</span>
 <select class="cpbx-select" required name="profile" [(ngModel)]="profileId">
-<option [ngValue]="null" disabled hidden>Profile</option>
+<option [ngValue]="null" disabled hidden>{{ 'ui.profile' | transloco }}</option>
                                     @for (val of onlyValues(list().profiles); track val.id) {
                                       <option [ngValue]="val.id">
                                         {{val.name}}
@@ -479,18 +449,18 @@
                                   </select>
 </label>
                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
 <input placeholder="New gateway name" required name="name" [(ngModel)]="newGatewayName" class="cpbx-input">
 </label>
-                                <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+                                <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
                               </form>
                             </div>
-                            <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
+                            <div appCpbxTabPanel [active]="selectedIndex === 2">
                               <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Profile</span>
+<span class="cpbx-label">{{ 'ui.profile' | transloco }}</span>
 <select class="cpbx-select" required name="profile" [(ngModel)]="profileId">
-<option [ngValue]="null" disabled hidden>Profile</option>
+<option [ngValue]="null" disabled hidden>{{ 'ui.profile' | transloco }}</option>
                                     @for (val of onlyValues(list().profiles); track val.id) {
                                       <option [ngValue]="val.id">
                                         {{val.name}}
@@ -500,36 +470,32 @@
 </label>
                                 @if (list().profiles && list().profiles[profileId]) {
                                   <div class="cpbx-form-panel cpbx-form-panel--stack">
-                                    <h3 class="cpbx-form-title">Profile</h3>
+                                    <h3 class="cpbx-form-title">{{ 'ui.profile' | transloco }}</h3>
                                     <div class="cpbx-edit-row">
                                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Profile name</span>
+<span class="cpbx-label">{{ 'configuration.profileName' | transloco }}</span>
 <input name="Profile name" required [ngModel]="list().profiles[profileId].name" [name]="'profile::' + profileId" placeholder="Profile name" class="cpbx-input">
 </label>
                                       <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['profile::' + profileId])"
                                         (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'rename')">
-                                        Update
+                                        {{'common.actions.update' | transloco}}
                                       </button>
                                       <button class="cpbx-button cpbx-button--danger-outline" type="button"
                                         (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'delete')">
-                                        Delete
+                                        {{'common.actions.delete' | transloco}}
                                       </button>
                                       </div>
-                                      <h3 class="cpbx-form-title">Gateways</h3>
+                                      <h3 class="cpbx-form-title">{{'ui.gateways' | transloco}}</h3>
                                       @for (item of onlyValues(list().profiles[profileId].gateways); track item.id) {
                                         <div class="cpbx-edit-row">
                                           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Gateway name</span>
+<span class="cpbx-label">{{ 'common.fields.gatewayName' | transloco }}</span>
 <input name="Gateway name" required [ngModel]="item.name" [name]="'gateway::' + item.id" placeholder="Gateway name" class="cpbx-input">
 </label>
                                             <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['gateway::' + item.id])"
-                                              (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'rename')">
-                                              Update
-                                            </button>
+                                              (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
                                             <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                                              (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'delete')">
-                                              Delete
-                                            </button>
+                                              (click)="openBottomSheetGateway(item.id, deleteForm.controls['gateway::' + item.id].value, item.name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
                                           </div>
                                         }
                                       </div>

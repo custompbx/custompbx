@@ -5,6 +5,7 @@ import {AbstractControl, FormsModule} from '@angular/forms';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {ConfirmationService} from '../../services/confirmation.service';
 import {resolvePositionedReorder} from '../../utils/reorder';
+import {TranslocoPipe, TranslocoService} from '@jsverse/transloco';
 
 type FieldSlot = 'name' | 'value' | 'extraField1' | 'extraField2' | 'extraField3' | 'extraField4' | 'extraField5' | 'extraField6' | 'extraField7';
 type FieldSize = 'sm' | 'md' | 'wide';
@@ -21,7 +22,7 @@ type FieldConfig = {
 
 @Component({
 standalone: true,
-  imports: [CommonModule, DragDropModule, FormsModule],
+  imports: [CommonModule, DragDropModule, FormsModule, TranslocoPipe],
     selector: 'app-key-value-pad-2',
     templateUrl: './key-value-pad-2.component.html',
     styleUrls: ['./key-value-pad-2.component.css']
@@ -61,7 +62,10 @@ export class KeyValuePad2Component implements OnInit {
     'extraField7',
   ];
 
-  constructor(private bottomSheet: ConfirmationService) { }
+  constructor(
+    private bottomSheet: ConfirmationService,
+    private transloco: TranslocoService,
+  ) { }
 
   ngOnInit() {
     if (!this.fieldsMask) {
@@ -207,7 +211,7 @@ export class KeyValuePad2Component implements OnInit {
   }
 
   optionLabel(option: string): string {
-    return option === '' ? 'Default' : option;
+    return option === '' ? this.transloco.translate('common.default') : option;
   }
 
   controlName(prefix: 'item' | 'newItem', field: FieldConfig, idOrIndex: number): string {
@@ -336,8 +340,8 @@ export class KeyValuePad2Component implements OnInit {
     const sheet = this.bottomSheet.open({
       data: {
         action: 'delete',
-        case1Text: `Delete item "${name}"?`,
-        message: 'This removes the item from the configuration after the server confirms the change.',
+        case1Text: this.transloco.translate('common.deleteItemConfirm', {name}),
+        message: this.transloco.translate('common.deleteItemDescription'),
       },
     });
 
@@ -499,10 +503,10 @@ export class KeyValuePad2Component implements OnInit {
   nameValidationMessage(name: string, id?: number, newIndex?: number): string | null {
     const normalizedName = this.normalizeName(name);
     if (!normalizedName) {
-      return 'Name is required.';
+      return this.transloco.translate('common.nameRequired');
     }
     if (this.hasDuplicateName(normalizedName, id, newIndex)) {
-      return 'Another item already uses this name.';
+      return this.transloco.translate('common.duplicateName');
     }
     return null;
   }

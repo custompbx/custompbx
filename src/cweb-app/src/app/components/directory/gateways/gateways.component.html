@@ -1,30 +1,31 @@
-<app-inner-header name="User Gateways" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="User Gateways" translationKey="navigation.gateways" [loadCounter]="loadCounter()"></app-inner-header>
 @if (loadCounter() === 0 && !onlyValues(list())?.length) {
   <section class="cpbx-card"><div class="cpbx-card__content">
       <div class="directory-empty">
         <div>
-          <h3>No domains yet</h3>
-          <p>Create or import a domain before adding gateways.</p>
+          <h3>{{'directory.noDomains' | transloco}}</h3>
+          <p>{{'directory.domainRequiredForGateways' | transloco}}</p>
         </div>
       <button class="switch-button cpbx-button cpbx-button--secondary"
         routerLink="/directory/domains">
-        Go to domains
+        {{'common.actions.goToDomains' | transloco}}
       </button>
       </div>
   </div></section>
 }
 @if (onlyValues(list())?.length) {
-  <app-tab-nav ariaLabel="Gateway sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+  <app-tab-nav ariaLabelKey="directory.gatewaySections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']"
     [(selectedIndex)]="selectedIndex"></app-tab-nav>
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
       @for (domain of onlyValues(list()); track domain) {
         <div class="directory-domain-section">
           <section class="cpbx-card">
-            <header class="cpbx-card__header"><p class="cpbx-card__subtitle">Domain: <b>{{domain.name}}</b></p></header>
+            <header class="cpbx-card__header"><p class="cpbx-card__subtitle">{{'directory.domainLabel' | transloco: {name: domain.name} }}</p></header>
             <div class="cpbx-card__content">
               @for (user of onlyValuesByParent(userList(), domain.id); track user) {
                 @if (onlyValuesByParent(gatewayList(), user.id).length > 0) {
-                  <h4>User: {{user.name}}</h4>
+                  <h4>{{'directory.userLabel' | transloco: {name: user.name} }}</h4>
                 }
                 @for (gateway of onlyValuesByParent(gatewayList(), user.id); track gateway) {
                   <app-disclosure (opened)="getDetails(gateway.id)" (closed)="clearDetails(gateway.id)">
@@ -32,14 +33,14 @@
                       <app-icon class="icon-spacer" name="swap_horizontal_circle"></app-icon>
                       <span>{{gateway.name}}</span>
                     </span>
-                    <span disclosureDescription>Click to get details</span>
+                    <span disclosureDescription>{{'common.clickDetails' | transloco}}</span>
                     <form #details="ngForm">
                       @if (listDetails()[gateway.id] && (listDetails()[gateway.id].parameters || listDetails()[gateway.id].variables)) {
                         <button class="directory-copy-button cpbx-button cpbx-button--secondary" (click)="copy(gateway.id)">
-                          Copy
+                          {{'common.actions.copy' | transloco}}
                         </button>
                       }
-                      <h3>Parameters:</h3>
+                      <h3>{{'common.parameters' | transloco}}:</h3>
                       <div>
                         <app-key-value-pad [exist]="listDetails()[gateway.id]"
                           [items]="listDetails()[gateway.id]?.parameters"
@@ -51,7 +52,7 @@
                           >
                         </app-key-value-pad>
                       </div>
-                      <h3>Variables:</h3>
+                      <h3>{{'common.variables' | transloco}}:</h3>
                       @if (listDetails()[gateway.id]?.variables) {
                         <app-key-value-pad-2
                           [exist]="true"
@@ -75,9 +76,9 @@
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
                   <form class="cpbx-form-panel" (ngSubmit)="onUserSubmit()">
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Domain</span>
+<span class="cpbx-label">{{'common.fields.domain' | transloco}}</span>
 <select class="cpbx-select" required name="domainId" [(ngModel)]="domainId">
-<option [ngValue]="null" disabled hidden>Domain</option>
+<option [ngValue]="null" disabled hidden>{{'common.fields.domain' | transloco}}</option>
                         <option>--</option>
                         @for (domain of onlyValues(list()); track domain) {
                           <option [ngValue]="domain.id">{{domain.name}}</option>
@@ -85,9 +86,9 @@
                       </select>
 </label>
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">User</span>
+<span class="cpbx-label">{{'common.fields.user' | transloco}}</span>
 <select class="cpbx-select" required name="domainId" [(ngModel)]="userId">
-<option [ngValue]="null" disabled hidden>User</option>
+<option [ngValue]="null" disabled hidden>{{'common.fields.user' | transloco}}</option>
                         <option>--</option>
                         @for (user of onlyValuesByParent(userList(), domainId); track user) {
                           <option [ngValue]="user.id">{{user.name}}</option>
@@ -95,18 +96,18 @@
                       </select>
 </label>
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New gateway name" required name="name" [ngModel]="newGatewayName()" (ngModelChange)="newGatewayName.set($event)" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
+<input [placeholder]="'directory.newGatewayName' | transloco" required name="name" [ngModel]="newGatewayName()" (ngModelChange)="newGatewayName.set($event)" class="cpbx-input">
 </label>
-                    <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+                    <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
                   </form>
                 </div>
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
                   <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Domain</span>
+<span class="cpbx-label">{{'common.fields.domain' | transloco}}</span>
 <select class="cpbx-select" required name="domainId" [(ngModel)]="domainId">
-<option [ngValue]="null" disabled hidden>Domain</option>
+<option [ngValue]="null" disabled hidden>{{'common.fields.domain' | transloco}}</option>
                         <option>--</option>
                         @for (domain of onlyValues(list()); track domain) {
                           <option [ngValue]="domain.id">{{domain.name}}</option>
@@ -115,20 +116,20 @@
 </label>
                   @for (user of onlyValuesByParent(userList(), domainId); track user) {
                     <div>
-                      <h4>User: {{user.name}}</h4>
+                      <h4>{{'directory.userLabel' | transloco: {name: user.name} }}</h4>
                       @for (gateway of onlyValuesByParent(gatewayList(), user.id); track gateway) {
                         <div class="cpbx-edit-row">
                           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Gateway name</span>
-<input name="gateway name" required [ngModel]="gateway.name" [name]="'user::' + gateway.id" placeholder="Gateway name" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.gatewayName' | transloco}}</span>
+<input name="gateway name" required [ngModel]="gateway.name" [name]="'user::' + gateway.id" [placeholder]="'common.fields.gatewayName' | transloco" class="cpbx-input">
 </label>
                             <button class="cpbx-button cpbx-button--primary" [disabled]="checkDirty(deleteForm.controls['user::' + gateway.id])"
                               (click)="openBottomSheet(gateway.id, deleteForm.controls['user::' + gateway.id].value, gateway.name, 'rename')">
-                              Update
+                              {{'common.actions.update' | transloco}}
                             </button>
                             <button class="cpbx-button cpbx-button--danger"
                               (click)="openBottomSheet(gateway.id, deleteForm.controls['user::' + gateway.id].value, gateway.name, 'delete')">
-                              Delete
+                              {{'common.actions.delete' | transloco}}
                             </button>
                           </div>
                         }

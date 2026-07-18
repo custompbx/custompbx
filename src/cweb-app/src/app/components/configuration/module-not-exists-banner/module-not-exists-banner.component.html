@@ -1,10 +1,10 @@
 @if (list && list.exists === false) {
   <section class="cpbx-card">
     <div class="cpbx-card__content">
-      This config is not serving now. Go to Modules page to manage the configs.
+      {{ 'configuration.notServing' | transloco }}
       <button class="but-spacer-left switch-button cpbx-button cpbx-button--secondary"
         routerLink="/configuration/modules">
-        Modules
+        {{ 'navigation.modules' | transloco }}
       </button>
     </div>
   </section>

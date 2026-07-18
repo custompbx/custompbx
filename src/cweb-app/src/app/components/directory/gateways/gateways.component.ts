@@ -38,10 +38,11 @@ import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 import {IconComponent} from '../../icon/icon.component';
 import {KeyValuePad2Component} from '../../key-value-pad-2/key-value-pad-2.component';
+import {TranslocoPipe, TranslocoService} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, RouterLink, KeyValuePadComponent, KeyValuePad2Component, InnerHeaderComponent, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent],
+  imports: [FormsModule, RouterLink, KeyValuePadComponent, KeyValuePad2Component, InnerHeaderComponent, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent, TranslocoPipe],
   selector: 'app-gateways',
   templateUrl: './gateways.component.html',
   styleUrls: ['./gateways.component.css']
@@ -53,6 +54,7 @@ export class GatewaysComponent implements OnInit, OnDestroy {
   private bottomSheet = inject(ConfirmationService);
   private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
+  private i18n = inject(TranslocoService);
 
   // --- Reactive State from NgRx using toSignal ---
   private directoryState = toSignal(
@@ -224,7 +226,7 @@ export class GatewaysComponent implements OnInit, OnDestroy {
       return;
     }
     this.toCopy = key;
-    this._snackBar.open('Copied!', null, {
+    this._snackBar.open(this.i18n.translate('common.copied'), null, {
       duration: 700,
       // horizontalPosition: 'right',
       // verticalPosition: 'top',
@@ -242,8 +244,8 @@ export class GatewaysComponent implements OnInit, OnDestroy {
           newName: newName,
           oldName: oldName,
           action: action,
-          case1Text: 'Are you sure you want to delete gateway "' + oldName + '"?',
-          case2Text: 'Are you sure you want to rename gateway "' + oldName + '" to "' + newName + '"?',
+          case1Text: this.i18n.translate('directory.confirmDeleteGateway', {name: oldName}),
+          case2Text: this.i18n.translate('directory.confirmRenameGateway', {oldName, newName}),
         }
     };
     const sheet = this.bottomSheet.open(config);

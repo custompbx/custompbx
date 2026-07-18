@@ -1,4 +1,7 @@
-import {ApplicationConfig, importProvidersFrom, provideZonelessChangeDetection} from '@angular/core';
+import {ApplicationConfig, importProvidersFrom, isDevMode, provideZonelessChangeDetection} from '@angular/core';
+import {provideTransloco} from '@jsverse/transloco';
+import {CpbxTranslocoLoader} from './i18n/transloco-loader';
+import {localeCodes} from './i18n/locale.model';
 import { provideRouter } from '@angular/router';
 import { routes } from './app-routing.module';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -172,6 +175,17 @@ export const appConfig: ApplicationConfig = {
     ),
 
     provideHttpClient(withInterceptorsFromDi()),
+
+    provideTransloco({
+      config: {
+        availableLangs: [...localeCodes],
+        defaultLang: 'en',
+        fallbackLang: 'en',
+        reRenderOnLangChange: true,
+        prodMode: !isDevMode(),
+      },
+      loader: CpbxTranslocoLoader,
+    }),
 
     { provide: APP_BASE_HREF, useValue: '/cweb/' }
   ]

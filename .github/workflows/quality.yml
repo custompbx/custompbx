@@ -56,6 +56,8 @@ jobs:
         working-directory: src/cweb-app
       - run: npm audit --audit-level=high
         working-directory: src/cweb-app
+      - run: npm run test:i18n
+        working-directory: src/cweb-app
       - run: docker build --target frontend-test -f docker/Dockerfile .
 
   docker-frontend-build:

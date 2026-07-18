@@ -1,10 +1,10 @@
-<app-inner-header name="Dashboard" subtitle="Live system capacity and service health" [loadCounter]="loadCounter()"
+<app-inner-header name="Dashboard" translationKey="navigation.dashboard" subtitleKey="dashboard.subtitle" [loadCounter]="loadCounter()"
   [status]="loadCounter() > 0 ? 'Refreshing' : 'Live'" [statusTone]="loadCounter() > 0 ? 'warning' : 'success'"></app-inner-header>
 <div class="grid-container page-content">
   <div class="section-heading">
     <div>
-      <h2>System overview</h2>
-      <p>Current FreeSWITCH host and workload metrics</p>
+      <h2>{{ 'dashboard.systemOverview' | transloco }}</h2>
+      <p>{{ 'dashboard.currentMetrics' | transloco }}</p>
     </div>
   </div>
   <div class="main-panel">
@@ -47,22 +47,22 @@
                 @case ('number') {
                   <div class="metric-grid" aria-label="Channel counters">
                     <div class="metric-card metric-card-success">
-                      <span class="metric-label">Answered</span>
-                      <strong>{{list()[card.field].answered}}</strong>
+                      <span class="metric-label">{{ 'dashboard.answered' | transloco }}</span>
+                      <strong>{{list()[card.field].answered | localizedNumber}}</strong>
                     </div>
                     <div class="metric-card">
-                      <span class="metric-label">Total</span>
-                      <strong>{{list()[card.field].total}}</strong>
+                      <span class="metric-label">{{ 'dashboard.total' | transloco }}</span>
+                      <strong>{{list()[card.field].total | localizedNumber}}</strong>
                     </div>
                   </div>
                 }
                 @case ('items') {
                   <div class="host-details">
-                    <div><span>Host</span><strong>{{list().hostname}}</strong></div>
-                    <div><span>OS</span><strong>{{list().os}}</strong></div>
-                    <div><span>Platform</span><strong>{{list().platform}}</strong></div>
-                    <div><span>CPU</span><strong>{{list().cpu_model}}</strong></div>
-                    <div><span>CPU Frequency</span><strong>{{list().cpu_frequency}}</strong></div>
+                    <div><span>{{ 'dashboard.host' | transloco }}</span><strong>{{list().hostname}}</strong></div>
+                    <div><span>{{ 'dashboard.os' | transloco }}</span><strong>{{list().os}}</strong></div>
+                    <div><span>{{ 'dashboard.platform' | transloco }}</span><strong>{{list().platform}}</strong></div>
+                    <div><span>{{ 'dashboard.cpu' | transloco }}</span><strong>{{list().cpu_model}}</strong></div>
+                    <div><span>{{ 'dashboard.cpuFrequency' | transloco }}</span><strong>{{list().cpu_frequency}}</strong></div>
                   </div>
                 }
                 @case ('table') {

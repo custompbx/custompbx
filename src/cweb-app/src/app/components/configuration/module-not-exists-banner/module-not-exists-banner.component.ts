@@ -1,10 +1,11 @@
 import {Component, Input} from '@angular/core';
 
 import {RouterLink} from "@angular/router";
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
 standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslocoPipe],
     selector: 'app-module-not-exists-banner',
     templateUrl: './module-not-exists-banner.component.html'
 })

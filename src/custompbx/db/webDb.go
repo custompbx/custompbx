@@ -12,6 +12,7 @@ import (
 
 func InitWebDB(instanceId int64) {
 	createWebUsersTable(db, instanceId)
+	migrateWebUserLocales(db)
 	createWebUsersTokensTable(db)
 	migrateWebUserTokens(db)
 
@@ -33,6 +34,7 @@ func createWebUsersTable(db *sql.DB, instanceId int64) {
 		stun VARCHAR DEFAULT '',
 		key VARCHAR,
 		lang INTEGER DEFAULT 0,
+		locale VARCHAR(16) NOT NULL DEFAULT 'en',
 		avatar TEXT DEFAULT '',
 		avatar_format VARCHAR DEFAULT '',
 		enabled BOOLEAN NOT NULL DEFAULT TRUE,
@@ -51,6 +53,15 @@ func createWebUsersTable(db *sql.DB, instanceId int64) {
 		"admin",
 	)
 	db.QueryRow(sqlReq)
+}
+
+func migrateWebUserLocales(db *sql.DB) {
+	_, err := db.Exec(`ALTER TABLE web_users ADD COLUMN IF NOT EXISTS locale VARCHAR(16) NOT NULL DEFAULT 'en'`)
+	panicErr(err)
+	_, err = db.Exec(`UPDATE web_users SET locale = CASE WHEN lang = 1 THEN 'ru' ELSE 'en' END WHERE locale IS NULL OR locale = '' OR (locale = 'en' AND lang = 1)`)
+	panicErr(err)
+	_, err = db.Exec(`UPDATE web_users SET locale = 'en' WHERE locale NOT IN ('en','fr','de','es','pt-BR','it','tr','ru','ar','fa','hi','zh-Hans','ja','ko')`)
+	panicErr(err)
 }
 
 func createWebUsersTokensTable(db *sql.DB) {
@@ -116,6 +127,8 @@ func GetWebUser(login string, instanceId int64) (*mainStruct.WebUser, error) {
 					wu.verto_ws as verto_ws,
 					wu.stun as stun,
 					wu.key as key,
+					wu.lang as lang,
+					wu.locale as locale,
 					wu.enabled as enabled
 				FROM web_users wu
 				WHERE
@@ -130,7 +143,7 @@ func GetWebUser(login string, instanceId int64) (*mainStruct.WebUser, error) {
 	}
 	var wUser mainStruct.WebUser
 	for user.Next() {
-		err := user.Scan(&wUser.Id, &wUser.Login, &wUser.SipId, &wUser.WebRTCLib, &wUser.Ws, &wUser.VertoWs, &wUser.Stun, &wUser.Key, &wUser.Lang, &wUser.Enabled)
+		err := user.Scan(&wUser.Id, &wUser.Login, &wUser.SipId, &wUser.WebRTCLib, &wUser.Ws, &wUser.VertoWs, &wUser.Stun, &wUser.Key, &wUser.Lang, &wUser.Locale, &wUser.Enabled)
 		if err != nil {
 			log.Printf("%+v", err)
 			return nil, err
@@ -152,6 +165,7 @@ func GetWebUsers(users *mainStruct.WebUsers, instanceId int64) {
 					wu.stun as stun,
 					wu.key as key,
 					wu.lang as lang,
+					wu.locale as locale,
 					wu.avatar as avatar,
 					wu.avatar_format as avatar_format,
 					wu.enabled as enabled
@@ -166,7 +180,7 @@ func GetWebUsers(users *mainStruct.WebUsers, instanceId int64) {
 	defer user.Close()
 	for user.Next() {
 		var wUser mainStruct.WebUser
-		err := user.Scan(&wUser.Id, &wUser.Login, &wUser.GroupId, &wUser.SipId, &wUser.WebRTCLib, &wUser.Ws, &wUser.VertoWs, &wUser.Stun, &wUser.Key, &wUser.Lang, &wUser.Avatar, &wUser.AvatarFormat, &wUser.Enabled)
+		err := user.Scan(&wUser.Id, &wUser.Login, &wUser.GroupId, &wUser.SipId, &wUser.WebRTCLib, &wUser.Ws, &wUser.VertoWs, &wUser.Stun, &wUser.Key, &wUser.Lang, &wUser.Locale, &wUser.Avatar, &wUser.AvatarFormat, &wUser.Enabled)
 		if err != nil {
 			log.Printf("%+v", err)
 			return
@@ -229,6 +243,7 @@ func GetWebUserByToken(token string) (*mainStruct.WebUser, error) {
 					wu.stun as stun,
 					wu.key as key,
 					wu.lang as lang,
+					wu.locale as locale,
 					wu.avatar as avatar,
 					wu.avatar_format as avatar_format,
 					wu.enabled as enabled
@@ -245,7 +260,7 @@ func GetWebUserByToken(token string) (*mainStruct.WebUser, error) {
 	var wUser mainStruct.WebUser
 	wUser.Tokens = mainStruct.NewWebUserTokens()
 	for user.Next() {
-		err := user.Scan(&wUser.Id, &wUser.Login, &wUser.GroupId, &wUser.SipId, &wUser.WebRTCLib, &wUser.Ws, &wUser.VertoWs, &wUser.Stun, &wUser.Key, &wUser.Lang, &wUser.Avatar, &wUser.AvatarFormat, &wUser.Enabled)
+		err := user.Scan(&wUser.Id, &wUser.Login, &wUser.GroupId, &wUser.SipId, &wUser.WebRTCLib, &wUser.Ws, &wUser.VertoWs, &wUser.Stun, &wUser.Key, &wUser.Lang, &wUser.Locale, &wUser.Avatar, &wUser.AvatarFormat, &wUser.Enabled)
 		if err != nil {
 			log.Printf("%+v", err)
 			return nil, err
@@ -308,6 +323,15 @@ func UpdateWebUserPassword(id int64, key string) bool {
 func UpdateWebUserLangId(id, langId int64) bool {
 	_, err := db.Exec(
 		`UPDATE web_users SET lang = $2 WHERE id = $1`, id, langId)
+	if err != nil {
+		log.Printf("%+v", err)
+		return false
+	}
+	return true
+}
+
+func UpdateWebUserLocale(id int64, locale string) bool {
+	_, err := db.Exec(`UPDATE web_users SET locale = $2 WHERE id = $1`, id, locale)
 	if err != nil {
 		log.Printf("%+v", err)
 		return false

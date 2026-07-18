@@ -21,10 +21,11 @@ import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {toSignal} from "@angular/core/rxjs-interop";
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
 standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, TabNavComponent, DisclosureComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, TabNavComponent, DisclosureComponent, TranslocoPipe],
   selector: 'app-distributor',
   templateUrl: './distributor.component.html',
   styleUrls: ['./distributor.component.css']

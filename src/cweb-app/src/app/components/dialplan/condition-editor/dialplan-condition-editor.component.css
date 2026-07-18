@@ -1,0 +1,73 @@
+:host {
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+
+.dialplan-condition-editor {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cpbx-space-5);
+  padding: var(--cpbx-space-5);
+  width: 100%;
+}
+
+.dialplan-editor-section,
+.dialplan-editor-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cpbx-space-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.dialplan-editor-section h3 {
+  color: var(--cpbx-text);
+  font-size: .875rem;
+  font-weight: 650;
+  margin: 0;
+}
+
+.dialplan-editor-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cpbx-space-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.dialplan-editor-row.is-draft {
+  background: var(--cpbx-surface-muted);
+  border-radius: var(--cpbx-radius-md);
+  padding: var(--cpbx-space-3);
+}
+
+.cpbx-field {
+  margin: 0;
+}
+
+.condition-break-field {
+  flex-basis: 11rem;
+  max-width: 11rem;
+  min-width: 9rem;
+  width: 11rem;
+}
+
+.cpbx-button {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+@media (max-width: 767px) {
+  .dialplan-condition-editor {
+    padding: var(--cpbx-space-4);
+  }
+
+  .cpbx-field,
+  .cpbx-field--md {
+    flex-basis: 100%;
+    width: 100%;
+  }
+}

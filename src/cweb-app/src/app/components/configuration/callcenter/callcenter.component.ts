@@ -1,4 +1,4 @@
-import {Component, inject, computed, OnInit, effect} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, computed, OnInit, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
 import {ActivatedRoute} from '@angular/router';
@@ -40,21 +40,23 @@ import {
 } from '../../../store/config/callcenter/config.actions.callcenter';
 import {AbstractControl, FormsModule} from '@angular/forms';
 import {IfilterField, IsortField} from '../../cdr/cdr.component';
-import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
-import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {Icallcenter, Iitem, State} from '../../../store/config/config.state.struct';
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {EditableTableCellEvent, EditableTableComponent} from '../../editable-table/editable-table.component';
 import {CpbxPageEvent, PaginatorComponent} from '../../paginator/paginator.component';
+import {TranslocoPipe} from '@jsverse/transloco';
+import {ConfigPageShellComponent} from '../config-page-shell/config-page-shell.component';
+import {CpbxTabPanelDirective} from '../../../directives/cpbx-tab-panel.directive';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent, EditableTableComponent, PaginatorComponent],
+  imports: [CommonModule, FormsModule, ConfigPageShellComponent, KeyValuePad2Component, TabNavComponent, CpbxTabPanelDirective, DisclosureComponent, EditableTableComponent, PaginatorComponent, TranslocoPipe],
   selector: 'app-callcenter',
   templateUrl: './callcenter.component.html',
-  styleUrls: ['./callcenter.component.css']
+  styleUrls: ['./callcenter.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CallcenterComponent implements OnInit {
 
@@ -101,6 +103,17 @@ export class CallcenterComponent implements OnInit {
   public agentName: string = '';
   public selectedIndex: number = 0;
   public detailTabIndex: number = 0;
+  readonly mainTabs = ['List', 'Add', 'Delete/Rename'];
+  readonly mainTabKeys = ['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename'];
+  readonly detailTabs = ['Queues', 'Agents', 'Tiers', 'Members', 'Queue commands', 'Global settings'];
+  readonly detailTabKeys = [
+    'ui.queues',
+    'configuration.agents',
+    'configuration.tiers',
+    'configuration.members',
+    'configuration.queueCommands',
+    'configuration.globalSettings'
+  ];
   protected queueId: number | null = null;
   protected panelCloser: {[key: string]: boolean} = {};
   protected toCopyqueue: number = 0;
@@ -245,9 +258,7 @@ export class CallcenterComponent implements OnInit {
       return;
     }
     this.toCopyqueue = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   tabChanged(event: number) {

@@ -1,18 +1,18 @@
 <app-inner-header name="Http cache" [loadCounter]="loadCounter()" [status]="statusText()" [statusTone]="statusTone()" [errorMessage]="errorMessage()">
-  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="expandAllPanels()">Expand all</button>
-  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="collapseAllPanels()">Collapse all</button>
+  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="expandAllPanels()">{{ 'configuration.expandAll' | transloco }}</button>
+  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="collapseAllPanels()">{{ 'configuration.collapseAll' | transloco }}</button>
 </app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <app-tab-nav ariaLabel="HTTP cache sections" [tabs]="['List', 'Add', 'Delete/Rename']" [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <app-tab-nav ariaLabel="HTTP cache sections" ariaLabelKey="navigation.configuration" [tabs]="['List', 'Add', 'Delete/Rename']" [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']" [(selectedIndex)]="selectedIndex"></app-tab-nav>
     <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
       @if (list() && list().exists !== false) {
         <section class="cpbx-card">
           <header class="cpbx-card__header">
-            <p class="cpbx-card__subtitle">Settings</p>
+            <p class="cpbx-card__subtitle">{{ 'configuration.settings' | transloco }}</p>
           </header>
           <div class="cpbx-card__content">
-            <h3>Params:</h3>
+            <h3>{{ 'common.parameters' | transloco }}:</h3>
             <app-key-value-pad-2 [exist]="list().settings"
               [items]="list().settings"
               [newItems]="list().settings?.new"
@@ -27,7 +27,7 @@
       }
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Profiles</p>
+          <p class="cpbx-card__subtitle">{{ 'configuration.profiles' | transloco }}</p>
         </header>
         <div class="cpbx-card__content">
           @for (item of onlyValues(list().profiles); track trackByFn($index, item)) {
@@ -38,7 +38,7 @@
                     {{item.name}}
                   </span>
                   <span disclosureDescription>
-                    Click to get details
+                    {{ 'common.clickDetails' | transloco }}
                   </span>
                 @if (!firstElement(item.azure).secret_access_key) {
                   <h3>AWS:</h3>
@@ -64,9 +64,7 @@
 </label>
                             <!-- [disabled]="!(form.controls['access_key_id' + onlyValues(item.aws_s3)[0].id].dirty || form.controls['secret_access_key' + item.id].dirty || form.controls['base_domain' + item.id].dirty || form.controls['region' + item.id].dirty || form.controls['expires' + item.id].dirty)" -->
                             <button class="but-spacer-left cpbx-button cpbx-button--primary"
-                              (click)="updateItemAws(firstElement(item.aws_s3))">
-                              Update
-                            </button>
+                              (click)="updateItemAws(firstElement(item.aws_s3))">{{ 'common.actions.update' | transloco }}</button>
                           }
                           @if (!firstElement(item.aws_s3).secret_access_key) {
                             <h3>AZURE:</h3>
@@ -75,11 +73,9 @@
 <input [placeholder]="secret_access_key" [(ngModel)]="firstElement(item.azure).secret_access_key" required [name]="'secret_access_key' + firstElement(item.azure).id" appResizeInput [resizeOnString]="firstElement(item.azure).secret_access_key" placeholder="secret_access_key" class="cpbx-input">
 </label>
                               <button class="but-spacer-left cpbx-button cpbx-button--primary"
-                                (click)="updateItemAzure(firstElement(item.azure))">
-                                Update
-                              </button>
+                                (click)="updateItemAzure(firstElement(item.azure))">{{ 'common.actions.update' | transloco }}</button>
                             }
-                            <h3>Domains:</h3>
+                            <h3>{{ 'ui.domains' | transloco }}:</h3>
                             <app-key-value-pad-position [exist]="item.domains"
                               [items]="item.domains"
                               [newItems]="item.domains?.new"
@@ -99,29 +95,25 @@
                 <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
                   <form class="spacer spacerb" (ngSubmit)="onProfileSubmit()">
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New profile name" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
+<input [placeholder]="'configuration.newProfileName' | transloco" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
 </label>
-                    <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+                    <button class="cpbx-button cpbx-button--primary" type="submit">{{ 'common.actions.submit' | transloco }}</button>
                   </form>
                 </div>
                 <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
                   <form class="spacer spacerb" #deleteForm="ngForm">
-                    <h3>Profiles:</h3>
+                    <h3>{{ 'configuration.profiles' | transloco }}:</h3>
                     @for (profile of onlyValues(list().profiles); track trackByFn($index, profile)) {
                       <div>
                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Profile name</span>
-<input name="Profile name" required [ngModel]="profile.name" [name]="'profile::' + profile.id" placeholder="Profile name" class="cpbx-input">
+<span class="cpbx-label">{{ 'configuration.profileName' | transloco }}</span>
+<input name="Profile name" required [ngModel]="profile.name" [name]="'profile::' + profile.id" [placeholder]="'configuration.profileName' | transloco" class="cpbx-input">
 </label>
                           <button class="cpbx-button cpbx-button--primary" [disabled]="checkDirty(deleteForm.controls['profile::' + profile.id])"
-                            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'rename')">
-                            Update
-                          </button>
+                            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
                           <button class="cpbx-button cpbx-button--danger"
-                            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'delete')">
-                            Delete
-                          </button>
+                            (click)="openBottomSheetProfile(profile.id, deleteForm.controls['profile::' + profile.id].value, list().profiles[profile.id].name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
                         </div>
                       }
                     </form>

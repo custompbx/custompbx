@@ -1,15 +1,15 @@
-<app-inner-header name="Dialplan" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="Dialplan" translationKey="navigation.dialplan" [loadCounter]="loadCounter()"></app-inner-header>
 @if (list()) {
-  <app-tab-nav ariaLabel="Dialplan sections" [tabs]="['List', 'Add', 'Rename/Delete', 'Dialplan Settings']"
+  <app-tab-nav ariaLabel="Dialplan sections" [tabs]="mainTabs" [tabKeys]="mainTabKeys"
     [selectedIndex]="selectedIndex()" (selectedIndexChange)="mainTabChanged($event)"></app-tab-nav>
-  <div class="cpbx-tab-panel" [hidden]="selectedIndex() !== 0">
+  <div appCpbxTabPanel [active]="selectedIndex() === 0">
       @if (loadCounter() === 0 && !onlyValues(list())?.length) {
         <section class="cpbx-card">
           <div class="cpbx-card__content">
-            Here no any contexts yet. You can start creating them or try to import from existing config.
+            {{'dialplan.noContexts' | transloco}}
             <button class="switch-button cpbx-button cpbx-button--secondary"
               (click)="importDialplan()">
-              Import
+              {{'common.actions.import' | transloco}}
             </button>
           </div>
         </section>
@@ -17,7 +17,7 @@
       @if (onlyValues(list())?.length) {
         <section class="cpbx-card">
           <header class="cpbx-card__header">
-            <p class="cpbx-card__subtitle">Contexts</p>
+            <p class="cpbx-card__subtitle">{{'dialplan.contexts' | transloco}}</p>
           </header>
           <div class="cpbx-card__content">
             @for (context of onlyValues(list()); track $index) {
@@ -28,7 +28,7 @@
                         {{context.name}}
                     </span>
                     <span disclosureDescription>
-                        Click to get details
+                        {{'common.clickDetails' | transloco}}
                     </span>
                     <div cdkDropList class="example-list"
                       (cdkDropListDropped)="dropExtension($event, context.extensions)">
@@ -41,21 +41,21 @@
                                   <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move context">::</button>
                                   {{extension.name}}
                                   @if (extension.continue === 'true') {
-                                    <span class="continue-label">Continue</span>
+                                    <span class="continue-label">{{'dialplan.continue' | transloco}}</span>
                                   }
                               </span>
                               <span disclosureDescription>
-                                  Click to get details
+                                  {{'common.clickDetails' | transloco}}
                               </span>
                               <div class="condition-toolbar">
                                 <label class="cpbx-checkbox continue-box">
                                   <input class="cpbx-checkbox__input" type="checkbox"
                                     [checked]="extension.continue === 'true'" (change)="switchContinue(extension)">
-                                  <span>Continue</span>
+                                  <span>{{'dialplan.continue' | transloco}}</span>
                                 </label>
                                 <button class="cpbx-button cpbx-button--primary" type="button"
                                   (click)="addCondition(extension.id)">
-                                  Add Condition
+                                  {{'dialplan.addCondition' | transloco}}
                                 </button>
                               </div>
                               <div cdkDropList class="example-list"
@@ -70,392 +70,35 @@
                                             {{condition | objectDataToName}}
                                         </span>
                                         <span disclosureDescription>
-                                            Click to get details
+                                            {{'common.clickDetails' | transloco}}
                                         </span>
-                                        <form #details="ngForm">
-                                          <h3>Condition fields:</h3>
-                                          <div class="spacer">
-                                            @if (!condition.regex) {
-                                              <div >
-                                                <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Field</span>
-<input name="field" [(ngModel)]="condition.field" required [disabled]="!condition.enabled" [name]="'conditionField' + condition.id" placeholder="Field" class="cpbx-input">
-</label>
-                                                  <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Expression</span>
-<input name="expression" [(ngModel)]="condition.expression" required [disabled]="!condition.enabled" [name]="'conditionExpression' + condition.id" placeholder="Expression" class="cpbx-input">
-</label>
-                                                  </div>
-                                                }
-                                                @if (!condition.field && !condition.regex) {
-                                                  <div>
-                                                    <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Dst</span>
-<input name="dst" [(ngModel)]="condition.dst" required [disabled]="!condition.enabled" [name]="'conditionDst' + condition.id" placeholder="Dst" class="cpbx-input">
-</label>
-                                                      <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Hour</span>
-<input name="hour" [(ngModel)]="condition.hour" required [disabled]="!condition.enabled" [name]="'conditionHour' + condition.id" placeholder="Hour" class="cpbx-input">
-</label>
-                                                      </div>
-                                                    }
-                                                    @if (!condition.field && !condition.regex) {
-                                                      <div>
-                                                        <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Mday</span>
-<input name="mday" [(ngModel)]="condition.mday" required [disabled]="!condition.enabled" [name]="'conditionMday' + condition.id" placeholder="Mday" class="cpbx-input">
-</label>
-                                                          <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Minday</span>
-<input name="minday" [(ngModel)]="condition.minday" required [disabled]="!condition.enabled" [name]="'conditionMinday' + condition.id" placeholder="Minday" class="cpbx-input">
-</label>
-                                                          </div>
-                                                        }
-                                                        @if (!condition.field && !condition.regex) {
-                                                          <div>
-                                                            <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Minute</span>
-<input name="minute" [(ngModel)]="condition.minute" required [disabled]="!condition.enabled" [name]="'conditionMinute' + condition.id" placeholder="Minute" class="cpbx-input">
-</label>
-                                                              <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Mon</span>
-<input name="mon" [(ngModel)]="condition.mon" required [disabled]="!condition.enabled" [name]="'conditionMon' + condition.id" placeholder="Mon" class="cpbx-input">
-</label>
-                                                              </div>
-                                                            }
-                                                            @if (!condition.field && !condition.regex) {
-                                                              <div>
-                                                                <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Mweek</span>
-<input name="mweek" [(ngModel)]="condition.mweek" required [disabled]="!condition.enabled" [name]="'conditionMweek' + condition.id" placeholder="Mweek" class="cpbx-input">
-</label>
-                                                                  <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Date-time</span>
-<input name="date-time" [(ngModel)]="condition.date_time" required [disabled]="!condition.enabled" [name]="'conditionDate_time' + condition.id" placeholder="Date-time" class="cpbx-input">
-</label>
-                                                                  </div>
-                                                                }
-                                                                @if (!condition.field && !condition.regex) {
-                                                                  <div>
-                                                                    <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Time_of_day</span>
-<input name="time_of_day" [(ngModel)]="condition.time_of_day" required [disabled]="!condition.enabled" [name]="'conditionTime_of_day' + condition.id" placeholder="Time_of_day" class="cpbx-input">
-</label>
-                                                                      <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Tz_offset</span>
-<input name="tz_offset" [(ngModel)]="condition.tz_offset" required [disabled]="!condition.enabled" [name]="'conditionTz_offset' + condition.id" placeholder="Tz_offset" class="cpbx-input">
-</label>
-                                                                      </div>
-                                                                    }
-                                                                    @if (!condition.field && !condition.regex) {
-                                                                      <div>
-                                                                        <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Wday</span>
-<input name="wday" [(ngModel)]="condition.wday" required [disabled]="!condition.enabled" [name]="'conditionWday' + condition.id" placeholder="Wday" class="cpbx-input">
-</label>
-                                                                          <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Week</span>
-<input name="week" [(ngModel)]="condition.week" required [disabled]="!condition.enabled" [name]="'conditionWeek' + condition.id" placeholder="Week" class="cpbx-input">
-</label>
-                                                                          </div>
-                                                                        }
-                                                                        @if (!condition.field && !condition.regex) {
-                                                                          <div>
-                                                                            <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Yday</span>
-<input name="yday" [(ngModel)]="condition.yday" required [disabled]="!condition.enabled" [name]="'conditionYday' + condition.id" placeholder="Yday" class="cpbx-input">
-</label>
-                                                                              <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Year</span>
-<input name="year" [(ngModel)]="condition.year" required [disabled]="!condition.enabled" [name]="'conditionYear' + condition.id" placeholder="Year" class="cpbx-input">
-</label>
-                                                                              </div>
-                                                                            }
-                                                                            <div>
-                                                                              @if (!condition.field) {
-                                                                                <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Regex</span>
-<input name="regex" [(ngModel)]="condition.regex" required [disabled]="!condition.enabled" [name]="'conditionRegex' + condition.id" placeholder="Regex" class="cpbx-input">
-</label>
-                                                                                }
-<label class="cpbx-field condition-break-field">
-<span class="cpbx-label">Break</span>
-<select cpbxSelect name="break" [(ngModel)]="condition.break" [disabled]="!condition.enabled" [name]="'conditionBreak' + condition.id" class="cpbx-select">
-<option value="">Default (on-false)</option>
-<option value="on-true">on-true</option>
-<option value="on-false">on-false</option>
-<option value="always">always</option>
-<option value="never">never</option>
-</select>
-</label>
-                                                                                  <button class="but-spacer-left cpbx-button cpbx-button--primary"
-                                                                                    (click)="updateCondition(condition)">
-                                                                                    Update
-                                                                                  </button>
-                                                                                  @if (condition.enabled) {
-                                                                                    <button
-                                                                                      class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
-                                                                                      (click)="switchCondition(condition)">
-                                                                                      Disable
-                                                                                    </button>
-                                                                                  }
-                                                                                  @if (!condition.enabled) {
-                                                                                    <button
-                                                                                      class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
-                                                                                      (click)="switchCondition(condition)">
-                                                                                      Enable
-                                                                                    </button>
-                                                                                  }
-                                                                                  <button class="but-spacer-left cpbx-button cpbx-button--danger"
-                                                                                    (click)="openBottomSheetCondition(condition, 'condition')">
-                                                                                    Delete
-                                                                                  </button>
-                                                                                </div>
-                                                                              </div>
-                                                                              @if (condition.regex) {
-                                                                                <h3>Regexes:</h3>
-                                                                              }
-                                                                              @if (condition.regex) {
-                                                                                <div class="example-list">
-                                                                                  @for (regex of condition.regexes; track trackById($index, regex)) {
-                                                                                    <div>
-                                                                                      @if (regex) {
-                                                                                        <div>
-                                                                                          <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Field</span>
-<input name="field" [(ngModel)]="regex.field" required [disabled]="!regex.enabled" [name]="'regexField' + regex.id" placeholder="Field" class="cpbx-input">
-</label>
-                                                                                            <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Expression</span>
-<input name="expression" [(ngModel)]="regex.expression" required [disabled]="!regex.enabled" [name]="'regexExpression' + regex.id" placeholder="Expression" class="cpbx-input">
-</label>
-                                                                                              <button class="but-spacer-left cpbx-button cpbx-button--primary"
-                                                                                                [disabled]="!isReadyToSend(details.controls['regexField' + regex.id], details.controls['regexExpression' + regex.id])"
-                                                                                                (click)="updateRegex(regex)">
-                                                                                                Update
-                                                                                              </button>
-                                                                                              @if (regex.enabled) {
-                                                                                                <button
-                                                                                                  class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
-                                                                                                  (click)="switchRegex(regex)">
-                                                                                                  Disable
-                                                                                                </button>
-                                                                                              }
-                                                                                              @if (!regex.enabled) {
-                                                                                                <button
-                                                                                                  class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
-                                                                                                  (click)="switchRegex(regex)">
-                                                                                                  Enable
-                                                                                                </button>
-                                                                                              }
-                                                                                              <button class="but-spacer-left cpbx-button cpbx-button--danger"
-                                                                                                (click)="deleteRegex(regex)">
-                                                                                                Delete
-                                                                                              </button>
-                                                                                            </div>
-                                                                                          }
-                                                                                        </div>
-                                                                                      }
-                                                                                      <div class="example-list">
-                                                                                        @for (newRegex of condition.newRegexes; track trackByFn(i, newRegex); let i = $index) {
-                                                                                          <div>
-                                                                                            @if (newRegex) {
-                                                                                              <div class="spacer">
-                                                                                                <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Field</span>
-<input name="field" [(ngModel)]="newRegex.field" required [disabled]="!newRegex.enabled" [name]="'newRegexField' + i" placeholder="Field" class="cpbx-input">
-</label>
-                                                                                                  <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Expression</span>
-<input name="expression" [(ngModel)]="newRegex.expression" required [disabled]="!newRegex.enabled" [name]="'newRegexExpression' + i" placeholder="Expression" class="cpbx-input">
-</label>
-                                                                                                    <button class="but-spacer-left cpbx-button cpbx-button--primary"
-                                                                                                      [disabled]="!isReadyToSend(details.controls['newRegexField' + i], details.controls['newRegexExpression' + i])"
-                                                                                                      (click)="addRegex(context.id, extension.id, condition.id, i, newRegex)">
-                                                                                                      Update
-                                                                                                    </button>
-                                                                                                    <button class="but-spacer-left cpbx-button cpbx-button--danger-outline"
-                                                                                                      (click)="delNewRegex(i, context.id, extension.id, condition.id)">
-                                                                                                      Delete
-                                                                                                    </button>
-                                                                                                  </div>
-                                                                                                }
-                                                                                              </div>
-                                                                                            }
-                                                                                            <button class="cpbx-button cpbx-button--primary"
-                                                                                              (click)="addNewRegex(context.id, extension.id, condition.id)">
-                                                                                              Add
-                                                                                            </button>
-                                                                                          </div>
-                                                                                        </div>
-                                                                                      }
-                                                                                      <h3>Actions:</h3>
-                                                                                      <div cdkDropList class="example-list"
-                                                                                        (cdkDropListDropped)="dropAction($event, condition.actions)">
-                                                                                        @for (action of condition.actions; track trackById($index, action)) {
-                                                                                          <div cdkDrag>
-                                                                                            @if (action) {
-                                                                                              <div>
-                                                                                                <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move condition">::</button>
-                                                                                                <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input name="name" [(ngModel)]="action.application" required [disabled]="!action.enabled" [name]="'actionApplication' + action.id" appResizeInput [resizeOnString]="action.application" placeholder="Name" class="cpbx-input">
-</label>
-                                                                                                  <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Data</span>
-<input name="data" [(ngModel)]="action.data" required [disabled]="!action.enabled" [name]="'actionData' + action.id" appResizeInput [resizeOnString]="action.data" placeholder="Data" class="cpbx-input">
-</label>
-                                                                                                    @if (inlineActions[action.application]) {
-                                                                                                      <label class="cpbx-field cpbx-field--sm inline-action">
-<span class="cpbx-label">Inline</span>
-<select [(ngModel)]="action.inline" required [disabled]="!action.enabled" [name]="'actionInline' + action.id" class="cpbx-select">
-  <option [ngValue]="false">False</option>
-  <option [ngValue]="true">True</option>
-</select>
-</label>
-                                                                                                      }
-                                                                                                      <button class="but-spacer-left cpbx-button cpbx-button--primary"
-                                                                                                        [disabled]="!isReadyToSendAction(details.controls['actionApplication' + action.id], details.controls['actionData' + action.id], details.controls['actionInline' + action.id])"
-                                                                                                        (click)="updateAction(action)">
-                                                                                                        Update
-                                                                                                      </button>
-                                                                                                      @if (action.enabled) {
-                                                                                                        <button
-                                                                                                          class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
-                                                                                                          (click)="switchAction(action)">
-                                                                                                          Disable
-                                                                                                        </button>
-                                                                                                      }
-                                                                                                      @if (!action.enabled) {
-                                                                                                        <button
-                                                                                                          class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
-                                                                                                          (click)="switchAction(action)">
-                                                                                                          Enable
-                                                                                                        </button>
-                                                                                                      }
-                                                                                                      <button class="but-spacer-left cpbx-button cpbx-button--danger"
-                                                                                                        (click)="deleteAction(action)">
-                                                                                                        Delete
-                                                                                                      </button>
-                                                                                                    </div>
-                                                                                                  }
-                                                                                                </div>
-                                                                                              }
-                                                                                              @for (newAction of condition.newActions; track trackByFn(i, newAction); let i = $index) {
-                                                                                                <div>
-                                                                                                  @if (newAction) {
-                                                                                                    <div class="spacer">
-                                                                                                      <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input name="name" [(ngModel)]="newAction.application" required [name]="'newActionApplication' + i" appResizeInput [resizeOnString]="newAction.application" placeholder="Name" class="cpbx-input">
-</label>
-                                                                                                        <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Data</span>
-<input name="data" [(ngModel)]="newAction.data" required [name]="'newActionData' + i" appResizeInput [resizeOnString]="newAction.data" placeholder="Data" class="cpbx-input">
-</label>
-                                                                                                          @if (inlineActions[newAction.application]) {
-                                                                                                            <label class="cpbx-field cpbx-field--sm inline-action">
-<span class="cpbx-label">Inline</span>
-<select [(ngModel)]="newAction.inline" required [name]="'newActionInline' + i" class="cpbx-select">
-  <option [ngValue]="false">False</option>
-  <option [ngValue]="true">True</option>
-</select>
-</label>
-                                                                                                            }
-                                                                                                            <button class="but-spacer-left cpbx-button cpbx-button--primary"
-                                                                                                              [disabled]="!isReadyToSend(details.controls['newActionApplication' + i], details.controls['newActionData' + i])"
-                                                                                                              (click)="addAction(context.id, extension.id, condition.id, i, newAction)">
-                                                                                                              Update
-                                                                                                            </button>
-                                                                                                            <button class="but-spacer-left cpbx-button cpbx-button--danger-outline"
-                                                                                                              (click)="delNewAction(i, context.id, extension.id, condition.id)">
-                                                                                                              Delete
-                                                                                                            </button>
-                                                                                                          </div>
-                                                                                                        }
-                                                                                                      </div>
-                                                                                                    }
-                                                                                                    <button class="cpbx-button cpbx-button--primary"
-                                                                                                      (click)="addNewAction(context.id, extension.id, condition.id)">
-                                                                                                      Add
-                                                                                                    </button>
-                                                                                                  </div>
-                                                                                                  <h3>Antiactions:</h3>
-                                                                                                  <div cdkDropList class="example-list"
-                                                                                                    (cdkDropListDropped)="dropAntiaction($event, condition.antiactions)">
-                                                                                                    @for (antiaction of condition.antiactions; track trackById($index, antiaction)) {
-                                                                                                      <div
-                                                                                                        cdkDrag>
-                                                                                                        @if (antiaction) {
-                                                                                                          <div>
-                                                                                                            <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move action">::</button>
-                                                                                                            <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input name="name" [(ngModel)]="antiaction.application" required [disabled]="!antiaction.enabled" [name]="'antiactionApplication' + antiaction.id" appResizeInput [resizeOnString]="antiaction.application" placeholder="Name" class="cpbx-input">
-</label>
-                                                                                                              <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Data</span>
-<input name="data" [(ngModel)]="antiaction.data" required [disabled]="!antiaction.enabled" [name]="'antiactionData' + antiaction.id" appResizeInput [resizeOnString]="antiaction.data" placeholder="Data" class="cpbx-input">
-</label>
-                                                                                                                <button class="but-spacer-left cpbx-button cpbx-button--primary"
-                                                                                                                  [disabled]="!isReadyToSend(details.controls['antiactionApplication' + antiaction.id], details.controls['antiactionData' + antiaction.id])"
-                                                                                                                  (click)="updateAntiaction(antiaction)">
-                                                                                                                  Update
-                                                                                                                </button>
-                                                                                                                @if (antiaction.enabled) {
-                                                                                                                  <button
-                                                                                                                    class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
-                                                                                                                    (click)="switchAntiaction(antiaction)">
-                                                                                                                    Disable
-                                                                                                                  </button>
-                                                                                                                }
-                                                                                                                @if (!antiaction.enabled) {
-                                                                                                                  <button
-                                                                                                                    class="but-spacer-left switch-button cpbx-button cpbx-button--primary"
-                                                                                                                    (click)="switchAntiaction(antiaction)">
-                                                                                                                    Enable
-                                                                                                                  </button>
-                                                                                                                }
-                                                                                                                <button class="but-spacer-left cpbx-button cpbx-button--danger"
-                                                                                                                  (click)="deleteAntiaction(antiaction)">
-                                                                                                                  Delete
-                                                                                                                </button>
-                                                                                                              </div>
-                                                                                                            }
-                                                                                                          </div>
-                                                                                                        }
-                                                                                                        @for (newAntiaction of condition.newAntiactions; track trackByFn(i, newAntiaction); let i = $index) {
-                                                                                                          <div
-                                                                                                            >
-                                                                                                            @if (newAntiaction) {
-                                                                                                              <div class="spacer">
-                                                                                                                <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input name="name" [(ngModel)]="newAntiaction.application" required [name]="'newAntiactionApplication' + i" appResizeInput [resizeOnString]="newAntiaction.application" placeholder="Name" class="cpbx-input">
-</label>
-                                                                                                                  <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Data</span>
-<input name="data" [(ngModel)]="newAntiaction.data" required [name]="'newAntiactionData' + i" appResizeInput [resizeOnString]="newAntiaction.data" placeholder="Data" class="cpbx-input">
-</label>
-                                                                                                                    <button class="but-spacer-left cpbx-button cpbx-button--primary"
-                                                                                                                      [disabled]="!isReadyToSend(details.controls['newAntiactionApplication' + i], details.controls['newAntiactionData' + i])"
-                                                                                                                      (click)="addAntiaction(context.id, extension.id, condition.id, i, newAntiaction)">
-                                                                                                                      Update
-                                                                                                                    </button>
-                                                                                                                    <button class="but-spacer-left cpbx-button cpbx-button--danger-outline"
-                                                                                                                      (click)="delNewAntiaction(i, context.id, extension.id, condition.id)">
-                                                                                                                      Delete
-                                                                                                                    </button>
-                                                                                                                  </div>
-                                                                                                                }
-                                                                                                              </div>
-                                                                                                            }
-                                                                                                            <button class="cpbx-button cpbx-button--primary"
-                                                                                                              (click)="addNewAntiaction(context.id, extension.id, condition.id)">
-                                                                                                              Add
-                                                                                                            </button>
-                                                                                                          </div>
-                                                                                                        </form>
+                                        <app-dialplan-condition-editor
+                                          [condition]="condition"
+                                          [inlineActions]="inlineActions"
+                                          (conditionSave)="updateCondition($event)"
+                                          (conditionToggle)="switchCondition($event)"
+                                          (conditionRemove)="deleteCondition(condition)"
+                                          (regexSave)="updateRegex($event)"
+                                          (regexToggle)="switchRegex($event)"
+                                          (regexRemove)="deleteRegex($event)"
+                                          (regexAdd)="addRegex(context.id, extension.id, condition.id, $event.index, $event.item)"
+                                          (regexDraftAdd)="addNewRegex(context.id, extension.id, condition.id)"
+                                          (regexDraftRemove)="delNewRegex($event, context.id, extension.id, condition.id)"
+                                          (actionSave)="updateAction($event)"
+                                          (actionToggle)="switchAction($event)"
+                                          (actionRemove)="deleteAction($event)"
+                                          (actionAdd)="addAction(context.id, extension.id, condition.id, $event.index, $event.item)"
+                                          (actionDraftAdd)="addNewAction(context.id, extension.id, condition.id)"
+                                          (actionDraftRemove)="delNewAction($event, context.id, extension.id, condition.id)"
+                                          (actionDropped)="dropAction($event, condition.actions)"
+                                          (antiactionSave)="updateAntiaction($event)"
+                                          (antiactionToggle)="switchAntiaction($event)"
+                                          (antiactionRemove)="deleteAntiaction($event)"
+                                          (antiactionAdd)="addAntiaction(context.id, extension.id, condition.id, $event.index, $event.item)"
+                                          (antiactionDraftAdd)="addNewAntiaction(context.id, extension.id, condition.id)"
+                                          (antiactionDraftRemove)="delNewAntiaction($event, context.id, extension.id, condition.id)"
+                                          (antiactionDropped)="dropAntiaction($event, condition.antiactions)">
+                                        </app-dialplan-condition-editor>
                                                                                                       </app-disclosure>
                                                                                                     }
                                                                                                   </div>
@@ -474,19 +117,19 @@
                                                                         </section>
                                                                       }
                                                                     </div>
-                                                                    <div class="cpbx-tab-panel" [hidden]="selectedIndex() !== 1">
+                                                                    <div appCpbxTabPanel [active]="selectedIndex() === 1">
                                                                       <form class="cpbx-form-panel" (ngSubmit)="onContextSubmit()">
                                                                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New context name" required name="name" [(ngModel)]="newContextName" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
+<input [placeholder]="'dialplan.newContextName' | transloco" required name="name" [(ngModel)]="newContextName" class="cpbx-input">
 </label>
-                                                                        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+                                                                        <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
                                                                       </form>
                                                                       <form class="cpbx-form-panel" (ngSubmit)="onExtensionSubmit()">
                                                                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Context</span>
+<span class="cpbx-label">{{'dialplan.context' | transloco}}</span>
 <select class="cpbx-select" required name="context" [(ngModel)]="newContextId">
-<option [ngValue]="null" disabled hidden>Context</option>
+<option [ngValue]="null" disabled hidden>{{'dialplan.context' | transloco}}</option>
                                                                             @for (context of onlyValues(list()); track trackByFn($index, context)) {
                                                                               <option [ngValue]="context.id">
                                                                                 @if (context) {
@@ -499,18 +142,18 @@
                                                                           </select>
 </label>
                                                                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New extension name" required name="name" [(ngModel)]="newExtensionName" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
+<input [placeholder]="'dialplan.newExtensionName' | transloco" required name="name" [(ngModel)]="newExtensionName" class="cpbx-input">
 </label>
-                                                                        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+                                                                        <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
                                                                       </form>
                                                                     </div>
-                                                                    <div class="cpbx-tab-panel" [hidden]="selectedIndex() !== 2">
+                                                                    <div appCpbxTabPanel [active]="selectedIndex() === 2">
                                                                       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
                                                                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Context</span>
+<span class="cpbx-label">{{'dialplan.context' | transloco}}</span>
 <select class="cpbx-select" required name="context" [(ngModel)]="contextId" (selectionChange)="selectContext($event)">
-<option [ngValue]="null" disabled hidden>Context</option>
+<option [ngValue]="null" disabled hidden>{{'dialplan.context' | transloco}}</option>
                                                                             @for (context of onlyValues(list()); track trackByFn($index, context)) {
                                                                               <option [ngValue]="context.id">
                                                                                 @if (context) {
@@ -524,35 +167,35 @@
 </label>
                                                                         @if (list() && list()[contextId]) {
                                                                           <div class="cpbx-form-panel cpbx-form-panel--stack">
-                                                                            <h3 class="cpbx-form-title">Context</h3>
+                                                                            <h3 class="cpbx-form-title">{{'dialplan.context' | transloco}}</h3>
                                                                             <div class="cpbx-edit-row">
                                                                             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Context name</span>
-<input name="Context name" required [ngModel]="list()[contextId].name" [name]="'context::' + contextId" placeholder="Context name" class="cpbx-input">
+<span class="cpbx-label">{{'dialplan.contextName' | transloco}}</span>
+<input required [ngModel]="list()[contextId].name" [name]="'context::' + contextId" [placeholder]="'dialplan.contextName' | transloco" class="cpbx-input">
 </label>
                                                                               <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['context::' + contextId])"
                                                                                 (click)="openBottomSheetContext(contextId, deleteForm.controls['context::' + contextId].value, list()[contextId].name, 'rename')">
-                                                                                Update
+                                                                                {{'common.actions.update' | transloco}}
                                                                               </button>
                                                                               <button class="cpbx-button cpbx-button--danger-outline" type="button"
                                                                                 (click)="openBottomSheetContext(contextId, deleteForm.controls['context::' + contextId].value, list()[contextId].name, 'delete')">
-                                                                                Delete
+                                                                                {{'common.actions.delete' | transloco}}
                                                                               </button>
                                                                               </div>
-                                                                              <h3 class="cpbx-form-title">Extensions</h3>
+                                                                              <h3 class="cpbx-form-title">{{'dialplan.extensions' | transloco}}</h3>
                                                                               @for (extension of list()[contextId].extensions; track extension) {
                                                                                 <div class="cpbx-edit-row">
                                                                                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Extension name</span>
-<input name="Extension name" required [ngModel]="extension.name" [name]="'extension::' + extension.id" placeholder="Extension name" class="cpbx-input">
+<span class="cpbx-label">{{'dialplan.extensionName' | transloco}}</span>
+<input required [ngModel]="extension.name" [name]="'extension::' + extension.id" [placeholder]="'dialplan.extensionName' | transloco" class="cpbx-input">
 </label>
                                                                                     <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['extension::' + extension.id])"
                                                                                       (click)="openBottomSheetExtension(extension.id, deleteForm.controls['extension::' + extension.id].value, extension.name, 'rename')">
-                                                                                      Update
+                                                                                      {{'common.actions.update' | transloco}}
                                                                                     </button>
                                                                                     <button class="cpbx-button cpbx-button--danger-outline" type="button"
                                                                                       (click)="openBottomSheetExtension(extension.id, deleteForm.controls['extension::' + extension.id].value, extension.name, 'delete')">
-                                                                                      Delete
+                                                                                      {{'common.actions.delete' | transloco}}
                                                                                     </button>
                                                                                   </div>
                                                                                 }
@@ -560,48 +203,48 @@
                                                                             }
                                                                           </form>
                                                                         </div>
-                                                                        <div class="cpbx-tab-panel" [hidden]="selectedIndex() !== 3">
+                                                                        <div appCpbxTabPanel [active]="selectedIndex() === 3">
                                                                           <div class="cpbx-form-panel cpbx-form-panel--stack">
-                                                                            <h3>Settings</h3>
+                                                                            <h3>{{'configuration.settings' | transloco}}</h3>
                                                                             @if (!staticDialplan()) {
                                                                               <button class="cpbx-button cpbx-button--secondary" type="button"
                                                                                 (click)="switchNoProceed()">
-                                                                                Enable static dialplan
+                                                                                {{'dialplan.enableStatic' | transloco}}
                                                                               </button>
                                                                             }
                                                                             @if (staticDialplan()) {
                                                                               <button class="cpbx-button cpbx-button--primary-outline" type="button"
                                                                                 (click)="switchNoProceed()">
-                                                                                Disable static dialplan
+                                                                                {{'dialplan.disableStatic' | transloco}}
                                                                               </button>
                                                                             }
                                                                           </div>
                                                                           <div class="cpbx-divider" role="separator"></div>
                                                                           <div class="cpbx-form-panel cpbx-form-panel--stack">
-                                                                            <h3>Dialplan Debug</h3>
+                                                                            <h3>{{'dialplan.debug' | transloco}}</h3>
                                                                             @if (!debug().enabled) {
                                                                               <button class="cpbx-button cpbx-button--secondary" type="button"
                                                                                 (click)="switchDebug()">
-                                                                                Enable collecting
+                                                                                {{'dialplan.enableCollecting' | transloco}}
                                                                               </button>
                                                                             }
                                                                             @if (debug().enabled) {
                                                                               <button class="cpbx-button cpbx-button--primary-outline" type="button"
                                                                                 (click)="switchDebug()">
-                                                                                Disable collecting
+                                                                                {{'dialplan.disableCollecting' | transloco}}
                                                                               </button>
                                                                             }
                                                                             <button class="cpbx-button cpbx-button--secondary" type="button"
                                                                               (click)="clearDebug()">
-                                                                              Clear
+                                                                              {{'settingsPage.clear' | transloco}}
                                                                             </button>
                                                                             @for (log of debug().log; track trackByFn(i, log); let i = $index) {
                                                                               <div>
-                                                                                <h3>Conditions log:</h3>
+                                                                                <h3>{{'dialplan.conditionsLog' | transloco}}</h3>
                                                                                 @for (conditions of log.log; track trackByFn(i, conditions); let i = $index) {
                                                                                   <p>{{conditions}}</p>
                                                                                 }
-                                                                                <h3>Got Actions:</h3>
+                                                                                <h3>{{'dialplan.gotActions' | transloco}}</h3>
                                                                                 @for (actions of log.actions; track trackByFn(i, actions); let i = $index) {
                                                                                   <p>application={{actions.application}} data={{actions.data}}</p>
                                                                                 }

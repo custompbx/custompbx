@@ -1,0 +1,159 @@
+<form #conditionForm="ngForm" class="dialplan-condition-editor">
+  <section class="dialplan-editor-section">
+    <h3>{{'dialplan.conditionFields' | transloco}}</h3>
+    <div class="dialplan-editor-rows">
+      @if (!condition().regex) {
+        <div class="dialplan-editor-row">
+          <label class="cpbx-field cpbx-field--md">
+            <span class="cpbx-label">{{'dialplan.field' | transloco}}</span>
+            <input [(ngModel)]="condition().field" required [disabled]="!condition().enabled"
+              [name]="'conditionField' + condition().id" [placeholder]="'dialplan.field' | transloco" class="cpbx-input">
+          </label>
+          <label class="cpbx-field cpbx-field--md">
+            <span class="cpbx-label">{{'dialplan.expression' | transloco}}</span>
+            <input [(ngModel)]="condition().expression" required [disabled]="!condition().enabled"
+              [name]="'conditionExpression' + condition().id" [placeholder]="'dialplan.expression' | transloco" class="cpbx-input">
+          </label>
+        </div>
+      }
+
+      @if (!condition().field && !condition().regex) {
+        @for (pair of scheduleFieldPairs; track $index) {
+          <div class="dialplan-editor-row">
+            @for (fieldName of pair; track fieldName) {
+              <label class="cpbx-field cpbx-field--md">
+                <span class="cpbx-label">{{fieldName}}</span>
+                <input [ngModel]="conditionValue(fieldName)" (ngModelChange)="setConditionValue(fieldName, $event)" required [disabled]="!condition().enabled"
+                  [name]="'condition-' + fieldName + '-' + condition().id" [placeholder]="fieldName" class="cpbx-input">
+              </label>
+            }
+          </div>
+        }
+      }
+
+      <div class="dialplan-editor-row">
+        @if (!condition().field) {
+          <label class="cpbx-field cpbx-field--md">
+            <span class="cpbx-label">{{'dialplan.regex' | transloco}}</span>
+            <input [(ngModel)]="condition().regex" required [disabled]="!condition().enabled"
+              [name]="'conditionRegex' + condition().id" [placeholder]="'dialplan.regex' | transloco" class="cpbx-input">
+          </label>
+        }
+        <label class="cpbx-field condition-break-field">
+          <span class="cpbx-label">{{'dialplan.break' | transloco}}</span>
+          <select cpbxSelect [ngModel]="condition().break ?? ''"
+            (ngModelChange)="condition().break = $event || undefined" [disabled]="!condition().enabled"
+            [name]="'conditionBreak' + condition().id" class="cpbx-select">
+            <option value="">{{'dialplan.defaultOnFalse' | transloco}}</option>
+            <option value="on-true">on-true</option>
+            <option value="on-false">on-false</option>
+            <option value="always">always</option>
+            <option value="never">never</option>
+          </select>
+        </label>
+        <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="!conditionForm.dirty"
+          (click)="conditionSave.emit(condition())">{{'common.actions.save' | transloco}}</button>
+        <button class="switch-button cpbx-button cpbx-button--secondary" type="button"
+          (click)="conditionToggle.emit(condition())">
+          {{(condition().enabled ? 'common.actions.disable' : 'common.actions.enable') | transloco}}
+        </button>
+        <button class="cpbx-button cpbx-button--danger-outline" type="button"
+          (click)="conditionRemove.emit()">{{'common.actions.delete' | transloco}}</button>
+      </div>
+    </div>
+  </section>
+
+  @if (condition().regex) {
+    <section class="dialplan-editor-section">
+      <h3>{{'dialplan.regexes' | transloco}}</h3>
+      <div class="dialplan-editor-rows">
+        @for (regex of condition().regexes; track regex.id) {
+          <div class="dialplan-editor-row">
+            <label class="cpbx-field cpbx-field--md">
+              <span class="cpbx-label">{{'dialplan.field' | transloco}}</span>
+              <input #regexField="ngModel" [(ngModel)]="regex.field" required [disabled]="!regex.enabled"
+                [name]="'regexField' + regex.id" [placeholder]="'dialplan.field' | transloco" class="cpbx-input">
+            </label>
+            <label class="cpbx-field cpbx-field--md">
+              <span class="cpbx-label">{{'dialplan.expression' | transloco}}</span>
+              <input #regexExpression="ngModel" [(ngModel)]="regex.expression" required [disabled]="!regex.enabled"
+                [name]="'regexExpression' + regex.id" [placeholder]="'dialplan.expression' | transloco" class="cpbx-input">
+            </label>
+            <button class="cpbx-button cpbx-button--primary" type="button"
+              [disabled]="regexField.invalid || regexExpression.invalid || (!regexField.dirty && !regexExpression.dirty)"
+              (click)="regexSave.emit(regex)">{{'common.actions.save' | transloco}}</button>
+            <button class="switch-button cpbx-button cpbx-button--secondary" type="button"
+              (click)="regexToggle.emit(regex)">{{(regex.enabled ? 'common.actions.disable' : 'common.actions.enable') | transloco}}</button>
+            <button class="cpbx-button cpbx-button--danger-outline" type="button"
+              (click)="regexRemove.emit(regex)">{{'common.actions.delete' | transloco}}</button>
+          </div>
+        }
+
+        @for (regex of condition().newRegexes; track $index; let index = $index) {
+          <div class="dialplan-editor-row is-draft">
+            <label class="cpbx-field cpbx-field--md">
+              <span class="cpbx-label">{{'dialplan.field' | transloco}}</span>
+              <input #newRegexField="ngModel" [(ngModel)]="regex.field" required
+                [name]="'newRegexField' + index" [placeholder]="'dialplan.field' | transloco" class="cpbx-input">
+            </label>
+            <label class="cpbx-field cpbx-field--md">
+              <span class="cpbx-label">{{'dialplan.expression' | transloco}}</span>
+              <input #newRegexExpression="ngModel" [(ngModel)]="regex.expression" required
+                [name]="'newRegexExpression' + index" [placeholder]="'dialplan.expression' | transloco" class="cpbx-input">
+            </label>
+            <button class="cpbx-button cpbx-button--primary" type="button"
+              [disabled]="newRegexField.invalid || newRegexExpression.invalid"
+              (click)="regexAdd.emit({index, item: regex})">{{'common.actions.save' | transloco}}</button>
+            <button class="cpbx-button cpbx-button--danger-outline" type="button"
+              (click)="regexDraftRemove.emit(index)">{{'common.actions.cancel' | transloco}}</button>
+          </div>
+        }
+      </div>
+      <button class="cpbx-button cpbx-button--primary" type="button"
+        (click)="regexDraftAdd.emit()">{{'common.actions.add' | transloco}}</button>
+    </section>
+  }
+
+  <section class="dialplan-editor-section">
+    <h3>{{'dialplan.actions' | transloco}}</h3>
+    <div cdkDropList class="dialplan-editor-rows" (cdkDropListDropped)="actionDropped.emit($event)">
+      @for (action of condition().actions; track action.id) {
+        <div cdkDrag>
+          <app-dialplan-application-row [item]="action" [rowKey]="'action' + action.id"
+            [supportsInline]="supportsInline(action.application)" (save)="actionSave.emit($event)"
+            (toggle)="actionToggle.emit($event)" (remove)="actionRemove.emit(action)">
+          </app-dialplan-application-row>
+        </div>
+      }
+    </div>
+    @for (action of condition().newActions; track $index; let index = $index) {
+      <app-dialplan-application-row [item]="action" [draft]="true" [rowKey]="'newAction' + index"
+        [supportsInline]="supportsInline(action.application)" (save)="actionAdd.emit({index, item: action})"
+        (remove)="actionDraftRemove.emit(index)">
+      </app-dialplan-application-row>
+    }
+    <button class="cpbx-button cpbx-button--primary" type="button"
+      (click)="actionDraftAdd.emit()">{{'common.actions.add' | transloco}}</button>
+  </section>
+
+  <section class="dialplan-editor-section">
+    <h3>{{'dialplan.antiactions' | transloco}}</h3>
+    <div cdkDropList class="dialplan-editor-rows" (cdkDropListDropped)="antiactionDropped.emit($event)">
+      @for (antiaction of condition().antiactions; track antiaction.id) {
+        <div cdkDrag>
+          <app-dialplan-application-row [item]="antiaction" [rowKey]="'antiaction' + antiaction.id"
+            (save)="antiactionSave.emit($event)" (toggle)="antiactionToggle.emit($event)"
+            (remove)="antiactionRemove.emit(antiaction)">
+          </app-dialplan-application-row>
+        </div>
+      }
+    </div>
+    @for (antiaction of condition().newAntiactions; track $index; let index = $index) {
+      <app-dialplan-application-row [item]="antiaction" [draft]="true" [rowKey]="'newAntiaction' + index"
+        (save)="antiactionAdd.emit({index, item: antiaction})" (remove)="antiactionDraftRemove.emit(index)">
+      </app-dialplan-application-row>
+    }
+    <button class="cpbx-button cpbx-button--primary" type="button"
+      (click)="antiactionDraftAdd.emit()">{{'common.actions.add' | transloco}}</button>
+  </section>
+</form>

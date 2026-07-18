@@ -1,4 +1,4 @@
-import {Component, inject, signal, computed, effect, OnInit, Pipe, PipeTransform} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal, computed, effect, OnInit, Pipe, PipeTransform} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
 import {DragDropModule} from '@angular/cdk/drag-drop';
@@ -48,14 +48,16 @@ import {
   DialplanDebug, SwitchDialplanDebug, StoreClearDialplanDebug, DialplanSettings, SwitchDialplanStatic
 } from '../../../store/dialplan/dialplan.actions';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import {AbstractControl, FormsModule} from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
-import {ResizeInputDirective} from "../../../directives/resize-input.directive";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 import {resolvePositionedReorder} from '../../../utils/reorder';
+import {CpbxTabPanelDirective} from '../../../directives/cpbx-tab-panel.directive';
+import {TranslocoPipe} from '@jsverse/transloco';
+import {DialplanConditionEditorComponent} from '../condition-editor/dialplan-condition-editor.component';
 
 @Pipe({
   name: 'objectDataToName',
@@ -81,10 +83,11 @@ export class ObjectToNamePipe implements PipeTransform {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, DragDropModule, FormsModule, InnerHeaderComponent, ObjectToNamePipe, ResizeInputDirective, CpbxSelectDirective, TabNavComponent, DisclosureComponent], // Include the new standalone pipe
+  imports: [CommonModule, DragDropModule, FormsModule, InnerHeaderComponent, ObjectToNamePipe, CpbxSelectDirective, TabNavComponent, CpbxTabPanelDirective, DisclosureComponent, TranslocoPipe, DialplanConditionEditorComponent],
   selector: 'app-contexts',
   templateUrl: './contexts.component.html',
-  styleUrls: ['./contexts.component.css']
+  styleUrls: ['./contexts.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContextsComponent { // Removed OnDestroy
 
@@ -117,6 +120,8 @@ export class ContextsComponent { // Removed OnDestroy
 
   // --- Local Component State as Signals/Properties ---
   public selectedIndex = signal<number>(0);
+  readonly mainTabs = ['List', 'Add', 'Rename/Delete', 'Dialplan Settings'];
+  readonly mainTabKeys = ['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename', 'dialplan.settings'];
 
   // Properties used for forms (kept as properties for two-way binding with ngModel)
   public newContextName: string = '';
@@ -126,7 +131,7 @@ export class ContextsComponent { // Removed OnDestroy
 
   private expanded = []; // This should probably be a signal if it controls UI state
 
-  protected inlineActions = {
+  protected readonly inlineActions: Record<string, boolean> = {
     'check_acl': true,
     'eval': true,
     'event': true,
@@ -193,26 +198,6 @@ export class ContextsComponent { // Removed OnDestroy
 
   trackById(index: number, item: any) {
     return item.id;
-  }
-
-  isReadyToSend(nameObject: AbstractControl | null, valueObject: AbstractControl | null): boolean {
-    // Check if both objects exist, and if either is dirty, and both are valid
-    return !!(nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid);
-  }
-
-  isReadyToSendAction(nameObject: AbstractControl | null, valueObject: AbstractControl | null, inlineObject: AbstractControl | null): boolean {
-    if (inlineObject) {
-      // If inline is an input, check if any of the three are dirty and valid
-      return (nameObject && nameObject.valid && nameObject.dirty)
-        || ((valueObject && valueObject.valid && valueObject.dirty) || (inlineObject && inlineObject.valid && inlineObject.dirty));
-    }
-    // If inline is not a control, revert to standard name/value check
-    return !!(nameObject && valueObject && (nameObject.dirty || valueObject.dirty) && nameObject.valid && valueObject.valid);
-  }
-
-  checkDirty(condition: AbstractControl | null): boolean {
-    // Returns true if the control is NOT dirty, or if the control is null
-    return !condition || !condition.dirty;
   }
 
   getExtensions(id: number) {

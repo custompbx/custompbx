@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+
+.dialplan-application-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cpbx-space-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.dialplan-application-row.is-draft {
+  background: var(--cpbx-surface-muted);
+  border-radius: var(--cpbx-radius-md);
+  padding: var(--cpbx-space-3);
+}
+
+.cpbx-field {
+  margin: 0;
+}
+
+.inline-action {
+  flex-basis: 7rem;
+  max-width: 7rem;
+  min-width: 7rem;
+  width: 7rem;
+}
+
+@media (max-width: 767px) {
+  .cpbx-field,
+  .cpbx-field--md {
+    flex-basis: 100%;
+    width: 100%;
+  }
+}

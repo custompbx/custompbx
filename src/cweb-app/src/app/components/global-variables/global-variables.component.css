@@ -54,3 +54,15 @@ article {
   width: 100%;
 }
 
+.global-variables-warning {
+  align-items: center;
+  display: flex;
+  gap: .625rem;
+}
+
+.global-variables-warning__icon {
+  flex: 0 0 auto;
+  font-size: 1.125rem;
+  line-height: 1;
+}
+

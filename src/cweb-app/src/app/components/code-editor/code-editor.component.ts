@@ -1,5 +1,6 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Ace, edit} from 'ace-builds';
+import {TranslocoPipe} from '@jsverse/transloco';
 // import 'ace-builds/webpack-resolver';
 import 'ace-builds/src-noconflict/mode-xml';
 // import 'ace-builds/src-noconflict/worker-xml';
@@ -13,7 +14,7 @@ const LANG = 'ace/mode/xml';
 
 @Component({
 standalone: true,
-    imports: [],
+    imports: [TranslocoPipe],
     selector: 'app-code-editor',
     templateUrl: './code-editor.component.html',
     styleUrls: ['./code-editor.component.css']

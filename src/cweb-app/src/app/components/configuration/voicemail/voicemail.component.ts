@@ -29,12 +29,13 @@ import {
 import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent, TranslocoPipe],
   selector: 'app-voicemail',
   templateUrl: './voicemail.component.html',
   styleUrls: ['./voicemail.component.css']
@@ -209,9 +210,7 @@ export class VoicemailComponent {
       return;
     }
     this.toCopyProfile = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   pasteProfileParams(to: number) {

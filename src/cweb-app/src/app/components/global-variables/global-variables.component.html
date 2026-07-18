@@ -1,22 +1,21 @@
-<app-inner-header name="Global Variables" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="Global Variables" translationKey="navigation.globalVariables" [loadCounter]="loadCounter()"></app-inner-header>
 @if (list() && ObjLength(list()) == 0) {
   <section class="cpbx-card">
     <div class="cpbx-card__content">
-      No global variables set in database you can import them from freeswitch instance
+      {{ 'globalVariables.none' | transloco }}
       <button class="switch-button cpbx-button cpbx-button--secondary"
-              (click)="ImportGlobalVariables()">
-        Import
-      </button>
+              (click)="ImportGlobalVariables()">{{ 'common.actions.import' | transloco }}</button>
     </div>
   </section>
 } @else {
 <section class="cpbx-card">
   <div class="cpbx-card__content">
-    <h3>
-      ⚠ Local vars.xml will be overwritten.
-    </h3>
+    <div class="cpbx-alert cpbx-alert--warning global-variables-warning" role="note">
+      <span class="global-variables-warning__icon" aria-hidden="true">⚠</span>
+      <span>{{ 'globalVariables.overwriteWarning' | transloco }}</span>
+    </div>
     <form #details="ngForm">
-      <h3>Global Variables:</h3>
+      <h3>{{'navigation.globalVariables' | transloco}}:</h3>
       @if (list()) {
         <div class="global-variable-list" cdkDropList
              (cdkDropListDropped)="dropAction($event, onlySortedValues(list()))">
@@ -26,17 +25,17 @@
                 <ng-container>
                   <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move item">::</button>
                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
 <input name="name" [(ngModel)]="variable.name" required [disabled]="!variable.enabled || variable.dynamic" [name]="'variableName' + variable.id" appResizeInput [resizeOnString]="variable.name" placeholder="Name" class="cpbx-input">
 </label>
                   <label class="cpbx-field cpbx-field--wide">
-<span class="cpbx-label">Value</span>
+<span class="cpbx-label">{{'ui.value' | transloco}}</span>
 <input name="value" [(ngModel)]="variable.value" required [disabled]="!variable.enabled || variable.dynamic" [name]="'variableValue' + variable.id" appResizeInput [resizeOnString]="variable.value" placeholder="Value" class="cpbx-input">
 </label>
                   <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Type</span>
+<span class="cpbx-label">{{'configuration.type' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="variable.type" [disabled]="!variable.enabled || variable.dynamic" [name]="'variableType' + variable.id">
-<option [ngValue]="null" disabled hidden>Type</option>
+<option [ngValue]="null" disabled hidden>{{'configuration.type' | transloco}}</option>
                       @for (val of variableTypes; track $index) {
                         <option [ngValue]="val">
                           {{val}}
@@ -46,23 +45,19 @@
 </label>
                   <button class="cpbx-button cpbx-button--primary" type="button"
                           [disabled]="!isReadyToSendThree(details.controls['variableName' + variable.id], details.controls['variableValue' + variable.id], details.controls['variableType' + variable.id]) || variable.dynamic"
-                          (click)="updateGlobalVariable(variable)">
-                    Update
-                  </button>
+                          (click)="updateGlobalVariable(variable)">{{ 'common.actions.update' | transloco }}</button>
                   <button *ngIf="variable.enabled" type="button"
                           [disabled]="variable.dynamic"
                           class="switch-button cpbx-button cpbx-button--secondary" (click)="switchGlobalVariable(variable)">
-                    Disable
+                    {{ 'common.actions.disable' | transloco }}
                   </button>
                   <button *ngIf="!variable.enabled" type="button"
                           [disabled]="variable.dynamic"
                           class="switch-button cpbx-button cpbx-button--primary-outline" (click)="switchGlobalVariable(variable)">
-                    Enable
+                    {{ 'common.actions.enable' | transloco }}
                   </button>
                   <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="deleteGlobalVariable(variable)"
-                          [disabled]="variable.dynamic">
-                    Delete
-                  </button>
+                          [disabled]="variable.dynamic">{{ 'common.actions.delete' | transloco }}</button>
                 </ng-container>
               }
             </div>
@@ -74,17 +69,17 @@
                   @if (variable) {
                     <ng-container>
                       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
 <input name="name" [(ngModel)]="variable.name" required [name]="'newName' + i" appResizeInput [resizeOnString]="variable.name" placeholder="Name" class="cpbx-input">
 </label>
                       <label class="cpbx-field cpbx-field--wide">
-<span class="cpbx-label">Value</span>
+<span class="cpbx-label">{{'ui.value' | transloco}}</span>
 <input name="value" [(ngModel)]="variable.value" required [name]="'newValue' + i" appResizeInput [resizeOnString]="variable.value" placeholder="Value" class="cpbx-input">
 </label>
                       <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Type</span>
+<span class="cpbx-label">{{'configuration.type' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="variable.type" [name]="'newType' + i">
-<option [ngValue]="null" disabled hidden>Type</option>
+<option [ngValue]="null" disabled hidden>{{'configuration.type' | transloco}}</option>
                           @for (val of variableTypes; track $index) {
                             <option [ngValue]="val">
                               {{val}}
@@ -94,12 +89,8 @@
 </label>
                       <button class="cpbx-button cpbx-button--primary" type="button"
                               [disabled]="!isReadyToSendThree(details.controls['newValue' + i], details.controls['newName' + i], details.controls['newType' + i])"
-                              (click)="newGlobalVariable(i, details.controls['newName' + i].value, details.controls['newValue' + i].value, details.controls['newType' + i].value)">
-                        Update
-                      </button>
-                      <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="dropNewGlobalVariable(i)">
-                        Delete
-                      </button>
+                              (click)="newGlobalVariable(i, details.controls['newName' + i].value, details.controls['newValue' + i].value, details.controls['newType' + i].value)">{{ 'common.actions.update' | transloco }}</button>
+                      <button class="cpbx-button cpbx-button--danger-outline" type="button" (click)="dropNewGlobalVariable(i)">{{ 'common.actions.delete' | transloco }}</button>
                     </ng-container>
                   }
                 </div>
@@ -108,9 +99,7 @@
           }
         </div>
       }
-      <button class="cpbx-button cpbx-button--primary" type="button" (click)="addNewGlobalVariable()">
-        Add
-      </button>
+      <button class="cpbx-button cpbx-button--primary" type="button" (click)="addNewGlobalVariable()">{{ 'common.actions.add' | transloco }}</button>
     </form>
   </div>
 </section>

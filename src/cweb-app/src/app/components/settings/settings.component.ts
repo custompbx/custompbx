@@ -13,7 +13,7 @@ import {
   SetSettings,
   SwitchWebUser,
   UpdateWebUserAvatar,
-  UpdateWebUserLang,
+  UpdateWebUserLocale,
   UpdateWebUserPassword,
   UpdateWebUserSipUser,
   UpdateWebUserStun,
@@ -50,10 +50,13 @@ import {ResizeInputDirective} from "../../directives/resize-input.directive";
 import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
 import {DisclosureComponent} from '../disclosure/disclosure.component';
 import {IconComponent} from '../icon/icon.component';
+import {SUPPORTED_LOCALES} from '../../i18n/locale.registry';
+import {LocaleService} from '../../i18n/locale.service';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent, TranslocoPipe],
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
@@ -68,6 +71,17 @@ export class SettingsComponent {
   private store = inject(Store<AppState>);
   private bottomSheet = inject(ConfirmationService);
   private _snackBar = inject(ToastService);
+  private localeService = inject(LocaleService);
+
+  formatDate(value: Date | number | string): string {
+    return this.localeService.formatDate(value, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
 
   // --- NgRx State converted to Signals (toSignal handles subscriptions automatically) ---
 
@@ -95,7 +109,7 @@ export class SettingsComponent {
   public directoryError = computed(() => this.directoryState().errorMessage || null);
 
   // --- Local Component State & Constants ---
-  public userLangs: Array<string> = ['EN', 'RU'];
+  public readonly userLocales = SUPPORTED_LOCALES;
   public login: string = '';
   public password: string = '';
   public groupId: 0 = 0;
@@ -165,8 +179,8 @@ export class SettingsComponent {
     this.store.dispatch(new UpdateWebUserPassword({password: pass, id: id}));
   }
 
-  updateLang(id: number, pass: string) {
-    this.store.dispatch(new UpdateWebUserLang({param_id: pass, id: id}));
+  updateLocale(id: number, locale: string) {
+    this.store.dispatch(new UpdateWebUserLocale({value: locale, id}));
   }
 
   updateGroup(id: number, pass: number) {
@@ -217,13 +231,6 @@ export class SettingsComponent {
 
   isvalueReadyToSend(valueObject: AbstractControl | null): boolean {
     return valueObject && valueObject.dirty && valueObject.valid;
-  }
-
-  getLangIndex(index: number): number {
-    if (this.userLangs.length <= index ) {
-      return 0;
-    }
-    return index;
   }
 
   openBottomSheet(id: number, newName: string, oldName: string, action: string): void {

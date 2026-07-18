@@ -301,8 +301,8 @@ func switchWebUser(data *webStruct.MessageData) webStruct.UserResponse {
 }
 
 func updateWebUsersPassword(data *webStruct.MessageData) webStruct.UserResponse {
-	if data.Id == 0 {
-		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
+	if response := requireOwnWebUserOrAdmin(data); response != nil {
+		return *response
 	}
 
 	if data.Password == "" || len(data.Password) < 6 {
@@ -345,6 +345,24 @@ func updateWebUsersLang(data *webStruct.MessageData) webStruct.UserResponse {
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
 }
 
+func updateWebUsersLocale(data *webStruct.MessageData) webStruct.UserResponse {
+	if response := requireOwnWebUserOrAdmin(data); response != nil {
+		return *response
+	}
+	if !mainStruct.IsSupportedLocale(data.Value) {
+		return webStruct.UserResponse{Error: "unsupported locale", MessageType: data.Event}
+	}
+	webUser := webcache.GetWebUserById(data.Id)
+	if webUser == nil {
+		return webStruct.UserResponse{Error: "user not found", MessageType: data.Event}
+	}
+	if !webcache.UpdateWebUserLocale(webUser, data.Value) {
+		return webStruct.UserResponse{Error: "can't change", MessageType: data.Event}
+	}
+	items := map[int64]*mainStruct.WebUser{webUser.Id: webUser}
+	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
+}
+
 func updateWebUsersSipUser(data *webStruct.MessageData) webStruct.UserResponse {
 	if data.Id == 0 {
 		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
@@ -365,8 +383,8 @@ func updateWebUsersSipUser(data *webStruct.MessageData) webStruct.UserResponse {
 }
 
 func updateWebUsersWs(data *webStruct.MessageData) webStruct.UserResponse {
-	if data.Id == 0 {
-		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
+	if response := requireOwnWebUserOrAdmin(data); response != nil {
+		return *response
 	}
 
 	webUser := webcache.GetWebUserById(data.Id)
@@ -384,8 +402,8 @@ func updateWebUsersWs(data *webStruct.MessageData) webStruct.UserResponse {
 }
 
 func updateWebUsersVertoWs(data *webStruct.MessageData) webStruct.UserResponse {
-	if data.Id == 0 {
-		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
+	if response := requireOwnWebUserOrAdmin(data); response != nil {
+		return *response
 	}
 
 	webUser := webcache.GetWebUserById(data.Id)
@@ -403,8 +421,8 @@ func updateWebUsersVertoWs(data *webStruct.MessageData) webStruct.UserResponse {
 }
 
 func UpdateWebUserWebRTCLib(data *webStruct.MessageData) webStruct.UserResponse {
-	if data.Id == 0 {
-		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
+	if response := requireOwnWebUserOrAdmin(data); response != nil {
+		return *response
 	}
 
 	webUser := webcache.GetWebUserById(data.Id)
@@ -422,8 +440,8 @@ func UpdateWebUserWebRTCLib(data *webStruct.MessageData) webStruct.UserResponse 
 }
 
 func updateWebUsersStun(data *webStruct.MessageData) webStruct.UserResponse {
-	if data.Id == 0 {
-		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
+	if response := requireOwnWebUserOrAdmin(data); response != nil {
+		return *response
 	}
 
 	webUser := webcache.GetWebUserById(data.Id)
@@ -441,8 +459,8 @@ func updateWebUsersStun(data *webStruct.MessageData) webStruct.UserResponse {
 }
 
 func updateWebUsersAvatar(data *webStruct.MessageData) webStruct.UserResponse {
-	if data.Id == 0 {
-		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
+	if response := requireOwnWebUserOrAdmin(data); response != nil {
+		return *response
 	}
 
 	webUser := webcache.GetWebUserById(data.Id)
@@ -450,7 +468,7 @@ func updateWebUsersAvatar(data *webStruct.MessageData) webStruct.UserResponse {
 		return webStruct.UserResponse{Error: "user not found", MessageType: data.Event}
 	}
 
-	if data.File == "" {
+	if len(data.File) < 30 {
 		return webStruct.UserResponse{Error: "empty file string", MessageType: data.Event}
 	}
 	prefix := data.File[:30]
@@ -479,8 +497,8 @@ func updateWebUsersAvatar(data *webStruct.MessageData) webStruct.UserResponse {
 }
 
 func clearWebUsersAvatar(data *webStruct.MessageData) webStruct.UserResponse {
-	if data.Id == 0 {
-		return webStruct.UserResponse{Error: "wrong id", MessageType: data.Event}
+	if response := requireOwnWebUserOrAdmin(data); response != nil {
+		return *response
 	}
 
 	webUser := webcache.GetWebUserById(data.Id)
@@ -499,6 +517,20 @@ func clearWebUsersAvatar(data *webStruct.MessageData) webStruct.UserResponse {
 
 	items := map[int64]*mainStruct.WebUser{webUser.Id: webUser}
 	return webStruct.UserResponse{MessageType: data.Event, WebUsers: &items}
+}
+
+func requireOwnWebUserOrAdmin(data *webStruct.MessageData) *webStruct.UserResponse {
+	if data == nil || data.Id == 0 || data.Context == nil || data.Context.User == nil {
+		messageType := ""
+		if data != nil {
+			messageType = data.Event
+		}
+		return &webStruct.UserResponse{Error: "wrong id", MessageType: messageType}
+	}
+	if data.Id != data.Context.User.Id && data.Context.User.GroupId != mainStruct.GetAdminId() {
+		return &webStruct.UserResponse{Error: "access denied", MessageType: data.Event}
+	}
+	return nil
 }
 
 func GetWebSettings(data *webStruct.MessageData) webStruct.UserResponse {

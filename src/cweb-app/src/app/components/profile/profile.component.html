@@ -1,0 +1,101 @@
+<app-inner-header translationKey="profilePage.title"></app-inner-header>
+<main class="profile-page">
+  <section class="profile-card" aria-labelledby="profile-heading">
+    <div class="profile-card__heading">
+      <div class="profile-avatar">
+        @if (user()?.avatar_format) {
+          <img [src]="'./assets/img/avatar/' + user().id + '.' + user().avatar_format" [alt]="user()?.login">
+          <button type="button" class="profile-avatar__clear" (click)="clearAvatar()"
+            [title]="'settingsPage.clear' | transloco" [attr.aria-label]="'settingsPage.clear' | transloco">×</button>
+        } @else {
+          <app-icon name="face"></app-icon>
+        }
+      </div>
+      <div>
+        <h2 id="profile-heading">{{ user()?.login }}</h2>
+        <p>{{ 'profilePage.help' | transloco }}</p>
+      </div>
+    </div>
+
+    <div class="profile-fields">
+      <label class="cpbx-field">
+        <span class="cpbx-label">{{ 'settingsPage.login' | transloco }}</span>
+        <input class="cpbx-input" [value]="user()?.login ?? ''" readonly>
+      </label>
+      <label class="cpbx-field">
+        <span class="cpbx-label">{{ 'common.language' | transloco }}</span>
+        <select class="cpbx-select" [value]="localeService.activeLocale()"
+          (change)="changeLocale($any($event.target).value)">
+          @for (locale of localeService.supportedLocales; track locale.code) {
+            <option [value]="locale.code">{{ locale.nativeLabel }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="profile-edit-row">
+        <label class="cpbx-field">
+          <span class="cpbx-label">{{ 'settingsPage.newPassword' | transloco }}</span>
+          <input class="cpbx-input" type="password" autocomplete="new-password"
+            [placeholder]="'settingsPage.newPasswordHint' | transloco"
+            [ngModel]="password()" (ngModelChange)="password.set($event)"
+            (keydown.enter)="updatePassword()">
+        </label>
+        <button type="button" class="cpbx-button cpbx-button--secondary"
+          [disabled]="password().length < 6" (click)="updatePassword()">
+          {{ 'common.actions.update' | transloco }}
+        </button>
+      </div>
+
+      <label class="cpbx-field">
+        <span class="cpbx-label">{{ technicalLabels.webRtc }}</span>
+        <select class="cpbx-select" [value]="user()?.webrtc_lib || 'sipjs'"
+          (change)="updateWebRtcLibrary($any($event.target).value)">
+          <option value="sipjs">{{ technicalLabels.sipJs }}</option>
+          <option value="verto">{{ technicalLabels.verto }}</option>
+        </select>
+      </label>
+
+      <div class="profile-edit-row">
+        <label class="cpbx-field">
+          <span class="cpbx-label">{{ 'settingsPage.wsForSipjs' | transloco }}</span>
+          <input class="cpbx-input" [ngModel]="ws()" (ngModelChange)="ws.set($event)"
+            (keydown.enter)="updateWs()">
+        </label>
+        <button type="button" class="cpbx-button cpbx-button--secondary"
+          [disabled]="ws() === (user()?.ws ?? '')" (click)="updateWs()">
+          {{ 'common.actions.update' | transloco }}
+        </button>
+      </div>
+
+      <div class="profile-edit-row">
+        <label class="cpbx-field">
+          <span class="cpbx-label">{{ 'settingsPage.wsForVerto' | transloco }}</span>
+          <input class="cpbx-input" [ngModel]="vertoWs()" (ngModelChange)="vertoWs.set($event)"
+            (keydown.enter)="updateVertoWs()">
+        </label>
+        <button type="button" class="cpbx-button cpbx-button--secondary"
+          [disabled]="vertoWs() === (user()?.verto_ws ?? '')" (click)="updateVertoWs()">
+          {{ 'common.actions.update' | transloco }}
+        </button>
+      </div>
+
+      <div class="profile-edit-row">
+        <label class="cpbx-field">
+          <span class="cpbx-label">{{ 'settingsPage.stunOverride' | transloco }}</span>
+          <input class="cpbx-input" [ngModel]="stun()" (ngModelChange)="stun.set($event)"
+            (keydown.enter)="updateStun()">
+        </label>
+        <button type="button" class="cpbx-button cpbx-button--secondary"
+          [disabled]="stun() === (user()?.stun ?? '')" (click)="updateStun()">
+          {{ 'common.actions.update' | transloco }}
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="cpbx-button cpbx-button--primary profile-upload" (click)="avatarInput.click()">
+      <app-icon name="file_upload"></app-icon>
+      <span>{{ 'settingsPage.uploadImage' | transloco }}</span>
+    </button>
+    <input #avatarInput hidden type="file" [accept]="acceptFile" (change)="chooseAvatar(avatarInput)">
+  </section>
+</main>

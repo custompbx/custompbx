@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, computed, effect} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, computed, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {Iitem, Iverto, IvertoParameterItem, State} from '../../../store/config/config.state.struct';
 import {select, Store} from '@ngrx/store';
@@ -17,20 +17,21 @@ import {
   UpdateVertoSetting
 } from '../../../store/config/verto/config.actions.verto';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
-import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {KeyValuePadPositionComponent} from "../../key-value-pad-position/key-value-pad-position.component";
-import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {resolvePositionedReorder} from '../../../utils/reorder';
+import {TranslocoPipe} from '@jsverse/transloco';
+import {ConfigPageShellComponent} from '../config-page-shell/config-page-shell.component';
+import {CpbxTabPanelDirective} from '../../../directives/cpbx-tab-panel.directive';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, KeyValuePadPositionComponent, TabNavComponent, DisclosureComponent],
+  imports: [FormsModule, ConfigPageShellComponent, CpbxTabPanelDirective, KeyValuePad2Component, KeyValuePadPositionComponent, DisclosureComponent, TranslocoPipe],
   selector: 'app-verto',
   templateUrl: './verto.component.html',
-  styleUrls: ['./verto.component.css']
+  styleUrls: ['./verto.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VertoComponent {
 
@@ -48,6 +49,8 @@ export class VertoComponent {
   public newProfileName: string = '';
   public newGatewayName: string = ''; // Note: This field exists but doesn't seem used in the component logic provided
   public selectedIndex: number = 0;
+  readonly mainTabs = ['List', 'Add', 'Delete/Rename'];
+  readonly mainTabKeys = ['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename'];
   public profileId: number = 0;
   public panelCloser: any = {};
   public toCopyProfile: number = 0;
@@ -215,9 +218,7 @@ export class VertoComponent {
       return;
     }
     this.toCopyProfile = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   pasteProfileParams(to: number) {

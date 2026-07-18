@@ -36,12 +36,14 @@ import {IwebUser} from "../../store/settings/settings.reducers";
 import {FormatTimerPipe} from "../../pipes/format-timer.pipe";
 import {LoadingBarComponent} from '../loading-bar/loading-bar.component';
 import {IconComponent} from '../icon/icon.component';
+import {LocaleService} from '../../i18n/locale.service';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 const scrollTop = 64;
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, FormatTimerPipe, LoadingBarComponent, IconComponent],
+  imports: [CommonModule, FormsModule, FormatTimerPipe, LoadingBarComponent, IconComponent, TranslocoPipe],
   selector: 'app-conversations',
   templateUrl: './conversations.component.html',
   styleUrls: ['./conversations.component.css']
@@ -58,6 +60,7 @@ export class ConversationsComponent {
   private route = inject(ActivatedRoute);
   private ws = inject(WsDataService);
   private destroyRef = inject(DestroyRef);
+  private localeService = inject(LocaleService);
 
   // NgRx State converted to Signals
   private webUsersState = toSignal(this.store.pipe(select(selectSettingsState)), {initialValue: {} as any});
@@ -363,21 +366,11 @@ export class ConversationsComponent {
   }
 
   convertDate(timestamp: string): string {
-    const f = new Date(timestamp);
-    const year = f.getFullYear().toString();
-    const month = (f.getUTCMonth() + 1).toString().padStart(2, '0'); // month is 0-indexed
-    const day = f.getDate().toString().padStart(2, '0');
-    const date = `${year}-${month}-${day}`;
-
-    const hours = f.getHours().toString().padStart(2, '0');
-    const minutes = f.getMinutes().toString().padStart(2, '0');
-    const time = `${hours}:${minutes}`;
-    let res = date + ' ' + time;
-
-    if (f.toDateString() === new Date().toDateString()) {
-      res = time;
-    }
-    return res;
+    const value = new Date(timestamp);
+    const today = value.toDateString() === new Date().toDateString();
+    return this.localeService.formatDate(value, today
+      ? {hour: '2-digit', minute: '2-digit'}
+      : {year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'});
   }
 
   voiceCall() {

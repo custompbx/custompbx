@@ -201,13 +201,47 @@
 
 .web-user-avatar-row {
   align-items: center !important;
-  grid-template-columns: auto auto auto !important;
+  grid-template-columns: auto auto !important;
 }
 
 .web-user-avatar-row .upload-image {
   max-width: max-content;
   min-width: 6rem;
   width: auto !important;
+}
+
+.web-user-avatar {
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+}
+
+.web-user-avatar__clear {
+  align-items: center;
+  background: rgba(15, 23, 42, .78);
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  font-size: 1rem;
+  height: 1.5rem;
+  justify-content: center;
+  opacity: 0;
+  padding: 0;
+  position: absolute;
+  right: -.35rem;
+  top: -.35rem;
+  transform: scale(.85);
+  transition: opacity .15s ease, transform .15s ease;
+  width: 1.5rem;
+}
+
+.web-user-avatar:hover .web-user-avatar__clear,
+.web-user-avatar:focus-within .web-user-avatar__clear {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .token-table th,

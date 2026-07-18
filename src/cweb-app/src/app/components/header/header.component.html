@@ -1,5 +1,6 @@
 <header class="app-toolbar" role="banner">
-  <button class="cpbx-button cpbx-button--icon" (click)="toggleMenu.emit()" title="Toggle navigation" aria-label="Toggle navigation">
+  <button class="cpbx-button cpbx-button--icon" (click)="toggleMenu.emit()"
+    [title]="'header.toggleNavigation' | transloco" [attr.aria-label]="'header.toggleNavigation' | transloco">
     <app-icon name="menu"></app-icon>
   </button>
   <a class="brand" routerLink="/dashboard" aria-label="CustomPBX dashboard">
@@ -8,24 +9,43 @@
   </a>
   <span class="example-spacer"></span>
   <div class="header-actions" aria-label="Application actions">
-    <button class="header-icon-button cpbx-button cpbx-button--icon" (click)="showHideConversations()" title="Conversations" aria-label="Open conversations">
+    <button class="header-icon-button cpbx-button cpbx-button--icon" (click)="showHideConversations()"
+      [title]="'header.conversations' | transloco" [attr.aria-label]="'header.openConversations' | transloco">
       <app-icon name="question_answer"></app-icon>
     </button>
-    <button class="header-icon-button cpbx-button cpbx-button--icon" (click)="showHidePhone()" title="Phone" aria-label="Toggle phone">
+    <button class="header-icon-button cpbx-button cpbx-button--icon" (click)="showHidePhone()"
+      [title]="'header.phone' | transloco" [attr.aria-label]="'header.togglePhone' | transloco">
       <app-icon name="phone"></app-icon>
     </button>
     <button class="header-icon-button cpbx-button cpbx-button--icon" (click)="cloneComponent()" [disabled]="!currentComponent"
-      title="Duplicate current view" aria-label="Duplicate current view">
+      [title]="'header.duplicateView' | transloco" [attr.aria-label]="'header.duplicateView' | transloco">
       <app-icon name="filter_2"></app-icon>
     </button>
     @if (user()?.group_id === 1) {
-      <button class="header-icon-button cpbx-button cpbx-button--icon" [routerLink]="['/settings']" title="Settings" aria-label="Open settings">
+      <button class="header-icon-button cpbx-button cpbx-button--icon" [routerLink]="['/settings']"
+        [title]="'header.settings' | transloco" [attr.aria-label]="'header.openSettings' | transloco">
         <app-icon name="settings"></app-icon>
       </button>
     }
   </div>
-  <details class="user-menu">
-    <summary class="user-block" aria-label="Open user menu">
+  <details class="locale-menu" #localeMenu>
+    <summary class="locale-menu__trigger" [title]="'common.language' | transloco"
+      [attr.aria-label]="'common.language' | transloco">
+      {{ localeService.activeLocale().slice(0, 2).toUpperCase() }}
+    </summary>
+    <div class="locale-menu__panel" role="menu">
+      @for (locale of localeService.supportedLocales; track locale.code) {
+        <button type="button" class="locale-menu__item"
+          [class.locale-menu__item--active]="locale.code === localeService.activeLocale()"
+          (click)="changeLocale(locale.code, localeMenu)" role="menuitem">
+          <span class="locale-menu__code">{{ locale.code.slice(0, 2).toUpperCase() }}</span>
+          <span>{{ locale.nativeLabel }}</span>
+        </button>
+      }
+    </div>
+  </details>
+  <details class="user-menu" #userMenu>
+    <summary class="user-block" [attr.aria-label]="'header.openUserMenu' | transloco">
       @if (!user()?.avatar_format) {
         <app-icon class="user-avatar-icon" name="face"></app-icon>
       }
@@ -36,19 +56,19 @@
       <span class="user-name">{{user()?.login}}</span>
     </summary>
     <div class="user-menu__panel" role="menu">
-      <button type="button" class="user-menu__item" role="menuitem">
+      <button type="button" class="user-menu__item" role="menuitem" [routerLink]="['/profile']">
         <app-icon name="account_circle"></app-icon>
-        <span>Profile</span>
+        <span>{{'header.profile' | transloco}}</span>
       </button>
       @if (user()?.group_id === 1) {
         <button type="button" class="user-menu__item" role="menuitem" [routerLink]="['/settings']">
           <app-icon name="settings"></app-icon>
-          <span>Settings</span>
+          <span>{{'header.settings' | transloco}}</span>
         </button>
       }
       <button type="button" class="user-menu__item" role="menuitem" (click)="logOut()">
         <app-icon name="keyboard_tab"></app-icon>
-        <span>Log out</span>
+        <span>{{'header.logOut' | transloco}}</span>
       </button>
     </div>
   </details>

@@ -22,10 +22,11 @@ import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent, TranslocoPipe],
   selector: 'app-opal',
   templateUrl: './opal.component.html',
   styleUrls: ['./opal.component.css']
@@ -185,9 +186,7 @@ export class OpalComponent {
       return;
     }
     this.toCopyListener = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   pasteListenerParams(to: number) {

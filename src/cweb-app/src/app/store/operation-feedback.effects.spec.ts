@@ -14,7 +14,7 @@ describe('operation feedback', () => {
       type: 'StoreRemoveUserToken',
       payload: {response: {id: 3}}
     })).toBeTrue();
-    expect(operationMessage('StoreRemoveUserToken')).toBe('Item removed successfully.');
+    expect(operationMessage('StoreRemoveUserToken')).toBe('feedback.itemRemoved');
   });
 
   it('recognizes legacy persisted delete action names', () => {

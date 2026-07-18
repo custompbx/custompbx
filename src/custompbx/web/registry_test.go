@@ -264,16 +264,20 @@ func TestCoreRegistryIncludesMigratedEvents(t *testing.T) {
 }
 
 func TestCoreRegistryIncludesWebUserSettingsFamily(t *testing.T) {
-	events := []string{
+	adminEvents := []string{
 		eventSettingsUsersGet,
 		eventGetWebUsersByDirectory,
 		eventSettingsUsersAdd,
 		eventSettingsUsersRename,
 		eventSettingsUsersDelete,
 		eventSettingsUsersSwitch,
-		eventSettingsUsersUpdatePass,
 		eventSettingsUsersUpdateLang,
 		eventSettingsUsersUpdateSip,
+	}
+	assertAdminOnlyEventsDispatch(t, adminEvents)
+
+	selfServiceEvents := []string{
+		eventSettingsUsersUpdatePass,
 		eventSettingsUsersUpdateWS,
 		eventSettingsUsersUpdateVerto,
 		eventSettingsUsersUpdateRTC,
@@ -281,7 +285,20 @@ func TestCoreRegistryIncludesWebUserSettingsFamily(t *testing.T) {
 		eventSettingsUsersUpdateAvatar,
 		eventSettingsUsersClearAvatar,
 	}
-	assertAdminOnlyEventsDispatch(t, events)
+	for _, event := range selfServiceEvents {
+		calls := 0
+		r := buildCoreEvents(map[string]eventHandler{
+			event: func(data *webStruct.MessageData) webStruct.UserResponse {
+				calls++
+				return webStruct.UserResponse{MessageType: data.Event}
+			},
+		})
+		ctx := userContext()
+		response, ok := r.Dispatch(messageData(ctx, event), ctx)
+		if !ok || calls != 1 || response.MessageType != event {
+			t.Fatalf("%s was not available to an authenticated user: ok=%v calls=%d response=%+v", event, ok, calls, response)
+		}
+	}
 }
 
 func TestCoreRegistryHandlerOverrides(t *testing.T) {

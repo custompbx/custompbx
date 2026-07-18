@@ -1,4 +1,4 @@
-<app-inner-header name="Instances" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="Instances" translationKey="navigation.instances" [loadCounter]="loadCounter()"></app-inner-header>
 <app-tab-nav ariaLabel="Instance sections" [tabs]="['List', 'Edit', 'Dump']"
   [(selectedIndex)]="selectedIndex"></app-tab-nav>
 <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
@@ -15,16 +15,16 @@
           </h3>
           <span class="card-header-spacer"></span>
           @if (instance.value.id !== currentInstanceId()) {
-            <button (click)="switchInstance(instance.value.id)" class="instance-switch-button cpbx-button cpbx-button--primary-outline">Open</button>
+            <button (click)="switchInstance(instance.value.id)" class="instance-switch-button cpbx-button cpbx-button--primary-outline">{{ 'instances.open' | transloco }}</button>
           }
           @if (instance.value.id === currentInstanceId()) {
-            <div class="current-instance-check" title="Current Instance"><span>Active</span></div>
+            <div class="current-instance-check" [title]="'instances.current' | transloco"><span>{{ 'instances.active' | transloco }}</span></div>
           }
           <p class="cpbx-card__subtitle subtitle">{{instance.value.description || 'Description'}}</p>
         </header>
         <div class="cpbx-card__content instances-content">
-          <div>Host: {{instance.value.host}}</div>
-          <div>Port: {{instance.value.port}}</div>
+          <div>{{ 'instances.host' | transloco }}: {{instance.value.host}}</div>
+          <div>{{ 'instances.port' | transloco }}: {{instance.value.port}}</div>
         </div>
     </section>
   }
@@ -36,17 +36,15 @@
     @for (instance of list() | keyvalue; track trackByFnId($index, instance)) {
       <div class="cpbx-edit-row">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Instance name</span>
-<input name="instance name" disabled required [ngModel]="instance.value.name" [name]="'instance-name::' + instance.value.id" placeholder="Instance name" class="cpbx-input">
+<span class="cpbx-label">{{ 'instances.name' | transloco }}</span>
+<input name="instance name" disabled required [ngModel]="instance.value.name" [name]="'instance-name::' + instance.value.id" [placeholder]="'instances.name' | transloco" class="cpbx-input">
 </label>
           <label class="cpbx-field cpbx-field--wide">
-<span class="cpbx-label">Instance description</span>
-<input name="instance description" required [ngModel]="instance.value.description" [name]="'instance-description::' + instance.value.id" placeholder="Instance description" class="cpbx-input">
+<span class="cpbx-label">{{ 'instances.description' | transloco }}</span>
+<input name="instance description" required [ngModel]="instance.value.description" [name]="'instance-description::' + instance.value.id" [placeholder]="'instances.description' | transloco" class="cpbx-input">
 </label>
             <button class="cpbx-button cpbx-button--primary" [disabled]="checkDirty(deleteForm.controls['instance-description::' + instance.value.id])"
-              (click)="updateDescription(instance.value, deleteForm.controls['instance-description::' + instance.value.id].value)">
-              Update
-            </button>
+              (click)="updateDescription(instance.value, deleteForm.controls['instance-description::' + instance.value.id].value)">{{ 'common.actions.update' | transloco }}</button>
           </div>
         }
       </form>

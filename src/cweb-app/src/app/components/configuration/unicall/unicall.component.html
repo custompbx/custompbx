@@ -1,21 +1,21 @@
 <app-inner-header name="Unicall" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <app-tab-nav ariaLabel="Unicall sections" [tabs]="['List', 'Add', 'Delete/Rename']" [(selectedIndex)]="selectedIndex"></app-tab-nav>
+  <app-tab-nav ariaLabel="Unicall sections" ariaLabelKey="navigation.configuration" [tabs]="['List', 'Add', 'Delete/Rename']" [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']" [(selectedIndex)]="selectedIndex"></app-tab-nav>
     <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Settings</p>
+          <p class="cpbx-card__subtitle">{{ 'configuration.settings' | transloco }}</p>
         </header>
         <div class="cpbx-card__content">
           <app-disclosure>
               <span disclosureTitle>
-                Settings
+                {{ 'configuration.settings' | transloco }}
               </span>
               <span disclosureDescription>
-                Click to get details
+                {{ 'common.clickDetails' | transloco }}
               </span>
-            <h3>Params:</h3>
+            <h3>{{ 'common.parameters' | transloco }}:</h3>
             <app-key-value-pad-2 [exist]="list().settings"
                                  [items]="list().settings"
                                  [newItems]="list().settings?.new"
@@ -30,7 +30,7 @@
 
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Spans</p>
+          <p class="cpbx-card__subtitle">{{ 'configuration.spans' | transloco }}</p>
         </header>
         <div class="cpbx-card__content">
           @for (item of onlyValues(list().spans); track item.id) {
@@ -41,13 +41,12 @@
                     {{item.span_id}}
                   </span>
                   <span disclosureDescription>
-                    Click to get details
+                    {{ 'common.clickDetails' | transloco }}
                   </span>
                 @if (list().spans[item.id] && (list().spans[item.id].parameters)) {
-                <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copySpan(item.id)">Copy
-                </button>
+                <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copySpan(item.id)">{{ 'common.actions.copy' | transloco }}</button>
                 }
-                <h3>Params:</h3>
+                <h3>{{ 'common.parameters' | transloco }}:</h3>
                 <div>
                   <app-key-value-pad-2 [exist]="item.parameters"
                                        [items]="item.parameters"
@@ -69,30 +68,26 @@
     <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
       <form class="cpbx-form-panel" (ngSubmit)="onSpanSubmit()">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input placeholder="New span id" required name="name" [(ngModel)]="newSpanId" class="cpbx-input">
 </label>
-        <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+        <button class="cpbx-button cpbx-button--primary" type="submit">{{ 'common.actions.submit' | transloco }}</button>
       </form>
     </div>
 
     <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
-        <h3 class="cpbx-form-title">Span</h3>
+        <h3 class="cpbx-form-title">{{ 'configuration.span' | transloco }}</h3>
         @for (span of onlyValues(list().spans); track span.id) {
           <div class="cpbx-edit-row">
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Span id</span>
+<span class="cpbx-label">{{ 'configuration.spanId' | transloco }}</span>
 <input name="Span id" required [ngModel]="span.span_id" [name]="'span::' + span.id" placeholder="Span id" class="cpbx-input">
 </label>
             <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['span::' + span.id])"
-                    (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'rename')">
-              Update
-            </button>
+                    (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'rename')">{{ 'common.actions.update' | transloco }}</button>
             <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                    (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'delete')">
-              Delete
-            </button>
+                    (click)="openBottomSheetSpan(span.id, deleteForm.controls['span::' + span.id].value, span.span_id, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
           </div>
         }
       </form>

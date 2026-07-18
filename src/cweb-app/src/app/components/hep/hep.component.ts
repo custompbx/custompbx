@@ -12,6 +12,7 @@ import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {TabNavComponent} from '../tab-nav/tab-nav.component';
 import {SvgSeqDiagramComponent} from "../svg-seq-diagram/svg-seq-diagram.component";
 import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 export interface IfilterField {
   field: string | null;
@@ -95,7 +96,7 @@ function downloadSvgAsPng(svgElement: SVGSVGElement, filename: string, scale = 1
 
 @Component({
   standalone: true,
-  imports: [FormsModule, InnerHeaderComponent, SvgSeqDiagramComponent, CpbxSelectDirective, TabNavComponent, PaginatorComponent],
+  imports: [FormsModule, InnerHeaderComponent, SvgSeqDiagramComponent, CpbxSelectDirective, TabNavComponent, PaginatorComponent, TranslocoPipe],
   selector: 'app-hep',
   templateUrl: './hep.component.html',
   styleUrls: ['./hep.component.css']

@@ -42,10 +42,11 @@ import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {State} from "../../../store/directory/directory.reducers";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 import {IconComponent} from '../../icon/icon.component';
+import {TranslocoPipe, TranslocoService} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent],
+  imports: [FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent, TranslocoPipe],
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
@@ -57,6 +58,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   private bottomSheet = inject(ConfirmationService);
   private _snackBar = inject(ToastService);
   private route = inject(ActivatedRoute);
+  private i18n = inject(TranslocoService);
 
   // --- Reactive State from NgRx using toSignal ---
   private directoryState = toSignal(
@@ -223,7 +225,7 @@ export class UsersComponent implements OnInit, OnDestroy {
       return;
     }
     this.toCopy = key;
-    this._snackBar.open('Copied!', null, {
+    this._snackBar.open(this.i18n.translate('common.copied'), null, {
       duration: 700,
       // horizontalPosition: 'right',
       // verticalPosition: 'top',
@@ -237,8 +239,8 @@ export class UsersComponent implements OnInit, OnDestroy {
           newName: newName,
           oldName: oldName,
           action: action,
-          case1Text: 'Are you sure you want to delete user "' + oldName + '"?',
-          case2Text: 'Are you sure you want to rename user "' + oldName + '" to "' + newName + '"?',
+          case1Text: this.i18n.translate('directory.confirmDeleteUser', {name: oldName}),
+          case2Text: this.i18n.translate('directory.confirmRenameUser', {oldName, newName}),
         }
     };
     const sheet = this.bottomSheet.open(config);

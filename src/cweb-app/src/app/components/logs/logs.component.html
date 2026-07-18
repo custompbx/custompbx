@@ -1,16 +1,16 @@
-<app-inner-header name="Logs" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="Logs" translationKey="navigation.logs" [loadCounter]="loadCounter()"></app-inner-header>
 <div class="logs-card">
   <div class="cpbx-form-panel">
     <button class="switch-button cpbx-button cpbx-button--secondary"
             (click)="getRecords()">
-      Get Records
+      {{'ui.getRecords' | transloco}}
     </button>
   </div>
   <div class="cpbx-form-panel">
     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Filter Field</span>
+<span class="cpbx-label">{{'ui.field' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="filter().field" [disabled]="!columns">
-<option [ngValue]="null" disabled hidden>Filter Field</option>
+<option [ngValue]="null" disabled hidden>{{'ui.field' | transloco}}</option>
         <option [ngValue]="null">
           ---
         </option>
@@ -23,9 +23,9 @@
 </label>
 
     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Operand</span>
+<span class="cpbx-label">{{'ui.operand' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="filter().operand" [disabled]="!filter().field">
-<option [ngValue]="null" disabled hidden>Operand</option>
+<option [ngValue]="null" disabled hidden>{{'ui.operand' | transloco}}</option>
         @for (val of operands; track val) {
           <option [ngValue]="val">
             {{ val }}
@@ -35,26 +35,26 @@
 </label>
 
     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
-<input name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required placeholder="Value" class="cpbx-input">
+<span class="cpbx-label">{{'ui.value' | transloco}}</span>
+<input name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required [placeholder]="'ui.value' | transloco" class="cpbx-input">
 </label>
     @if (!filters()[toEditFilter()]) {
       <button class="switch-button cpbx-button cpbx-button--secondary"
               [disabled]="!filter().field_value || !filter().operand || !filter().field"
               (click)="addFilter()">
-        Add filter
+        {{'ui.addFilter' | transloco}}
       </button>
     } @else {
       <button class="switch-button cpbx-button cpbx-button--primary"
               [disabled]="!filter().field_value || !filter().operand || !filter().field"
               (click)="saveFilter()">
-        Edit filter
+        {{'ui.editFilter' | transloco}}
       </button>
     }
     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Order Field</span>
+<span class="cpbx-label">{{'ui.sortField' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="sortColumns" [disabled]="!columns">
-<option [ngValue]="null" disabled hidden>Order Field</option>
+<option [ngValue]="null" disabled hidden>{{'ui.sortField' | transloco}}</option>
         <option [ngValue]="null">
           ---
         </option>
@@ -71,7 +71,7 @@
     <button class="switch-button cpbx-button cpbx-button--secondary"
             [disabled]="!sortColumns"
             (click)="addSorter()">
-      Add sorting
+      {{'ui.addSorting' | transloco}}
     </button>
   </div>
   <div class="chips-pad">

@@ -3,10 +3,10 @@
 @if (list() && list().exists !== false) {
   <section class="cpbx-card">
     <header class="cpbx-card__header">
-      <p class="cpbx-card__subtitle">Settings</p>
+      <p class="cpbx-card__subtitle">{{ 'configuration.settings' | transloco }}</p>
     </header>
     <div class="cpbx-card__content">
-      <h3>Params:</h3>
+      <h3>{{ 'common.parameters' | transloco }}:</h3>
       <app-key-value-pad-2 [exist]="list().settings"
         [items]="list().settings"
         [newItems]="list().newSettingParams"
@@ -22,10 +22,10 @@
 @if (list() && list().exists !== false) {
   <section class="cpbx-card">
     <header class="cpbx-card__header">
-      <p class="cpbx-card__subtitle">Schema</p>
+      <p class="cpbx-card__subtitle">{{ 'configuration.schema' | transloco }}</p>
     </header>
     <div class="cpbx-card__content">
-      <h3>Fields:</h3>
+      <h3>{{ 'configuration.fields' | transloco }}:</h3>
       <app-key-value-pad-2 [exist]="list().schema"
         [items]="list().schema"
         [newItems]="list().newSchemaFields"

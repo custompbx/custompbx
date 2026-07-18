@@ -207,15 +207,16 @@ func registerCoreWebUserEvents(r *handlerRegistry, overrides map[string]eventHan
 	mustRegister(r, eventSettingsUsersRename, registeredHandler(eventSettingsUsersRename, renameWebUsers, overrides), adminOnly)
 	mustRegister(r, eventSettingsUsersDelete, registeredHandler(eventSettingsUsersDelete, deleteWebUsers, overrides), adminOnly)
 	mustRegister(r, eventSettingsUsersSwitch, registeredHandler(eventSettingsUsersSwitch, switchWebUser, overrides), adminOnly)
-	mustRegister(r, eventSettingsUsersUpdatePass, registeredHandler(eventSettingsUsersUpdatePass, updateWebUsersPassword, overrides), adminOnly)
+	mustRegister(r, eventSettingsUsersUpdatePass, registeredHandler(eventSettingsUsersUpdatePass, updateWebUsersPassword, overrides), onlyAdminManagerAndUserGroup)
 	mustRegister(r, eventSettingsUsersUpdateLang, registeredHandler(eventSettingsUsersUpdateLang, updateWebUsersLang, overrides), adminOnly)
+	mustRegister(r, eventSettingsUsersUpdateLocale, registeredHandler(eventSettingsUsersUpdateLocale, updateWebUsersLocale, overrides), onlyAdminManagerAndUserGroup)
 	mustRegister(r, eventSettingsUsersUpdateSip, registeredHandler(eventSettingsUsersUpdateSip, updateWebUsersSipUser, overrides), adminOnly)
-	mustRegister(r, eventSettingsUsersUpdateWS, registeredHandler(eventSettingsUsersUpdateWS, updateWebUsersWs, overrides), adminOnly)
-	mustRegister(r, eventSettingsUsersUpdateVerto, registeredHandler(eventSettingsUsersUpdateVerto, updateWebUsersVertoWs, overrides), adminOnly)
-	mustRegister(r, eventSettingsUsersUpdateRTC, registeredHandler(eventSettingsUsersUpdateRTC, UpdateWebUserWebRTCLib, overrides), adminOnly)
-	mustRegister(r, eventSettingsUsersUpdateStun, registeredHandler(eventSettingsUsersUpdateStun, updateWebUsersStun, overrides), adminOnly)
-	mustRegister(r, eventSettingsUsersUpdateAvatar, registeredHandler(eventSettingsUsersUpdateAvatar, updateWebUsersAvatar, overrides), adminOnly)
-	mustRegister(r, eventSettingsUsersClearAvatar, registeredHandler(eventSettingsUsersClearAvatar, clearWebUsersAvatar, overrides), adminOnly)
+	mustRegister(r, eventSettingsUsersUpdateWS, registeredHandler(eventSettingsUsersUpdateWS, updateWebUsersWs, overrides), onlyAdminManagerAndUserGroup)
+	mustRegister(r, eventSettingsUsersUpdateVerto, registeredHandler(eventSettingsUsersUpdateVerto, updateWebUsersVertoWs, overrides), onlyAdminManagerAndUserGroup)
+	mustRegister(r, eventSettingsUsersUpdateRTC, registeredHandler(eventSettingsUsersUpdateRTC, UpdateWebUserWebRTCLib, overrides), onlyAdminManagerAndUserGroup)
+	mustRegister(r, eventSettingsUsersUpdateStun, registeredHandler(eventSettingsUsersUpdateStun, updateWebUsersStun, overrides), onlyAdminManagerAndUserGroup)
+	mustRegister(r, eventSettingsUsersUpdateAvatar, registeredHandler(eventSettingsUsersUpdateAvatar, updateWebUsersAvatar, overrides), onlyAdminManagerAndUserGroup)
+	mustRegister(r, eventSettingsUsersClearAvatar, registeredHandler(eventSettingsUsersClearAvatar, clearWebUsersAvatar, overrides), onlyAdminManagerAndUserGroup)
 }
 
 func registerCoreDirectoryTemplateEvents(r *handlerRegistry, overrides map[string]eventHandler) {

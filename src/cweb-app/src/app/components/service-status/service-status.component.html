@@ -13,11 +13,11 @@
   </button>
 
   @if (detailsOpen()) {
-    <section id="service-status-details" class="service-status__panel" aria-label="Connection status" aria-live="polite">
+    <section id="service-status-details" class="service-status__panel" [attr.aria-label]="'serviceStatus.title' | transloco" aria-live="polite">
       <div class="service-status__heading">
         <div>
-          <strong>Connection status</strong>
-          <span>Live service availability</span>
+          <strong>{{ 'serviceStatus.title' | transloco }}</strong>
+          <span>{{ 'serviceStatus.availability' | transloco }}</span>
         </div>
         <button type="button" class="service-status__close" aria-label="Close connection status" (click)="closeDetails()">
           <app-icon name="close"></app-icon>
@@ -28,7 +28,7 @@
         <div class="service-status__row">
           <span class="service-status__service">
             <span class="service-status__dot" [class.is-ok]="isConnected() === true" [class.is-error]="isConnected() === false"></span>
-            Web application
+            {{ 'serviceStatus.webApplication' | transloco }}
           </span>
           <span class="service-status__value">{{websocketLabel()}}</span>
         </div>
@@ -42,16 +42,16 @@
         <div class="service-status__row">
           <span class="service-status__service">
             <span class="service-status__dot" [class.is-ok]="daemonStatusReceived() && !noDB()" [class.is-error]="noDB()"></span>
-            Database
+            {{ 'serviceStatus.database' | transloco }}
           </span>
           <span class="service-status__value">{{databaseLabel()}}</span>
         </div>
       </div>
 
       @if (connectionState() === 'offline') {
-        <p class="service-status__help">The app is reconnecting automatically. Changes cannot be sent until the connection returns.</p>
+        <p class="service-status__help">{{ 'serviceStatus.reconnecting' | transloco }}</p>
       } @else if (connectionState() === 'degraded') {
-        <p class="service-status__help">The web app is connected, but one or more backend services need attention.</p>
+        <p class="service-status__help">{{ 'serviceStatus.degraded' | transloco }}</p>
       }
     </section>
   }

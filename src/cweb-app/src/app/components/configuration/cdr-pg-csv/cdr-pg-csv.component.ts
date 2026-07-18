@@ -18,10 +18,11 @@ import { ActivatedRoute } from '@angular/router';
 import { InnerHeaderComponent } from "../../inner-header/inner-header.component";
 import { ModuleNotExistsBannerComponent } from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  imports: [FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TranslocoPipe],
   selector: 'app-cdr-pg-csv',
   templateUrl: './cdr-pg-csv.component.html',
   styleUrls: ['./cdr-pg-csv.component.css']

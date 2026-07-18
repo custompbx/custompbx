@@ -2,6 +2,7 @@ import {ChangeDetectionStrategy, Component, input, output, signal} from '@angula
 import {FormsModule} from '@angular/forms';
 import {AppAutoFocusDirective} from '../../directives/auto-focus.directive';
 import {IconComponent} from '../icon/icon.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 export interface EditableTableCellEvent {
   row: Record<string, any>;
@@ -13,7 +14,7 @@ export interface EditableTableCellEvent {
 @Component({
   selector: 'app-editable-table',
   standalone: true,
-  imports: [FormsModule, AppAutoFocusDirective, IconComponent],
+  imports: [FormsModule, AppAutoFocusDirective, IconComponent, TranslocoPipe],
   templateUrl: './editable-table.component.html',
   styleUrl: './editable-table.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

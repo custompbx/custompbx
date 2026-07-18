@@ -15,6 +15,12 @@ export interface Iuser {
   token?: string;
   avatar_format?: string;
   sip_id?: object;
+  lang?: number;
+  locale?: string;
+  webrtc_lib?: string;
+  ws?: string;
+  verto_ws?: string;
+  stun?: string;
 }
 
 export const initialState: State = {
@@ -64,6 +70,12 @@ export function reducer(state = initialState, action: (All | SettingsAll)): Stat
         ...state,
         user: {...state.user, ...updatedUser},
       };
+    }
+
+    case SettingsActionTypes.STORE_UPDATE_WEB_USER_LOCALE: {
+      const data = action.payload.response['web_users'] || {};
+      const updatedUser = state.user?.id ? data[state.user.id] : null;
+      return updatedUser ? {...state, user: {...state.user, locale: updatedUser.locale}} : state;
     }
 
     case AuthActionTypes.LOGIN_FAILURE: {

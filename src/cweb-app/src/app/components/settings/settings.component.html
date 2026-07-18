@@ -1,159 +1,159 @@
-<app-inner-header name="Settings" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="Settings" translationKey="header.settings" [loadCounter]="loadCounter()"></app-inner-header>
 <div class="component-inner">
   <app-disclosure (opened)="getConnectionsSettings()">
-    <span disclosureTitle>Connections settings</span>
-    <span disclosureDescription>Click to get details</span>
+    <span disclosureTitle>{{ 'settingsPage.connectionsSettings' | transloco }}</span>
+    <span disclosureDescription>{{ 'common.clickDetails' | transloco }}</span>
 
     <form #sets="ngForm" (ngSubmit)="onSubmit(sets)" ngNativeValidate class="full-form">
       <div class="setting">
         <div class="setting-title">
           <h3>ESL</h3>
-          <div>Event socket settings</div>
+          <div>{{ 'settingsPage.eventSocketSettings' | transloco }}</div>
         </div>
         @if (settings()?.freeswitch?.esl) {
           <div>
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Esl_host</span>
-<input placeholder="host" required [(ngModel)]="settings().freeswitch.esl.host" name="esl_host" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.host' | transloco }}</span>
+<input [placeholder]="'settingsPage.host' | transloco" required [(ngModel)]="settings().freeswitch.esl.host" name="esl_host" class="cpbx-input">
 </label>
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Esl_port</span>
-<input placeholder="port" type="number" required [(ngModel)]="settings().freeswitch.esl.port" name="esl_port" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.port' | transloco }}</span>
+<input [placeholder]="'settingsPage.port' | transloco" type="number" required [(ngModel)]="settings().freeswitch.esl.port" name="esl_port" class="cpbx-input">
 </label>
               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Esl_pass</span>
-<input placeholder="password" required [(ngModel)]="settings().freeswitch.esl.pass" name="esl_pass" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.password' | transloco }}</span>
+<input [placeholder]="'settingsPage.password' | transloco" required [(ngModel)]="settings().freeswitch.esl.pass" name="esl_pass" class="cpbx-input">
 </label>
               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Esl_timeout</span>
-<input placeholder="timeout" type="number" required [(ngModel)]="settings().freeswitch.esl.timeout" name="esl_timeout" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.timeout' | transloco }}</span>
+<input [placeholder]="'settingsPage.timeout' | transloco" type="number" required [(ngModel)]="settings().freeswitch.esl.timeout" name="esl_timeout" class="cpbx-input">
 </label>
               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Collect_logs</span>
-<input placeholder="collect_logs" type="number" required [(ngModel)]="settings().freeswitch.esl.collect_logs" name="collect_logs" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.collectLogs' | transloco }}</span>
+<input [placeholder]="'settingsPage.collectLogs' | transloco" type="number" required [(ngModel)]="settings().freeswitch.esl.collect_logs" name="collect_logs" class="cpbx-input">
 </label>
               </div>
             }
           </div>
           <div class="setting">
             <div class="setting-title">
-              <h3>Database</h3>
-              <div>Database settings</div>
+              <h3>{{ 'settingsPage.database' | transloco }}</h3>
+              <div>{{ 'settingsPage.databaseSettings' | transloco }}</div>
             </div>
             @if (settings()?.database) {
               <div>
                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">DataBase_host</span>
-<input placeholder="host" required [(ngModel)]="settings().database.host" name="dataBase_host" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.host' | transloco }}</span>
+<input [placeholder]="'settingsPage.host' | transloco" required [(ngModel)]="settings().database.host" name="dataBase_host" class="cpbx-input">
 </label>
                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">DataBase_port</span>
-<input placeholder="port" type="number" required [(ngModel)]="settings().database.port" name="dataBase_port" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.port' | transloco }}</span>
+<input [placeholder]="'settingsPage.port' | transloco" type="number" required [(ngModel)]="settings().database.port" name="dataBase_port" class="cpbx-input">
 </label>
                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">DataBase_name</span>
-<input placeholder="name" required [(ngModel)]="settings().database.name" name="dataBase_name" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.databaseName' | transloco }}</span>
+<input [placeholder]="'settingsPage.databaseName' | transloco" required [(ngModel)]="settings().database.name" name="dataBase_name" class="cpbx-input">
 </label>
                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">DataBase_user</span>
-<input placeholder="user" required [(ngModel)]="settings().database.user" name="dataBase_user" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.databaseUser' | transloco }}</span>
+<input [placeholder]="'settingsPage.databaseUser' | transloco" required [(ngModel)]="settings().database.user" name="dataBase_user" class="cpbx-input">
 </label>
                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">DataBase-pass</span>
-<input placeholder="password" required [(ngModel)]="settings().database.pass" name="dataBase-pass" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.password' | transloco }}</span>
+<input [placeholder]="'settingsPage.password' | transloco" required [(ngModel)]="settings().database.pass" name="dataBase-pass" class="cpbx-input">
 </label>
                 </div>
               }
             </div>
             <div class="setting">
               <div class="setting-title">
-                <h3>Webserver</h3>
-                <div>Webserver settings</div>
+              <h3>{{ 'settingsPage.webserver' | transloco }}</h3>
+              <div>{{ 'settingsPage.webserverSettings' | transloco }}</div>
               </div>
               @if (settings()?.webserver) {
                 <div>
                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Webserver_host</span>
-<input placeholder="host" required [(ngModel)]="settings().webserver.host" name="webserver_host" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.host' | transloco }}</span>
+<input [placeholder]="'settingsPage.host' | transloco" required [(ngModel)]="settings().webserver.host" name="webserver_host" class="cpbx-input">
 </label>
                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Webserver_port</span>
-<input placeholder="port" type="number" required [(ngModel)]="settings().webserver.port" name="webserver_port" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.port' | transloco }}</span>
+<input [placeholder]="'settingsPage.port' | transloco" type="number" required [(ngModel)]="settings().webserver.port" name="webserver_port" class="cpbx-input">
 </label>
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Webserver_route</span>
-<input placeholder="route" required [(ngModel)]="settings().webserver.route" name="webserver_route" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.route' | transloco }}</span>
+<input [placeholder]="'settingsPage.route' | transloco" required [(ngModel)]="settings().webserver.route" name="webserver_route" class="cpbx-input">
 </label>
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">WebSocket write timeout seconds</span>
+<span class="cpbx-label">{{ 'settingsPage.wsWriteTimeout' | transloco }}</span>
 <input placeholder="10" type="number" min="1" [(ngModel)]="settings().webserver.ws_write_timeout_seconds" name="webserver_ws_write_timeout_seconds" class="cpbx-input">
 </label>
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">WebSocket read timeout seconds</span>
+<span class="cpbx-label">{{ 'settingsPage.wsReadTimeout' | transloco }}</span>
 <input placeholder="60" type="number" min="2" [(ngModel)]="settings().webserver.ws_read_timeout_seconds" name="webserver_ws_read_timeout_seconds" class="cpbx-input">
 </label>
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">WebSocket ping interval seconds</span>
+<span class="cpbx-label">{{ 'settingsPage.wsPingInterval' | transloco }}</span>
 <input placeholder="30" type="number" min="1" [(ngModel)]="settings().webserver.ws_ping_interval_seconds" name="webserver_ws_ping_interval_seconds" class="cpbx-input">
 </label>
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">WebSocket queue size</span>
+<span class="cpbx-label">{{ 'settingsPage.wsQueueSize' | transloco }}</span>
 <input placeholder="64" type="number" min="1" max="1024" [(ngModel)]="settings().webserver.websocket_queue_size" name="webserver_websocket_queue_size" class="cpbx-input">
 </label>
                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Webserver_cert_path</span>
-<input placeholder="cert_path" [(ngModel)]="settings().webserver.cert_path" name="webserver_cert_path" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.certificatePath' | transloco }}</span>
+<input [placeholder]="'settingsPage.certificatePath' | transloco" [(ngModel)]="settings().webserver.cert_path" name="webserver_cert_path" class="cpbx-input">
 </label>
                       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Webserver-key_path</span>
-<input placeholder="key_path" [(ngModel)]="settings().webserver.key_path" name="webserver-key_path" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.keyPath' | transloco }}</span>
+<input [placeholder]="'settingsPage.keyPath' | transloco" [(ngModel)]="settings().webserver.key_path" name="webserver-key_path" class="cpbx-input">
 </label>
                       </div>
                     }
                   </div>
                   <div class="setting">
                     <div class="setting-title">
-                      <h3>Xml curl server</h3>
-                      <div>Xml curl server settings</div>
+                      <h3>{{ 'settingsPage.xmlCurlServer' | transloco }}</h3>
+                      <div>{{ 'settingsPage.xmlCurlServerSettings' | transloco }}</div>
                     </div>
                     @if (settings()?.xml_curl_server) {
                       <div>
                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Xml_curl_server_host</span>
-<input placeholder="host" required [(ngModel)]="settings().xml_curl_server.host" name="xml_curl_server_host" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.host' | transloco }}</span>
+<input [placeholder]="'settingsPage.host' | transloco" required [(ngModel)]="settings().xml_curl_server.host" name="xml_curl_server_host" class="cpbx-input">
 </label>
                           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Xml_curl_server_port</span>
-<input placeholder="port" type="number" required [(ngModel)]="settings().xml_curl_server.port" name="xml_curl_server_port" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.port' | transloco }}</span>
+<input [placeholder]="'settingsPage.port' | transloco" type="number" required [(ngModel)]="settings().xml_curl_server.port" name="xml_curl_server_port" class="cpbx-input">
 </label>
                             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Xml_curl_server_route</span>
-<input placeholder="route" required [(ngModel)]="settings().xml_curl_server.route" name="xml_curl_server_route" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.route' | transloco }}</span>
+<input [placeholder]="'settingsPage.route' | transloco" required [(ngModel)]="settings().xml_curl_server.route" name="xml_curl_server_route" class="cpbx-input">
 </label>
                               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Xml_curl_server_cert_path</span>
-<input placeholder="cert_path" [(ngModel)]="settings().xml_curl_server.cert_path" name="xml_curl_server_cert_path" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.certificatePath' | transloco }}</span>
+<input [placeholder]="'settingsPage.certificatePath' | transloco" [(ngModel)]="settings().xml_curl_server.cert_path" name="xml_curl_server_cert_path" class="cpbx-input">
 </label>
                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Xml_curl_server-key_path</span>
-<input placeholder="key_path" [(ngModel)]="settings().xml_curl_server.key_path" name="xml_curl_server-key_path" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.keyPath' | transloco }}</span>
+<input [placeholder]="'settingsPage.keyPath' | transloco" [(ngModel)]="settings().xml_curl_server.key_path" name="xml_curl_server-key_path" class="cpbx-input">
 </label>
                                 </div>
                               }
                             </div>
                             <div class="content-center">
-                              <button class="cpbx-button cpbx-button--primary" type="submit" [disabled]="sets.invalid || !sets.dirty">Save</button>
-                              <button class="cpbx-button cpbx-button--primary" type="reset" (click)="getConnectionsSettings()" [disabled]="sets.invalid || !sets.dirty">
-                                Reset
-                              </button>
+                              <button class="cpbx-button cpbx-button--primary" type="submit" [disabled]="sets.invalid || !sets.dirty">{{ 'common.actions.save' | transloco }}</button>
+                              <button class="cpbx-button cpbx-button--primary" type="reset" (click)="getConnectionsSettings()" [disabled]="sets.invalid || !sets.dirty">{{ 'common.actions.reset' | transloco }}</button>
                             </div>
                           </form>
                         </app-disclosure>
                         <app-disclosure (opened)="getWebUsers()">
-                          <span disclosureTitle>Web users</span>
-                          <span disclosureDescription>Click to get details</span>
+                          <span disclosureTitle>{{ 'settingsPage.webUsers' | transloco }}</span>
+                          <span disclosureDescription>{{ 'common.clickDetails' | transloco }}</span>
 
-                          <app-tab-nav ariaLabel="Web user sections" [tabs]="['List', 'Add', 'Rename/Delete']"
+                          <app-tab-nav ariaLabel="Web user sections" ariaLabelKey="settingsPage.webUsers"
+                            [tabs]="['List', 'Add', 'Rename/Delete']"
+                            [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']"
                             [(selectedIndex)]="webUsersTabIndex"></app-tab-nav>
                           @if (webUsersTabIndex === 0) {
                             <div class="cpbx-tab-panel cpbx-tab-panel--nested">
@@ -162,15 +162,15 @@
                                   @for (user of users() | keyvalue; track user.value.id) {
                                     <app-disclosure class="tabbed-panel">
                                       <span disclosureTitle>{{user.value.login}}</span>
-                                      <span disclosureDescription>Click to get details</span>
+                                      <span disclosureDescription>{{ 'common.clickDetails' | transloco }}</span>
                                       <form #userDetails="ngForm">
                                         @if (user.value) {
                                           <div class="web-user-details">
                                             <div class="cpbx-edit-row">
                                               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">User group</span>
+<span class="cpbx-label">{{ 'settingsPage.userGroup' | transloco }}</span>
 <select class="cpbx-select" required name="group" [(ngModel)]="user.value.group_id">
-<option [ngValue]="null" disabled hidden>User group</option>
+<option [ngValue]="null" disabled hidden>{{ 'settingsPage.userGroup' | transloco }}</option>
                                                   @for (val of onlyValues(usersGroups()); track val.id) {
                                                     <option [ngValue]="val.id">
                                                       {{val.name}}
@@ -180,44 +180,38 @@
 </label>
                                               <button class="cpbx-button cpbx-button--primary" type="button"
                                                 [disabled]="!isvalueReadyToSend(userDetails.controls['group'])"
-                                                (click)="updateGroup(user.value.id, userDetails.controls['group'].value); userDetails.form.markAsPristine();">
-                                                Update
-                                              </button>
+                                                (click)="updateGroup(user.value.id, userDetails.controls['group'].value); userDetails.form.markAsPristine();">{{ 'common.actions.update' | transloco }}</button>
                                             </div>
                                             <div class="cpbx-edit-row">
                                               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">New password</span>
-<input placeholder="new password for web user" [(ngModel)]="user.value.password" name="userPassword" type="password" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.newPassword' | transloco }}</span>
+<input [placeholder]="'settingsPage.newPasswordHint' | transloco" [(ngModel)]="user.value.password" name="userPassword" type="password" autocomplete="off" class="cpbx-input">
 </label>
                                                 <button class="cpbx-button cpbx-button--primary" type="button"
                                                   [disabled]="!isvalueReadyToSend(userDetails.controls['userPassword']) || user.value.password.length < 6"
-                                                  (click)="updatePassword(user.value.id, userDetails.controls['userPassword'].value); userDetails.form.markAsPristine();">
-                                                  Update
-                                                </button>
+                                                  (click)="updatePassword(user.value.id, userDetails.controls['userPassword'].value); userDetails.form.markAsPristine();">{{ 'common.actions.update' | transloco }}</button>
                                               </div>
                                               <div class="cpbx-edit-row">
                                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">User language</span>
-<select class="cpbx-select" required name="lang" [(ngModel)]="user.value.lang">
-<option [ngValue]="null" disabled hidden>User language</option>
-                                                    @for (val of userLangs; track val; let i = $index) {
-                                                      <option [ngValue]="i">
-                                                        {{val}}
+<span class="cpbx-label">{{ 'settingsPage.userLanguage' | transloco }}</span>
+<select class="cpbx-select" required name="locale" [(ngModel)]="user.value.locale">
+<option [ngValue]="null" disabled hidden>{{ 'settingsPage.userLanguage' | transloco }}</option>
+                                                    @for (locale of userLocales; track locale.code) {
+                                                      <option [ngValue]="locale.code">
+                                                        {{locale.nativeLabel}}
                                                       </option>
                                                     }
                                                   </select>
 </label>
                                                 <button class="cpbx-button cpbx-button--primary" type="button"
-                                                  [disabled]="!isvalueReadyToSend(userDetails.controls['lang'])"
-                                                  (click)="updateLang(user.value.id, userDetails.controls['lang'].value); userDetails.form.markAsPristine();">
-                                                  Update
-                                                </button>
+                                                  [disabled]="!isvalueReadyToSend(userDetails.controls['locale'])"
+                                                  (click)="updateLocale(user.value.id, userDetails.controls['locale'].value); userDetails.form.markAsPristine();">{{ 'common.actions.update' | transloco }}</button>
                                               </div>
                                               <div class="cpbx-edit-row">
                                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Directory user</span>
+<span class="cpbx-label">{{ 'settingsPage.directoryUser' | transloco }}</span>
 <select class="cpbx-select" required name="sipUser" [(ngModel)]="user.value.sip_id.Int64">
-                                                    <option [ngValue]="0">-- None --</option>
+                                                    <option [ngValue]="0">{{ 'settingsPage.none' | transloco }}</option>
                                                     @for (domain of directoryDomains() | keyvalue; track domain.key) {
                                                       <optgroup [label]="domain.value.name"
                                                         [disabled]="domain.disabled">
@@ -232,9 +226,7 @@
 </label>
                                                 <button class="cpbx-button cpbx-button--primary" type="button"
                                                   [disabled]="!isvalueReadyToSend(userDetails.controls['sipUser'])"
-                                                  (click)="updateSipUser(user.value.id, userDetails.controls['sipUser'].value); userDetails.form.markAsPristine();">
-                                                  Update
-                                                </button>
+                                                  (click)="updateSipUser(user.value.id, userDetails.controls['sipUser'].value); userDetails.form.markAsPristine();">{{ 'common.actions.update' | transloco }}</button>
                                               </div>
                                               <div class="cpbx-edit-row extra-space">
                                                 <div class="cpbx-segmented" role="radiogroup" aria-label="WebRTC library">
@@ -256,7 +248,7 @@
                                               </div>
                                               <div class="cpbx-edit-row">
 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">ws for sipjs</span>
+<span class="cpbx-label">{{ 'settingsPage.wsForSipjs' | transloco }}</span>
 <input placeholder="wss://HOST:PORT" class="cpbx-input" [(ngModel)]="user.value.ws"
                                                   name="userWs"
                                                   appResizeInput
@@ -266,13 +258,11 @@
 </label>
                                                 <button class="cpbx-button cpbx-button--primary" type="button"
                                                   [disabled]="!isvalueReadyToSend(userDetails.controls['userWs']) || user.value.webrtc_lib == 'verto'"
-                                                  (click)="updateWs(user.value.id, userDetails.controls['userWs'].value); userDetails.form.markAsPristine();">
-                                                  Update
-                                                </button>
+                                                  (click)="updateWs(user.value.id, userDetails.controls['userWs'].value); userDetails.form.markAsPristine();">{{ 'common.actions.update' | transloco }}</button>
                                               </div>
                                               <div class="cpbx-edit-row">
 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">ws for verto</span>
+<span class="cpbx-label">{{ 'settingsPage.wsForVerto' | transloco }}</span>
 <input placeholder="wss://HOST:PORT" class="cpbx-input" [(ngModel)]="user.value.verto_ws"
                                                   name="userVertoWs"
                                                   appResizeInput
@@ -282,13 +272,11 @@
 </label>
                                                 <button class="cpbx-button cpbx-button--primary" type="button"
                                                   [disabled]="!isvalueReadyToSend(userDetails.controls['userVertoWs']) || user.value.webrtc_lib != 'verto'"
-                                                  (click)="updateVertoWs(user.value.id, userDetails.controls['userVertoWs'].value); userDetails.form.markAsPristine();">
-                                                  Update
-                                                </button>
+                                                  (click)="updateVertoWs(user.value.id, userDetails.controls['userVertoWs'].value); userDetails.form.markAsPristine();">{{ 'common.actions.update' | transloco }}</button>
                                               </div>
                                               <div class="cpbx-edit-row">
 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Stun (replace default)</span>
+<span class="cpbx-label">{{ 'settingsPage.stunOverride' | transloco }}</span>
 <input placeholder="stun:HOST:PORT" class="cpbx-input" [(ngModel)]="user.value.stun"
                                                   name="userStun"
                                                   appResizeInput
@@ -297,70 +285,71 @@
 </label>
                                                 <button class="cpbx-button cpbx-button--primary" type="button"
                                                   [disabled]="!isvalueReadyToSend(userDetails.controls['userStun'])"
-                                                  (click)="updateStun(user.value.id, userDetails.controls['userStun'].value); userDetails.form.markAsPristine();">
-                                                  Update
-                                                </button>
+                                                  (click)="updateStun(user.value.id, userDetails.controls['userStun'].value); userDetails.form.markAsPristine();">{{ 'common.actions.update' | transloco }}</button>
                                               </div>
                                               <div class="cpbx-edit-row web-user-avatar-row">
-                                                @if (!user.value.avatar_format) {
-                                                  <div class="avatar-ico">
-                                                    <app-icon name="face"></app-icon>
-                                                  </div>
-                                                }
-                                                @if (user.value.avatar_format) {
-                                                  <img class="avatar-img"
-                                                    [src]="'./assets/img/avatar/' + user.value.id + '.' + user.value.avatar_format">
+                                                <div class="web-user-avatar">
+                                                  @if (!user.value.avatar_format) {
+                                                    <div class="avatar-ico">
+                                                      <app-icon name="face"></app-icon>
+                                                    </div>
                                                   }
+                                                  @if (user.value.avatar_format) {
+                                                    <img class="avatar-img"
+                                                      [src]="'./assets/img/avatar/' + user.value.id + '.' + user.value.avatar_format"
+                                                      [alt]="user.value.login">
+                                                    <button type="button" class="web-user-avatar__clear"
+                                                      (click)="clearAvatar(user.value.id)"
+                                                      [title]="'settingsPage.clear' | transloco"
+                                                      [attr.aria-label]="'settingsPage.clear' | transloco">×</button>
+                                                  }
+                                                </div>
                                                   <button type="button" class="upload-image cpbx-button cpbx-button--primary"
                                                     (click)="fileInput.click()">
                                                     <app-icon name="file_upload"></app-icon>
-                                                    <span>Upload image</span>
+                                                    <span>{{ 'settingsPage.uploadImage' | transloco }}</span>
                                                     <input #fileInput type="file" name="fileUpload" (change)="chooseAvatar(fileInput, user.value.id)"
                                                       style="display:none;" accept="{{acceptFile}}"/>
-                                                    </button>
-                                                    <button type="button" class="upload-image cpbx-button cpbx-button--secondary"
-                                                      (click)="clearAvatar(user.value.id)" [disabled]="!user.value.avatar_format">
-                                                      <span>Clear</span>
                                                     </button>
                                                   </div>
                                                 </div>
                                               }
                                             </form>
                                             <app-disclosure (opened)="getUserTokens(user.value.id)">
-                                              <span disclosureTitle>User Tokens</span>
-                                              <span disclosureDescription>Click to get details</span>
+                                              <span disclosureTitle>{{ 'settingsPage.userTokens' | transloco }}</span>
+                                              <span disclosureDescription>{{ 'common.clickDetails' | transloco }}</span>
                                               <div class="token-table-wrap">
                                                 <table class="token-table">
                                                   <thead>
                                                     <tr>
                                                       <th scope="col">
-                                                        <span>Token</span>
+                                                        <span>{{ 'settingsPage.token' | transloco }}</span>
                                                         <button class="cpbx-button cpbx-button--primary cpbx-button--compact"
                                                           type="button" (click)="AddUserToken(user.value.id)">
-                                                          Add
+                                                          {{'common.actions.add' | transloco}}
                                                         </button>
                                                       </th>
-                                                      <th scope="col">Created</th>
-                                                      <th scope="col">Purpose</th>
-                                                      <th scope="col"><span class="sr-only">Actions</span></th>
+                                                      <th scope="col">{{ 'settingsPage.created' | transloco }}</th>
+                                                      <th scope="col">{{ 'settingsPage.purpose' | transloco }}</th>
+                                                      <th scope="col"><span class="sr-only">{{ 'settingsPage.actions' | transloco }}</span></th>
                                                     </tr>
                                                   </thead>
                                                   <tbody>
                                                     @for (token of user.value.tokens; track token.id) {
                                                       <tr>
                                                         <td>{{token.token || 'Hidden after creation'}}</td>
-                                                        <td>{{token.created}}</td>
+                                                        <td>{{formatDate(token.created)}}</td>
                                                         <td>{{token.purpose}}</td>
                                                         <td class="token-table__actions">
                                                           <button class="cpbx-button cpbx-button--danger-outline cpbx-button--compact"
                                                             type="button" (click)="openBottomSheetRemoveToken(token.id)">
-                                                            Remove
+                                                            {{'common.actions.remove' | transloco}}
                                                           </button>
                                                         </td>
                                                       </tr>
                                                     } @empty {
                                                       <tr>
-                                                        <td class="token-table__empty" colspan="4">No API tokens</td>
+                                                        <td class="token-table__empty" colspan="4">{{ 'settingsPage.noApiTokens' | transloco }}</td>
                                                       </tr>
                                                     }
                                                   </tbody>
@@ -375,21 +364,21 @@
                           }
                           @if (webUsersTabIndex === 1) {
                                   <div class="cpbx-tab-panel cpbx-tab-panel--nested">
-                                    <h3>New user data</h3>
+                                    <h3>{{ 'settingsPage.newUserData' | transloco }}</h3>
                                     <form #newUserForm="ngForm" class="cpbx-form-panel full-form" (ngSubmit)="onNewUserSubmit(newUserForm)"
                                       ngNativeValidate>
                                       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Login</span>
+<span class="cpbx-label">{{ 'settingsPage.login' | transloco }}</span>
 <input placeholder="New user login" required name="login" (ngModel)="login" class="cpbx-input">
 </label>
                                       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Password</span>
+<span class="cpbx-label">{{ 'settingsPage.password' | transloco }}</span>
 <input placeholder="Password" required name="password" (ngModel)="password" class="cpbx-input">
 </label>
                                       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">User group</span>
+<span class="cpbx-label">{{ 'settingsPage.userGroup' | transloco }}</span>
 <select class="cpbx-select" required name="group_id" (ngModel)="groupId">
-<option [ngValue]="null" disabled hidden>User group</option>
+<option [ngValue]="null" disabled hidden>{{ 'settingsPage.userGroup' | transloco }}</option>
                                           @for (val of onlyValues(usersGroups()); track val.id) {
                                             <option [ngValue]="val.id">
                                               {{val.name}}
@@ -398,47 +387,41 @@
                                         </select>
 </label>
                                       <button class="cpbx-button cpbx-button--primary" type="submit"
-                                        [disabled]="newUserForm.invalid || !newUserForm.dirty || newUserForm.value.password.length < 6">
-                                        Submit
-                                      </button>
+                                        [disabled]="newUserForm.invalid || !newUserForm.dirty || newUserForm.value.password.length < 6">{{ 'common.actions.submit' | transloco }}</button>
                                     </form>
 
                                   </div>
                           }
                           @if (webUsersTabIndex === 2) {
                                   <div class="cpbx-tab-panel cpbx-tab-panel--nested">
-                                    <h3>User logins</h3>
+                                    <h3>{{ 'settingsPage.userLogins' | transloco }}</h3>
                                     @if (users()) {
                                       <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm" ngNativeValidate>
                                         @for (user of users() | keyvalue; track user.key) {
                                           <div class="cpbx-edit-row">
                                             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">User login</span>
-<input name="User login" required [ngModel]="user.value.login" [name]="'list::' + user.key" placeholder="User login" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.userLogin' | transloco }}</span>
+<input required [ngModel]="user.value.login" [name]="'list::' + user.key" [placeholder]="'settingsPage.userLogin' | transloco" class="cpbx-input">
 </label>
                                               <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['list::' + user.key])"
-                                                (click)="openBottomSheet(user.value.id, deleteForm.controls['list::' + user.key].value, user.value.login, 'rename')">
-                                                Update
-                                              </button>
+                                                (click)="openBottomSheet(user.value.id, deleteForm.controls['list::' + user.key].value, user.value.login, 'rename')">{{ 'common.actions.update' | transloco }}</button>
                                               @if (user.value.enabled) {
                                                 <button type="button"
                                                   class="switch-button cpbx-button cpbx-button--secondary"
                                                   (click)="switchWebUser(user.value)">
-                                                  Disable
+                                                  {{ 'common.actions.disable' | transloco }}
                                                 </button>
                                               }
                                               @if (!user.value.enabled) {
                                                 <button type="button"
                                                   class="switch-button cpbx-button cpbx-button--primary-outline"
                                                   (click)="switchWebUser(user.value)">
-                                                  Enable
+                                                  {{ 'common.actions.enable' | transloco }}
                                                 </button>
                                               }
                                               <button class="cpbx-button cpbx-button--danger-outline" type="button"
                                                 [disabled]="objectLength(users()) < 2"
-                                                (click)="openBottomSheet(user.value.id, deleteForm.controls['list::' + user.key].value, user.value.login, 'delete')">
-                                                Delete
-                                              </button>
+                                                (click)="openBottomSheet(user.value.id, deleteForm.controls['list::' + user.key].value, user.value.login, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
                                             </div>
                                           }
                                         </form>
@@ -449,9 +432,11 @@
                                 </app-disclosure>
 
                                 <app-disclosure (opened)="getWebUsersTemplates()">
-                                  <span disclosureTitle>Web user templates</span>
-                                  <span disclosureDescription>Click to get details</span>
-                                  <app-tab-nav ariaLabel="Web user template sections" [tabs]="['List', 'Add', 'Rename/Delete']"
+                                  <span disclosureTitle>{{ 'settingsPage.webUserTemplates' | transloco }}</span>
+                                  <span disclosureDescription>{{ 'common.clickDetails' | transloco }}</span>
+                                  <app-tab-nav ariaLabel="Web user template sections" ariaLabelKey="settingsPage.webUserTemplates"
+                                    [tabs]="['List', 'Add', 'Rename/Delete']"
+                                    [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']"
                                     [(selectedIndex)]="webUserTemplatesTabIndex"></app-tab-nav>
                                   @if (webUserTemplatesTabIndex === 0) {
                                     <div class="cpbx-tab-panel cpbx-tab-panel--nested">
@@ -460,81 +445,73 @@
                                           <app-disclosure class="tabbed-panel"
                                             (opened)="getWebUsersTemplateDetails(template.id)">
                                             <span disclosureTitle>{{template.name}}&#64;{{directoryDomains()[template.domain.id].name}}</span>
-                                            <span disclosureDescription>Click to get details</span>
+                                            <span disclosureDescription>{{ 'common.clickDetails' | transloco }}</span>
                                             <!--
                                             number_alias
                                             directory_name-->
                                             <form #templateDetails="ngForm">
-                                              <h3>Template:</h3>
+                                              <h3>{{ 'settingsPage.template' | transloco }}</h3>
                                               <div class="cpbx-edit-row">
                                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="Template name" [(ngModel)]="template.name" name="name" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
+<input [placeholder]="'settingsPage.templateName' | transloco" [(ngModel)]="template.name" name="name" autocomplete="off" class="cpbx-input">
 </label>
                                                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Cache</span>
-<input type="number" placeholder="Template cache" [(ngModel)]="template.cache" name="cache" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'common.fields.cache' | transloco }}</span>
+<input type="number" [placeholder]="'common.fields.cache' | transloco" [(ngModel)]="template.cache" name="cache" autocomplete="off" class="cpbx-input">
 </label>
                                                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Cidr</span>
-<input placeholder="Template cidr" [(ngModel)]="template.cidr" name="cidr" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'common.fields.cidr' | transloco }}</span>
+<input [placeholder]="'common.fields.cidr' | transloco" [(ngModel)]="template.cidr" name="cidr" autocomplete="off" class="cpbx-input">
 </label>
                                                       <button class="cpbx-button cpbx-button--primary" type="button"
                                                         [disabled]="!isvalueReadyToSend(templateDetails.controls['name']) && !isvalueReadyToSend(templateDetails.controls['cache']) && !isvalueReadyToSend(templateDetails.controls['cidr'])"
-                                                        (click)="UpdateWebDirectoryUsersTemplate(template)">
-                                                        Update
-                                                      </button>
+                                                        (click)="UpdateWebDirectoryUsersTemplate(template)">{{ 'common.actions.update' | transloco }}</button>
                                                       <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                                                        (click)="DelWebDirectoryUsersTemplate(template.name, template.id)">
-                                                        Delete
-                                                      </button>
+                                                        (click)="DelWebDirectoryUsersTemplate(template.name, template.id)">{{ 'common.actions.delete' | transloco }}</button>
                                                     </div>
                                                     <div class="cpbx-form-panel cpbx-form-panel--stack">
-                                                      <h3>Parameters:</h3>
+                                                      <h3>{{ 'common.parameters' | transloco }}</h3>
                                                       @for (param of onlyValues(usersTemplateParameters()); track param) {
                                                         @if (param.parent.id == template.id) {
                                                           <div class="cpbx-edit-row">
                                                             <form #templateParams="ngForm">
                                                               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="Name" [(ngModel)]="param.name" name="name" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
+<input [placeholder]="'common.fields.name' | transloco" [(ngModel)]="param.name" name="name" autocomplete="off" class="cpbx-input">
 </label>
                                                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
-<input placeholder="Value" [(ngModel)]="param.value" name="value" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.value' | transloco }}</span>
+<input [placeholder]="'settingsPage.value' | transloco" [(ngModel)]="param.value" name="value" autocomplete="off" class="cpbx-input">
 </label>
                                                                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Description</span>
-<input placeholder="Description" [(ngModel)]="param.description" name="description" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.description' | transloco }}</span>
+<input [placeholder]="'settingsPage.description' | transloco" [(ngModel)]="param.description" name="description" autocomplete="off" class="cpbx-input">
 </label>
                                                                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Placeholder</span>
-<input placeholder="Placeholder" [(ngModel)]="param.placeholder" name="placeholder" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.placeholder' | transloco }}</span>
+<input [placeholder]="'settingsPage.placeholder' | transloco" [(ngModel)]="param.placeholder" name="placeholder" autocomplete="off" class="cpbx-input">
 </label>
                                                                       <button [color]="param.show ? 'primary' : 'basic'"
                                                                         class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                         (click)="UpdateWebDirectoryUsersTemplateParameter(param, 'show')">
-                                                                        {{param.show ? 'Hide' : 'Show'}}
+                                                                        {{(param.show ? 'settingsPage.hide' : 'settingsPage.show') | transloco}}
                                                                       </button>
                                                                       <button [color]="param.editable ? 'primary' : 'basic'"
                                                                         class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                         (click)="UpdateWebDirectoryUsersTemplateParameter(param, 'editable')">
-                                                                        {{param.editable ? 'Editable' : 'Uneditable'}}
+                                                                        {{(param.editable ? 'settingsPage.editable' : 'settingsPage.uneditable') | transloco}}
                                                                       </button>
                                                                       <button [color]="param.enabled ? 'primary' : 'basic'"
                                                                         class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                         (click)="UpdateWebDirectoryUsersTemplateParameter(param, 'enabled')">
-                                                                        {{param.enabled ? 'Disable' : 'Enable'}}
+                                                                        {{(param.enabled ? 'common.actions.disable' : 'common.actions.enable') | transloco}}
                                                                       </button>
                                                                       <button class="cpbx-button cpbx-button--primary" type="button"
                                                                         [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
-                                                                        (click)="UpdateWebDirectoryUsersTemplateParameter(param, null);">
-                                                                        Update
-                                                                      </button>
+                                                                        (click)="UpdateWebDirectoryUsersTemplateParameter(param, null);">{{ 'common.actions.update' | transloco }}</button>
                                                                       <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                                                                        (click)="DelWebDirectoryUsersTemplateParameter(param.id)">
-                                                                        Delete
-                                                                      </button>
+                                                                        (click)="DelWebDirectoryUsersTemplateParameter(param.id)">{{ 'common.actions.delete' | transloco }}</button>
                                                                     </form>
                                                                   </div>
                                                                 }
@@ -543,99 +520,89 @@
                                                                 <div class="cpbx-edit-row">
                                                                   <form #templateParams="ngForm">
                                                                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="Name" [(ngModel)]="param.name" name="name" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
+<input [placeholder]="'common.fields.name' | transloco" [(ngModel)]="param.name" name="name" autocomplete="off" class="cpbx-input">
 </label>
                                                                       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
-<input placeholder="Value" [(ngModel)]="param.value" name="value" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.value' | transloco }}</span>
+<input [placeholder]="'settingsPage.value' | transloco" [(ngModel)]="param.value" name="value" autocomplete="off" class="cpbx-input">
 </label>
                                                                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Description</span>
-<input placeholder="Description" [(ngModel)]="param.description" name="description" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.description' | transloco }}</span>
+<input [placeholder]="'settingsPage.description' | transloco" [(ngModel)]="param.description" name="description" autocomplete="off" class="cpbx-input">
 </label>
                                                                           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Placeholder</span>
-<input placeholder="Placeholder" [(ngModel)]="param.placeholder" name="placeholder" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.placeholder' | transloco }}</span>
+<input [placeholder]="'settingsPage.placeholder' | transloco" [(ngModel)]="param.placeholder" name="placeholder" autocomplete="off" class="cpbx-input">
 </label>
                                                                             <button [color]="param.show ? 'primary' : 'basic'"
                                                                               class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                               (click)="param.show = !param.show">
-                                                                              {{param.show ? 'Hide' : 'Show'}}
+                                                                              {{(param.show ? 'settingsPage.hide' : 'settingsPage.show') | transloco}}
                                                                             </button>
                                                                             <button [color]="param.editable ? 'primary' : 'basic'"
                                                                               class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                               (click)="param.editable = !param.editable">
-                                                                              {{param.editable ? 'Editable' : 'Uneditable'}}
+                                                                              {{(param.editable ? 'settingsPage.editable' : 'settingsPage.uneditable') | transloco}}
                                                                             </button>
                                                                             <button [color]="param.enabled ? 'primary' : 'basic'"
                                                                               class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                               (click)="param.enabled = !param.enabled">
-                                                                              {{param.enabled ? 'Disable' : 'Enable'}}
+                                                                              {{(param.enabled ? 'common.actions.disable' : 'common.actions.enable') | transloco}}
                                                                             </button>
                                                                             <button class="cpbx-button cpbx-button--primary" type="button"
                                                                               [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
-                                                                              (click)="AddWebDirectoryUsersTemplateParameter(param, template.id, i);">
-                                                                              Update
-                                                                            </button>
+                                                                              (click)="AddWebDirectoryUsersTemplateParameter(param, template.id, i);">{{ 'common.actions.update' | transloco }}</button>
                                                                             <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                                                                              (click)="StoreDelNewWebDirectoryUsersTemplateParameter(template.id, i)">
-                                                                              Delete
-                                                                            </button>
+                                                                              (click)="StoreDelNewWebDirectoryUsersTemplateParameter(template.id, i)">{{ 'common.actions.delete' | transloco }}</button>
                                                                           </form>
                                                                         </div>
                                                                       }
                                                                       <button class="cpbx-button cpbx-button--primary" type="button"
-                                                                        (click)="StoreNewWebDirectoryUsersTemplateParameter(template.id)">
-                                                                        Add
-                                                                      </button>
+                                                                        (click)="StoreNewWebDirectoryUsersTemplateParameter(template.id)">{{ 'common.actions.add' | transloco }}</button>
                                                                     </div>
                                                                     <div class="cpbx-form-panel cpbx-form-panel--stack">
-                                                                      <h3>Variables:</h3>
+                                                                      <h3>{{ 'common.variables' | transloco }}</h3>
                                                                       @for (variable of onlyValues(usersTemplateVariables()); track variable) {
                                                                         @if (variable.parent.id == template.id) {
                                                                           <div class="cpbx-edit-row">
                                                                             <form #templateParams="ngForm">
                                                                               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="Name" [(ngModel)]="variable.name" name="name" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
+<input [placeholder]="'common.fields.name' | transloco" [(ngModel)]="variable.name" name="name" autocomplete="off" class="cpbx-input">
 </label>
                                                                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
-<input placeholder="Value" [(ngModel)]="variable.value" name="value" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.value' | transloco }}</span>
+<input [placeholder]="'settingsPage.value' | transloco" [(ngModel)]="variable.value" name="value" autocomplete="off" class="cpbx-input">
 </label>
                                                                                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Description</span>
-<input placeholder="Description" [(ngModel)]="variable.description" name="description" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.description' | transloco }}</span>
+<input [placeholder]="'settingsPage.description' | transloco" [(ngModel)]="variable.description" name="description" autocomplete="off" class="cpbx-input">
 </label>
                                                                                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Placeholder</span>
-<input placeholder="Placeholder" [(ngModel)]="variable.placeholder" name="placeholder" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.placeholder' | transloco }}</span>
+<input [placeholder]="'settingsPage.placeholder' | transloco" [(ngModel)]="variable.placeholder" name="placeholder" autocomplete="off" class="cpbx-input">
 </label>
                                                                                       <button [color]="variable.show ? 'primary' : 'basic'"
                                                                                         class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                                         (click)="UpdateWebDirectoryUsersTemplateVariable(variable, 'show')">
-                                                                                        {{variable.show ? 'Hide' : 'Show'}}
+                                                                                        {{(variable.show ? 'settingsPage.hide' : 'settingsPage.show') | transloco}}
                                                                                       </button>
                                                                                       <button [color]="variable.editable ? 'primary' : 'basic'"
                                                                                         class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                                         (click)="UpdateWebDirectoryUsersTemplateVariable(variable, 'editable')">
-                                                                                        {{variable.editable ? 'Editable' : 'Uneditable'}}
+                                                                                        {{(variable.editable ? 'settingsPage.editable' : 'settingsPage.uneditable') | transloco}}
                                                                                       </button>
                                                                                       <button [color]="variable.enabled ? 'primary' : 'basic'"
                                                                                         class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                                         (click)="UpdateWebDirectoryUsersTemplateVariable(variable, 'enabled')">
-                                                                                        {{variable.enabled ? 'Disable' : 'Enable'}}
+                                                                                        {{(variable.enabled ? 'common.actions.disable' : 'common.actions.enable') | transloco}}
                                                                                       </button>
                                                                                       <button class="cpbx-button cpbx-button--primary" type="button"
                                                                                         [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
-                                                                                        (click)="UpdateWebDirectoryUsersTemplateVariable(variable, null);">
-                                                                                        Update
-                                                                                      </button>
+                                                                                        (click)="UpdateWebDirectoryUsersTemplateVariable(variable, null);">{{ 'common.actions.update' | transloco }}</button>
                                                                                       <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                                                                                        (click)="DelWebDirectoryUsersTemplateVariable(variable.id)">
-                                                                                        Delete
-                                                                                      </button>
+                                                                                        (click)="DelWebDirectoryUsersTemplateVariable(variable.id)">{{ 'common.actions.delete' | transloco }}</button>
                                                                                     </form>
                                                                                   </div>
                                                                                 }
@@ -644,52 +611,46 @@
                                                                                 <div class="cpbx-edit-row">
                                                                                   <form #templateParams="ngForm">
                                                                                     <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="Name" [(ngModel)]="variable.name" name="name" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
+<input [placeholder]="'common.fields.name' | transloco" [(ngModel)]="variable.name" name="name" autocomplete="off" class="cpbx-input">
 </label>
                                                                                       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
-<input placeholder="Value" [(ngModel)]="variable.value" name="value" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.value' | transloco }}</span>
+<input [placeholder]="'settingsPage.value' | transloco" [(ngModel)]="variable.value" name="value" autocomplete="off" class="cpbx-input">
 </label>
                                                                                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Description</span>
-<input placeholder="Description" [(ngModel)]="variable.description" name="description" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.description' | transloco }}</span>
+<input [placeholder]="'settingsPage.description' | transloco" [(ngModel)]="variable.description" name="description" autocomplete="off" class="cpbx-input">
 </label>
                                                                                           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Placeholder</span>
-<input placeholder="Placeholder" [(ngModel)]="variable.placeholder" name="placeholder" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.placeholder' | transloco }}</span>
+<input [placeholder]="'settingsPage.placeholder' | transloco" [(ngModel)]="variable.placeholder" name="placeholder" autocomplete="off" class="cpbx-input">
 </label>
                                                                                             <button [color]="variable.show ? 'primary' : 'basic'"
                                                                                               class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                                               (click)="variable.show = !variable.show">
-                                                                                              {{variable.show ? 'Hide' : 'Show'}}
+                                                                                              {{(variable.show ? 'settingsPage.hide' : 'settingsPage.show') | transloco}}
                                                                                             </button>
                                                                                             <button [color]="variable.editable ? 'primary' : 'basic'"
                                                                                               class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                                               (click)="variable.editable = !variable.editable">
-                                                                                              {{variable.editable ? 'Editable' : 'Uneditable'}}
+                                                                                              {{(variable.editable ? 'settingsPage.editable' : 'settingsPage.uneditable') | transloco}}
                                                                                             </button>
                                                                                             <button [color]="variable.enabled ? 'primary' : 'basic'"
                                                                                               class="switch-button cpbx-button cpbx-button--secondary" type="button"
                                                                                               (click)="variable.enabled = !variable.enabled">
-                                                                                              {{variable.enabled ? 'Disable' : 'Enable'}}
+                                                                                              {{(variable.enabled ? 'common.actions.disable' : 'common.actions.enable') | transloco}}
                                                                                             </button>
                                                                                             <button class="cpbx-button cpbx-button--primary" type="button"
                                                                                               [disabled]="!isvalueReadyToSend(templateParams.controls['name'])"
-                                                                                              (click)="AddWebDirectoryUsersTemplateVariable(variable, template.id, i);">
-                                                                                              Update
-                                                                                            </button>
+                                                                                              (click)="AddWebDirectoryUsersTemplateVariable(variable, template.id, i);">{{ 'common.actions.update' | transloco }}</button>
                                                                                             <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                                                                                              (click)="StoreDelNewWebDirectoryUsersTemplateVariable(template.id, i)">
-                                                                                              Delete
-                                                                                            </button>
+                                                                                              (click)="StoreDelNewWebDirectoryUsersTemplateVariable(template.id, i)">{{ 'common.actions.delete' | transloco }}</button>
                                                                                           </form>
                                                                                         </div>
                                                                                       }
                                                                                       <button class="cpbx-button cpbx-button--primary" type="button"
-                                                                                        (click)="StoreNewWebDirectoryUsersTemplateVariable(template.id)">
-                                                                                        Add
-                                                                                      </button>
+                                                                                        (click)="StoreNewWebDirectoryUsersTemplateVariable(template.id)">{{ 'common.actions.add' | transloco }}</button>
                                                                                     </div>
                                                                                   </form>
                                                                                 </app-disclosure>
@@ -702,9 +663,9 @@
                                                                             <section class="cpbx-card">
                                                                               <div class="cpbx-form-panel">
                                                                                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Domain</span>
+<span class="cpbx-label">{{ 'common.fields.domain' | transloco }}</span>
 <select class="cpbx-select" required name="domainId" [(ngModel)]="domainId">
-<option [ngValue]="null" disabled hidden>Domain</option>
+<option [ngValue]="null" disabled hidden>{{ 'common.fields.domain' | transloco }}</option>
                                                                                     <option>--</option>
                                                                                     @for (domain of onlyValues(directoryDomains()); track domain) {
                                                                                       <option [ngValue]="domain.id">{{domain.name}}</option>
@@ -712,14 +673,12 @@
                                                                                 </select>
 </label>
                                                                               <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Template Name</span>
-<input placeholder="Template name" [(ngModel)]="templateName" name="cache" autocomplete="off" class="cpbx-input">
+<span class="cpbx-label">{{ 'settingsPage.templateName' | transloco }}</span>
+<input [placeholder]="'settingsPage.templateName' | transloco" [(ngModel)]="templateName" name="cache" autocomplete="off" class="cpbx-input">
 </label>
                                                                                 <button class="cpbx-button cpbx-button--primary" type="button"
                                                                                   [disabled]="!templateName"
-                                                                                  (click)="AddWebUsersTemplates()">
-                                                                                  Submit
-                                                                                </button>
+                                                                                  (click)="AddWebUsersTemplates()">{{ 'common.actions.submit' | transloco }}</button>
                                                                               </div>
                                                                             </section>
                                                                           </div>

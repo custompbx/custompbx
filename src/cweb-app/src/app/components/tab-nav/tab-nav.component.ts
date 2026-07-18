@@ -1,11 +1,13 @@
 import {ChangeDetectionStrategy, Component, input, model} from '@angular/core';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-tab-nav',
   standalone: true,
+  imports: [TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="cpbx-tab-nav" role="tablist" [attr.aria-label]="ariaLabel()">
+    <div class="cpbx-tab-nav" role="tablist" [attr.aria-label]="ariaLabelKey() ? (ariaLabelKey() | transloco) : ariaLabel()">
       @for (tab of tabs(); track tab; let index = $index) {
         <button
           type="button"
@@ -17,7 +19,7 @@ import {ChangeDetectionStrategy, Component, input, model} from '@angular/core';
           [disabled]="disabled()[index]"
           (click)="select(index)"
           (keydown)="handleKeydown($event, index)">
-          {{ tab }}
+          {{ tabKeys()[index] ? (tabKeys()[index] | transloco) : tab }}
         </button>
       }
     </div>
@@ -25,8 +27,10 @@ import {ChangeDetectionStrategy, Component, input, model} from '@angular/core';
 })
 export class TabNavComponent {
   readonly tabs = input.required<readonly string[]>();
+  readonly tabKeys = input<readonly string[]>([]);
   readonly disabled = input<readonly boolean[]>([]);
   readonly ariaLabel = input('Sections');
+  readonly ariaLabelKey = input('');
   readonly selectedIndex = model(0);
 
   select(index: number): void {

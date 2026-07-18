@@ -19,7 +19,8 @@ article {
 }
 
 .get-button {
-  margin: 20px 0 10px 20px;
+  margin-block: 20px 10px;
+  margin-inline: 20px 0;
   display: inline-table;
 }
 .filter-container {
@@ -40,7 +41,7 @@ article {
 }
 
 .callcenter-sort-field {
-  margin-left: .5rem;
+  margin-inline-start: .5rem;
 }
 
 .callcenter-filter-bar .cpbx-button,
@@ -49,7 +50,7 @@ article {
 }
 
 .callcenter-filter-bar .but-spacer-left {
-  margin-left: 0;
+  margin-inline-start: 0;
 }
 .chips-pad {
   margin: 4px;
@@ -63,7 +64,7 @@ article {
   }
 
   .callcenter-sort-field {
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 }
 
@@ -82,7 +83,7 @@ th {
 }
 
 .table-cell:first-child {
-  padding-left: 24px;
+  padding-inline-start: 24px;
 }
 
 .queue-command-panel {

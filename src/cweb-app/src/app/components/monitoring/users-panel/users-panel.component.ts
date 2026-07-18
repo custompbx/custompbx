@@ -21,11 +21,12 @@ import {State as ConfigState} from "../../../store/config/config.state.struct";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {IconComponent} from '../../icon/icon.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 
 @Component({
 standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, FormatTimerPipe, CpbxSelectDirective, TabNavComponent, IconComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, FormatTimerPipe, CpbxSelectDirective, TabNavComponent, IconComponent, TranslocoPipe],
     selector: 'app-users-panel',
     templateUrl: './users-panel.component.html',
     styleUrls: ['./users-panel.component.css']

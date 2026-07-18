@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, computed, effect} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, computed, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {CommonModule} from "@angular/common";
 import {
@@ -64,19 +64,22 @@ import {
 } from '../../../store/config/sofia/config.actions.sofia';
 import {ConfirmationService} from '../../../services/confirmation.service';
 import {ToastService} from '../../../services/toast.service';
-import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
-import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {TranslocoPipe} from '@jsverse/transloco';
+import {ConfigPageShellComponent} from '../config-page-shell/config-page-shell.component';
+import {CpbxTabPanelDirective} from '../../../directives/cpbx-tab-panel.directive';
+import {profilesNeedingGatewaySubscription} from './sofia.helpers';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, CpbxSelectDirective, TabNavComponent, DisclosureComponent],
+  imports: [CommonModule, FormsModule, ConfigPageShellComponent, KeyValuePad2Component, CpbxSelectDirective, TabNavComponent, CpbxTabPanelDirective, DisclosureComponent, TranslocoPipe],
   selector: 'app-sofia',
   templateUrl: './sofia.component.html',
-  styleUrls: ['./sofia.component.css']
+  styleUrls: ['./sofia.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SofiaComponent {
 
@@ -95,12 +98,17 @@ export class SofiaComponent {
   public newGatewayName: string = '';
   public selectedIndex: number = 0;
   public detailTabIndex: number = 0;
+  readonly mainTabs = ['List', 'Add', 'Delete/Rename'];
+  readonly mainTabKeys = ['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename'];
+  readonly detailTabs = ['Parameters', 'Gateways', 'Domains', 'Aliases', 'Commands'];
+  readonly detailTabKeys = ['common.parameters', 'ui.gateways', 'ui.domains', 'ui.aliases', 'ui.commands'];
   public profileId: number = 0;
   public panelCloser = {};
   public choosedGateway = [];
   public toCopyProfile: number = 0;
   public toCopyGateway: number = 0;
   public toCopyProfileGateway: number = 0;
+  private readonly requestedGatewayProfileIds = new Set<number>();
 
   public globalSettingsDispatchers: object;
   public profileParamsDispatchers: object;
@@ -111,6 +119,7 @@ export class SofiaComponent {
   private snackbarEffect = effect(() => {
     const errorMessage = this.lastErrorMessage();
     if (errorMessage) {
+      this.requestedGatewayProfileIds.clear();
       this._snackBar.open('Error: ' + errorMessage + '!', null, {
         duration: 3000,
         panelClass: ['error-snack'],
@@ -266,10 +275,10 @@ export class SofiaComponent {
 
   getSofiaProfilesGateways() {
     const profiles = this.list().profiles;
-    if (profiles) {
-      const ids = Object.keys(profiles).map(Number);
-      ids.forEach((id) => this.store.dispatch(new GetSofiaProfileGateways({id: id, keep_subscription: true})));
-    }
+    profilesNeedingGatewaySubscription(profiles, this.requestedGatewayProfileIds).forEach(id => {
+      this.requestedGatewayProfileIds.add(id);
+      this.store.dispatch(new GetSofiaProfileGateways({id, keep_subscription: true}));
+    });
   }
 
   getSofiaProfilesGatewayParams(id: number) {
@@ -468,9 +477,7 @@ export class SofiaComponent {
       return;
     }
     this.toCopyProfile = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   pasteProfileParams(to: number) {
@@ -486,9 +493,7 @@ export class SofiaComponent {
     }
     this.toCopyProfileGateway = key;
     this.toCopyGateway = id;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   pasteGatewayParams(profileId: number, to: number) {

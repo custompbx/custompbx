@@ -53,6 +53,8 @@ export interface IwebUser {
   ws: string;
   group_id: number;
   sip_id: {Int64: number; Valid: boolean};
+  lang?: number;
+  locale?: string;
 }
 
 export function reducer(state = initialState, action: All): State {
@@ -85,6 +87,7 @@ export function reducer(state = initialState, action: All): State {
     case SettingsActionTypes.SWITCH_WEB_USER:
     case SettingsActionTypes.UPDATE_WEB_USER_PASSWORD:
     case SettingsActionTypes.UPDATE_WEB_USER_LANG:
+    case SettingsActionTypes.UPDATE_WEB_USER_LOCALE:
     case SettingsActionTypes.UPDATE_WEB_USER_SIP_USER:
     case SettingsActionTypes.UPDATE_WEB_USER_WS:
     case SettingsActionTypes.UPDATE_WEB_USER_VERTO_WS:
@@ -137,6 +140,7 @@ export function reducer(state = initialState, action: All): State {
     case SettingsActionTypes.STORE_UPDATE_WEB_USER_AVATAR:
     case SettingsActionTypes.STORE_UPDATE_WEB_USER_PASSWORD:
     case SettingsActionTypes.STORE_UPDATE_WEB_USER_LANG:
+    case SettingsActionTypes.STORE_UPDATE_WEB_USER_LOCALE:
     case SettingsActionTypes.STORE_UPDATE_WEB_USER_SIP_USER:
     case SettingsActionTypes.STORE_UPDATE_WEB_USER_WS:
     case SettingsActionTypes.STORE_UPDATE_WEB_USER_VERTO_WS:
@@ -172,6 +176,10 @@ export function reducer(state = initialState, action: All): State {
         }
         case SettingsActionTypes.STORE_UPDATE_WEB_USER_SIP_USER: {
           newState = {...newState, webUsers: {...newState.webUsers, [id]: {...newState.webUsers[id], sip_id: data[id].sip_id}}};
+          break;
+        }
+        case SettingsActionTypes.STORE_UPDATE_WEB_USER_LOCALE: {
+          newState = {...newState, webUsers: {...newState.webUsers, [id]: {...newState.webUsers[id], locale: data[id].locale}}};
           break;
         }
         case SettingsActionTypes.STORE_UPDATE_WEB_USER_WS: {

@@ -14,6 +14,7 @@ import {ConfirmationDialogComponent} from './components/confirmation-dialog/conf
 import {IconSpriteService} from './services/icon-sprite.service';
 import {WsDataService} from './services/ws-data.service';
 import {ToastService} from './services/toast.service';
+import {LocaleService} from './i18n/locale.service';
 
 @Component({
   standalone: true,
@@ -39,6 +40,7 @@ export class AppComponent {
     iconSprite: IconSpriteService,
     wsData: WsDataService,
     toast: ToastService,
+    locale: LocaleService,
   ) {
     iconSprite.load();
     router.events

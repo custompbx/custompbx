@@ -9,10 +9,11 @@ import {SendFSCLICommand} from '../../store/fscli/fscli.actions';
 import {FormsModule} from "@angular/forms";
 import {ResizeInputDirective} from "../../directives/resize-input.directive";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, ResizeInputDirective, InnerHeaderComponent],
+  imports: [FormsModule, ResizeInputDirective, InnerHeaderComponent, TranslocoPipe],
   selector: 'app-fs-cli',
   templateUrl: './fs-cli.component.html',
   styleUrls: ['./fs-cli.component.css']

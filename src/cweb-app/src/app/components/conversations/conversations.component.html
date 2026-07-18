@@ -1,6 +1,6 @@
 <div class="chat-overlay" role="presentation" (click)="closeConversations.emit()"></div>
 
-<section class="chat-drawer" role="dialog" aria-modal="true" aria-label="Conversations">
+<section class="chat-drawer" role="dialog" aria-modal="true" [attr.aria-label]="'conversations.title' | transloco">
   @if (loadCounter() > 0) {
     <app-loading-bar label="Loading conversations" />
   }
@@ -8,8 +8,8 @@
   <aside class="chat-sidebar">
     <div class="chat-sidebar-header">
       <div>
-        <h2>Conversations</h2>
-        <p>{{ getLogins('').length }} users</p>
+        <h2>{{ 'conversations.title' | transloco }}</h2>
+        <p>{{ 'conversations.userCount' | transloco: {count: getLogins('').length} }}</p>
       </div>
       <button type="button" class="chat-icon-button" (click)="closeConversations.emit()" aria-label="Close conversations">
         <app-icon name="close"></app-icon>
@@ -18,7 +18,7 @@
 
     <label class="chat-search">
       <app-icon name="search"></app-icon>
-      <input [(ngModel)]="searchUser" placeholder="Search users" autocomplete="off">
+      <input [(ngModel)]="searchUser" [placeholder]="'conversations.searchUsers' | transloco" autocomplete="off">
     </label>
 
     <div class="chat-contact-list">
@@ -35,7 +35,7 @@
           </span>
           <span class="contact-body">
             <span class="contact-user">{{ webUser.login }}</span>
-            <span class="contact-meta">Private chat</span>
+            <span class="contact-meta">{{ 'conversations.privateChat' | transloco }}</span>
           </span>
         </button>
       }
@@ -55,7 +55,7 @@
           </span>
           <div>
             <h3>{{ userList()[currentChat()].login }}</h3>
-            <p>Private conversation</p>
+            <p>{{ 'conversations.privateConversation' | transloco }}</p>
           </div>
         </div>
 
@@ -80,8 +80,8 @@
             <app-icon name="forum"></app-icon>
           </span>
           <div>
-            <h3>Select a conversation</h3>
-            <p>Choose a user to open messages</p>
+            <h3>{{ 'conversations.selectConversation' | transloco }}</h3>
+            <p>{{ 'conversations.chooseUser' | transloco }}</p>
           </div>
         </div>
         <button type="button" class="chat-icon-button" (click)="closeConversations.emit()" aria-label="Close conversations">
@@ -93,8 +93,8 @@
     @if (!currentChat()) {
       <div class="chat-empty">
         <app-icon name="question_answer"></app-icon>
-        <h3>No conversation selected</h3>
-        <p>Pick a user from the list to view messages and calls.</p>
+        <h3>{{ 'conversations.noneSelected' | transloco }}</h3>
+        <p>{{ 'conversations.noneSelectedHelp' | transloco }}</p>
       </div>
     } @else if (currentVoice() === currentChat() && toChat()) {
       <div class="chat-call">
@@ -136,7 +136,7 @@
               @if (message.duration === 0 || message.duration) {
                 <div class="call-message">
                   <app-icon name="phone"></app-icon>
-                  <span>{{ message.receiver_id.id == user().id ? 'Incoming call' : 'Outgoing call' }}</span>
+                  <span>{{ (message.receiver_id.id == user().id ? 'conversations.incomingCall' : 'conversations.outgoingCall') | transloco }}</span>
                 </div>
               } @else {
                 <div class="message-text">{{ message.text }}</div>
@@ -149,7 +149,7 @@
 
       <footer class="msg-input">
         <label class="chat-compose">
-          <input [(ngModel)]="newMsg" (keydown.enter)="sendMsg()" placeholder="Write a message..." autocomplete="off">
+          <input [(ngModel)]="newMsg" (keydown.enter)="sendMsg()" [placeholder]="'conversations.writeMessage' | transloco" autocomplete="off">
           <button type="button" (click)="sendMsg()" [disabled]="!newMsg" aria-label="Send message">
             <app-icon name="send"></app-icon>
           </button>

@@ -1,4 +1,4 @@
-import {Component, inject, signal, computed, effect, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal, computed, effect, OnInit} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 
 import {DragDropModule} from '@angular/cdk/drag-drop';
@@ -24,20 +24,21 @@ import {Iacl, Inode, State} from '../../../store/config/config.state.struct';
 import {ToastService} from '../../../services/toast.service';
 import {ActivatedRoute} from '@angular/router';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
-import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
-import {TabNavComponent} from '../../tab-nav/tab-nav.component';
-import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {ResizeInputDirective} from "../../../directives/resize-input.directive";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {resolvePositionedReorder} from '../../../utils/reorder';
+import {TranslocoPipe} from '@jsverse/transloco';
+import {ConfigPageShellComponent} from '../config-page-shell/config-page-shell.component';
+import {CpbxTabPanelDirective} from '../../../directives/cpbx-tab-panel.directive';
 
 @Component({
   standalone: true,
-  imports: [DragDropModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, ResizeInputDirective, CpbxSelectDirective, TabNavComponent, DisclosureComponent],
+  imports: [DragDropModule, FormsModule, ConfigPageShellComponent, CpbxTabPanelDirective, ResizeInputDirective, CpbxSelectDirective, DisclosureComponent, TranslocoPipe],
   selector: 'app-acl',
   templateUrl: './acl.component.html',
-  styleUrls: ['./acl.component.css']
+  styleUrls: ['./acl.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AclComponent { // Removed OnDestroy
 
@@ -68,6 +69,8 @@ export class AclComponent { // Removed OnDestroy
   // --- Local Component State as Signals/Properties ---
   public newItemName: string = ''; // Kept as property for two-way binding
   public selectedIndex: number = 0; // Kept as property for binding
+  readonly mainTabs = ['List', 'Add', 'Delete/Rename'];
+  readonly mainTabKeys = ['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename'];
   public aclBehavior = ['allow', 'deny'];
   public defaultBehavior = 'deny';
 

@@ -4,7 +4,13 @@ describe('KeyValuePad2Component', () => {
   let component: KeyValuePad2Component;
 
   beforeEach(() => {
-    component = new KeyValuePad2Component(null as any);
+    const messages = {
+      'common.default': 'Default',
+      'common.nameRequired': 'Name is required.',
+      'common.duplicateName': 'Another item already uses this name.',
+    };
+    const transloco = {translate: (key: string) => messages[key] ?? key};
+    component = new KeyValuePad2Component(null as any, transloco as any);
     component.ngOnInit();
   });
 

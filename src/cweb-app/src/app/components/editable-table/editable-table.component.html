@@ -45,11 +45,11 @@
                   (blur)="finishEdit(row, column)"
                   appAutoFocus
                 >
-                <span class="cpbx-data-grid__edit-hint">Enter to save &middot; Esc to cancel</span>
+                <span class="cpbx-data-grid__edit-hint">{{'ui.enterSaveEscCancel' | transloco}}</span>
               } @else {
                 <span class="cpbx-data-grid__value">{{row[column]}}</span>
                 @if (isChanged(row, column)) {
-                  <span class="cpbx-data-grid__unsaved">Unsaved</span>
+                  <span class="cpbx-data-grid__unsaved">{{'ui.unsaved' | transloco}}</span>
                 }
                 @if (isCellEditable(column)) {
                   <app-icon class="cpbx-data-grid__edit-icon" name="edit"></app-icon>
@@ -60,7 +60,7 @@
         </tr>
       } @empty {
         <tr>
-          <td class="cpbx-data-grid__empty" [attr.colspan]="columns().length || 1">No records found</td>
+          <td class="cpbx-data-grid__empty" [attr.colspan]="columns().length || 1">{{'ui.noRecords' | transloco}}</td>
         </tr>
       }
     </tbody>

@@ -61,6 +61,7 @@ type WebUser struct {
 	AvatarFormat string        `json:"avatar_format"`
 	Enabled      bool          `json:"enabled"`
 	Lang         uint          `json:"lang"`
+	Locale       string        `json:"locale"`
 	Key          string        `json:"-"`
 	Tokens       WebUserTokens `json:"-"`
 	GroupId      int           `json:"group_id"`

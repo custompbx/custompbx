@@ -94,6 +94,13 @@ export const routes: Routes = [
     loadComponent: () => import('./components/settings/settings.component').then(m => m.SettingsComponent),
     resolve: {reconnectUpdater: UnsubscribeService}
   },
+  {
+    path: 'profile',
+    title: 'profile',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./components/profile/profile.component').then(m => m.ProfileComponent),
+    resolve: {reconnectUpdater: UnsubscribeService}
+  },
   // NOTE: All components are assumed to be in a path matching the route segment.
 
   // --- Directory Routes ---

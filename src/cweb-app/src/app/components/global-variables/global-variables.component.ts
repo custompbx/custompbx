@@ -23,11 +23,12 @@ import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {ResizeInputDirective} from "../../directives/resize-input.directive";
 import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
 import {resolvePositionedReorder} from '../../utils/reorder';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 
 @Component({
   standalone: true,
-  imports: [CommonModule, DragDropModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective],
+  imports: [CommonModule, DragDropModule, FormsModule, InnerHeaderComponent, ResizeInputDirective, CpbxSelectDirective, TranslocoPipe],
   selector: 'app-global-variables',
   templateUrl: './global-variables.component.html',
   styleUrls: ['./global-variables.component.css'],

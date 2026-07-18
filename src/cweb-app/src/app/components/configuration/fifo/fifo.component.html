@@ -1,25 +1,25 @@
 <app-inner-header name="Fifo" [loadCounter]="loadCounter()" [status]="statusText()" [statusTone]="statusTone()" [errorMessage]="errorMessage()">
-  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="expandAllPanels()">Expand all</button>
-  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="collapseAllPanels()">Collapse all</button>
+  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="expandAllPanels()">{{ 'configuration.expandAll' | transloco }}</button>
+  <button class="cpbx-button cpbx-button--secondary" type="button" (click)="collapseAllPanels()">{{ 'configuration.collapseAll' | transloco }}</button>
 </app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 <div *ngIf="list() && list().exists !== false">
- <app-tab-nav ariaLabel="FIFO sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+ <app-tab-nav ariaLabel="FIFO sections" ariaLabelKey="navigation.configuration" [tabs]="['List', 'Add', 'Delete/Rename']" [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']"
    [(selectedIndex)]="selectedIndex"></app-tab-nav>
  <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
     <section class="cpbx-card">
       <header class="cpbx-card__header">
-        <p class="cpbx-card__subtitle">Settings</p>
+        <p class="cpbx-card__subtitle">{{'configuration.settings' | transloco}}</p>
       </header>
       <div class="cpbx-card__content">
         <app-disclosure [expanded]="settingsExpanded">
             <span disclosureTitle>
-              Settings
+              {{'configuration.settings' | transloco}}
             </span>
             <span disclosureDescription>
-              Click to get details
+              {{'common.clickDetails' | transloco}}
             </span>
-          <h3>Params:</h3>
+          <h3>{{ 'common.parameters' | transloco }}:</h3>
           <app-key-value-pad-2 [exist]="list().settings"
                                [items]="list().settings"
                                [newItems]="list().settings?.new"
@@ -35,7 +35,7 @@
 
     <section class="cpbx-card">
       <header class="cpbx-card__header">
-        <p class="cpbx-card__subtitle">Fifos</p>
+        <p class="cpbx-card__subtitle">{{'configuration.fifo' | transloco}}</p>
       </header>
       <div class="cpbx-card__content">
         <div *ngFor="let item of onlyValues(list().fifos); trackBy: trackByFn" class="panel-wrapper">
@@ -45,26 +45,23 @@
                 {{item.name}}
               </span>
               <span disclosureDescription>
-                Click to get details
+                {{'common.clickDetails' | transloco}}
               </span>
-            <h3>Importance:</h3>
+            <h3>{{ 'configuration.importance' | transloco }}:</h3>
             <div *ngIf="item.id" class="cpbx-edit-row">
               <form #details="ngForm">
                 <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Importance</span>
-<input name="importance" [ngModel]="item.importance" required [name]="'importance' + item.id" placeholder="Importance" class="cpbx-input">
+<span class="cpbx-label">{{ 'configuration.importance' | transloco }}</span>
+<input name="importance" [ngModel]="item.importance" required [name]="'importance' + item.id" [placeholder]="'configuration.importance' | transloco" class="cpbx-input">
 </label>
                 <button class="cpbx-button cpbx-button--primary" type="button"
                         [disabled]="!isvalueReadyToSend(details.controls['importance' + item.id])"
-                        (click)="updateImportance(item.id, details.controls['importance' + item.id])">
-                  Update
-                </button>
+                        (click)="updateImportance(item.id, details.controls['importance' + item.id])">{{ 'common.actions.update' | transloco }}</button>
               </form>
             </div>
             <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyFifo(item.id)"
-                    *ngIf="list().fifos[item.id] && (list().fifos[item.id].members)">Copy
-            </button>
-            <h3>Members:</h3>
+                    *ngIf="list().fifos[item.id] && (list().fifos[item.id].members)">{{ 'common.actions.copy' | transloco }}</button>
+            <h3>{{ 'configuration.members' | transloco }}:</h3>
             <div>
               <app-key-value-pad-2 [exist]="item.members"
                                    [items]="item.members"
@@ -86,29 +83,25 @@
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
     <form class="cpbx-form-panel" (ngSubmit)="onFifoSubmit()">
       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New fifo name" required name="name" [(ngModel)]="newFifoName" class="cpbx-input">
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
+<input [placeholder]="'configuration.newFifoName' | transloco" required name="name" [(ngModel)]="newFifoName" class="cpbx-input">
 </label>
-      <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+      <button class="cpbx-button cpbx-button--primary" type="submit">{{ 'common.actions.submit' | transloco }}</button>
     </form>
   </div>
 
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
     <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
-      <h3 class="cpbx-form-title">Fifo</h3>
+      <h3 class="cpbx-form-title">{{ 'configuration.fifo' | transloco }}</h3>
       <div class="cpbx-edit-row" *ngFor="let fifo of onlyValues(list().fifos); trackBy: trackByFn">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Fifo name</span>
-<input name="Fifo name" required [ngModel]="fifo.name" [name]="'fifo::' + fifo.id" placeholder="Fifo name" class="cpbx-input">
+<span class="cpbx-label">{{ 'configuration.fifoName' | transloco }}</span>
+<input name="Fifo name" required [ngModel]="fifo.name" [name]="'fifo::' + fifo.id" [placeholder]="'configuration.fifoName' | transloco" class="cpbx-input">
 </label>
         <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['fifo::' + fifo.id])"
-                (click)="openBottomSheetFifo(fifo.id, deleteForm.controls['fifo::' + fifo.id].value, fifo.name, 'rename')">
-          Update
-        </button>
+                (click)="openBottomSheetFifo(fifo.id, deleteForm.controls['fifo::' + fifo.id].value, fifo.name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
         <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                (click)="openBottomSheetFifo(fifo.id, deleteForm.controls['fifo::' + fifo.id].value, fifo.name, 'delete')">
-          Delete
-        </button>
+                (click)="openBottomSheetFifo(fifo.id, deleteForm.controls['fifo::' + fifo.id].value, fifo.name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
       </div>
     </form>
   </div>

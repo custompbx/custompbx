@@ -1,27 +1,27 @@
 <main class="login-page">
-  <section class="login-shell" aria-label="CustomPBX login">
+  <section class="login-shell" [attr.aria-label]="'auth.loginAria' | transloco">
     <div class="brand-panel">
       <img class="logo" src="./assets/img/logo-big.png" alt="CustomPBX">
       <div class="brand-copy">
         <h1>CustomPBX</h1>
-        <p>Sign in to manage your PBX, calls, routing and system configuration.</p>
+        <p>{{'auth.tagline' | transloco}}</p>
       </div>
     </div>
 
     <form class="login-card" (ngSubmit)="onSubmit()" ngNativeValidate>
       <div class="login-card__header">
-        <h2>Welcome back</h2>
-        <p>Use your administrator credentials to continue.</p>
+        <h2>{{'auth.welcome' | transloco}}</h2>
+        <p>{{'auth.instructions' | transloco}}</p>
       </div>
 
       <label class="login-field">
-        <span>Login</span>
+        <span>{{'auth.login' | transloco}}</span>
         <input [(ngModel)]="user.login" name="login" placeholder="admin" required autocomplete="username" autofocus>
       </label>
 
       <label class="login-field">
-        <span>Password</span>
-        <input [(ngModel)]="user.password" name="password" type="password" placeholder="Enter password" required autocomplete="current-password">
+        <span>{{'auth.password' | transloco}}</span>
+        <input [(ngModel)]="user.password" name="password" type="password" [placeholder]="'auth.passwordPlaceholder' | transloco" required autocomplete="current-password">
       </label>
 
       @if (userService.errorMessage) {
@@ -30,7 +30,7 @@
         </div>
       }
 
-      <button class="login-submit" type="submit">Sign in</button>
+      <button class="login-submit" type="submit">{{'auth.signIn' | transloco}}</button>
     </form>
   </section>
 </main>

@@ -20,6 +20,8 @@ import {
   StoreUpdateWebUserPassword,
   UpdateWebUserLang,
   StoreUpdateWebUserLang,
+  UpdateWebUserLocale,
+  StoreUpdateWebUserLocale,
   UpdateWebUserSipUser,
   StoreUpdateWebUserSipUser,
   UpdateWebUserWs,
@@ -267,6 +269,16 @@ export class SettingsEffects {
         }
       ));
   });
+
+  UpdateWebUserLocale: Observable<any> = createEffect(() => this.actions.pipe(
+    ofType(SettingsActionTypes.UPDATE_WEB_USER_LOCALE),
+    switchMap((action: UpdateWebUserLocale) => this.ws.universalSender(action.type, action.payload).pipe(
+      map(response => response.error
+        ? new StoreGotWebError({error: response.error})
+        : new StoreUpdateWebUserLocale({response})),
+      catchError(error => of(new Failure({error}))),
+    )),
+  ));
 
   UpdateWebUserSipUser: Observable<any> = createEffect(() => {
     return this.actions.pipe(

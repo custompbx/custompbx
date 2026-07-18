@@ -29,11 +29,11 @@ describe('HeaderComponent', () => {
     const labels = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('[aria-label]'))
       .map((element) => element.getAttribute('aria-label'));
 
-    expect(labels).toContain('Toggle navigation');
+    expect(labels).toContain('header.toggleNavigation');
     expect(labels).toContain('CustomPBX dashboard');
-    expect(labels).toContain('Open conversations');
-    expect(labels).toContain('Toggle phone');
-    expect(labels).toContain('Open user menu');
+    expect(labels).toContain('header.openConversations');
+    expect(labels).toContain('header.togglePhone');
+    expect(labels).toContain('header.openUserMenu');
     expect(fixture.nativeElement.querySelector('.user-menu .user-name')).not.toBeNull();
     expect(fixture.nativeElement.querySelector(':scope > .user-name')).toBeNull();
   });
@@ -51,5 +51,43 @@ describe('HeaderComponent', () => {
     const dispatchedTypes = dispatch.calls.allArgs()
       .map(([action]) => (action as unknown as {type: string}).type);
     expect(dispatchedTypes).toEqual([StartPhone.type, ToggleShowPhone.type]);
+  });
+
+  it('closes header menus when clicking outside', () => {
+    const localeMenu = fixture.nativeElement.querySelector('.locale-menu') as HTMLDetailsElement;
+    const userMenu = fixture.nativeElement.querySelector('.user-menu') as HTMLDetailsElement;
+    localeMenu.open = true;
+    userMenu.open = true;
+
+    component.closeMenusOnOutsideClick({target: document.body} as unknown as Event);
+
+    expect(localeMenu.open).toBeFalse();
+    expect(userMenu.open).toBeFalse();
+  });
+
+  it('keeps the clicked menu open and closes the other menu', () => {
+    const localeMenu = fixture.nativeElement.querySelector('.locale-menu') as HTMLDetailsElement;
+    const userMenu = fixture.nativeElement.querySelector('.user-menu') as HTMLDetailsElement;
+    localeMenu.open = true;
+    userMenu.open = true;
+
+    component.closeMenusOnOutsideClick({
+      target: userMenu.querySelector('summary')
+    } as unknown as Event);
+
+    expect(localeMenu.open).toBeFalse();
+    expect(userMenu.open).toBeTrue();
+  });
+
+  it('closes all header menus on Escape', () => {
+    const localeMenu = fixture.nativeElement.querySelector('.locale-menu') as HTMLDetailsElement;
+    const userMenu = fixture.nativeElement.querySelector('.user-menu') as HTMLDetailsElement;
+    localeMenu.open = true;
+    userMenu.open = true;
+
+    component.closeMenusOnEscape();
+
+    expect(localeMenu.open).toBeFalse();
+    expect(userMenu.open).toBeFalse();
   });
 });

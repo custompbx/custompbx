@@ -11,6 +11,7 @@ import {GetLogs} from '../../store/logs/logs.actions';
 import {FormsModule} from "@angular/forms";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {CpbxSelectDirective} from '../../directives/cpbx-select.directive';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 export interface IfilterField {
   field: string|null;
@@ -25,7 +26,7 @@ export interface IsortField {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, CpbxSelectDirective, PaginatorComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, CpbxSelectDirective, PaginatorComponent, TranslocoPipe],
   selector: 'app-logs',
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.css'],

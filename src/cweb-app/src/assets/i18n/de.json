@@ -1,0 +1,91 @@
+{
+    "feedback": {"changesSaved":"Änderungen gespeichert.","itemAdded":"Element hinzugefügt.","itemRemoved":"Element entfernt.","statusUpdated":"Status aktualisiert.","importCompleted":"Import abgeschlossen.","itemsPasted":"Elemente eingefügt.","itemRenamed":"Element umbenannt.","orderUpdated":"Reihenfolge aktualisiert.","reloadCompleted":"Neuladen abgeschlossen.","moduleUnloaded":"Modul entladen.","moduleLoaded":"Modul geladen.","autoloadUpdated":"Autoload-Einstellung aktualisiert.","itemCleared":"Element geleert.","configurationCleared":"Konfiguration geleert.","configurationCreated":"Konfiguration erstellt.","commandCompleted":"Befehl abgeschlossen.","errorWithDetail":"Fehler: {{message}}"},
+    "common":  {
+                   "language":  "Sprache",
+                   "loading":  "Wird geladen",
+                   "pageActions":  "Seitenaktionen",
+                   "lastOperationFailed":  "Letzter Vorgang fehlgeschlagen",
+                   "notifications":  "Benachrichtigungen",
+                   "dismissNotification":  "Benachrichtigung schließen",
+                   "default":  "Standard",
+                   "filterItems":  "Einträge filtern",
+                   "searchItems":  "Nach Name, Wert oder ID suchen",
+                   "itemsShown":  "{{visible}} / {{total}} angezeigt",
+                   "moveItem":  "Eintrag verschieben",
+                   "draftItems":  "Entwürfe",
+                   "noMatchingItems":  "Keine Einträge entsprechen diesem Filter.",
+                   "noItemsYet":  "Noch keine Einträge. Fügen Sie unten den ersten hinzu.",
+                   "nameRequired":  "Name ist erforderlich.",
+                   "duplicateName":  "Ein anderer Eintrag verwendet bereits diesen Namen.",
+                   "deleteItemConfirm":  "Eintrag \"{{name}}\" löschen?",
+                   "deleteItemDescription":  "Der Eintrag wird aus der Konfiguration entfernt, nachdem der Server die Änderung bestätigt hat.",
+                   "copied":"Kopiert!","clickDetails":"Klicken, um Details anzuzeigen","parameters":"Parameter","variables":"Variablen","xmlEditor":"XML-Editor",
+                   "tabs":{"list":"Liste","add":"Hinzufügen","deleteRename":"Löschen/Umbenennen"},
+                   "fields":{"name":"Name","domain":"Domäne","user":"Benutzer","cache":"Cache","numberAlias":"Nummern-Alias","cidr":"CIDR","bulk":"Anzahl","userName":"Benutzername","domainName":"Domänenname","groupName":"Gruppenname","gatewayName":"Gateway-Name"},
+                   "actions":  {
+                                   "save":  "Speichern",
+                                   "cancel":  "Abbrechen",
+                                   "add":  "Hinzufügen",
+                                   "delete":  "Löschen",
+                                   "update":  "Aktualisieren",
+                                   "reset":  "Zurücksetzen",
+                                   "disable":  "Deaktivieren",
+                                   "enable":  "Aktivieren",
+                                   "addItem":  "+ Eintrag hinzufügen",
+                                   "paste":"Einfügen","import":"Importieren","copy":"Kopieren","submit":"Absenden","goToDomains":"Zu den Domänen","manage":"Verwalten","done":"Fertig","remove":"Entfernen"
+                               }
+               },
+    "directory": {
+        "domainSections":"Domänenbereiche","userSections":"Benutzerbereiche","groupSections":"Gruppenbereiche","gatewaySections":"Gateway-Bereiche","noDomains":"Noch keine Domänen","createOrImportDomain":"Erstellen Sie eine Domäne oder importieren Sie eine vorhandene FreeSWITCH-Verzeichniskonfiguration.","domainRequiredForUsers":"Erstellen oder importieren Sie vor dem Hinzufügen von Benutzern eine Domäne.","domainRequiredForGroups":"Erstellen oder importieren Sie vor dem Hinzufügen von Gruppen eine Domäne.","domainRequiredForGateways":"Erstellen oder importieren Sie vor dem Hinzufügen von Gateways eine Domäne.",
+        "domainLabel":"Domäne: {{name}}","userLabel":"Benutzer: {{name}}","copyParametersVariables":"Parameter / Variablen kopieren","chooseDomain":"Domäne auswählen","newDomainName":"Neuer Domänenname","newUserName":"Neuer Benutzername","newGroupName":"Neuer Gruppenname","newGatewayName":"Neuer Gateway-Name","userTemplates":"Benutzervorlagen","numberOrUserName":"Nummer/Benutzername",
+        "confirmDeleteDomain":"Domäne \"{{name}}\" löschen?","confirmRenameDomain":"Domäne \"{{oldName}}\" in \"{{newName}}\" umbenennen?","confirmDeleteUser":"Benutzer \"{{name}}\" löschen?","confirmRenameUser":"Benutzer \"{{oldName}}\" in \"{{newName}}\" umbenennen?","confirmDeleteGroup":"Gruppe \"{{name}}\" löschen?","confirmRenameGroup":"Gruppe \"{{oldName}}\" in \"{{newName}}\" umbenennen?","confirmDeleteGateway":"Gateway \"{{name}}\" löschen?","confirmRenameGateway":"Gateway \"{{oldName}}\" in \"{{newName}}\" umbenennen?"
+    },
+    "configuration":{"moduleSections":"Modulbereiche","aclSections":"ACL-Bereiche","callcenterSections":"Callcenter-Bereiche","sofiaSections":"Sofia-Bereiche","vertoSections":"Verto-Bereiche","importFromXml":"Aus XML importieren","truncate":"Leeren","lists":"Listen","nodes":"Knoten","type":"Typ","newAclListName":"Name der neuen ACL-Liste","settings":"Einstellungen","profiles":"Profile","globalSettings":"Globale Einstellungen","newProfileName":"Neuer Profilname","profileName":"Profilname","importance":"Wichtigkeit","members":"Mitglieder","fifo":"FIFO","fifoName":"FIFO-Name","newFifoName":"Neuer FIFO-Name","noAgents":"Es gibt noch keine Agents. Erstellen Sie Agents und Tiers oder importieren Sie sie, während das Modul geladen ist."},
+    "ui":{"field":"Feld","operand":"Operator","value":"Wert","sortField":"Sortierfeld","descending":"Absteigend","queues":"Warteschlangen","queue":"Warteschlange","queueName":"Name der Warteschlange","newAgentName":"Name des neuen Agenten","tierAgentName":"Name des Stufenagenten","getList":"Liste abrufen","addFilter":"Filter hinzufügen","editFilter":"Filter bearbeiten","addSorting":"Sortierung hinzufügen","gateways":"Gateways","domains":"Domänen","aliases":"Aliase","profileCommands":"Profilbefehle","profile":"Profil","gateway":"Gateway","direction":"Richtung","alias":"Alias","parse":"Analysieren","advertise":"Ankündigungen","rooms":"Räume","callerControlGroups":"Anrufersteuerungsgruppen","controls":"Steuerelemente","chatPermissions":"Chat-Berechtigungen","layouts":"Layouts","layoutGroups":"Layoutgruppen","images":"Bilder","group":"Gruppe","permissionProfile":"Berechtigungsprofil","command":"Befehl","enterSaveEscCancel":"Eingabe speichert · Esc bricht ab","unsaved":"Nicht gespeichert","noRecords":"Keine Einträge gefunden","exportPng":"PNG exportieren","exportTxt":"TXT exportieren"},
+    "auth":  {
+                 "loginAria":  "CustomPBX-Anmeldung",
+                 "tagline":  "Melden Sie sich an, um PBX, Anrufe, Routing und Systemkonfiguration zu verwalten.",
+                 "welcome":  "Willkommen zurück",
+                 "instructions":  "Verwenden Sie Ihre Administrator-Zugangsdaten.",
+                 "login":  "Benutzername",
+                 "password":  "Passwort",
+                 "passwordPlaceholder":  "Passwort eingeben",
+                 "signIn":  "Anmelden"
+             },
+    "header":  {
+                   "profile":  "Profil",
+                   "settings":  "Einstellungen",
+                   "logOut":  "Abmelden"
+               },
+    "dashboard":  {
+                      "subtitle":  "Systemkapazität und Dienstzustand in Echtzeit"
+                  },
+    "dialplan":{"settings":"Dialplan-Einstellungen","addCondition":"Bedingung hinzufügen","actions":"Aktionen","antiactions":"Gegenaktionen","conditionFields":"Bedingungsfelder","field":"Feld","expression":"Ausdruck","break":"Break","defaultOnFalse":"Standard (on-false)","regexes":"Reguläre Ausdrücke","data":"Daten","inline":"Inline","regex":"Regulärer Ausdruck","noContexts":"Noch keine Kontexte. Erstellen Sie einen oder importieren Sie eine vorhandene Konfiguration.","contexts":"Kontexte","continue":"Fortsetzen","newContextName":"Neuer Kontextname","context":"Kontext","newExtensionName":"Neuer Durchwahlname","contextName":"Kontextname","extensions":"Durchwahlen","extensionName":"Durchwahlname","enableStatic":"Statischen Dialplan aktivieren","disableStatic":"Statischen Dialplan deaktivieren","debug":"Dialplan-Debug","enableCollecting":"Erfassung aktivieren","disableCollecting":"Erfassung deaktivieren","conditionsLog":"Bedingungsprotokoll","gotActions":"Übereinstimmende Aktionen","true":"Wahr","false":"Falsch"},
+    "navigation":  {
+                       "section":  "Navigationsbereich",
+                       "monitoring":  "Überwachung",
+                       "dashboard":  "Übersicht",
+                       "usersPanel":  "Benutzerübersicht",
+                       "directory":  "Directory",
+                       "domains":  "Domänen",
+                       "users":  "Benutzer",
+                       "groups":  "Gruppen",
+                       "gateways":  "Gateways",
+                       "configuration":  "Konfiguration",
+                       "modules":  "Module",
+                       "acl":  "ACL",
+                       "callcenter":  "Callcenter",
+                       "sofia":  "Sofia",
+                       "verto":  "Verto",
+                       "switch":  "Switch",
+                       "dialplan":  "Wählplan",
+                       "contexts":  "Kontexte",
+                       "cdr":  "CDR",
+                       "logs":  "Protokolle",
+                       "fsCli":  "FS_CLI",
+                       "hep":  "HEP",
+                       "instances":  "Instanzen",
+                       "globalVariables":  "Globale Variablen"
+                   },
+    "settingsPage": {"webUsers":"Webbenutzer","userGroup":"Benutzergruppe","newPassword":"Neues Passwort","newPasswordHint":"Neues Passwort für den Webbenutzer","userLanguage":"Benutzersprache","directoryUser":"Verzeichnisbenutzer","stunOverride":"STUN (Standard ersetzen)","uploadImage":"Bild hochladen","clear":"Leeren","userTokens":"Benutzertoken","token":"Token","created":"Erstellt","purpose":"Zweck","actions":"Aktionen","noApiTokens":"Keine API-Token","newUserData":"Neue Benutzerdaten","login":"Anmeldename","password":"Passwort","userLogins":"Benutzeranmeldungen","userLogin":"Benutzeranmeldung","webUserTemplates":"Webbenutzervorlagen","template":"Vorlage","templateName":"Vorlagenname","connectionsSettings":"Verbindungseinstellungen","eventSocketSettings":"Event-Socket-Einstellungen","host":"Host","port":"Port","timeout":"Zeitüberschreitung","collectLogs":"Protokolle sammeln","database":"Datenbank","databaseSettings":"Datenbankeinstellungen","databaseName":"Datenbankname","databaseUser":"Datenbankbenutzer","webserver":"Webserver","webserverSettings":"Webserver-Einstellungen","route":"Route","wsWriteTimeout":"WebSocket-Schreibtimeout (Sekunden)","wsReadTimeout":"WebSocket-Lesetimeout (Sekunden)","wsPingInterval":"WebSocket-Pingintervall (Sekunden)","wsQueueSize":"WebSocket-Warteschlangengröße","certificatePath":"Zertifikatspfad","keyPath":"Schlüsselpfad","xmlCurlServer":"XML-curl-Server","xmlCurlServerSettings":"XML-curl-Servereinstellungen","none":"-- Keine --","wsForSipjs":"WebSocket für Sip.js","wsForVerto":"WebSocket für Verto","value":"Wert","description":"Beschreibung","placeholder":"Platzhalter","hide":"Ausblenden","show":"Anzeigen","editable":"Bearbeitbar","uneditable":"Schreibgeschützt"}
+}

@@ -6,10 +6,11 @@ import {UserService} from '../../services/user.service';
 import {IsActiveMatchOptions, NavigationEnd, Router, RouterLink} from '@angular/router';
 import {filter, map, startWith} from 'rxjs/operators';
 import {IconComponent} from '../icon/icon.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [RouterLink, IconComponent],
+  imports: [RouterLink, IconComponent, TranslocoPipe],
     selector: 'app-sidenav',
     templateUrl: './sidenav.component.html',
     styleUrls: ['./sidenav.component.css']
@@ -65,130 +66,130 @@ export class SidenavComponent {
           {
             route: '',
             icon: 'assessment',
-            name: 'Monitoring',
+            name: 'navigation.monitoring',
             subMenu: [
               {
                 route: '/dashboard',
                 icon: 'navigate_next',
-                name: 'Dashboard',
+                name: 'navigation.dashboard',
               },
               {
                 route: 'monitoring/users-panel',
                 icon: 'navigate_next',
-                name: 'Users Panel',
+                name: 'navigation.usersPanel',
               },
             ],
           },
           {
             route: '',
             icon: 'folder_shared',
-            name: 'Directory',
+            name: 'navigation.directory',
             subMenu: [
               {
                 route: 'directory/domains',
                 icon: 'navigate_next',
-                name: 'Domains',
+                name: 'navigation.domains',
               },
               {
                 route: 'directory/users',
                 icon: 'navigate_next',
-                name: 'Users',
+                name: 'navigation.users',
               },
               {
                 route: 'directory/groups',
                 icon: 'navigate_next',
-                name: 'Groups',
+                name: 'navigation.groups',
               },
               {
                 route: 'directory/gateways',
                 icon: 'navigate_next',
-                name: 'Gateways',
+                name: 'navigation.gateways',
               },
             ],
           },
           {
             route: '',
             icon: 'settings',
-            name: 'Configuration',
+            name: 'navigation.configuration',
             subMenu: [
               {
                 route: '/configuration/modules',
                 icon: 'navigate_next',
-                name: 'Modules',
+                name: 'navigation.modules',
               },
               {
                 route: '/configuration/acl',
                 icon: 'navigate_next',
-                name: 'Acl',
+                name: 'navigation.acl',
               },
               {
                 route: '/configuration/callcenter',
                 icon: 'navigate_next',
-                name: 'Callcenter',
+                name: 'navigation.callcenter',
               },
               {
                 route: '/configuration/sofia',
                 icon: 'navigate_next',
-                name: 'Sofia',
+                name: 'navigation.sofia',
               },
               {
                 route: '/configuration/verto',
                 icon: 'navigate_next',
-                name: 'Verto',
+                name: 'navigation.verto',
               },
               {
                 route: '/configuration/post-load-switch',
                 icon: 'navigate_next',
-                name: 'Switch',
+                name: 'navigation.switch',
               },
             ],
           },
           {
             route: '',
             icon: 'dialpad',
-            name: 'Dialplan',
+            name: 'navigation.dialplan',
             subMenu: [
               {
                 route: '/dialplan/contexts',
                 icon: 'navigate_next',
-                name: 'Contexts',
+                name: 'navigation.contexts',
               },
             ]
           },
           {
             route: '/cdr',
             icon: 'find_in_page',
-            name: 'CDR',
+            name: 'navigation.cdr',
             subMenu: null,
           },
           {
             route: '/logs',
             icon: 'insert_drive_file',
-            name: 'Logs',
+            name: 'navigation.logs',
             subMenu: null,
           },
           {
             route: '/fs-cli',
             icon: 'chevron_right',
-            name: 'FS_CLI',
+            name: 'navigation.fsCli',
             subMenu: null,
           },
           {
             route: '/hep',
             icon: 'storage',
-            name: 'HEP',
+            name: 'navigation.hep',
             subMenu: null,
           },
           {
             route: '/instances',
             icon: 'settings_input_component',
-            name: 'Instances',
+            name: 'navigation.instances',
             subMenu: null,
           },
           {
             route: '/global-variables',
             icon: 'playlist_add_check',
-            name: 'Global Variables',
+            name: 'navigation.globalVariables',
             subMenu: null,
           }
         ];
@@ -197,13 +198,13 @@ export class SidenavComponent {
             {
             route: 'monitoring/users-panel',
             icon: 'navigate_next',
-            name: 'Users Panel',
+            name: 'navigation.usersPanel',
               subMenu: null,
           },
           {
             route: '/cdr',
             icon: 'find_in_page',
-            name: 'CDR',
+            name: 'navigation.cdr',
             subMenu: null,
           },
         ];

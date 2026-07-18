@@ -1,25 +1,26 @@
-<app-inner-header name="Conference" [loadCounter]="loadCounter()"></app-inner-header>
-<app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
+<app-config-page-shell name="Conference"
+  [loadCounter]="loadCounter()" [module]="list()"
+  ariaLabel="Conference configuration"
+  [tabs]="mainTabs" [(selectedIndex)]="mainSectionIndex"
+  (selectedIndexChange)="mainTabChanged($event)" />
 @if (list() && list().exists !== false) {
-  <app-tab-nav ariaLabel="Conference configuration" [tabs]="['Conference', 'Conference layouts']"
-    [(selectedIndex)]="mainSectionIndex" (selectedIndexChange)="mainTabChanged($event)"></app-tab-nav>
-    <div class="cpbx-tab-panel" [hidden]="mainSectionIndex !== 0">
-      <app-tab-nav ariaLabel="Conference sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    <div appCpbxTabPanel [active]="mainSectionIndex === 0">
+      <app-tab-nav ariaLabel="Conference sections" ariaLabelKey="navigation.configuration" [tabs]="conferenceTabs" [tabKeys]="conferenceTabKeys"
         [(selectedIndex)]="conferenceTabIndex"></app-tab-nav>
-        <div class="cpbx-tab-panel" [hidden]="conferenceTabIndex !== 0">
+        <div appCpbxTabPanel [active]="conferenceTabIndex === 0">
           <section class="cpbx-card">
             <header class="cpbx-card__header">
-              <p class="cpbx-card__subtitle">Advertise</p>
+              <p class="cpbx-card__subtitle">{{'ui.advertise' | transloco}}</p>
             </header>
             <div class="cpbx-card__content">
               <app-disclosure>
                   <span disclosureTitle>
-                    Advertise
+                    {{'ui.advertise' | transloco}}
                   </span>
                   <span disclosureDescription>
-                    Click to get details
+                    {{'common.clickDetails' | transloco}}
                   </span>
-                <h3>Rooms:</h3>
+                <h3>{{'ui.rooms' | transloco}}:</h3>
                 <app-key-value-pad-2 [exist]="list().advertise"
                                      [items]="list().advertise"
                                      [newItems]="list().advertise?.new"
@@ -34,7 +35,7 @@
           </section>
           <section class="cpbx-card">
             <header class="cpbx-card__header">
-              <p class="cpbx-card__subtitle">Caller Control Groups</p>
+              <p class="cpbx-card__subtitle">{{'ui.callerControlGroups' | transloco}}</p>
             </header>
             <div class="cpbx-card__content">
               @for (item of onlyValues(list().caller_controls); track item.id) {
@@ -44,13 +45,13 @@
                         {{ item.name }}
                       </span>
                       <span disclosureDescription>
-                        Click to get details
+                        {{'common.clickDetails' | transloco}}
                       </span>
                     @if (list().caller_controls[item.id] && (list().caller_controls[item.id].controls)) {
-                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyCallerControlGroup(item.id)">Copy
+                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyCallerControlGroup(item.id)">{{'common.actions.copy' | transloco}}
                       </button>
                     }
-                    <h3>Controls:</h3>
+                    <h3>{{'ui.controls' | transloco}}:</h3>
                     <div>
                       <app-key-value-pad-2 [exist]="item.controls"
                                            [items]="item.controls"
@@ -69,7 +70,7 @@
           </section>
           <section class="cpbx-card">
             <header class="cpbx-card__header">
-              <p class="cpbx-card__subtitle">Profiles</p>
+              <p class="cpbx-card__subtitle">{{'configuration.profiles' | transloco}}</p>
             </header>
             <div class="cpbx-card__content">
               @for (item of onlyValues(list().profiles); track item.id) {
@@ -79,13 +80,13 @@
                         {{ item.name }}
                       </span>
                       <span disclosureDescription>
-                        Click to get details
+                        {{'common.clickDetails' | transloco}}
                       </span>
                     @if (list().profiles[item.id] && (list().profiles[item.id].parameters)) {
-                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyProfile(item.id)">Copy
+                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyProfile(item.id)">{{'common.actions.copy' | transloco}}
                       </button>
                     }
-                    <h3>Params:</h3>
+                    <h3>{{'common.parameters' | transloco}}:</h3>
                     <div>
                       <app-key-value-pad-2 [exist]="item.parameters"
                                            [items]="item.parameters"
@@ -103,7 +104,7 @@
           </section>
           <section class="cpbx-card">
             <header class="cpbx-card__header">
-              <p class="cpbx-card__subtitle">Chat Permissions</p>
+              <p class="cpbx-card__subtitle">{{'ui.chatPermissions' | transloco}}</p>
             </header>
             <div class="cpbx-card__content">
               @for (item of onlyValues(list().chat_profiles); track item.id) {
@@ -113,13 +114,13 @@
                         {{ item.name }}
                       </span>
                       <span disclosureDescription>
-                        Click to get details
+                        {{'common.clickDetails' | transloco}}
                       </span>
                     @if (list().chat_profiles[item.id] && (list().chat_profiles[item.id].users)) {
-                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyProfile(item.id)">Copy
+                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyProfile(item.id)">{{'common.actions.copy' | transloco}}
                       </button>
                     }
-                    <h3>Params:</h3>
+                    <h3>{{'common.parameters' | transloco}}:</h3>
                     <div>
                       <app-key-value-pad-2 [exist]="item.users"
                                            [items]="item.users"
@@ -138,37 +139,37 @@
           </section>
 
         </div>
-        <div class="cpbx-tab-panel" [hidden]="conferenceTabIndex !== 1">
+        <div appCpbxTabPanel [active]="conferenceTabIndex === 1">
           <form class="cpbx-form-panel" (ngSubmit)="onProfileSubmit()">
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Profile Name</span>
+<span class="cpbx-label">{{ 'configuration.profileName' | transloco }}</span>
 <input placeholder="New profile name" required name="name" [(ngModel)]="newProfileName" class="cpbx-input">
 </label>
-            <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+            <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
           </form>
           <form class="cpbx-form-panel" (ngSubmit)="onControlGroupSubmit()">
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Control Group Name</span>
+<span class="cpbx-label">{{ 'configuration.controlGroupName' | transloco }}</span>
 <input placeholder="New control group name" required name="name" [(ngModel)]="newControlGroupName" class="cpbx-input">
 </label>
-            <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+            <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
           </form>
           <form class="cpbx-form-panel" (ngSubmit)="onChatPermissionSubmit()">
             <label class="cpbx-field cpbx-field--wide">
-<span class="cpbx-label">Chat Permission Profile Name</span>
+<span class="cpbx-label">{{ 'configuration.chatPermissionProfileName' | transloco }}</span>
 <input placeholder="New chat permission profile name" required name="name" [(ngModel)]="newChatPermissionName" class="cpbx-input">
 </label>
-            <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+            <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
           </form>
         </div>
 
-        <div class="cpbx-tab-panel" [hidden]="conferenceTabIndex !== 2">
+        <div appCpbxTabPanel [active]="conferenceTabIndex === 2">
           <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
             <div class="cpbx-edit-row">
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Profile</span>
+<span class="cpbx-label">{{ 'ui.profile' | transloco }}</span>
 <select class="cpbx-select" required name="profile" [(ngModel)]="profileId">
-<option [ngValue]="null" disabled hidden>Profile</option>
+<option [ngValue]="null" disabled hidden>{{ 'ui.profile' | transloco }}</option>
                 @for (val of onlyValues(list().profiles); track val.id) {
                   <option [ngValue]="val.id">
                     {{ val.name }}
@@ -177,9 +178,9 @@
               </select>
 </label>
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Caller Control Group</span>
+<span class="cpbx-label">{{ 'configuration.callerControlGroup' | transloco }}</span>
 <select class="cpbx-select" required name="group" [(ngModel)]="controlGroupId">
-<option [ngValue]="null" disabled hidden>Caller Control Group</option>
+<option [ngValue]="null" disabled hidden>{{ 'configuration.callerControlGroup' | transloco }}</option>
                 @for (val of onlyValues(list().caller_controls); track val.id) {
                   <option [ngValue]="val.id">
                     {{ val.name }}
@@ -188,9 +189,9 @@
               </select>
 </label>
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Chat Permission Profile</span>
+<span class="cpbx-label">{{ 'configuration.chatPermissionProfile' | transloco }}</span>
 <select class="cpbx-select" required name="chat-profile" [(ngModel)]="chatPermissionId">
-<option [ngValue]="null" disabled hidden>Chat Permission Profile</option>
+<option [ngValue]="null" disabled hidden>{{ 'configuration.chatPermissionProfile' | transloco }}</option>
                 @for (val of onlyValues(list().chat_profiles); track val.id) {
                   <option [ngValue]="val.id">
                     {{ val.name }}
@@ -202,62 +203,50 @@
             @if (list().profiles && list().profiles[profileId]) {
               <div class="cpbx-edit-row">
                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Profile name</span>
+<span class="cpbx-label">{{ 'configuration.profileName' | transloco }}</span>
 <input name="Profile name" required [ngModel]="list().profiles[profileId].name" [name]="'profile::' + profileId" placeholder="Profile name" class="cpbx-input">
 </label>
                 <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['profile::' + profileId])"
-                        (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'rename')">
-                  Update
-                </button>
+                        (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
                 <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                        (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'delete')">
-                  Delete
-                </button>
+                        (click)="openBottomSheetProfile(profileId, deleteForm.controls['profile::' + profileId].value, list().profiles[profileId].name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
               </div>
             }
             @if (list().caller_controls && list().caller_controls[controlGroupId]) {
               <div class="cpbx-edit-row">
                 <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Group name</span>
+<span class="cpbx-label">{{ 'common.fields.groupName' | transloco }}</span>
 <input name="Group name" required [ngModel]="list().caller_controls[controlGroupId].name" [name]="'group::' + controlGroupId" placeholder="Group name" class="cpbx-input">
 </label>
                 <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['group::' + controlGroupId])"
-                        (click)="openBottomSheetControlGroup(controlGroupId, deleteForm.controls['group::' + controlGroupId].value, list().caller_controls[controlGroupId].name, 'rename')">
-                  Update
-                </button>
+                        (click)="openBottomSheetControlGroup(controlGroupId, deleteForm.controls['group::' + controlGroupId].value, list().caller_controls[controlGroupId].name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
                 <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                        (click)="openBottomSheetControlGroup(controlGroupId, deleteForm.controls['group::' + controlGroupId].value, list().caller_controls[controlGroupId].name, 'delete')">
-                  Delete
-                </button>
+                        (click)="openBottomSheetControlGroup(controlGroupId, deleteForm.controls['group::' + controlGroupId].value, list().caller_controls[controlGroupId].name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
               </div>
             }
             @if (list().chat_profiles && list().chat_profiles[chatPermissionId]) {
               <div class="cpbx-edit-row">
                 <label class="cpbx-field cpbx-field--wide">
-<span class="cpbx-label">Permission profile name</span>
+<span class="cpbx-label">{{ 'configuration.permissionProfileName' | transloco }}</span>
 <input name="Permission profile name" required [ngModel]="list().chat_profiles[chatPermissionId].name" [name]="'chat-profile::' + chatPermissionId" placeholder="Permission profile name" class="cpbx-input">
 </label>
                 <button class="cpbx-button cpbx-button--primary" type="button"
                         [disabled]="checkDirty(deleteForm.controls['chat-profile::' + chatPermissionId])"
-                        (click)="openBottomSheetChatPermissionProfile(chatPermissionId, deleteForm.controls['chat-profile::' + chatPermissionId].value, list().chat_profiles[chatPermissionId].name, 'rename')">
-                  Update
-                </button>
+                        (click)="openBottomSheetChatPermissionProfile(chatPermissionId, deleteForm.controls['chat-profile::' + chatPermissionId].value, list().chat_profiles[chatPermissionId].name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
                 <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                        (click)="openBottomSheetChatPermissionProfile(chatPermissionId, deleteForm.controls['chat-profile::' + chatPermissionId].value, list().chat_profiles[chatPermissionId].name, 'delete')">
-                  Delete
-                </button>
+                        (click)="openBottomSheetChatPermissionProfile(chatPermissionId, deleteForm.controls['chat-profile::' + chatPermissionId].value, list().chat_profiles[chatPermissionId].name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
               </div>
             }
           </form>
         </div>
     </div>
-    <div class="cpbx-tab-panel" [hidden]="mainSectionIndex !== 1">
-      <app-tab-nav ariaLabel="Conference layout sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+    <div appCpbxTabPanel [active]="mainSectionIndex === 1">
+      <app-tab-nav ariaLabel="Conference layout sections" ariaLabelKey="navigation.configuration" [tabs]="conferenceTabs" [tabKeys]="conferenceTabKeys"
         [(selectedIndex)]="selectedIndex"></app-tab-nav>
-        <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
+        <div appCpbxTabPanel [active]="selectedIndex === 0">
           <section class="cpbx-card">
             <header class="cpbx-card__header">
-              <p class="cpbx-card__subtitle">Layouts</p>
+              <p class="cpbx-card__subtitle">{{'ui.layouts' | transloco}}</p>
             </header>
             <div class="cpbx-card__content">
               @for (item of onlyValues(list().layouts?.conference_layouts); track item.id) {
@@ -267,28 +256,24 @@
                         {{ item.name }}
                       </span>
                       <span disclosureDescription>
-                        Click to get details
+                        {{'common.clickDetails' | transloco}}
                       </span>
                     @if (list().layouts?.conference_layouts[item.id] && (list().layouts?.conference_layouts[item.id].images)) {
-                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyLayoutImage(item.id)">
-                        Copy
-                      </button>
+                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyLayoutImage(item.id)">{{ 'common.actions.copy' | transloco }}</button>
                     }
-                    <h3>Auto 3d Position:</h3>
+                    <h3>{{ 'configuration.auto3dPosition' | transloco }}:</h3>
                     <div class="spacer">
                       <form #auto3d="ngForm">
                         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Auto 3d Position</span>
+<span class="cpbx-label">{{ 'configuration.auto3dPosition' | transloco }}</span>
 <input placeholder="auto_3d_position" [ngModel]="item.auto_3d_position" required [name]="'auto_3d_position' + item.id" class="cpbx-input">
 </label>
                         <button class="cpbx-button cpbx-button--primary"
                                 [disabled]="!isvalueReadyToSend(auto3d.controls['auto_3d_position' + item.id])"
-                                (click)="updateConferenceLayout3D(item.id, auto3d.controls['auto_3d_position' + item.id].value)">
-                          Update
-                        </button>
+                                (click)="updateConferenceLayout3D(item.id, auto3d.controls['auto_3d_position' + item.id].value)">{{ 'common.actions.update' | transloco }}</button>
                       </form>
                     </div>
-                    <h3>Images:</h3>
+                    <h3>{{'ui.images' | transloco}}:</h3>
                     <div>
                       <app-key-value-pad-2 [exist]="item.images || item.new"
                                            [items]="item.images"
@@ -307,7 +292,7 @@
           </section>
           <section class="cpbx-card">
             <header class="cpbx-card__header">
-              <p class="cpbx-card__subtitle">Layout's groups</p>
+              <p class="cpbx-card__subtitle">{{'ui.layoutGroups' | transloco}}</p>
             </header>
             <div class="cpbx-card__content">
               @for (item of onlyValues(list().layouts?.conference_layouts_groups); track item.id) {
@@ -317,14 +302,12 @@
                         {{ item.name }}
                       </span>
                       <span disclosureDescription>
-                        Click to get details
+                        {{'common.clickDetails' | transloco}}
                       </span>
                     @if (list().layouts?.conference_layouts_groups[item.id] && (list().layouts?.conference_layouts_groups[item.id].layouts)) {
-                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyLayoutGroup(item.id)">
-                        Copy
-                      </button>
+                      <button class="config-copy-button cpbx-button cpbx-button--secondary" (click)="copyLayoutGroup(item.id)">{{ 'common.actions.copy' | transloco }}</button>
                     }
-                    <h3>Layouts:</h3>
+                    <h3>{{'ui.layouts' | transloco}}:</h3>
                     <div>
                       <app-key-value-pad-2 [exist]="item.layouts || item.new"
                                            [items]="item.layouts"
@@ -343,58 +326,50 @@
           </section>
         </div>
 
-        <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
+        <div appCpbxTabPanel [active]="selectedIndex === 1">
           <form class="cpbx-form-panel" (ngSubmit)="onLayoutSubmit()">
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Layout Name</span>
+<span class="cpbx-label">{{ 'configuration.layoutName' | transloco }}</span>
 <input placeholder="New Layout name" required name="name" [(ngModel)]="newLayoutName" class="cpbx-input">
 </label>
-            <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+            <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
           </form>
           <form class="cpbx-form-panel" (ngSubmit)="onLayoutGroupSubmit()">
             <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Group Name</span>
+<span class="cpbx-label">{{ 'common.fields.groupName' | transloco }}</span>
 <input placeholder="New Group name" required name="name" [(ngModel)]="newLayoutGroupName" class="cpbx-input">
 </label>
-            <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+            <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
           </form>
         </div>
 
-        <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
+        <div appCpbxTabPanel [active]="selectedIndex === 2">
           @if (list().layouts) {
             <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
-              <h3 class="cpbx-form-title">Layouts</h3>
+              <h3 class="cpbx-form-title">{{'ui.layouts' | transloco}}</h3>
               @for (item of onlyValues(list().layouts?.conference_layouts); track item.id) {
                 <div class="cpbx-edit-row">
                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Layout</span>
+<span class="cpbx-label">{{ 'configuration.layout' | transloco }}</span>
 <input name="Layout name" required [ngModel]="item.name" [name]="'layout::' + item.id" placeholder="Layout" class="cpbx-input">
 </label>
                   <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['layout::' + item.id])"
-                          (click)="openBottomSheetLayout(item.id, deleteForm.controls['layout::' + item.id].value, item.name, 'rename')">
-                    Update
-                  </button>
+                          (click)="openBottomSheetLayout(item.id, deleteForm.controls['layout::' + item.id].value, item.name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
                   <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                          (click)="openBottomSheetLayout(item.id, deleteForm.controls['layout::' + item.id].value, item.name, 'delete')">
-                    Delete
-                  </button>
+                          (click)="openBottomSheetLayout(item.id, deleteForm.controls['layout::' + item.id].value, item.name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
                 </div>
               }
-              <h3 class="cpbx-form-title">Layout Groups</h3>
+              <h3 class="cpbx-form-title">{{'ui.layoutGroups' | transloco}}</h3>
               @for (item of onlyValues(list().layouts?.conference_layouts_groups); track item.id) {
                 <div class="cpbx-edit-row">
                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Group</span>
+<span class="cpbx-label">{{ 'ui.group' | transloco }}</span>
 <input name="Layout name" required [ngModel]="item.name" [name]="'group::' + item.id" placeholder="Group" class="cpbx-input">
 </label>
                   <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['group::' + item.id])"
-                          (click)="openBottomSheetLayoutGroup(item.id, deleteForm.controls['group::' + item.id].value, item.name, 'rename')">
-                    Update
-                  </button>
+                          (click)="openBottomSheetLayoutGroup(item.id, deleteForm.controls['group::' + item.id].value, item.name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
                   <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                          (click)="openBottomSheetLayoutGroup(item.id, deleteForm.controls['group::' + item.id].value, item.name, 'delete')">
-                    Delete
-                  </button>
+                          (click)="openBottomSheetLayoutGroup(item.id, deleteForm.controls['group::' + item.id].value, item.name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
                 </div>
               }
             </form>

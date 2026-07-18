@@ -1,9 +1,8 @@
 import {Component, inject, computed, OnInit, effect} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {CommonModule} from "@angular/common";
 import {select, Store} from '@ngrx/store';
 import {AppState, selectConfigurationState} from '../../../store/app.states';
-import {AbstractControl, FormsModule} from '@angular/forms';
+import {AbstractControl} from '@angular/forms';
 import {ToastService} from '../../../services/toast.service';
 import {ActivatedRoute} from '@angular/router';
 import {
@@ -14,14 +13,12 @@ import {
   SwitchSndfileParameter,
   UpdateSndfileParameter
 } from '../../../store/config/sndfile/config.actions.sndfile'; // Changed path
-import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
-import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module-not-exists-banner.component";
 import {Iitem, IsimpleModule, State} from '../../../store/config/config.state.struct';
-import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
+import {SimpleConfigPageComponent} from "../simple-config-page/simple-config-page.component";
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component],
+  imports: [SimpleConfigPageComponent],
   selector: 'app-sndfile', // Changed selector
   templateUrl: './sndfile.component.html', // Kept original template reference
   styleUrls: ['../generated-config-page.css']

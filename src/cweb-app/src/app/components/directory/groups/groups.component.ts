@@ -23,10 +23,11 @@ import {State} from "../../../store/directory/directory.reducers";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 import {ConfirmationService} from '../../../services/confirmation.service';
 import {IconComponent} from '../../icon/icon.component';
+import {TranslocoPipe, TranslocoService} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, RouterLink, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, RouterLink, CpbxSelectDirective, TabNavComponent, DisclosureComponent, IconComponent, TranslocoPipe],
   selector: 'app-groups',
   templateUrl: './groups.component.html',
   styleUrls: ['./groups.component.css']
@@ -38,6 +39,7 @@ export class GroupsComponent implements OnDestroy {
   private confirmation = inject(ConfirmationService);
   private route = inject(ActivatedRoute);
   private _snackBar = inject(ToastService);
+  private i18n = inject(TranslocoService);
 
   // --- Reactive State from NgRx using toSignal ---
   private directoryState = toSignal(
@@ -163,8 +165,8 @@ export class GroupsComponent implements OnDestroy {
   openBottomSheet(id, newName, oldName, action): void {
     const previousName = typeof oldName === 'string' ? oldName : oldName?.name;
     const message = action === 'delete'
-      ? `Delete group "${previousName}"?`
-      : `Rename group "${previousName}" to "${newName}"?`;
+      ? this.i18n.translate('directory.confirmDeleteGroup', {name: previousName})
+      : this.i18n.translate('directory.confirmRenameGroup', {oldName: previousName, newName});
     const sheet = this.confirmation.open({data: {action, message}});
     sheet.afterDismissed().subscribe(result => {
       if (!result) {

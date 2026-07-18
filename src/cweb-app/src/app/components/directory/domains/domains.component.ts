@@ -33,10 +33,11 @@ import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {KeyValuePadComponent} from "../../key-value-pad/key-value-pad.component";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {State} from "../../../store/directory/directory.reducers";
+import {TranslocoPipe, TranslocoService} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, TabNavComponent, DisclosureComponent],
+  imports: [FormsModule, InnerHeaderComponent, KeyValuePadComponent, CodeEditorComponent, TabNavComponent, DisclosureComponent, TranslocoPipe],
   selector: 'app-domains',
   templateUrl: './domains.component.html',
   styleUrls: ['./domains.component.css']
@@ -47,6 +48,7 @@ export class DomainsComponent implements OnInit {
   public store = inject(Store<AppState>);
   private bottomSheet = inject(ConfirmationService);
   private _snackBar = inject(ToastService);
+  private i18n = inject(TranslocoService);
 
   private directoryState = toSignal(
     this.store.pipe(select(selectDirectoryState)),
@@ -176,7 +178,7 @@ export class DomainsComponent implements OnInit {
       return;
     }
     this.toCopy = key;
-    this._snackBar.open('Copied!', null, {
+    this._snackBar.open(this.i18n.translate('common.copied'), null, {
       duration: 700,
       // horizontalPosition: 'right',
       // verticalPosition: 'top',
@@ -190,8 +192,8 @@ export class DomainsComponent implements OnInit {
           newName: newName,
           oldName: oldName,
           action: action,
-          case1Text: 'Are you sure you want to delete domain "' + oldName + '"?',
-          case2Text: 'Are you sure you want to rename domain "' + oldName + '" to "' + newName + '"?',
+          case1Text: this.i18n.translate('directory.confirmDeleteDomain', {name: oldName}),
+          case2Text: this.i18n.translate('directory.confirmRenameDomain', {oldName, newName}),
         }
     };
     const sheet = this.bottomSheet.open(config);

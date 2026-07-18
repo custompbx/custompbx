@@ -1,5 +1,6 @@
-<app-inner-header name="HEP" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="HEP" translationKey="navigation.hep" [loadCounter]="loadCounter()"></app-inner-header>
 <app-tab-nav ariaLabel="HEP sections" [tabs]="['Search', 'Details', 'Settings']"
+  [tabKeys]="['common.tabs.search', 'common.tabs.details', 'common.tabs.settings']"
   [disabled]="[false, selectedCallIds().length === 0, false]"
   [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"></app-tab-nav>
 <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
@@ -7,14 +8,14 @@
       <div class="filter-container">
         <button class="switch-button cpbx-button cpbx-button--secondary"
           (click)="getRecords()">
-          Get Records
+          {{'ui.getRecords' | transloco}}
         </button>
       </div>
       <div class="filter-container">
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Filter Field</span>
+<span class="cpbx-label">{{'ui.field' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="filter().field" [disabled]="!columns">
-<option [ngValue]="null" disabled hidden>Filter Field</option>
+<option [ngValue]="null" disabled hidden>{{'ui.field' | transloco}}</option>
             <option [ngValue]="null">
               ---
             </option>
@@ -27,9 +28,9 @@
 </label>
 
         <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Operand</span>
+<span class="cpbx-label">{{'ui.operand' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="filter().operand" [disabled]="!filter().field">
-<option [ngValue]="null" disabled hidden>Operand</option>
+<option [ngValue]="null" disabled hidden>{{'ui.operand' | transloco}}</option>
             @for (val of operands; track val) {
               <option [ngValue]="val">
                 {{val}}
@@ -39,27 +40,27 @@
 </label>
 
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Value</span>
-<input name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required placeholder="Value" class="cpbx-input">
+<span class="cpbx-label">{{'ui.value' | transloco}}</span>
+<input name="Value" [(ngModel)]="filter().field_value" [disabled]="!filter().operand" required [placeholder]="'ui.value' | transloco" class="cpbx-input">
 </label>
         @if (!filters()[toEditFilter()]) {
           <button class="switch-button cpbx-button cpbx-button--secondary"
             [disabled]="!filter().field_value || !filter().operand || !filter().field"
             (click)="addFilter()">
-            Add filter
+            {{'ui.addFilter' | transloco}}
           </button>
         }
         @if (filters()[toEditFilter()]) {
           <button class="switch-button cpbx-button cpbx-button--primary"
             [disabled]="!filter().field_value || !filter().operand || !filter().field"
             (click)="saveFilter()">
-            Edit filter
+            {{'ui.editFilter' | transloco}}
           </button>
         }
         <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Order Field</span>
+<span class="cpbx-label">{{'ui.sortField' | transloco}}</span>
 <select class="cpbx-select" [(ngModel)]="sortColumns" [disabled]="!columns">
-<option [ngValue]="null" disabled hidden>Order Field</option>
+<option [ngValue]="null" disabled hidden>{{'ui.sortField' | transloco}}</option>
             <option [ngValue]="null">
               ---
             </option>
@@ -78,7 +79,7 @@
         <button class="switch-button cpbx-button cpbx-button--secondary"
           [disabled]="!sortColumns"
           (click)="addSorter()">
-          Add sorting
+          {{'ui.addSorting' | transloco}}
         </button>
       </div>
       <div class="chips-pad">
@@ -146,8 +147,8 @@
   </div>
 <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
     <div class="hep-details-toolbar" aria-label="HEP export actions">
-      <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsPng()">Export PNG</button>
-      <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsText()">Export TXT</button>
+      <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsPng()">{{'ui.exportPng' | transloco}}</button>
+      <button class="switch-button cpbx-button cpbx-button--secondary" type="button" (click)="exportAsText()">{{'ui.exportTxt' | transloco}}</button>
     </div>
     <section class="cpbx-card">
       <div class="cpbx-card__content">

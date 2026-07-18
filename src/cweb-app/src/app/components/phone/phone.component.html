@@ -4,21 +4,23 @@
     [class.phone-header--ringing]="ringing()"
     [class.phone-header--in-call]="inCall() || answered()">
     <span class="phone-title">
-      <strong>Phone</strong>
+      <strong>{{ 'phone.title' | transloco }}</strong>
       <small [class.phone-status--online]="isClientConnected()">
         <span class="phone-status-dot"></span>
-        {{ registered() && libName === sipjsLib ? 'Registered' : (isClientConnected() ? 'Connected' : 'Offline') }}
+        {{ registered() && libName === sipjsLib
+          ? ('phone.registered' | transloco)
+          : (isClientConnected() ? ('phone.connected' | transloco) : ('phone.offline' | transloco)) }}
       </small>
     </span>
     <span class="example-spacer"></span>
     @if (!isClientConnected()) {
-      <app-icon class="offline-icon" name="wifi_off" label="Phone offline"></app-icon>
+      <app-icon class="offline-icon" name="wifi_off" [label]="'phone.phoneOffline' | transloco"></app-icon>
     }
     @if (isSipJsTransportConnected()) {
       <button class="reg-button" type="button"
         [class.reg-button--registered]="registered() && libName === sipjsLib"
-        [title]="!registered() && libName === sipjsLib ? 'Register for calls' : 'Unregister from calls'"
-        [attr.aria-label]="!registered() && libName === sipjsLib ? 'Register for calls' : 'Unregister from calls'"
+        [title]="(!registered() && libName === sipjsLib ? 'phone.registerForCalls' : 'phone.unregisterFromCalls') | transloco"
+        [attr.aria-label]="(!registered() && libName === sipjsLib ? 'phone.registerForCalls' : 'phone.unregisterFromCalls') | transloco"
         (click)="register()" [disabled]="!isSipJsTransportConnected()">
         @if (!registered() && libName === sipjsLib) {
           <app-icon name="phone_callback"></app-icon>
@@ -28,7 +30,8 @@
         }
       </button>
     }
-    <button class="phone-header-action cpbx-button cpbx-button--icon" (click)="restartUS()" title="Restart phone" aria-label="Restart phone">
+    <button class="phone-header-action cpbx-button cpbx-button--icon" (click)="restartUS()"
+      [title]="'phone.restartPhone' | transloco" [attr.aria-label]="'phone.restartPhone' | transloco">
       <app-icon name="autorenew"></app-icon>
     </button>
   </header>
@@ -36,18 +39,18 @@
     <section id="main-content" class="animated fadeInUp">
       <div class="dial-input-row">
         <label class="cpbx-field phone-number-field">
-          <span class="cpbx-label">Number</span>
+          <span class="cpbx-label">{{ 'phone.number' | transloco }}</span>
           <input [ngModel]="number()" (ngModelChange)="number.set($event)" name="number"
-            placeholder="Enter number" class="cpbx-input">
+            [placeholder]="'phone.enterNumber' | transloco" class="cpbx-input">
         </label>
         @if (number()) {
-          <button aria-label="Delete last digit" title="Delete last digit"
+          <button [attr.aria-label]="'phone.deleteLastDigit' | transloco" [title]="'phone.deleteLastDigit' | transloco"
             (click)="removeLastDigit()" class="dial-input-action cpbx-button cpbx-button--icon">
             <app-icon name="backspace"></app-icon>
           </button>
         }
-        <button (click)="switchHideButtonsPad()" title="Toggle dialpad"
-          aria-label="Toggle dialpad" class="dial-input-action cpbx-button cpbx-button--icon">
+        <button (click)="switchHideButtonsPad()" [title]="'phone.toggleDialpad' | transloco"
+          [attr.aria-label]="'phone.toggleDialpad' | transloco" class="dial-input-action cpbx-button cpbx-button--icon">
           <app-icon name="dialpad"></app-icon>
         </button>
       </div>
@@ -61,41 +64,41 @@
       }
       <div class="actions-buttons-pad">
         @if (!(inCall() || ringing() || answered())) {
-          <button (click)="call()" title="call"
+          <button (click)="call()" [title]="'phone.call' | transloco"
             class="phone-action-button cpbx-button cpbx-button--primary"
             [disabled]="!isClientConnected() || !number()"
             >
-            <app-icon name="phone"></app-icon><span>Call</span>
+            <app-icon name="phone"></app-icon><span>{{ 'phone.call' | transloco }}</span>
           </button>
         }
         @if (ringing()) {
-          <button (click)="answer()" title="answer" class="phone-action-button cpbx-button cpbx-button--success"
+          <button (click)="answer()" [title]="'phone.answer' | transloco" class="phone-action-button cpbx-button cpbx-button--success"
             [disabled]="!isClientConnected()"
             >
-            <span>Answer: </span><span style="font-size: 20px">{{ data.session?.request?.from?.uri?.user }}</span>
+            <span>{{ 'phone.answer' | transloco }}: </span><span style="font-size: 20px">{{ data.session?.request?.from?.uri?.user }}</span>
           </button>
         }
         @if (inCall() || ringing() || answered()) {
           <button (click)="hangup()" class="phone-action-button cpbx-button cpbx-button--danger"
             [disabled]="!isClientConnected()"
             >
-            <app-icon name="call_end"></app-icon><span>Hangup</span>
+            <app-icon name="call_end"></app-icon><span>{{ 'phone.hangup' | transloco }}</span>
           </button>
         }
         @if (answered() && !onHold()) {
           <button (click)="hold()"
-            title="hold" class="phone-action-button phone-action-button--active cpbx-button cpbx-button--secondary"
+            [title]="'phone.hold' | transloco" class="phone-action-button phone-action-button--active cpbx-button cpbx-button--secondary"
             [disabled]="!isClientConnected()"
             >
-            <app-icon name="phone_paused"></app-icon><span>Hold</span>
+            <app-icon name="phone_paused"></app-icon><span>{{ 'phone.hold' | transloco }}</span>
           </button>
         }
         @if (answered() && onHold()) {
           <button (click)="unhold()"
-            title="unhold" class="phone-action-button phone-action-button--active cpbx-button cpbx-button--secondary"
+            [title]="'phone.unhold' | transloco" class="phone-action-button phone-action-button--active cpbx-button cpbx-button--secondary"
             [disabled]="!isClientConnected()"
             >
-            <app-icon name="play_arrow"></app-icon><span>Unhold</span>
+            <app-icon name="play_arrow"></app-icon><span>{{ 'phone.unhold' | transloco }}</span>
           </button>
         }
       </div>
@@ -103,7 +106,7 @@
   }
   @if (!authorizationUsername()) {
     <section>
-      <div role="status" class="header phone-no-credentials">No credentials configured</div>
+      <div role="status" class="header phone-no-credentials">{{ 'phone.noCredentials' | transloco }}</div>
     </section>
   }
   <div id="mediaTags" #mediaTags>

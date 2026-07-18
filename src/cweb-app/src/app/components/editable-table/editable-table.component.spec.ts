@@ -1,5 +1,6 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {EditableTableCellEvent, EditableTableComponent} from './editable-table.component';
+import {customPbxTestProviders} from '../../testing/test-providers';
 
 describe('EditableTableComponent', () => {
   let fixture: ComponentFixture<EditableTableComponent>;
@@ -7,7 +8,10 @@ describe('EditableTableComponent', () => {
   let rows: Record<string, any>[];
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({imports: [EditableTableComponent]}).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [EditableTableComponent],
+      providers: [...customPbxTestProviders()],
+    }).compileComponents();
     fixture = TestBed.createComponent(EditableTableComponent);
     component = fixture.componentInstance;
     rows = [{id: 7, name: 'agent-7', contact: ''}];

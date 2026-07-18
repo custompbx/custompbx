@@ -1,10 +1,10 @@
 @if (loadCounter > 0) {
-  <div class="cpbx-loading-bar" role="progressbar" aria-label="Loading"></div>
+  <div class="cpbx-loading-bar" role="progressbar" [attr.aria-label]="'common.loading' | transloco"></div>
 }
 <header class="page-header">
   <div class="page-heading">
     <div class="title-row">
-      <h1>{{name}}</h1>
+      <h1>{{translationKey ? (translationKey | transloco) : name}}</h1>
       @if (status) {
         <span class="status-badge"
           [class.success]="statusTone === 'success'"
@@ -12,15 +12,15 @@
           [class.danger]="statusTone === 'danger'">{{status}}</span>
       }
     </div>
-    @if (subtitle) { <p>{{subtitle}}</p> }
+    @if (subtitleKey || subtitle) { <p>{{subtitleKey ? (subtitleKey | transloco) : subtitle}}</p> }
   </div>
-  <div class="page-actions" aria-label="Page actions"><ng-content></ng-content></div>
+  <div class="page-actions" [attr.aria-label]="'common.pageActions' | transloco"><ng-content></ng-content></div>
 </header>
 @if (errorMessage) {
   <section class="page-error" role="alert">
     <app-icon name="error"></app-icon>
     <div>
-      <strong>Last operation failed</strong>
+      <strong>{{'common.lastOperationFailed' | transloco}}</strong>
       <p>{{errorMessage}}</p>
     </div>
   </section>

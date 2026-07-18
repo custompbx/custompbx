@@ -13,6 +13,8 @@ import {FormsModule} from "@angular/forms";
 import {InnerHeaderComponent} from "../inner-header/inner-header.component";
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from "ng2-charts";
 import {toSignal} from "@angular/core/rxjs-interop";
+import {TranslocoPipe} from '@jsverse/transloco';
+import {LocalizedNumberPipe} from '../../i18n/localized-number.pipe';
 
 // --- Type Definitions for Signals (for better structure and initial values) ---
 interface DashboardDataState {
@@ -33,7 +35,7 @@ interface ChartDataMap {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, BaseChartDirective],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, BaseChartDirective, TranslocoPipe, LocalizedNumberPipe],
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],

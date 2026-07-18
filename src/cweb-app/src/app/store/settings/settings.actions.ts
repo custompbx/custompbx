@@ -21,6 +21,8 @@ export enum SettingsActionTypes {
   STORE_UPDATE_WEB_USER_PASSWORD = '[Settings][Store][Users][Update] Password',
   UPDATE_WEB_USER_LANG = '[Settings][Users][Update] Lang',
   STORE_UPDATE_WEB_USER_LANG = '[Settings][Store][Users][Update] Lang',
+  UPDATE_WEB_USER_LOCALE = '[Settings][Users][Update] Locale',
+  STORE_UPDATE_WEB_USER_LOCALE = '[Settings][Store][Users][Update] Locale',
   UPDATE_WEB_USER_SIP_USER = '[Settings][Users][Update] Sip user',
   STORE_UPDATE_WEB_USER_SIP_USER = '[Settings][Store][Users][Update] Sip user',
   UPDATE_WEB_USER_WS = '[Settings][Users][Update] Ws',
@@ -231,6 +233,16 @@ export class UpdateWebUserLang implements Action {
 
 export class StoreUpdateWebUserLang implements Action {
   readonly type = SettingsActionTypes.STORE_UPDATE_WEB_USER_LANG;
+  constructor(public payload: any) {}
+}
+
+export class UpdateWebUserLocale implements Action {
+  readonly type = SettingsActionTypes.UPDATE_WEB_USER_LOCALE;
+  constructor(public payload: {id: number; value: string}) {}
+}
+
+export class StoreUpdateWebUserLocale implements Action {
+  readonly type = SettingsActionTypes.STORE_UPDATE_WEB_USER_LOCALE;
   constructor(public payload: any) {}
 }
 
@@ -503,6 +515,8 @@ export type All =
   | StoreUpdateWebUserPassword
   | UpdateWebUserLang
   | StoreUpdateWebUserLang
+  | UpdateWebUserLocale
+  | StoreUpdateWebUserLocale
   | UpdateWebUserSipUser
   | StoreUpdateWebUserSipUser
   | UpdateWebUserWs

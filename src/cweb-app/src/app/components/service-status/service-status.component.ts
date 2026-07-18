@@ -11,10 +11,11 @@ import { UserService } from '../../services/user.service';
 import { WsDataService } from '../../services/ws-data.service';
 import { filter } from 'rxjs';
 import {IconComponent} from '../icon/icon.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, TranslocoPipe],
   selector: 'app-service-status',
   templateUrl: './service-status.component.html',
   styleUrls: ['./service-status.component.css'],

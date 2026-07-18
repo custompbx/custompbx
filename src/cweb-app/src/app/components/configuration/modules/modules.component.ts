@@ -20,10 +20,11 @@ import {InnerHeaderComponent} from "../../inner-header/inner-header.component";
 import {CodeEditorComponent} from "../../code-editor/code-editor.component";
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, RouterLink, CodeEditorComponent, TabNavComponent, DisclosureComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, RouterLink, CodeEditorComponent, TabNavComponent, DisclosureComponent, TranslocoPipe],
   selector: 'app-modules',
   templateUrl: './modules.component.html',
   styleUrls: ['./modules.component.css']

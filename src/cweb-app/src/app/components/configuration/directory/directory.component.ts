@@ -23,11 +23,12 @@ import {ModuleNotExistsBannerComponent} from "../module-not-exists-banner/module
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {TranslocoPipe} from '@jsverse/transloco';
 import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
 standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent],
+  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, TabNavComponent, DisclosureComponent, TranslocoPipe],
   selector: 'app-directory',
   templateUrl: './directory.component.html',
   styleUrls: ['./directory.component.css']
@@ -201,9 +202,7 @@ export class DirectoryComponent implements OnInit, OnDestroy {
       return;
     }
     this.toCopyProfile = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   pasteProfileParams(to: number) {

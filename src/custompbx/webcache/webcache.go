@@ -134,6 +134,22 @@ func UpdateWebUserLangId(user *mainStruct.WebUser, id int64) bool {
 	}
 
 	user.Lang = uint(id)
+	user.Locale = mainStruct.LegacyLocale(uint(id))
+	if !db.UpdateWebUserLocale(user.Id, user.Locale) {
+		return false
+	}
+	return true
+}
+
+func UpdateWebUserLocale(user *mainStruct.WebUser, locale string) bool {
+	if user == nil || !mainStruct.IsSupportedLocale(locale) {
+		return false
+	}
+	locale = mainStruct.NormalizeLocale(locale)
+	if !db.UpdateWebUserLocale(user.Id, locale) {
+		return false
+	}
+	user.Locale = locale
 	return true
 }
 
@@ -229,6 +245,7 @@ func AddWebUser(login, key string, groupId int, instanceId int64) *mainStruct.We
 	user.Login = login
 	user.Key = key
 	user.Enabled = true
+	user.Locale = mainStruct.DefaultLocale
 	user.Tokens = mainStruct.NewWebUserTokens()
 	user.GroupId = mainStruct.GetWebUserGroup(groupId).Id
 	users.Set(user)

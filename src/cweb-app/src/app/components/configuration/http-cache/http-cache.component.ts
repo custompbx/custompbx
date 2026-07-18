@@ -33,10 +33,11 @@ import {KeyValuePadPositionComponent} from "../../key-value-pad-position/key-val
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
 import {toSignal} from "@angular/core/rxjs-interop";
+import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
 standalone: true,
-imports:  [FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, KeyValuePadPositionComponent, TabNavComponent, DisclosureComponent],
+imports:  [FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, KeyValuePadPositionComponent, TabNavComponent, DisclosureComponent, TranslocoPipe],
     selector: 'app-http-cache',
     templateUrl: './http-cache.component.html',
     styleUrls: ['./http-cache.component.css']

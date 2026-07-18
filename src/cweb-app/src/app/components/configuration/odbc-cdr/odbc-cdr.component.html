@@ -1,15 +1,15 @@
 <app-inner-header name="ODBC CDR" [loadCounter]="loadCounter()"></app-inner-header>
 <app-module-not-exists-banner [list]="list()"></app-module-not-exists-banner>
 @if (list() && list().exists !== false) {
-  <app-tab-nav ariaLabel="ODBC CDR sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+  <app-tab-nav ariaLabel="ODBC CDR sections" ariaLabelKey="navigation.configuration" [tabs]="['List', 'Add', 'Delete/Rename']" [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']"
     [(selectedIndex)]="selectedIndex"></app-tab-nav>
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Settings</p>
+          <p class="cpbx-card__subtitle">{{ 'configuration.settings' | transloco }}</p>
         </header>
         <div class="cpbx-card__content">
-          <h3>Params:</h3>
+          <h3>{{ 'common.parameters' | transloco }}:</h3>
           <app-key-value-pad-2 [exist]="list().settings"
             [items]="list().settings"
             [newItems]="list().settings?.new"
@@ -23,7 +23,7 @@
       </section>
       <section class="cpbx-card">
         <header class="cpbx-card__header">
-          <p class="cpbx-card__subtitle">Tables</p>
+          <p class="cpbx-card__subtitle">{{ 'configuration.tables' | transloco }}</p>
         </header>
         <div class="cpbx-card__content">
           @for (table of onlyValues(list().tables); track trackByFnId($index, table)) {
@@ -34,25 +34,23 @@
                     {{table.name}}
                   </span>
                   <span disclosureDescription>
-                    Click to get details
+                    {{ 'common.clickDetails' | transloco }}
                   </span>
-                <h3>Log Leg</h3>
+                <h3>{{ 'configuration.logLeg' | transloco }}</h3>
                 @if (table.id) {
                   <div class="cpbx-edit-row">
                     <form #details="ngForm">
                       <label class="cpbx-field cpbx-field--sm">
-<span class="cpbx-label">Log-leg</span>
+<span class="cpbx-label">{{ 'configuration.logLeg' | transloco }}</span>
 <input name="log-leg" [(ngModel)]="table.log_leg" [disabled]="!table.enabled" [name]="'tableLogLeg' + table.id" placeholder="Log-leg" class="cpbx-input">
 </label>
                         <button class="cpbx-button cpbx-button--primary" type="button"
                           [disabled]="!isReadyToSendOne(details.controls['tableLogLeg' + table.id])"
-                          (click)="updateTable(table)">
-                          Update
-                        </button>
+                          (click)="updateTable(table)">{{ 'common.actions.update' | transloco }}</button>
                       </form>
                     </div>
                   }
-                  <h3>Fields:</h3>
+                  <h3>{{ 'configuration.fields' | transloco }}:</h3>
                   <app-key-value-pad-2 [exist]="table.fields"
                     [items]="table.fields"
                     [newItems]="table.fields?.new"
@@ -72,31 +70,27 @@
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
         <form class="cpbx-form-panel" (ngSubmit)="onTableSubmit()">
           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
+<span class="cpbx-label">{{ 'common.fields.name' | transloco }}</span>
 <input placeholder="New table name" required name="name" [(ngModel)]="newTableName" class="cpbx-input">
 </label>
-          <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+          <button class="cpbx-button cpbx-button--primary" type="submit">{{ 'common.actions.submit' | transloco }}</button>
         </form>
       </div>
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 2">
         <form class="cpbx-form-panel cpbx-form-panel--stack" #deleteForm="ngForm">
           @if (list().tables) {
             <div>
-              <h3 class="cpbx-form-title">Tables</h3>
+              <h3 class="cpbx-form-title">{{ 'configuration.tables' | transloco }}</h3>
               @for (table of onlyValues(list().tables); track table) {
                 <div class="cpbx-edit-row">
                   <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Table name</span>
+<span class="cpbx-label">{{ 'configuration.tableName' | transloco }}</span>
 <input name="Table name" required [ngModel]="table.name" [name]="'Table::' + table.id" placeholder="Table name" class="cpbx-input">
 </label>
                     <button class="cpbx-button cpbx-button--primary" type="button" [disabled]="checkDirty(deleteForm.controls['Table::' + table.id])"
-                      (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'rename')">
-                      Update
-                    </button>
+                      (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'rename')">{{ 'common.actions.update' | transloco }}</button>
                     <button class="cpbx-button cpbx-button--danger-outline" type="button"
-                      (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'delete')">
-                      Delete
-                    </button>
+                      (click)="openBottomSheetTable(table.id, deleteForm.controls['Table::' + table.id].value, table.name, 'delete')">{{ 'common.actions.delete' | transloco }}</button>
                   </div>
                 }
               </div>

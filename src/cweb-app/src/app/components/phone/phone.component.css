@@ -79,6 +79,12 @@
   width: 44px;
 }
 
+.phone-header-action:hover,
+.phone-header-action:focus-visible {
+  background: rgba(255, 255, 255, .14);
+  color: #ffffff;
+}
+
 .phone-header-action app-icon {
   font-size: 28px;
 }

@@ -1,11 +1,12 @@
-<app-inner-header name="Users Panel" [loadCounter]="loadCounter()"></app-inner-header>
+<app-inner-header name="Users Panel" translationKey="navigation.usersPanel" [loadCounter]="loadCounter()"></app-inner-header>
 
 <app-tab-nav ariaLabel="Users panel sections" [tabs]="['Directory', 'Callcenter']"
+  [tabKeys]="['navigation.directory', 'navigation.callcenter']"
   [(selectedIndex)]="selectedIndex" (selectedIndexChange)="mainTabChanged($event)"></app-tab-nav>
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
     <div class="filter-container users-panel-filters">
       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Domain</span>
+<span class="cpbx-label">{{ 'common.fields.domain' | transloco }}</span>
 <select class="cpbx-select" required [(ngModel)]="domainIds" multiple>
           @for (domain of list() | keyvalue; track domain) {
             <option [ngValue]="domain.key">{{ domain.value.name }}</option>
@@ -14,7 +15,7 @@
 </label>
 
       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Status</span>
+<span class="cpbx-label">{{ 'monitoring.status' | transloco }}</span>
 <select class="cpbx-select" required [(ngModel)]="chosenUserStatuses" multiple>
           @for (status of userStatuses; track status) {
             <option [ngValue]="status">{{ status }}</option>
@@ -25,13 +26,13 @@
       <label class="cpbx-checkbox users-panel-checkbox">
         <input class="cpbx-checkbox__input" type="checkbox" [(ngModel)]="agentsListEnabled"
           (change)="agentsListChange()">
-        <span>Callcenter Statuses</span>
+        <span>{{ 'monitoring.callcenterStatuses' | transloco }}</span>
       </label>
 
       @if (agentsListEnabled) {
         <label class="cpbx-checkbox users-panel-checkbox">
           <input class="cpbx-checkbox__input" type="checkbox" [(ngModel)]="agentsListOnly">
-          <span>Show only with agents</span>
+          <span>{{ 'monitoring.onlyWithAgents' | transloco }}</span>
         </label>
       }
     </div>
@@ -40,7 +41,7 @@
       @for (domain of domainFilter() | keyvalue; track trackByFnId($index, domain)) {
         <section class="cpbx-card users-section-card">
           <header class="cpbx-card__header users-section-header">
-            <p class="cpbx-card__subtitle">Domain</p>
+            <p class="cpbx-card__subtitle">{{ 'common.fields.domain' | transloco }}</p>
             <h3 class="cpbx-card__title">{{ domain.value.name }}</h3>
           </header>
 
@@ -83,7 +84,7 @@
                   <button class="connect-button cpbx-button cpbx-button--secondary"
                     [disabled]="!user['talking'] && !user['in_call'] && !(user['sip_register'] || user['verto_register']) || !phoneStatus() || phoneUser() === user.name"
                     (click)="connectToUser(user, domain.value.name)">
-                    Connect
+                    {{ 'monitoring.connect' | transloco }}
                   </button>
                 </footer>
               </section>
@@ -97,7 +98,7 @@
   <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
     <div class="filter-container users-panel-filters">
       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Queue</span>
+<span class="cpbx-label">{{ 'ui.queue' | transloco }}</span>
 <select class="cpbx-select" required [(ngModel)]="queueIds" multiple>
           @for (queue of queuesList() | keyvalue; track queue) {
             <option [ngValue]="queue.key">{{ queue.value.name }}</option>
@@ -106,7 +107,7 @@
 </label>
 
       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Status</span>
+<span class="cpbx-label">{{ 'monitoring.status' | transloco }}</span>
 <select class="cpbx-select" required [(ngModel)]="chosenAgentStatuses" multiple>
           @for (status of agentStatuses; track status) {
             <option [ngValue]="status">{{ status }}</option>
@@ -119,7 +120,7 @@
       @for (queue of queueFilter() | keyvalue; track trackByFnId($index, queue)) {
         <section class="cpbx-card users-section-card">
           <header class="cpbx-card__header users-section-header">
-            <p class="cpbx-card__subtitle">Queue</p>
+            <p class="cpbx-card__subtitle">{{ 'ui.queue' | transloco }}</p>
             <h3 class="cpbx-card__title">{{ queue.value.name }}</h3>
           </header>
 
@@ -149,7 +150,7 @@
 
                 <footer class="cpbx-card__actions action-pad">
                   <button class="connect-button cpbx-button cpbx-button--secondary">
-                    Connect
+                    {{ 'monitoring.connect' | transloco }}
                   </button>
                 </footer>
               </section>

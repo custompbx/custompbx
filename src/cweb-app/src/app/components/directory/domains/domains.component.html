@@ -1,5 +1,6 @@
-<app-inner-header name="Domains" [loadCounter]="loadCounter()"></app-inner-header>
-<app-tab-nav ariaLabel="Domain sections" [tabs]="['List', 'Add', 'Delete/Rename']"
+<app-inner-header name="Domains" translationKey="navigation.domains" [loadCounter]="loadCounter()"></app-inner-header>
+<app-tab-nav ariaLabelKey="directory.domainSections" [tabs]="['List', 'Add', 'Delete/Rename']"
+  [tabKeys]="['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename']"
   [(selectedIndex)]="selectedIndex"></app-tab-nav>
 <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 0">
     @if (loadCounter() === 0 && !onlyValues(domainsList())?.length) {
@@ -7,12 +8,12 @@
         <div class="cpbx-card__content">
           <div class="domains-empty">
             <div>
-              <h3>No domains yet</h3>
-              <p>Create a domain or import an existing FreeSWITCH directory config.</p>
+              <h3>{{'directory.noDomains' | transloco}}</h3>
+              <p>{{'directory.createOrImportDomain' | transloco}}</p>
             </div>
           <button class="switch-button cpbx-button cpbx-button--secondary"
             (click)="importDirectory()">
-            Import
+            {{'common.actions.import' | transloco}}
           </button>
           </div>
         </div>
@@ -20,20 +21,20 @@
     }
     @if (onlyValues(domainsList())?.length) {
       <section class="cpbx-card">
-        <header class="cpbx-card__header"><h2 class="cpbx-card__title">Domains</h2></header>
+        <header class="cpbx-card__header"><h2 class="cpbx-card__title">{{'navigation.domains' | transloco}}</h2></header>
         <div class="cpbx-card__content">
           <div class="domains-list">
             @for (domain of onlyValues(domainsList()); track trackByFnId($index, domain)) {
               <app-disclosure (opened)="getDetails(domain.id)" (closed)="clearDetails(domain.id)">
                 <span disclosureTitle>{{domain.name}}</span>
-                <span disclosureDescription>Click to get details</span>
+                <span disclosureDescription>{{'common.clickDetails' | transloco}}</span>
                 @if (listDetails()[domain.id] && (listDetails()[domain.id].parameters || listDetails()[domain.id].variables)) {
                   <button class="domains-copy-button cpbx-button cpbx-button--secondary" (click)="copy(domain.id)">
-                    Copy
+                    {{'common.actions.copy' | transloco}}
                   </button>
                 }
                 <section class="domains-detail-section">
-                  <h3>Parameters</h3>
+                  <h3>{{'common.parameters' | transloco}}</h3>
                   <app-key-value-pad [exist]="listDetails()[domain.id]"
                     [items]="listDetails()[domain.id]?.parameters"
                     [newItems]="listDetails()[domain.id]?.parameters?.new"
@@ -45,7 +46,7 @@
                   </app-key-value-pad>
                 </section>
                 <section class="domains-detail-section">
-                  <h3>Variables</h3>
+                  <h3>{{'common.variables' | transloco}}</h3>
                   <app-key-value-pad [exist]="listDetails()[domain.id]"
                     [items]="listDetails()[domain.id]?.variables"
                     [newItems]="listDetails()[domain.id]?.variables?.new"
@@ -66,21 +67,21 @@
 <div class="cpbx-tab-panel" [hidden]="selectedIndex !== 1">
     <form class="cpbx-form-panel" (ngSubmit)="onDomainSubmit()">
       <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Name</span>
-<input placeholder="New domain name" required name="name" [ngModel]="newDomainName()" (ngModelChange)="newDomainName.set($event)" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.name' | transloco}}</span>
+<input [placeholder]="'directory.newDomainName' | transloco" required name="name" [ngModel]="newDomainName()" (ngModelChange)="newDomainName.set($event)" class="cpbx-input">
 </label>
-      <button class="cpbx-button cpbx-button--primary" type="submit">Submit</button>
+      <button class="cpbx-button cpbx-button--primary" type="submit">{{'common.actions.submit' | transloco}}</button>
     </form>
     <section class="cpbx-card"><div class="cpbx-card__content">
         <button class="switch-button spacer-bottom cpbx-button cpbx-button--secondary"
           [disabled]="!XMLBody"
           (click)="ImportXMLDomain()"
           >
-          Import
+          {{'common.actions.import' | transloco}}
         </button>
         <app-disclosure (opened)="initEditor()">
-          <span disclosureTitle>XML editor</span>
-          <span disclosureDescription>Click to get details</span>
+          <span disclosureTitle>{{'common.xmlEditor' | transloco}}</span>
+          <span disclosureDescription>{{'common.clickDetails' | transloco}}</span>
           @if (editorInited) {
             <app-code-editor [(content)]="XMLBody"></app-code-editor>
           }
@@ -92,28 +93,28 @@
       @for (domain of onlyValues(domainsList()); track trackByFnId($index, domain)) {
         <div class="cpbx-edit-row">
           <label class="cpbx-field cpbx-field--md">
-<span class="cpbx-label">Domain name</span>
-<input placeholder="domain name" required [ngModel]="domain.name" [name]="'domain::' + domain.id" class="cpbx-input">
+<span class="cpbx-label">{{'common.fields.domainName' | transloco}}</span>
+<input [placeholder]="'common.fields.domainName' | transloco" required [ngModel]="domain.name" [name]="'domain::' + domain.id" class="cpbx-input">
 </label>
             <button class="cpbx-button cpbx-button--primary" [disabled]="checkDirty(deleteForm.controls['domain::' + domain.id])"
               (click)="openBottomSheet(domain.id, deleteForm.controls['domain::' + domain.id].value, domain.name, 'rename')">
-              Update
+              {{'common.actions.update' | transloco}}
             </button>
             @if (domain.enabled) {
               <button class="switch-button cpbx-button cpbx-button--secondary"
                 (click)="switchDomain(domain)">
-                Disable
+                {{'common.actions.disable' | transloco}}
               </button>
             }
             @if (!domain.enabled) {
               <button class="switch-button cpbx-button cpbx-button--primary-outline"
                 (click)="switchDomain(domain)">
-                Enable
+                {{'common.actions.enable' | transloco}}
               </button>
             }
             <button class="cpbx-button cpbx-button--danger-outline"
               (click)="openBottomSheet(domain.id, deleteForm.controls['domain::' + domain.id].value, domain.name, 'delete')">
-              Delete
+              {{'common.actions.delete' | transloco}}
             </button>
           </div>
         }

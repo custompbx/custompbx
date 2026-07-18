@@ -91,23 +91,23 @@ export function withOperationFeedback<T extends Action>(action: T, sourceType: s
   return kind ? {...action, operationFeedback: {kind, sourceType}} : action;
 }
 
-export function operationSuccessMessage(kind: OperationKind): string {
+export function operationSuccessKey(kind: OperationKind): string {
   switch (kind) {
-    case 'add': return 'Item added successfully.';
-    case 'delete': return 'Item removed successfully.';
-    case 'switch': return 'Status updated successfully.';
-    case 'import': return 'Import completed successfully.';
-    case 'paste': return 'Items pasted successfully.';
-    case 'rename': return 'Item renamed successfully.';
-    case 'move': return 'Order updated successfully.';
-    case 'reload': return 'Reload completed successfully.';
-    case 'unload': return 'Module unloaded successfully.';
-    case 'load': return 'Module loaded successfully.';
-    case 'autoload': return 'Autoload setting updated successfully.';
-    case 'clear': return 'Item cleared successfully.';
-    case 'truncate': return 'Configuration cleared successfully.';
-    case 'from-scratch': return 'Configuration created successfully.';
-    case 'send': return 'Command completed successfully.';
-    default: return 'Changes saved successfully.';
+    case 'add': return 'feedback.itemAdded';
+    case 'delete': return 'feedback.itemRemoved';
+    case 'switch': return 'feedback.statusUpdated';
+    case 'import': return 'feedback.importCompleted';
+    case 'paste': return 'feedback.itemsPasted';
+    case 'rename': return 'feedback.itemRenamed';
+    case 'move': return 'feedback.orderUpdated';
+    case 'reload': return 'feedback.reloadCompleted';
+    case 'unload': return 'feedback.moduleUnloaded';
+    case 'load': return 'feedback.moduleLoaded';
+    case 'autoload': return 'feedback.autoloadUpdated';
+    case 'clear': return 'feedback.itemCleared';
+    case 'truncate': return 'feedback.configurationCleared';
+    case 'from-scratch': return 'feedback.configurationCreated';
+    case 'send': return 'feedback.commandCompleted';
+    default: return 'feedback.changesSaved';
   }
 }

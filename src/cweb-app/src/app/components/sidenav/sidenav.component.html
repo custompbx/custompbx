@@ -3,15 +3,15 @@
     <a [routerLink]="[item.subMenu ? item.subMenu[0].route : item.route]"
       class="menu-rail-item"
       [class.menu-item-active]="item.subMenu ? isMenuSectionActive(item) : isRouteActive(item.route)"
-      [attr.title]="item.name"
-      [attr.aria-label]="item.name">
+      [attr.title]="item.name | transloco"
+      [attr.aria-label]="item.name | transloco">
       <app-icon [name]="item.icon"></app-icon>
     </a>
   } @else if (item.subMenu) {
     <details class="menu-panel" [class.menu-section-active]="isMenuSectionActive(item)" [open]="isMenuSectionActive(item)">
-      <summary class="mep-header" [attr.aria-label]="item.name + ' navigation section'">
+      <summary class="mep-header" [attr.aria-label]="(item.name | transloco) + ' ' + ('navigation.section' | transloco)">
         <span class="menu-title">
-          <app-icon class="icon-spacer menu-name-1 menu-name-2" [name]="item.icon"></app-icon><span class="menu-name-2">{{item.name}}</span>
+          <app-icon class="icon-spacer menu-name-1 menu-name-2" [name]="item.icon"></app-icon><span class="menu-name-2">{{item.name | transloco}}</span>
         </span>
         <span class="menu-chevron" aria-hidden="true"></span>
       </summary>
@@ -19,17 +19,17 @@
         @for (subItem of item.subMenu; track subItem.route) {
           <a [routerLink]="[subItem.route]" class="menu-sub-item" [class.menu-item-active]="isRouteActive(subItem.route)"
             [attr.aria-current]="isRouteActive(subItem.route) ? 'page' : null"
-            [attr.aria-label]="subItem.name">
-            <span class="menu-sub-name-2">{{subItem.name}}</span>
+            [attr.aria-label]="subItem.name | transloco">
+            <span class="menu-sub-name-2">{{subItem.name | transloco}}</span>
           </a>
         }
       </div>
     </details>
   } @else {
     <a [routerLink]="[item.route]" class="menu-item" [class.menu-item-active]="isRouteActive(item.route)"
-      [attr.aria-current]="isRouteActive(item.route) ? 'page' : null" [attr.aria-label]="item.name">
+      [attr.aria-current]="isRouteActive(item.route) ? 'page' : null" [attr.aria-label]="item.name | transloco">
       <app-icon class="icon-spacer" [name]="item.icon"></app-icon>
-      <span class="menu-name-2">{{item.name}}</span>
+      <span class="menu-name-2">{{item.name | transloco}}</span>
     </a>
   }
 }

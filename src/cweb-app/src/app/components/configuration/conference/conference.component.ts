@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, computed, effect } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, computed, effect} from '@angular/core';
 import { CommonModule } from "@angular/common";
 import { toSignal } from '@angular/core/rxjs-interop'; // Import for signal conversion
 import {Iconference, Iitem, State} from '../../../store/config/config.state.struct';
@@ -8,6 +8,7 @@ import { AbstractControl, FormsModule } from '@angular/forms';
 import {ConfirmationService} from '../../../services/confirmation.service';
 import {ToastService} from '../../../services/toast.service';
 import { ActivatedRoute } from '@angular/router';
+import {TranslocoPipe} from '@jsverse/transloco';
 import {
   AddConferenceProfile,
   AddConferenceProfileParameter,
@@ -70,19 +71,20 @@ import {
   DelConferenceLayout,
   UpdateConferenceLayout, DelConferenceLayoutGroup, UpdateConferenceLayoutGroup, UpdateConferenceLayout3D,
 } from '../../../store/config/conference/config.actions.conference';
-import { InnerHeaderComponent } from "../../inner-header/inner-header.component";
-import { ModuleNotExistsBannerComponent } from "../module-not-exists-banner/module-not-exists-banner.component";
 import {KeyValuePad2Component} from "../../key-value-pad-2/key-value-pad-2.component";
 import {CpbxSelectDirective} from '../../../directives/cpbx-select.directive';
 import {TabNavComponent} from '../../tab-nav/tab-nav.component';
 import {DisclosureComponent} from '../../disclosure/disclosure.component';
+import {ConfigPageShellComponent} from '../config-page-shell/config-page-shell.component';
+import {CpbxTabPanelDirective} from '../../../directives/cpbx-tab-panel.directive';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, InnerHeaderComponent, ModuleNotExistsBannerComponent, KeyValuePad2Component, CpbxSelectDirective, TabNavComponent, DisclosureComponent],
+  imports: [CommonModule, FormsModule, ConfigPageShellComponent, KeyValuePad2Component, CpbxSelectDirective, TabNavComponent, CpbxTabPanelDirective, DisclosureComponent, TranslocoPipe],
   selector: 'app-conference',
   templateUrl: './conference.component.html',
-  styleUrls: ['./conference.component.css']
+  styleUrls: ['./conference.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConferenceComponent implements OnInit, OnDestroy {
 
@@ -123,6 +125,9 @@ export class ConferenceComponent implements OnInit, OnDestroy {
   public selectedIndex: number = 0;
   public mainSectionIndex: number = 0;
   public conferenceTabIndex: number = 0;
+  readonly mainTabs = ['Conference', 'Conference layouts'];
+  readonly conferenceTabs = ['List', 'Add', 'Delete/Rename'];
+  readonly conferenceTabKeys = ['common.tabs.list', 'common.tabs.add', 'common.tabs.deleteRename'];
   public profileId: number = 0;
   public controlGroupId: number = 0;
   public chatPermissionId: number = 0;
@@ -410,9 +415,7 @@ export class ConferenceComponent implements OnInit, OnDestroy {
       return;
     }
     this.toCopyGroup = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   pasteCallerControls(to: number) {
@@ -449,9 +452,7 @@ export class ConferenceComponent implements OnInit, OnDestroy {
       return;
     }
     this.toCopyProfile = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   pasteProfileParams(to: number) {
@@ -580,9 +581,7 @@ export class ConferenceComponent implements OnInit, OnDestroy {
       return;
     }
     this.toCopylayoutImage = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   copyLayoutGroup(key) {
@@ -591,9 +590,7 @@ export class ConferenceComponent implements OnInit, OnDestroy {
       return;
     }
     this.toCopylayoutGroup = key;
-    this._snackBar.open('Copied!', null, {
-      duration: 700,
-    });
+    this._snackBar.copied();
   }
 
   storeNewConferenceLayoutImage(parentId: number) {

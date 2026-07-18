@@ -1,0 +1,23 @@
+<app-inner-header [name]="name()" [loadCounter]="loadCounter()" />
+<app-module-not-exists-banner [list]="module()" />
+@if (module() && module().exists !== false) {
+  <section class="cpbx-card simple-config-page__settings">
+    <header class="cpbx-card__header">
+      <div class="cpbx-card__subtitle">{{sectionTitleKey() | transloco}}</div>
+    </header>
+    <div class="cpbx-card__content">
+      <h3>{{contentTitleKey() | transloco}}:</h3>
+      <app-key-value-pad-2
+        [exist]="collection()"
+        [items]="collection()"
+        [newItems]="newItems()"
+        [id]="null"
+        [toCopy]="null"
+        [dispatchersCallbacks]="dispatchersCallbacks()"
+        [fieldsMask]="fieldsMask()"
+        [pending]="pending()"
+        [sortable]="sortable()"
+      />
+    </div>
+  </section>
+}

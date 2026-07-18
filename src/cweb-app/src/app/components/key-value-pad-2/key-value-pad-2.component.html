@@ -3,11 +3,11 @@
     @if (showFilter(items)) {
       <div class="kv-toolbar" [class.kv-toolbar--with-handle]="sortable">
         <label class="kv-search">
-          <span class="kv-search-label">Filter items</span>
+          <span class="kv-search-label">{{'common.filterItems' | transloco}}</span>
           <input class="kv-search-input" type="search" [(ngModel)]="filterText" [ngModelOptions]="{standalone: true}"
-            placeholder="Search name, value, or id">
+            [placeholder]="'common.searchItems' | transloco">
         </label>
-        <span class="kv-count">{{ visibleItemCount(items) }} / {{ totalItemCount(items) }} shown</span>
+        <span class="kv-count">{{'common.itemsShown' | transloco: {visible: visibleItemCount(items), total: totalItemCount(items)} }}</span>
       </div>
     }
 
@@ -18,7 +18,7 @@
           <section class="kv-row" [class.kv-row--dirty]="isRowDirty(form, item.id)" cdkDrag [cdkDragDisabled]="!sortable">
             <div class="kv-row-main">
               @if (sortable) {
-                <button class="kv-drag-handle" type="button" cdkDragHandle aria-label="Move item">::</button>
+                <button class="kv-drag-handle" type="button" cdkDragHandle [attr.aria-label]="'common.moveItem' | transloco">::</button>
               }
               @for (field of fieldConfigs(); track field.slot) {
                 <label class="kv-field" [ngClass]="fieldClass(field)" [ngStyle]="field.style">
@@ -54,12 +54,12 @@
                   <button class="kv-button kv-button--primary" type="button"
                     [disabled]="pending || !canSaveExistingForm(form, item)"
                     (click)="saveExistingFromForm(form, item)">
-                    Save
+                    {{'common.actions.save' | transloco}}
                   </button>
                   <button class="kv-button kv-button--ghost" type="button"
                     [disabled]="pending"
                     (click)="resetItemForm(form, item)">
-                    Reset
+                    {{'common.actions.reset' | transloco}}
                   </button>
                 }
 
@@ -68,20 +68,20 @@
                     <button class="kv-button kv-button--disable" type="button"
                       [disabled]="pending"
                       (click)="switchItem(item)">
-                      Disable
+                      {{'common.actions.disable' | transloco}}
                     </button>
                   }
                   @if (!item.enabled) {
                     <button class="kv-button kv-button--enable" type="button"
                       [disabled]="pending"
                       (click)="switchItem(item)">
-                      Enable
+                      {{'common.actions.enable' | transloco}}
                     </button>
                   }
                   <button class="kv-button kv-button--danger" type="button"
                     [disabled]="pending"
                     (click)="confirmDeleteItem(item)">
-                    Delete
+                    {{'common.actions.delete' | transloco}}
                   </button>
                 }
               </div>
@@ -91,7 +91,7 @@
       }
 
       @if (hasNewItems()) {
-        <div class="kv-draft-title">Draft items</div>
+        <div class="kv-draft-title">{{'common.draftItems' | transloco}}</div>
       }
       @if (newItems) {
         @for (item of newItems; track item; let i = $index) {
@@ -133,12 +133,12 @@
                   <button class="kv-button kv-button--primary" type="button"
                     [disabled]="pending || !canAddNewForm(form, i)"
                     (click)="addNewFromForm(form, i)">
-                    Save
+                    {{'common.actions.save' | transloco}}
                   </button>
                   <button class="kv-button kv-button--ghost-danger" type="button"
                     [disabled]="pending"
                     (click)="dropNewItem(i)">
-                    Cancel
+                    {{'common.actions.cancel' | transloco}}
                   </button>
                 </div>
               </div>
@@ -149,19 +149,19 @@
     </form>
 
     @if (hasItems(items) && visibleItemCount(items) === 0) {
-      <div class="kv-empty-state">No items match this filter.</div>
+      <div class="kv-empty-state">{{'common.noMatchingItems' | transloco}}</div>
     }
     @if (!hasItems(items)) {
-      <div class="kv-empty-state">No items yet. Add the first one below.</div>
+      <div class="kv-empty-state">{{'common.noItemsYet' | transloco}}</div>
     }
 
     <div class="kv-footer-actions" [class.kv-footer-actions--with-handle]="sortable">
       <button class="kv-button kv-button--accent" type="button" [disabled]="pending" (click)="addNewItemField()">
-        + Add item
+        {{'common.actions.addItem' | transloco}}
       </button>
       @if (toCopy && toCopy !== id) {
         <button class="kv-button kv-button--primary" type="button" [disabled]="pending" (click)="pasteItems()">
-          Paste
+          {{'common.actions.paste' | transloco}}
         </button>
       }
     </div>
