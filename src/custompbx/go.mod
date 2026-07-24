@@ -6,17 +6,17 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/custompbx/customorm v0.0.0-20240604205339-ef13a8616d01
 	github.com/custompbx/hepparser v0.0.0-20221125161844-0d40e7556a5c
-	github.com/go-chi/chi/v5 v5.2.0
+	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-chi/render v1.0.3
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/jackc/pgx/v5 v5.10.0
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.12.3
 	github.com/pion/turn/v4 v4.1.4
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/zusrut/fsock v0.0.0-20200207174906-02bc1fd2a8d6
-	golang.org/x/crypto v0.32.0
-	golang.org/x/net v0.34.0
+	golang.org/x/crypto v0.54.0
+	golang.org/x/net v0.56.0
 )
 
 require (
@@ -41,6 +41,6 @@ require (
 	github.com/tklauser/numcpus v0.9.0 // indirect
 	github.com/wlynxg/anet v0.0.5 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 )
