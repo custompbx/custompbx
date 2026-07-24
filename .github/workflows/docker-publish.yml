@@ -19,10 +19,10 @@ jobs:
     if: github.repository == 'custompbx/custompbx' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -30,7 +30,7 @@ jobs:
 
       - name: Generate image tags
         id: metadata
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/custompbx/custompbx
           tags: |
@@ -38,7 +38,7 @@ jobs:
             type=ref,event=tag
 
       - name: Build and push CustomPBX
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/Dockerfile
@@ -50,10 +50,10 @@ jobs:
     if: github.repository == 'custompbx/custompbx'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -61,7 +61,7 @@ jobs:
 
       - name: Generate image tags
         id: metadata
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/custompbx/freeswitch
           tags: |
@@ -69,7 +69,7 @@ jobs:
             type=ref,event=tag
 
       - name: Build and push FreeSWITCH
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/fs.Dockerfile
