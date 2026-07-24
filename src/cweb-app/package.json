@@ -40,8 +40,8 @@
     "vertojs": "^0.0.5"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "21.2.18",
-    "@angular/cli": "21.2.18",
+    "@angular-devkit/build-angular": "21.2.19",
+    "@angular/cli": "21.2.19",
     "@angular/compiler-cli": "21.2.18",
     "@angular/language-service": "21.2.18",
     "@tailwindcss/postcss": "^4.3.2",
