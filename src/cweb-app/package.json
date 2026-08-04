@@ -57,7 +57,7 @@
     "tailwindcss": "^4.3.2",
     "ts-node": "~10.9.1",
     "typescript": "5.9.3",
-    "zone.js": "^0.15.1"
+    "zone.js": "^0.16.2"
   },
   "overrides": {
     "http-proxy-middleware": "3.0.7"
